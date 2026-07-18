@@ -6,7 +6,7 @@ import pytest
 import torch
 from ase import Atoms
 
-from atombit_batch import (
+from batch_mlip import (
     BatchCalculator,
     BatchedFIRE,
     BatchedGradientDescent,

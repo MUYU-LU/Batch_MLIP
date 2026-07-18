@@ -4,14 +4,15 @@ import importlib
 import pickle
 
 import atombit_batch
-from atombit_batch.core.calculator import BatchCalculator
-from atombit_batch.core.state import AseGraphBatch
-from atombit_batch.interfaces.api import relax
-from atombit_batch.models.loaders import build_model
-from atombit_batch.models.mace import MACEBatchCalculator
-from atombit_batch.models.potential import BatchedPotential
-from atombit_batch.models.toy_models import QuadraticWellModel
-from atombit_batch.optimization.registry import BatchedBFGS
+import batch_mlip
+from batch_mlip.core.calculator import BatchCalculator
+from batch_mlip.core.state import AseGraphBatch
+from batch_mlip.interfaces.api import relax
+from batch_mlip.models.loaders import build_model
+from batch_mlip.models.mace import MACEBatchCalculator
+from batch_mlip.models.potential import AtomBitBatchCalculator
+from batch_mlip.models.toy_models import QuadraticWellModel
+from batch_mlip.optimization.registry import BatchedBFGS
 
 LEGACY_MODULES = {
     "api": "interfaces.api",
@@ -35,29 +36,51 @@ LEGACY_MODULES = {
 
 
 def test_root_public_symbols_keep_their_new_canonical_identities():
-    assert atombit_batch.BatchCalculator is BatchCalculator
-    assert atombit_batch.AseGraphBatch is AseGraphBatch
-    assert atombit_batch.BatchedPotential is BatchedPotential
-    assert atombit_batch.BatchedBFGS is BatchedBFGS
-    assert atombit_batch.MACEBatchCalculator is MACEBatchCalculator
+    assert batch_mlip.BatchCalculator is BatchCalculator
+    assert batch_mlip.AseGraphBatch is AseGraphBatch
+    assert batch_mlip.AtomBitBatchCalculator is AtomBitBatchCalculator
+    assert batch_mlip.BatchedBFGS is BatchedBFGS
+    assert batch_mlip.MACEBatchCalculator is MACEBatchCalculator
+    assert callable(batch_mlip.MACEBatchCalculator.from_off)
+    assert batch_mlip.relax is relax
+
+
+def test_pre_rename_root_symbols_are_compatibility_aliases():
+    assert atombit_batch.AtomBitBatchCalculator is AtomBitBatchCalculator
+    assert atombit_batch.BatchedPotential is AtomBitBatchCalculator
+    assert batch_mlip.BatchedPotential is AtomBitBatchCalculator
+    assert atombit_batch.FrechetCellFilter is batch_mlip.FrechetCellFilter
+    assert atombit_batch.BatchedFrechetCellFilter is batch_mlip.FrechetCellFilter
     assert atombit_batch.relax is relax
 
 
 def test_all_legacy_module_paths_alias_canonical_modules():
     for legacy_name, canonical_name in LEGACY_MODULES.items():
-        legacy = importlib.import_module(f"atombit_batch.{legacy_name}")
-        canonical = importlib.import_module(f"atombit_batch.{canonical_name}")
+        legacy = importlib.import_module(f"batch_mlip.{legacy_name}")
+        canonical = importlib.import_module(f"batch_mlip.{canonical_name}")
         assert legacy is canonical
-        assert getattr(atombit_batch, legacy_name) is canonical
+        assert getattr(batch_mlip, legacy_name) is canonical
+
+        old_namespace = importlib.import_module(f"atombit_batch.{legacy_name}")
+        old_canonical = importlib.import_module(f"atombit_batch.{canonical_name}")
+        assert old_namespace is canonical
+        assert old_canonical is canonical
 
 
-def test_legacy_yaml_factory_path_still_builds_a_model():
+def test_new_and_legacy_yaml_factory_paths_build_models():
     model = build_model(
-        "atombit_batch.toy_models:build_quadratic_model",
+        "batch_mlip.toy_models:build_quadratic_model",
         {"k": 2.0},
     )
     assert isinstance(model, QuadraticWellModel)
     assert model.k == 2.0
+
+    legacy_model = build_model(
+        "atombit_batch.toy_models:build_quadratic_model",
+        {"k": 4.0},
+    )
+    assert isinstance(legacy_model, QuadraticWellModel)
+    assert legacy_model.k == 4.0
 
 
 def test_legacy_serialized_model_path_remains_loadable():

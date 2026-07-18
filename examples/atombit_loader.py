@@ -6,7 +6,7 @@ from pathlib import Path
 
 import torch
 import yaml
-from atombit_batch.loaders import load_full_torch_model
+from batch_mlip.loaders import load_full_torch_model
 
 from src.model import AtomBitModel
 from src.utils import AtomBitConfig

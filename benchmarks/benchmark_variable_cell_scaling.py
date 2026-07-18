@@ -14,7 +14,7 @@ from typing import Any
 import numpy as np
 import torch
 from ase.calculators.calculator import all_changes
-from ase.filters import FrechetCellFilter
+from ase.filters import FrechetCellFilter as ASEFrechetCellFilter
 from ase.io import read
 from ase.optimize import BFGS, FIRE
 
@@ -31,9 +31,9 @@ from benchmark_production import (  # noqa: E402
     write_result,
 )
 
-from atombit_batch import (  # noqa: E402
-    BatchedFrechetCellFilter,
-    BatchedPotential,
+from batch_mlip import (  # noqa: E402
+    AtomBitBatchCalculator,
+    FrechetCellFilter,
     batched_bfgs_relax,
     batched_fire_relax,
 )
@@ -113,7 +113,7 @@ def run_ase(
     for source in systems:
         atoms = source.copy()
         atoms.calc = calculator
-        cell_filter = FrechetCellFilter(atoms)
+        cell_filter = ASEFrechetCellFilter(atoms)
         if optimizer_name == "fire":
             optimizer = FIRE(
                 cell_filter,
@@ -175,7 +175,7 @@ def run_batch(
     optimizer_dtype: str | None,
     model_dtype: torch.dtype,
 ) -> dict[str, Any]:
-    calculator = BatchedPotential(
+    calculator = AtomBitBatchCalculator(
         model,
         cutoff=cutoff,
         skin=skin,
@@ -194,7 +194,7 @@ def run_batch(
         chunk = systems[start : start + batch_size]
         state = calculator.create_state(chunk)
         common = {
-            "cell_filter": BatchedFrechetCellFilter(),
+            "cell_filter": FrechetCellFilter(),
             "active_compaction": active_compaction,
             "fmax": fmax,
             "smax": None,
@@ -408,7 +408,7 @@ def main() -> None:
     write_result(args.output, result)
 
     # Warm model and stress/autograd paths before timing.
-    warm_calculator = BatchedPotential(
+    warm_calculator = AtomBitBatchCalculator(
         model,
         cutoff=args.cutoff,
         device=device,

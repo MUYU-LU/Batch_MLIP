@@ -5,15 +5,15 @@ import torch
 from ase import Atoms
 from ase.build import bulk
 from ase.calculators.lj import LennardJones
-from ase.filters import FrechetCellFilter
+from ase.filters import FrechetCellFilter as ASEFrechetCellFilter
 from ase.optimize import FIRE
-from atombit_batch.filters import GPA_TO_EV_PER_A3
-from atombit_batch.toy_models import PairHarmonicModel
+from batch_mlip.filters import GPA_TO_EV_PER_A3
+from batch_mlip.toy_models import PairHarmonicModel
 
-from atombit_batch import (
+from batch_mlip import (
     ASECalculatorAdapter,
-    BatchedFrechetCellFilter,
-    BatchedPotential,
+    AtomBitBatchCalculator,
+    FrechetCellFilter,
     batched_fire_relax,
 )
 
@@ -30,7 +30,7 @@ def test_graph_model_stress_matches_finite_difference_strain():
     atoms = Atoms(
         "H3", positions=positions.numpy(), cell=cell.numpy(), pbc=True
     )
-    calculator = BatchedPotential(
+    calculator = AtomBitBatchCalculator(
         PairHarmonicModel(k=2.0, r0=1.4, cutoff=3.5),
         cutoff=3.5,
         device="cpu",
@@ -85,7 +85,7 @@ def _ase_frechet_fire(
     reference = atoms.copy()
     reference.calc = _lj_calculator()
     optimizer = FIRE(
-        FrechetCellFilter(
+        ASEFrechetCellFilter(
             reference,
             hydrostatic_strain=hydrostatic,
             scalar_pressure=pressure_GPa * GPA_TO_EV_PER_A3,
@@ -107,7 +107,7 @@ def test_batched_hydrostatic_frechet_fire_matches_individual_ase():
     result = batched_fire_relax(
         calculator.create_state(systems),
         calculator,
-        cell_filter=BatchedFrechetCellFilter(hydrostatic_strain=True),
+        cell_filter=FrechetCellFilter(hydrostatic_strain=True),
         fmax=2e-5,
         smax=None,
         max_steps=500,
@@ -144,7 +144,7 @@ def test_batched_anisotropic_frechet_fire_matches_ase():
     result = batched_fire_relax(
         calculator.create_state([atoms]),
         calculator,
-        cell_filter=BatchedFrechetCellFilter(),
+        cell_filter=FrechetCellFilter(),
         fmax=2e-5,
         smax=None,
         max_steps=500,
@@ -177,7 +177,7 @@ def test_external_compressive_pressure_matches_ase_enthalpy_force():
     result = batched_fire_relax(
         calculator.create_state([atoms]),
         calculator,
-        cell_filter=BatchedFrechetCellFilter(
+        cell_filter=FrechetCellFilter(
             pressure_GPa=1.0, hydrostatic_strain=True
         ),
         fmax=2e-5,
@@ -224,7 +224,7 @@ def test_variable_cell_active_compaction_matches_masked_trajectory_and_reduces_w
         result = batched_fire_relax(
             calculator.create_state(systems),
             calculator,
-            cell_filter=BatchedFrechetCellFilter(
+            cell_filter=FrechetCellFilter(
                 pressure_GPa=[0.0, 0.2, 0.5],
                 cell_factor=[4.0, 6.0, 8.0],
                 hydrostatic_strain=True,

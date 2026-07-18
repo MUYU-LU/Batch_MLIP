@@ -16,9 +16,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from benchmark_production import load_manifest, load_production_model  # noqa: E402
 
-from atombit_batch import (  # noqa: E402
-    BatchedFrechetCellFilter,
-    BatchedPotential,
+from batch_mlip import (  # noqa: E402
+    AtomBitBatchCalculator,
+    FrechetCellFilter,
     batched_fire_relax,
 )
 
@@ -47,7 +47,7 @@ def main() -> None:
     names = manifest["samples"][str(args.atom_count)][: args.sample_count]
     systems = [read(args.dataset_dir / name) for name in names]
     model, checkpoint_metadata = load_production_model(args.checkpoint)
-    calculator = BatchedPotential(
+    calculator = AtomBitBatchCalculator(
         model,
         cutoff=6.0,
         skin=0.0,
@@ -88,7 +88,7 @@ def main() -> None:
     relaxation = batched_fire_relax(
         batch_state,
         calculator,
-        cell_filter=BatchedFrechetCellFilter(hydrostatic_strain=True),
+        cell_filter=FrechetCellFilter(hydrostatic_strain=True),
         active_compaction=True,
         # Fixed thresholds make the first manifest sample converge at step 0
         # while the second remains active, exercising real state compaction.

@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import torch
 from ase import Atoms
-from atombit_batch.toy_models import QuadraticWellModel
+from batch_mlip.toy_models import QuadraticWellModel
 
-from atombit_batch import AseGraphBatch, BatchedPotential
+from batch_mlip import AseGraphBatch, AtomBitBatchCalculator
 
 
 def test_skin_avoids_unnecessary_rebuilds():
@@ -15,7 +15,7 @@ def test_skin_avoids_unnecessary_rebuilds():
         device="cpu",
         dtype=torch.float64,
     )
-    potential = BatchedPotential(
+    potential = AtomBitBatchCalculator(
         QuadraticWellModel(), device="cpu", dtype=torch.float64
     )
     assert state.neighbor_rebuild_count == 1

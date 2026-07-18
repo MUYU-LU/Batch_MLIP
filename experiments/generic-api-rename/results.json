@@ -1,0 +1,37 @@
+{
+  "baseline_commit": "9df0b10056204d51312f3547532ac0d97099e157",
+  "candidate_version": "0.2.0",
+  "numerical_kernels_changed": false,
+  "checks": {
+    "ruff": "passed",
+    "pytest": {
+      "passed": 41,
+      "failed": 0
+    },
+    "batch_vs_single_validation": {
+      "passed": true,
+      "systems": 3,
+      "atoms": 9,
+      "cross_system_edges": false,
+      "max_abs_energy_error": 0.0,
+      "max_abs_force_error": 0.0
+    },
+    "wheel": {
+      "filename": "batch_mlip-0.2.0-py3-none-any.whl",
+      "isolated_import_smoke": "passed",
+      "console_scripts": [
+        "batch-mlip",
+        "atombit-batch"
+      ]
+    },
+    "mace_off_small": {
+      "constructor": "MACEBatchCalculator.from_off",
+      "device": "cuda:0",
+      "dtype": "torch.float64",
+      "systems": 1,
+      "atoms": 2,
+      "finite_energy_and_forces": true
+    }
+  },
+  "performance_measurement": "not applicable; public naming and packaging only"
+}

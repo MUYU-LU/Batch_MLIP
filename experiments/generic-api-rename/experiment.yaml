@@ -1,0 +1,18 @@
+id: generic-api-rename
+description: Rename the public package and adapter classes without duplicating implementation.
+hypothesis: Canonical generic names and thin compatibility aliases produce identical class and module objects, with no numerical behavior change.
+baseline_commit: 9df0b10056204d51312f3547532ac0d97099e157
+environment:
+  PYTHONHASHSEED: "0"
+commands:
+  - name: tests
+    command: [python, -m, pytest, -q]
+  - name: import-smoke
+    command:
+      - python
+      - -c
+      - "import atombit_batch, batch_mlip; assert atombit_batch.BatchedPotential is batch_mlip.AtomBitBatchCalculator"
+  - name: make-demo
+    command: [python, -m, batch_mlip, make-demo, data/demo.extxyz]
+  - name: validation
+    command: [python, -m, batch_mlip, validate, configs/relax_toy.yaml]

@@ -16,7 +16,7 @@ from ..core.types import BatchEvaluation
 ForceMode = Literal["auto", "autograd", "direct"]
 
 
-class BatchedPotential(BatchCalculator):
+class AtomBitBatchCalculator(BatchCalculator):
     """Wrap an AtomBit-like graph model for batched atomistic simulation.
 
     Supported model outputs:
@@ -199,3 +199,7 @@ class BatchedPotential(BatchCalculator):
             forces=forces.detach(),
             stress=None if stress is None else stress.detach(),
         )
+
+
+# Public compatibility alias retained for existing scripts and checkpoints.
+BatchedPotential = AtomBitBatchCalculator

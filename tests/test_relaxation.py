@@ -5,9 +5,9 @@ from ase import Atoms
 from ase.calculators.calculator import Calculator, all_changes
 from ase.constraints import FixAtoms
 from ase.optimize import FIRE
-from atombit_batch.toy_models import QuadraticWellModel
+from batch_mlip.toy_models import QuadraticWellModel
 
-from atombit_batch import AseGraphBatch, BatchedPotential, batched_fire_relax
+from batch_mlip import AseGraphBatch, AtomBitBatchCalculator, batched_fire_relax
 
 
 class QuadraticCalculator(Calculator):
@@ -27,7 +27,7 @@ def test_fire_converges_multiple_heterogeneous_systems():
     state = AseGraphBatch.from_ase(
         systems, cutoff=2.5, skin=0.3, device="cpu", dtype=torch.float64
     )
-    potential = BatchedPotential(
+    potential = AtomBitBatchCalculator(
         QuadraticWellModel(k=1.0), device="cpu", dtype=torch.float64
     )
     result = batched_fire_relax(
@@ -50,7 +50,7 @@ def test_fixatoms_position_is_unchanged():
         [atoms], cutoff=3.0, device="cpu", dtype=torch.float64
     )
     initial_fixed = state.positions[0].clone()
-    potential = BatchedPotential(
+    potential = AtomBitBatchCalculator(
         QuadraticWellModel(), device="cpu", dtype=torch.float64
     )
     result = batched_fire_relax(state, potential, fmax=1e-5, max_steps=1000)
@@ -71,7 +71,7 @@ def test_batched_fire_matches_ase_update_order():
     state = AseGraphBatch.from_ase(
         [initial], cutoff=2.5, device="cpu", dtype=torch.float64
     )
-    potential = BatchedPotential(
+    potential = AtomBitBatchCalculator(
         QuadraticWellModel(k=1.0), device="cpu", dtype=torch.float64
     )
     result = batched_fire_relax(
@@ -101,7 +101,7 @@ def test_active_compaction_matches_masked_fire_and_reduces_graph_work():
             positions=[[1.5, -0.4, 0.2], [-0.8, 1.0, 0.0], [0.3, -0.2, 0.7]],
         ),
     ]
-    potential = BatchedPotential(
+    potential = AtomBitBatchCalculator(
         QuadraticWellModel(k=1.0), device="cpu", dtype=torch.float64
     )
 

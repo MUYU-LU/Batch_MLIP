@@ -7,16 +7,16 @@ test:
 	pytest -q
 
 lint:
-	ruff check atombit_batch src examples tests tools benchmarks
+	ruff check batch_mlip atombit_batch src examples tests tools benchmarks
 
 demo:
-	atombit-batch make-demo data/demo.extxyz
+	batch-mlip make-demo data/demo.extxyz
 
 relax:
-	atombit-batch run configs/relax_toy.yaml
+	batch-mlip run configs/relax_toy.yaml
 
 validate:
-	atombit-batch validate configs/relax_toy.yaml
+	batch-mlip validate configs/relax_toy.yaml
 
 benchmark:
 	python benchmarks/benchmark_scaling.py --output runs/benchmark.json

@@ -22,7 +22,7 @@ import torch
 from ase.calculators.calculator import all_changes
 from ase.io import read
 
-from atombit_batch import AseGraphBatch, BatchedPotential
+from batch_mlip import AseGraphBatch, AtomBitBatchCalculator
 from src.Calculator import AtomBitCalculator
 from src.model import AtomBitModel
 from src.utils import AtomBitConfig
@@ -269,7 +269,7 @@ def benchmark_group(
         enable_stress=False,
         add_e0=False,
     )
-    potential = BatchedPotential(
+    potential = AtomBitBatchCalculator(
         model,
         device=device,
         dtype=torch.float32,

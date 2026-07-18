@@ -3,9 +3,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "atombit-batch-lab"
-version = "0.1.0"
-description = "Torch-native batched geometry optimization and MD for AtomBit-like graph MLIPs"
+name = "batch-mlip"
+version = "0.2.0"
+description = "Model-independent batched geometry optimization and MD for MLIPs"
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [{name = "Project owner"}]
@@ -27,11 +27,12 @@ dev = [
 ]
 
 [project.scripts]
-atombit-batch = "atombit_batch.interfaces.cli:main"
+batch-mlip = "batch_mlip.interfaces.cli:main"
+atombit-batch = "batch_mlip.interfaces.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["atombit_batch*", "src*", "examples*"]
+include = ["batch_mlip*", "atombit_batch*", "src*", "examples*"]
 exclude = ["tests*", "benchmarks*", "tools*", "original_uploads*"]
 
 [tool.pytest.ini_options]

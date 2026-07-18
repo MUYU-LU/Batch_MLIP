@@ -4,7 +4,7 @@ from ase.calculators.calculator import (
     Calculator, all_changes, PropertyNotImplementedError
 )
 from ase.stress import full_3x3_to_voigt_6_stress
-from atombit_batch.types import GraphData
+from batch_mlip.types import GraphData
 
 from .Utils import DEFAULT_FLOAT_DTYPE
 from .neighbors import neighbor_list

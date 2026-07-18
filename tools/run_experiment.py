@@ -50,7 +50,14 @@ def run(spec_path: Path, root: Path) -> Path:
 
     tracked_files = [
         path
-        for top in ("atombit_batch", "src", "tests", "benchmarks", "configs")
+        for top in (
+            "batch_mlip",
+            "atombit_batch",
+            "src",
+            "tests",
+            "benchmarks",
+            "configs",
+        )
         for path in (root / top).rglob("*")
         if path.is_file()
     ]

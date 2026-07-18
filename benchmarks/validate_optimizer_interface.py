@@ -16,10 +16,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from benchmark_production import load_manifest, load_production_model  # noqa: E402
 
-from atombit_batch import (  # noqa: E402
+from batch_mlip import (  # noqa: E402
+    AtomBitBatchCalculator,
     BatchedFIRE,
-    BatchedFrechetCellFilter,
-    BatchedPotential,
+    FrechetCellFilter,
     relax,
 )
 
@@ -102,7 +102,7 @@ def main() -> None:
     systems = [read(args.dataset_dir / name) for name in names]
     device = torch.device(args.device)
     model, _ = load_production_model(args.checkpoint)
-    calculator = BatchedPotential(
+    calculator = AtomBitBatchCalculator(
         model,
         cutoff=6.0,
         skin=0.0,
@@ -122,7 +122,7 @@ def main() -> None:
 
     variable_options = {
         **common,
-        "cell_filter": BatchedFrechetCellFilter(),
+        "cell_filter": FrechetCellFilter(),
         "smax": None,
     }
     variable_named = relax(

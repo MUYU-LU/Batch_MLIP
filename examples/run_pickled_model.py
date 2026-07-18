@@ -5,11 +5,11 @@ from __future__ import annotations
 import argparse
 
 from ase.io import read, write
-from atombit_batch.loaders import infer_cutoff, load_full_torch_model, parse_dtype
+from batch_mlip.loaders import infer_cutoff, load_full_torch_model, parse_dtype
 
-from atombit_batch import (
+from batch_mlip import (
     AseGraphBatch,
-    BatchedPotential,
+    AtomBitBatchCalculator,
     batched_fire_relax,
     batched_langevin_baoab,
     batched_velocity_verlet,
@@ -47,7 +47,7 @@ def main() -> int:
         device=args.device,
         dtype=dtype,
     )
-    potential = BatchedPotential(
+    potential = AtomBitBatchCalculator(
         model,
         device=args.device,
         dtype=dtype,

@@ -37,6 +37,35 @@ class MACEBatchCalculator(BatchCalculator):
     structures and keeps optimizer/MD state independent of MACE internals.
     """
 
+    @classmethod
+    def from_off(
+        cls,
+        model: str = "small",
+        *,
+        device: str | torch.device = "cpu",
+        dtype: torch.dtype = torch.float64,
+        **adapter_kwargs: Any,
+    ) -> MACEBatchCalculator:
+        """Load a MACE-OFF foundation model as a native batch calculator."""
+
+        resolved_device = torch.device(device)
+        if resolved_device.type == "cuda" and not torch.cuda.is_initialized():
+            # Some legacy MACE-OFF checkpoints must be loaded after CUDA
+            # initialization and before importing MACE/e3nn.
+            torch.empty(0, device=resolved_device)
+        _, _, _, mace_off = _mace_imports()
+        raw_model = mace_off(
+            model=model,
+            device=str(resolved_device),
+            return_raw_model=True,
+        )
+        return cls(
+            raw_model,
+            device=resolved_device,
+            dtype=dtype,
+            **adapter_kwargs,
+        )
+
     def __init__(
         self,
         model: torch.nn.Module,
@@ -181,22 +210,11 @@ def load_mace_off_batch(
     dtype: torch.dtype = torch.float64,
     **adapter_kwargs: Any,
 ) -> MACEBatchCalculator:
-    """Load a MACE-OFF foundation model as a native batch calculator."""
+    """Compatibility wrapper for :meth:`MACEBatchCalculator.from_off`."""
 
-    resolved_device = torch.device(device)
-    if resolved_device.type == "cuda" and not torch.cuda.is_initialized():
-        # Legacy pickled MACE-OFF models in some environments must be loaded
-        # after CUDA runtime initialization and before importing MACE/e3nn.
-        torch.empty(0, device=resolved_device)
-    _, _, _, mace_off = _mace_imports()
-    raw_model = mace_off(
+    return MACEBatchCalculator.from_off(
         model=model,
-        device=str(resolved_device),
-        return_raw_model=True,
-    )
-    return MACEBatchCalculator(
-        raw_model,
-        device=resolved_device,
+        device=device,
         dtype=dtype,
         **adapter_kwargs,
     )

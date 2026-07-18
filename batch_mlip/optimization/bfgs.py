@@ -9,7 +9,7 @@ import torch
 from ..core.calculator import BatchCalculator
 from ..core.state import AseGraphBatch
 from ..core.types import BatchEvaluation, RelaxationResult, StepCallback
-from .cell_filters import BatchedFrechetCellFilter, BoundFrechetCellFilter
+from .cell_filters import BoundFrechetCellFilter, FrechetCellFilter
 from .fire import max_force_per_system, max_generalized_force_per_system
 
 
@@ -163,7 +163,7 @@ def batched_bfgs_relax(
     callback_interval: int = 1,
     zero_output_velocities: bool = True,
     active_compaction: bool = False,
-    cell_filter: BatchedFrechetCellFilter | None = None,
+    cell_filter: FrechetCellFilter | None = None,
     smax: float | None = 0.005,
     optimizer_dtype: torch.dtype | str | None = None,
 ) -> RelaxationResult:

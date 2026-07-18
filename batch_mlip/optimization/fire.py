@@ -10,7 +10,7 @@ from ..core.calculator import BatchCalculator
 from ..core.math_utils import scatter_max, scatter_sum, system_l2_norm
 from ..core.state import AseGraphBatch
 from ..core.types import BatchEvaluation, RelaxationResult, StepCallback
-from .cell_filters import BatchedFrechetCellFilter
+from .cell_filters import FrechetCellFilter
 
 
 @dataclass(frozen=True)
@@ -437,7 +437,7 @@ def _batched_fire_relax_variable_cell(
     potential: BatchCalculator,
     *,
     cfg: FIREConfig,
-    cell_filter: BatchedFrechetCellFilter,
+    cell_filter: FrechetCellFilter,
     smax: float | None,
     callback: StepCallback | None,
     zero_output_velocities: bool,
@@ -683,7 +683,7 @@ def _batched_fire_relax_variable_cell_compacted(
     potential: BatchCalculator,
     *,
     cfg: FIREConfig,
-    cell_filter: BatchedFrechetCellFilter,
+    cell_filter: FrechetCellFilter,
     smax: float | None,
     callback: StepCallback | None,
     zero_output_velocities: bool,
@@ -1022,7 +1022,7 @@ def batched_fire_relax(
     callback_interval: int = 1,
     zero_output_velocities: bool = True,
     active_compaction: bool = False,
-    cell_filter: BatchedFrechetCellFilter | None = None,
+    cell_filter: FrechetCellFilter | None = None,
     smax: float | None = 0.005,
 ) -> RelaxationResult:
     """Relax independent systems with optional removal of converged graphs.

@@ -13,7 +13,7 @@ AseGraphBatch.from_ase
   - offset atom indices and concatenate edges
        |
        v
-BatchedPotential
+AtomBitBatchCalculator
   - optional neighbour-list rebuild
   - create GraphData attributes
   - one model forward for B systems

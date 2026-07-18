@@ -14,19 +14,19 @@ from typing import Any
 
 import numpy as np
 import torch
-from ase.filters import FrechetCellFilter
+from ase.filters import FrechetCellFilter as ASEFrechetCellFilter
 from ase.io import read
 from ase.optimize import BFGS
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from atombit_batch import (  # noqa: E402
-    BatchedFrechetCellFilter,
+from batch_mlip import (  # noqa: E402
+    FrechetCellFilter,
+    MACEBatchCalculator,
     batched_bfgs_relax,
     batched_velocity_verlet,
     initialize_maxwell_boltzmann,
-    load_mace_off_batch,
 )
 
 
@@ -113,7 +113,7 @@ def optimize_ase(systems, calculator, steps: int) -> dict[str, Any]:
         atoms = source.copy()
         atoms.calc = calculator
         optimizer = BFGS(
-            FrechetCellFilter(atoms),
+            ASEFrechetCellFilter(atoms),
             logfile=None,
             trajectory=None,
             alpha=70.0,
@@ -138,7 +138,7 @@ def optimize_batch(systems, calculator, steps: int) -> dict[str, Any]:
     result = batched_bfgs_relax(
         state,
         calculator,
-        cell_filter=BatchedFrechetCellFilter(),
+        cell_filter=FrechetCellFilter(),
         active_compaction=True,
         fmax=1e-30,
         max_steps=steps,
@@ -236,8 +236,8 @@ def main() -> None:
     names = manifest["samples"][str(args.atom_count)][: args.pool_size]
     systems = [read(args.dataset_dir / name) for name in names]
 
-    calculator = load_mace_off_batch(
-        "small", device=args.device, dtype=torch.float64
+    calculator = MACEBatchCalculator.from_off(
+        model="small", device=args.device, dtype=torch.float64
     )
     from mace.calculators import MACECalculator
 

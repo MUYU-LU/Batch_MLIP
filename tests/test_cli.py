@@ -5,7 +5,7 @@ from pathlib import Path
 import yaml
 from ase import Atoms
 from ase.io import write
-from atombit_batch.cli import run_config, validate_batch
+from batch_mlip.cli import run_config, validate_batch
 
 
 def test_yaml_cli_run_and_validation(tmp_path: Path):
@@ -23,7 +23,7 @@ def test_yaml_cli_run_and_validation(tmp_path: Path):
         "validation_output": str(tmp_path / "validation.json"),
         "runtime": {"device": "cpu", "dtype": "float64", "skin": 0.2},
         "model": {
-            "factory": "atombit_batch.toy_models:build_quadratic_model",
+            "factory": "batch_mlip.toy_models:build_quadratic_model",
             "kwargs": {"k": 1.0},
             "cutoff": 2.0,
             "force_mode": "autograd",
@@ -72,7 +72,7 @@ def test_yaml_cli_accepts_optional_frechet_cell_filter(tmp_path: Path):
         "output": str(output_file),
         "runtime": {"device": "cpu", "dtype": "float64", "skin": 0.0},
         "model": {
-            "factory": "atombit_batch.toy_models:build_pair_harmonic_model",
+            "factory": "batch_mlip.toy_models:build_pair_harmonic_model",
             "kwargs": {"k": 2.0, "r0": 1.4, "cutoff": 3.0},
             "cutoff": 3.0,
             "force_mode": "autograd",

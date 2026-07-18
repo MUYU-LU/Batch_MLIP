@@ -10,9 +10,9 @@ from pathlib import Path
 import numpy as np
 import torch
 from ase import Atoms
-from atombit_batch.toy_models import PairHarmonicModel
+from batch_mlip.toy_models import PairHarmonicModel
 
-from atombit_batch import AseGraphBatch, BatchedPotential
+from batch_mlip import AseGraphBatch, AtomBitBatchCalculator
 
 
 def synchronize(device: torch.device) -> None:
@@ -63,7 +63,7 @@ def main() -> int:
     dtype = torch.float32 if args.dtype == "float32" else torch.float64
     systems = make_systems(args.systems, args.atoms, seed=123)
     model = PairHarmonicModel(cutoff=3.0)
-    potential = BatchedPotential(model, device=device, dtype=dtype)
+    potential = AtomBitBatchCalculator(model, device=device, dtype=dtype)
     batch = AseGraphBatch.from_ase(
         systems, cutoff=3.0, skin=args.skin, device=device, dtype=dtype
     )

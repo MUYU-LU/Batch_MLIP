@@ -14,6 +14,13 @@
 
 ## 0.2.0 - Unreleased
 
+- Rename the canonical distribution/package to `batch-mlip`/`batch_mlip` and
+  retain `atombit_batch` as a thin compatibility namespace.
+- Rename the canonical AtomBit adapter and cell filter to
+  `AtomBitBatchCalculator` and `FrechetCellFilter`; preserve the former class
+  names as aliases.
+- Add `MACEBatchCalculator.from_off()` as the named MACE-OFF constructor while
+  preserving `load_mace_off_batch()`.
 - Organize implementation modules into readable `core`, `optimization`,
   `dynamics`, `models`, and `interfaces` subpackages while preserving root
   exports and legacy import aliases.

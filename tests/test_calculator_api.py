@@ -5,7 +5,7 @@ import torch
 from ase import Atoms
 from ase.calculators.calculator import Calculator, all_changes
 
-from atombit_batch import (
+from batch_mlip import (
     ASECalculatorAdapter,
     BatchCalculator,
     BatchEvaluation,

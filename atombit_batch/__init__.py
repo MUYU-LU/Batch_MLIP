@@ -1,130 +1,72 @@
-"""Torch-native batched optimization and MD for graph MLIPs."""
+"""Compatibility namespace for the package formerly named ``atombit_batch``.
+
+New code should import from :mod:`batch_mlip`. This module intentionally
+forwards both public symbols and historical submodule paths without copying the
+implementation.
+"""
 
 from __future__ import annotations
 
+import importlib as _importlib
 import sys as _sys
-from types import ModuleType as _ModuleType
 
-from .core.calculator import ASECalculatorAdapter, BatchCalculator
-from .core.state import AseGraphBatch
-from .core.types import (
-    BatchEvaluation,
-    EvaluationResult,
-    GraphData,
-    MDResult,
-    RelaxationResult,
-)
-from .dynamics.integrators import (
-    batched_langevin_baoab,
-    batched_velocity_verlet,
-    initialize_maxwell_boltzmann,
-)
-from .interfaces.api import evaluate, molecular_dynamics, relax
-from .interfaces.reporting import (
-    CompositeReporter,
-    ExtXYZReporter,
-    JSONLReporter,
-    TorchStateCheckpointReporter,
-    build_reporter,
-)
-from .models.mace import MACEBatchCalculator, load_mace_off_batch
-from .models.potential import BatchedPotential
-from .optimization.bfgs import batched_bfgs_relax
-from .optimization.cell_filters import BatchedFrechetCellFilter
-from .optimization.fire import (
-    FIREConfig,
-    batched_fire_relax,
-    batched_gradient_descent,
-    max_force_per_system,
-)
-from .optimization.registry import (
-    BatchedBFGS,
-    BatchedFIRE,
-    BatchedGradientDescent,
-    BatchOptimizer,
-    OptimizerCapabilities,
-    OptimizerFactory,
-    available_optimizers,
-    create_optimizer,
-    register_optimizer,
+import batch_mlip as _implementation
+
+_CANONICAL_MODULES = (
+    "core",
+    "core.calculator",
+    "core.math_utils",
+    "core.neighbors",
+    "core.state",
+    "core.types",
+    "dynamics",
+    "dynamics.integrators",
+    "interfaces",
+    "interfaces.api",
+    "interfaces.cli",
+    "interfaces.config",
+    "interfaces.reporting",
+    "models",
+    "models.loaders",
+    "models.mace",
+    "models.potential",
+    "models.toy_models",
+    "optimization",
+    "optimization.bfgs",
+    "optimization.cell_filters",
+    "optimization.fire",
+    "optimization.registry",
 )
 
+for _module_name in _CANONICAL_MODULES:
+    _module = _importlib.import_module(f"batch_mlip.{_module_name}")
+    _sys.modules[f"{__name__}.{_module_name}"] = _module
+    if "." not in _module_name:
+        globals()[_module_name] = _module
 
-def _install_legacy_module_aliases() -> None:
-    """Keep pre-reorganization import paths and serialized models loadable."""
+for _module_name in (
+    "api",
+    "bfgs",
+    "calculator",
+    "cli",
+    "config",
+    "filters",
+    "loaders",
+    "math_utils",
+    "md",
+    "neighbors",
+    "optimize",
+    "optimizers",
+    "potential",
+    "reporting",
+    "state",
+    "toy_models",
+    "types",
+):
+    _module = getattr(_implementation, _module_name)
+    _sys.modules[f"{__name__}.{_module_name}"] = _module
+    globals()[_module_name] = _module
 
-    from .core import calculator, math_utils, neighbors, state, types
-    from .dynamics import integrators
-    from .interfaces import api, cli, config, reporting
-    from .models import loaders, potential, toy_models
-    from .optimization import bfgs, cell_filters, fire, registry
-
-    aliases: dict[str, _ModuleType] = {
-        "api": api,
-        "bfgs": bfgs,
-        "calculator": calculator,
-        "cli": cli,
-        "config": config,
-        "filters": cell_filters,
-        "loaders": loaders,
-        "math_utils": math_utils,
-        "md": integrators,
-        "neighbors": neighbors,
-        "optimize": fire,
-        "optimizers": registry,
-        "potential": potential,
-        "reporting": reporting,
-        "state": state,
-        "toy_models": toy_models,
-        "types": types,
-    }
-    package = _sys.modules[__name__]
-    for legacy_name, module in aliases.items():
-        qualified_name = f"{__name__}.{legacy_name}"
-        _sys.modules.setdefault(qualified_name, module)
-        setattr(package, legacy_name, module)
-
-
-_install_legacy_module_aliases()
-
-__all__ = [
-    "AseGraphBatch",
-    "ASECalculatorAdapter",
-    "BatchEvaluation",
-    "BatchCalculator",
-    "BatchOptimizer",
-    "BatchedBFGS",
-    "BatchedFIRE",
-    "BatchedFrechetCellFilter",
-    "BatchedGradientDescent",
-    "BatchedPotential",
-    "CompositeReporter",
-    "EvaluationResult",
-    "ExtXYZReporter",
-    "FIREConfig",
-    "GraphData",
-    "JSONLReporter",
-    "MACEBatchCalculator",
-    "MDResult",
-    "OptimizerCapabilities",
-    "OptimizerFactory",
-    "RelaxationResult",
-    "TorchStateCheckpointReporter",
-    "available_optimizers",
-    "batched_bfgs_relax",
-    "batched_fire_relax",
-    "batched_gradient_descent",
-    "batched_langevin_baoab",
-    "batched_velocity_verlet",
-    "build_reporter",
-    "create_optimizer",
-    "evaluate",
-    "initialize_maxwell_boltzmann",
-    "load_mace_off_batch",
-    "max_force_per_system",
-    "molecular_dynamics",
-    "register_optimizer",
-    "relax",
-]
-
-__version__ = "0.1.0"
+__all__ = list(_implementation.__all__)
+globals().update({name: getattr(_implementation, name) for name in __all__})
+__version__ = _implementation.__version__

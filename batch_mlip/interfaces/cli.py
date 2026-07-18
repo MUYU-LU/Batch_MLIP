@@ -22,8 +22,8 @@ from ..dynamics.integrators import (
     initialize_maxwell_boltzmann,
 )
 from ..models.loaders import build_model, infer_cutoff, load_e0, parse_dtype
-from ..models.potential import BatchedPotential
-from ..optimization.cell_filters import BatchedFrechetCellFilter
+from ..models.potential import AtomBitBatchCalculator
+from ..optimization.cell_filters import FrechetCellFilter
 from ..optimization.registry import create_optimizer
 from .config import load_yaml, required
 from .reporting import build_reporter
@@ -52,7 +52,7 @@ def _prepare(config: Mapping[str, Any]):
     )
     cutoff = infer_cutoff(model, model_cfg.get("cutoff"))
     e0_dict = load_e0(model_cfg.get("e0"))
-    potential = BatchedPotential(
+    potential = AtomBitBatchCalculator(
         model,
         device=device,
         dtype=dtype,
@@ -144,7 +144,7 @@ def run_config(config_path: str | Path) -> dict[str, Any]:
                 raise ValueError(
                     f"unsupported relaxation cell filter {filter_type!r}"
                 )
-            options["cell_filter"] = BatchedFrechetCellFilter(**cell_options)
+            options["cell_filter"] = FrechetCellFilter(**cell_options)
         result = create_optimizer(optimizer).run(
             state,
             potential,
@@ -306,7 +306,7 @@ def make_demo_data(output: str | Path) -> None:
 
 
 def _parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="atombit-batch")
+    parser = argparse.ArgumentParser(prog="batch-mlip")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     run_parser = subparsers.add_parser("run", help="run a YAML-configured simulation")

@@ -2,11 +2,11 @@
 
 import torch
 from ase.io import read, write
-from atombit_batch.toy_models import QuadraticWellModel
+from batch_mlip.toy_models import QuadraticWellModel
 
-from atombit_batch import (
+from batch_mlip import (
     AseGraphBatch,
-    BatchedPotential,
+    AtomBitBatchCalculator,
     JSONLReporter,
     batched_fire_relax,
 )
@@ -19,7 +19,7 @@ state = AseGraphBatch.from_ase(
     device="cpu",
     dtype=torch.float64,
 )
-potential = BatchedPotential(
+potential = AtomBitBatchCalculator(
     QuadraticWellModel(k=1.0),
     device="cpu",
     dtype=torch.float64,

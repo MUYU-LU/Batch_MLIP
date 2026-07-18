@@ -5,8 +5,10 @@ environment: {}
 commands:
   - name: tests
     command: [python, -m, pytest, -q]
+  - name: make-demo
+    command: [python, -m, batch_mlip, make-demo, data/demo.extxyz]
   - name: validation
-    command: [python, -m, atombit_batch.cli, validate, configs/relax_toy.yaml]
+    command: [python, -m, batch_mlip, validate, configs/relax_toy.yaml]
   - name: benchmark
     command: [python, benchmarks/benchmark_scaling.py, --output, runs/candidate_benchmark.json]
 collect_json:

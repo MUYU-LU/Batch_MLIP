@@ -1,12 +1,12 @@
-# AtomBit Batch Lab
+# Batch MLIP
 
-A reproducible project packet for developing and testing **true batched geometry optimization and molecular dynamics** with an AtomBit-like graph MLIP.
+A model-independent interface for **true batched geometry optimization and molecular dynamics** with graph MLIPs. Native adapters are included for AtomBit-style models and MACE.
 
 The engine concatenates independent atomic systems into one heterogeneous graph batch and performs one model forward pass per simulation step. ASE is used at the boundary for structure I/O and neighbour-list construction; PyTorch owns the batched model evaluation, optimizer state, and MD integration.
 
 ## What is included
 
-- A reusable package under `atombit_batch/`.
+- A reusable package under `batch_mlip/`.
 - Compatibility copies of the uploaded model under the original `src.*` namespace.
 - Exact source snapshots under `original_uploads/`.
 - Fixed/variable-cell batched FIRE and full BFGS, plus steepest descent.
@@ -21,7 +21,8 @@ The engine concatenates independent atomic systems into one heterogeneous graph 
 ## Repository layout
 
 ```text
-atombit_batch/          Public package and compatibility exports
+batch_mlip/             Canonical public package
+atombit_batch/          Thin compatibility namespace for the former package name
   core/                 Batch state, calculator contract, types, neighbors
   optimization/         FIRE, BFGS, cell filters, optimizer registry
   dynamics/             Molecular-dynamics integrators
@@ -40,11 +41,10 @@ docs/                    Architecture, validation, and roadmap
 AGENTS.md                Rules for autonomous experimental agents
 ```
 
-New code should import from these functional subpackages when it needs an
-internal component. Existing public imports from `atombit_batch` are unchanged,
-and legacy module paths such as `atombit_batch.filters`,
-`atombit_batch.toy_models`, and `atombit_batch.cli` remain available as
-compatibility aliases for configs, scripts, and serialized models.
+New code should import from `batch_mlip`. Flat paths such as
+`batch_mlip.filters` remain available, and the former `atombit_batch` package
+name forwards to the same implementations for scripts, configs, and serialized
+models created before version 0.2.
 
 ## Installation
 
@@ -67,7 +67,7 @@ python -m pip install -e '.[performance]'
 
 ```bash
 pytest -q
-atombit-batch validate configs/relax_toy.yaml
+batch-mlip validate configs/relax_toy.yaml
 ```
 
 The included tests check:
@@ -85,9 +85,9 @@ The included tests check:
 ## Run the included examples
 
 ```bash
-atombit-batch run configs/relax_toy.yaml
-atombit-batch run configs/nve_toy.yaml
-atombit-batch run configs/nvt_toy.yaml
+batch-mlip run configs/relax_toy.yaml
+batch-mlip run configs/nve_toy.yaml
+batch-mlip run configs/nvt_toy.yaml
 ```
 
 Outputs are written under `runs/`, including final structures, trajectories, diagnostics, and summaries.
@@ -131,8 +131,8 @@ model:
 Run:
 
 ```bash
-atombit-batch validate configs/relax_atombit_template.yaml
-atombit-batch run configs/relax_atombit_template.yaml
+batch-mlip validate configs/relax_atombit_template.yaml
+batch-mlip run configs/relax_atombit_template.yaml
 ```
 
 Validation should precede long optimization or MD runs.
@@ -162,16 +162,16 @@ single-point evaluation, relaxation, and MD:
 import torch
 from ase.io import read
 
-from atombit_batch import (
-    BatchedFrechetCellFilter,
-    BatchedPotential,
+from batch_mlip import (
+    AtomBitBatchCalculator,
+    FrechetCellFilter,
     evaluate,
     molecular_dynamics,
     relax,
 )
 
 systems = read("structures.extxyz", index=":")
-calculator = BatchedPotential(
+calculator = AtomBitBatchCalculator(
     model,
     cutoff=6.0,
     skin=0.5,
@@ -192,7 +192,7 @@ relaxed = relax(
 cell_relaxed = relax(
     systems,
     calculator,
-    cell_filter=BatchedFrechetCellFilter(pressure_GPa=0.0),
+    cell_filter=FrechetCellFilter(pressure_GPa=0.0),
     fmax=0.03,
     smax=0.0006,
     max_steps=1000,
@@ -214,7 +214,7 @@ belongs in calculator adapters.
 An ordinary ASE calculator can be used as a correctness/reference fallback:
 
 ```python
-from atombit_batch import ASECalculatorAdapter, relax
+from batch_mlip import ASECalculatorAdapter, relax
 
 calculator = ASECalculatorAdapter(existing_ase_calculator)
 result = relax(systems, calculator, fmax=0.03)
@@ -230,10 +230,10 @@ fallback:
 ```python
 import torch
 
-from atombit_batch import load_mace_off_batch, relax
+from batch_mlip import MACEBatchCalculator, relax
 
-calculator = load_mace_off_batch(
-    "small",
+calculator = MACEBatchCalculator.from_off(
+    model="small",
     device="cuda:0",
     dtype=torch.float64,
 )
@@ -246,7 +246,7 @@ not permit commercial use. The adapter uses MACE's own `AtomicData` graph
 builder, direct forces, stress convention, cutoff, element table, and heads.
 
 `cell_filter=None` is the default and preserves fixed-cell FIRE. Passing
-`BatchedFrechetCellFilter` optimizes atomic positions and full-rank periodic
+`FrechetCellFilter` optimizes atomic positions and full-rank periodic
 cells together using log-deformation coordinates. Pressure is specified in
 GPa and is positive in compression; `smax` is in eV/Angstrom^3. Variable-cell
 FIRE requires calculator stress. Active compaction removes converged graph and
@@ -258,7 +258,7 @@ cell optimizer state while preserving original output order.
 implements the runtime-checkable `BatchOptimizer` protocol:
 
 ```python
-from atombit_batch import BatchedFIRE, create_optimizer, relax
+from batch_mlip import BatchedFIRE, create_optimizer, relax
 
 # Registered-name convenience path.
 result = relax(systems, calculator, optimizer="fire", fmax=0.03)
@@ -275,7 +275,7 @@ A third-party batched optimizer declares its optional capabilities and returns
 a `RelaxationResult` from `run`:
 
 ```python
-from atombit_batch import OptimizerCapabilities, register_optimizer
+from batch_mlip import OptimizerCapabilities, register_optimizer
 
 class BatchedLBFGS:
     def capabilities(self):
@@ -297,13 +297,13 @@ compaction. Full BFGS stores an independent dense Hessian for every active
 structure and follows ASE's update, eigensolve, and row-wise step clipping:
 
 ```python
-from atombit_batch import BatchedBFGS
+from batch_mlip import BatchedBFGS
 
 result = relax(
     systems,
     calculator,
     optimizer=BatchedBFGS(alpha=70.0, max_step=0.2),
-    cell_filter=BatchedFrechetCellFilter(),
+    cell_filter=FrechetCellFilter(),
     active_compaction=True,
     fmax=0.05,
     smax=None,
@@ -326,7 +326,7 @@ dedicated batched implementation to retain acceleration.
 import torch
 from ase.io import read, write
 
-from atombit_batch import AseGraphBatch, BatchedPotential, batched_fire_relax
+from batch_mlip import AseGraphBatch, AtomBitBatchCalculator, batched_fire_relax
 
 systems = read("structures.extxyz", index=":")
 state = AseGraphBatch.from_ase(
@@ -336,7 +336,7 @@ state = AseGraphBatch.from_ase(
     device="cuda",
     dtype=torch.float32,
 )
-potential = BatchedPotential(
+potential = AtomBitBatchCalculator(
     model,
     device="cuda",
     dtype=torch.float32,
@@ -358,7 +358,7 @@ write("relaxed.extxyz", result.state.to_ase(result.evaluation, wrap=True))
 - `direct`: use the model's direct force head. This is faster when the head exists, but it may not be exactly conservative.
 - `auto`: use direct forces when returned, otherwise autograd.
 
-Do not add E0 both inside the model and in `BatchedPotential`; choose one location.
+Do not add E0 both inside the model and in `AtomBitBatchCalculator`; choose one location.
 
 ## Neighbour-list policy
 

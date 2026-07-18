@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import torch
 from ase import Atoms
-from atombit_batch.toy_models import QuadraticWellModel
+from batch_mlip.toy_models import QuadraticWellModel
 
-from atombit_batch import (
+from batch_mlip import (
     AseGraphBatch,
-    BatchedPotential,
+    AtomBitBatchCalculator,
     batched_langevin_baoab,
     batched_velocity_verlet,
     initialize_maxwell_boltzmann,
@@ -22,7 +22,7 @@ def test_velocity_verlet_has_small_energy_drift_for_quadratic_well():
         dtype=torch.float64,
     )
     state.velocities[:] = torch.tensor([[0.0, 0.01, 0.0]], dtype=torch.float64)
-    potential = BatchedPotential(
+    potential = AtomBitBatchCalculator(
         QuadraticWellModel(k=1.0), device="cpu", dtype=torch.float64
     )
     initial = potential(state).energy + state.kinetic_energy()
@@ -43,7 +43,7 @@ def test_langevin_supports_per_system_temperature_and_friction():
         device="cpu",
         dtype=torch.float64,
     )
-    potential = BatchedPotential(
+    potential = AtomBitBatchCalculator(
         QuadraticWellModel(), device="cpu", dtype=torch.float64
     )
     initialize_maxwell_boltzmann(

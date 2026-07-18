@@ -39,7 +39,7 @@ def _cell_mask(
 
 
 @dataclass(frozen=True)
-class BatchedFrechetCellFilter:
+class FrechetCellFilter:
     """ASE-style log-deformation cell coordinates for a heterogeneous batch.
 
     Pressure is positive in compression. Cell forces minimize ``E + pV``.
@@ -77,7 +77,7 @@ class BoundFrechetCellFilter:
     def from_config(
         cls,
         state: AseGraphBatch,
-        config: BatchedFrechetCellFilter,
+        config: FrechetCellFilter,
         *,
         dtype: torch.dtype | None = None,
     ) -> BoundFrechetCellFilter:
@@ -263,3 +263,7 @@ class BoundFrechetCellFilter:
         )
         state._neighbor_reference_positions = None
         state._neighbor_reference_cells = None
+
+
+# Public compatibility alias retained for the pre-0.2 API.
+BatchedFrechetCellFilter = FrechetCellFilter

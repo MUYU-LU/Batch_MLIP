@@ -1,4 +1,4 @@
-from atombit_batch.cli import make_demo_data
+from batch_mlip.cli import make_demo_data
 
 if __name__ == "__main__":
     make_demo_data("data/demo.extxyz")

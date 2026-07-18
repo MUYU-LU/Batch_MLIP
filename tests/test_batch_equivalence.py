@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import torch
 from ase import Atoms
-from atombit_batch.toy_models import QuadraticWellModel
+from batch_mlip.toy_models import QuadraticWellModel
 
-from atombit_batch import AseGraphBatch, BatchedPotential
+from batch_mlip import AseGraphBatch, AtomBitBatchCalculator
 
 
 def make_systems():
@@ -20,7 +20,7 @@ def make_systems():
 def test_batch_matches_single_system_evaluations():
     systems = make_systems()
     model = QuadraticWellModel(k=1.7)
-    potential = BatchedPotential(model, device="cpu", dtype=torch.float64)
+    potential = AtomBitBatchCalculator(model, device="cpu", dtype=torch.float64)
 
     batch = AseGraphBatch.from_ase(
         systems, cutoff=3.0, device="cpu", dtype=torch.float64

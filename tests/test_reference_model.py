@@ -3,7 +3,7 @@ from __future__ import annotations
 import torch
 from ase import Atoms
 
-from atombit_batch import AseGraphBatch, BatchedPotential
+from batch_mlip import AseGraphBatch, AtomBitBatchCalculator
 from src.model import AtomBitModel
 from src.utils import AtomBitConfig
 
@@ -32,7 +32,7 @@ def test_uploaded_model_namespace_runs_as_a_real_batch():
         device="cpu",
         dtype=torch.float64,
     )
-    potential = BatchedPotential(model, device="cpu", dtype=torch.float64)
+    potential = AtomBitBatchCalculator(model, device="cpu", dtype=torch.float64)
     evaluation = potential(state)
     assert evaluation.energy.shape == (2,)
     assert evaluation.forces.shape == (5, 3)

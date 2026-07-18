@@ -25,7 +25,7 @@ from benchmark_production import (
     write_result,
 )
 
-from atombit_batch import AseGraphBatch, BatchedPotential, batched_fire_relax
+from batch_mlip import AseGraphBatch, AtomBitBatchCalculator, batched_fire_relax
 from src.Calculator import AtomBitCalculator
 
 
@@ -148,7 +148,7 @@ def run_batched_pool(
     f_alpha: float,
     active_compaction: bool = False,
 ) -> dict[str, Any]:
-    potential = BatchedPotential(
+    potential = AtomBitBatchCalculator(
         model,
         device=device,
         dtype=torch.float32,
@@ -522,7 +522,7 @@ def main() -> int:
         warmup_state = AseGraphBatch.from_ase(
             [systems[0]], cutoff=args.cutoff, skin=args.skin, device=device, dtype=torch.float32
         )
-        warmup_potential = BatchedPotential(
+        warmup_potential = AtomBitBatchCalculator(
             model, device=device, dtype=torch.float32, force_mode="autograd"
         )
         warmup_potential(warmup_state, neighbor_policy="never")

@@ -8,7 +8,7 @@ Never claim an improvement from wall-clock speed alone. A change is acceptable o
 
 ## Immutable provenance
 
-Do not edit files under `original_uploads/`. Compatibility changes belong under `src/`; batching changes belong under `atombit_batch/`.
+Do not edit files under `original_uploads/`. Compatibility changes belong under `src/`; batching changes belong under `batch_mlip/`.
 
 ## Required loop
 

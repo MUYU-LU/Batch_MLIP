@@ -8,15 +8,15 @@ from ase.build import bulk
 from ase.calculators.calculator import Calculator, all_changes
 from ase.calculators.lj import LennardJones
 from ase.constraints import FixAtoms
-from ase.filters import FrechetCellFilter
+from ase.filters import FrechetCellFilter as ASEFrechetCellFilter
 from ase.optimize import BFGS
-from atombit_batch.toy_models import QuadraticWellModel
+from batch_mlip.toy_models import QuadraticWellModel
 
-from atombit_batch import (
+from batch_mlip import (
     ASECalculatorAdapter,
+    AtomBitBatchCalculator,
     BatchedBFGS,
-    BatchedFrechetCellFilter,
-    BatchedPotential,
+    FrechetCellFilter,
     available_optimizers,
     batched_bfgs_relax,
     create_optimizer,
@@ -38,8 +38,8 @@ class QuadraticCalculator(Calculator):
         self.results["forces"] = -atoms.positions.copy()
 
 
-def _quadratic_potential() -> BatchedPotential:
-    return BatchedPotential(
+def _quadratic_potential() -> AtomBitBatchCalculator:
+    return AtomBitBatchCalculator(
         QuadraticWellModel(k=1.0),
         cutoff=2.5,
         device="cpu",
@@ -62,14 +62,14 @@ def test_bfgs_is_registered_and_constructible():
 
 def test_float32_bfgs_promotes_frechet_optimizer_state():
     atoms = bulk("Ar", "fcc", a=5.5, cubic=True)
-    calculator = BatchedPotential(
+    calculator = AtomBitBatchCalculator(
         QuadraticWellModel(k=1.0),
         cutoff=2.5,
         device="cpu",
         dtype=torch.float32,
     )
     state = calculator.create_state([atoms])
-    bound = BatchedFrechetCellFilter().bind(state, dtype=torch.float64)
+    bound = FrechetCellFilter().bind(state, dtype=torch.float64)
     assert bound.reference_cells.dtype == torch.float64
     assert bound.generalized_positions.dtype == torch.float64
     assert bound.log_deformation.dtype == torch.float64
@@ -77,7 +77,7 @@ def test_float32_bfgs_promotes_frechet_optimizer_state():
     result = batched_bfgs_relax(
         state,
         calculator,
-        cell_filter=BatchedFrechetCellFilter(),
+        cell_filter=FrechetCellFilter(),
         fmax=1e-30,
         smax=None,
         max_steps=1,
@@ -191,7 +191,7 @@ def _ase_frechet_bfgs(atoms: Atoms) -> tuple[Atoms, int]:
     reference = atoms.copy()
     reference.calc = LennardJones(sigma=3.4, epsilon=0.0103, rc=8.5)
     optimizer = BFGS(
-        FrechetCellFilter(reference, hydrostatic_strain=True),
+        ASEFrechetCellFilter(reference, hydrostatic_strain=True),
         logfile=None,
         alpha=70.0,
         maxstep=0.2,
@@ -214,7 +214,7 @@ def test_variable_cell_active_bfgs_matches_masked_and_ase():
         return batched_bfgs_relax(
             calculator.create_state(systems),
             calculator,
-            cell_filter=BatchedFrechetCellFilter(hydrostatic_strain=True),
+            cell_filter=FrechetCellFilter(hydrostatic_strain=True),
             active_compaction=compact,
             fmax=2e-5,
             smax=None,

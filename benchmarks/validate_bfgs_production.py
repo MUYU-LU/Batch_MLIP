@@ -11,7 +11,7 @@ from typing import Any
 
 import numpy as np
 import torch
-from ase.filters import FrechetCellFilter
+from ase.filters import FrechetCellFilter as ASEFrechetCellFilter
 from ase.io import read
 from ase.optimize import BFGS
 
@@ -24,9 +24,9 @@ from benchmark_production import (  # noqa: E402
     sha256_file,
 )
 
-from atombit_batch import (  # noqa: E402
-    BatchedFrechetCellFilter,
-    BatchedPotential,
+from batch_mlip import (  # noqa: E402
+    AtomBitBatchCalculator,
+    FrechetCellFilter,
     relax,
 )
 from src.Calculator import AtomBitCalculator  # noqa: E402
@@ -59,7 +59,7 @@ def run_ase(
     for source in systems:
         atoms = source.copy()
         atoms.calc = calculator
-        target = FrechetCellFilter(atoms) if variable_cell else atoms
+        target = ASEFrechetCellFilter(atoms) if variable_cell else atoms
         optimizer = BFGS(
             target,
             logfile=None,
@@ -93,7 +93,7 @@ def run_batch(
     variable_cell: bool,
     steps: int,
 ):
-    calculator = BatchedPotential(
+    calculator = AtomBitBatchCalculator(
         model,
         cutoff=6.0,
         skin=0.0,
@@ -111,7 +111,7 @@ def run_batch(
     }
     if variable_cell:
         options.update(
-            cell_filter=BatchedFrechetCellFilter(),
+            cell_filter=FrechetCellFilter(),
             smax=None,
         )
     return relax(systems, calculator, **options)
