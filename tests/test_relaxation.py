@@ -5,9 +5,9 @@ from ase import Atoms
 from ase.calculators.calculator import Calculator, all_changes
 from ase.constraints import FixAtoms
 from ase.optimize import FIRE
+from atombit_batch.toy_models import QuadraticWellModel
 
 from atombit_batch import AseGraphBatch, BatchedPotential, batched_fire_relax
-from atombit_batch.toy_models import QuadraticWellModel
 
 
 class QuadraticCalculator(Calculator):

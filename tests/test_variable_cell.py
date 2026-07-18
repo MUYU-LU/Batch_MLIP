@@ -7,6 +7,8 @@ from ase.build import bulk
 from ase.calculators.lj import LennardJones
 from ase.filters import FrechetCellFilter
 from ase.optimize import FIRE
+from atombit_batch.filters import GPA_TO_EV_PER_A3
+from atombit_batch.toy_models import PairHarmonicModel
 
 from atombit_batch import (
     ASECalculatorAdapter,
@@ -14,8 +16,6 @@ from atombit_batch import (
     BatchedPotential,
     batched_fire_relax,
 )
-from atombit_batch.filters import GPA_TO_EV_PER_A3
-from atombit_batch.toy_models import PairHarmonicModel
 
 
 def test_graph_model_stress_matches_finite_difference_strain():

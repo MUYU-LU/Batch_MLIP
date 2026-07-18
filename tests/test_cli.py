@@ -5,7 +5,6 @@ from pathlib import Path
 import yaml
 from ase import Atoms
 from ase.io import write
-
 from atombit_batch.cli import run_config, validate_batch
 
 

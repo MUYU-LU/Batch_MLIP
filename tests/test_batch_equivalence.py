@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import torch
 from ase import Atoms
+from atombit_batch.toy_models import QuadraticWellModel
 
 from atombit_batch import AseGraphBatch, BatchedPotential
-from atombit_batch.toy_models import QuadraticWellModel
 
 
 def make_systems():

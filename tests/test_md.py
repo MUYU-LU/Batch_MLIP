@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import torch
 from ase import Atoms
+from atombit_batch.toy_models import QuadraticWellModel
 
 from atombit_batch import (
     AseGraphBatch,
@@ -10,7 +11,6 @@ from atombit_batch import (
     batched_velocity_verlet,
     initialize_maxwell_boltzmann,
 )
-from atombit_batch.toy_models import QuadraticWellModel
 
 
 def test_velocity_verlet_has_small_energy_drift_for_quadratic_well():
