@@ -1,0 +1,14 @@
+include README.md AGENTS.md NOTICE.md CHANGELOG.md Makefile
+include requirements.txt requirements-dev.txt
+recursive-include configs *.yaml
+recursive-include data *.extxyz
+recursive-include docs *.md
+recursive-include examples *.py
+recursive-include original_uploads *.py
+recursive-include experiments *.yaml *.md
+recursive-include benchmarks *.py
+recursive-include tools *.py
+recursive-include tests *.py
+recursive-include .github *.yml
+include PROVENANCE.json PROJECT_MANIFEST.json
+recursive-include verification *.json *.md

@@ -1,0 +1,53 @@
+name: bfgs-integration
+date: 2026-07-17
+hypothesis: >-
+  Independent full Hessians using ASE's BFGS update can support heterogeneous
+  fixed and Frechet variable-cell batches, while active compaction preserves
+  trajectories and reduces graph evaluations.
+source_packet:
+  path: atombit_batch_lab_packet.zip
+  sha256: f8366816dadc7b1c764bf51065be16c0cdc6f3abf6c0699687d6c7c0ba25731d
+baseline:
+  command: python -m pytest -q
+  result: 26 passed
+algorithm:
+  initial_hessian: alpha times identity per system
+  update: ASE BFGS full Hessian update
+  solve: symmetric eigendecomposition with absolute eigenvalues
+  step_limit: maximum generalized-coordinate row norm
+  default_alpha_eV_per_A2: 70.0
+  default_max_step_A: 0.2
+modes:
+  - fixed-cell masked
+  - fixed-cell active compaction
+  - Frechet variable-cell masked
+  - Frechet variable-cell active compaction
+correctness_gates:
+  - Fixed-cell steps and positions match ASE BFGS.
+  - FixAtoms positions match ASE and remain unchanged.
+  - Frechet cells, positions, steps, energies, forces, and stress match ASE.
+  - Active and masked outputs match in original order.
+  - Active graph evaluations are lower for heterogeneous convergence.
+  - Production AtomBit fixed and variable-cell smoke comparisons pass.
+production_validation:
+  command: >-
+    python benchmarks/validate_bfgs_production.py --device cuda:0
+    --output runs/bfgs_integration/results.json
+  samples: first 2 fixed 46-atom T2 manifest structures
+  modes: [fixed cell, full Frechet variable cell]
+  steps: 3 forced steps
+  dtype: float32
+  result: passed
+tolerance_amendment:
+  original_force_eV_per_A: 0.0002
+  amended_force_eV_per_A: 0.0003
+  observed_ase_vs_b2_eV_per_A: 0.0002371072769165039
+  observed_b1_vs_b2_eV_per_A: 0.00010201334953308105
+  relative_ase_force_error: 0.00023928270048031582
+  justification: >-
+    Float32 graph-reduction and trajectory variation; exact float64 ASE
+    algorithm references pass. Original failed artifacts are retained.
+final_checks:
+  pytest: 34 passed in 32.38s
+  ruff: All checks passed
+  wheel: Successfully built atombit-batch-lab

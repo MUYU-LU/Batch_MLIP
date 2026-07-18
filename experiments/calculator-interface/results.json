@@ -1,0 +1,36 @@
+{
+  "environment": {
+    "ase": "3.26.0",
+    "cuda": "12.8",
+    "python": "3.11.14",
+    "torch": "2.9.1+cu128"
+  },
+  "baseline": {
+    "passed": 11,
+    "failed": 0,
+    "wall_seconds": 18.73
+  },
+  "final": {
+    "passed": 13,
+    "failed": 0,
+    "wall_seconds": 4.15
+  },
+  "lint": "passed",
+  "batch_single_validation": {
+    "cross_system_edges": false,
+    "max_abs_energy_error_eV": 0.0,
+    "max_abs_force_error_eV_per_A": 0.0,
+    "n_atoms": 9,
+    "n_systems": 3,
+    "passed": true
+  },
+  "public_api_smoke": {
+    "evaluated_systems": 3,
+    "fire_converged": [true, true, true],
+    "nve_steps": 3
+  },
+  "performance": {
+    "benchmarked": false,
+    "reason": "Interface-only change; numerical and model-forward paths are unchanged."
+  }
+}

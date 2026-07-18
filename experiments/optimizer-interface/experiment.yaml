@@ -1,0 +1,35 @@
+name: optimizer-interface
+date: 2026-07-17
+hypothesis: >-
+  A runtime optimizer protocol plus a validated registry/factory can make the
+  structure-level relaxation API accept custom batched optimizer objects while
+  preserving all existing FIRE, variable-cell, compaction, and CLI behavior.
+source_packet:
+  path: atombit_batch_lab_packet.zip
+  sha256: f8366816dadc7b1c764bf51065be16c0cdc6f3abf6c0699687d6c7c0ba25731d
+baseline:
+  command: python -m pytest -q
+  result: 19 passed in 23.06s
+changes:
+  - Runtime-checkable BatchOptimizer and OptimizerFactory protocols.
+  - Built-in FIRE and gradient-descent optimizer objects.
+  - Validated name registry and create_optimizer factory.
+  - Direct optimizer-object dispatch in relax.
+  - Shared registry dispatch in the YAML CLI.
+correctness_gates:
+  - Existing string optimizer calls remain backward compatible.
+  - Direct custom optimizer objects receive state, calculator, and options.
+  - Factory aliases and third-party registration work.
+  - Unsupported cell and compaction modes fail before optimization.
+  - Existing fixed-cell, variable-cell, and active-compaction tests pass.
+production_validation:
+  command: >-
+    python benchmarks/validate_optimizer_interface.py --device cuda:0
+    --output runs/optimizer_interface_checks/production_equivalence.json
+  samples: 2 fixed 46-atom T2 manifest structures
+  modes: [fixed-cell active FIRE, Frechet variable-cell active FIRE]
+  result: passed
+final_checks:
+  pytest: 26 passed in 32.66s
+  ruff: All checks passed
+  wheel: Successfully built atombit-batch-lab

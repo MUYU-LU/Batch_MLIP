@@ -1,0 +1,71 @@
+name: bfgs-fire-scaling
+date: 2026-07-17
+hypothesis: >-
+  Active-compacted batched full BFGS reduces end-to-end variable-cell
+  relaxation time versus sequential ASE BFGS, but its dense per-system
+  eigensolves cause weaker batch scaling than active-compacted FIRE.
+source_packet:
+  path: atombit_batch_lab_packet.zip
+  sha256: f8366816dadc7b1c764bf51065be16c0cdc6f3abf6c0699687d6c7c0ba25731d
+baseline:
+  command: python -m pytest -q
+  result: 38 passed in 33.42s
+pool:
+  manifest: benchmarks/t2_fixed_samples.json
+  atom_counts: [46, 92, 184, 276]
+  systems_per_group: 32
+  expansion: none
+methods: [ase-fire, ase-bfgs, active-fire, active-bfgs]
+batch_sizes: [1, 2, 4, 8, 16, 32]
+parameters:
+  cell_filter: full Frechet log deformation
+  pressure_GPa: 0.0
+  fmax_eV_per_A: 0.05
+  convergence: ASE generalized filter-force maximum
+  max_steps: 500
+  bfgs_alpha_eV_per_A2: 70.0
+  fire_dt_start: 0.1
+  fire_dt_max: 1.0
+  max_step_A: 0.2
+  dtype: float32
+  cutoff_A: 6.0
+  skin_A: 0.0
+  batch_repeats: 3
+  ase_repeats: 1
+timing:
+  cuda_synchronized: true
+  warmup: one stress/force evaluation
+  peak_gpu_memory: true
+  cpu_threads_per_worker: 1
+  thread_environment: OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+commands:
+  worker: >-
+    OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+    python benchmarks/benchmark_variable_cell_scaling.py
+    --optimizer OPTIMIZER --method METHOD --atom-count ATOMS --pool-size 32
+    --batch-sizes 1,2,4,8,16,32 --repeats REPEATS --device cuda:0 --output OUTPUT
+  summarize: >-
+    python benchmarks/summarize_bfgs_fire_scaling.py
+    --raw-dir runs/bfgs_fire_scaling_raw
+    --output runs/bfgs_fire_scaling_summary.json
+correctness_gates:
+  - Every method processes the identical ordered pool of 32 structures.
+  - Each batched optimizer is compared with its matching common ASE optimizer.
+  - Convergence flags, energy, force, stress, positions, cells, and step counts are compared.
+  - OOM and nonconvergence outcomes remain in raw artifacts.
+limitations:
+  - ASE has one timing sample, so its timing uncertainty is unavailable.
+  - Model-forward, neighbor-list, transfer, and optimizer phase times are not isolated.
+  - Full BFGS stores a dense Hessian and performs a dense eigensolve per active system.
+  - Structures reaching 500 steps are retained in timing and validation.
+negative_controls:
+  - The initial ASE-BFGS 46-atom pilot was terminated after 282 seconds because
+    default BLAS selected more than 100 threads for small dense eigensolves.
+    Its incomplete artifact is retained under raw/pilot after collection.
+final_checks:
+  pytest: 38 passed in 32.93s
+  ruff: All checks passed
+result: >-
+  Performance hypothesis confirmed, correctness hypothesis rejected. Active
+  BFGS is 2.83x-7.16x faster than ASE BFGS at B32, but is 1.43x-2.61x slower
+  than active FIRE and fails the production final-state gate at every size.

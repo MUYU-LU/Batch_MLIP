@@ -1,0 +1,90 @@
+name: bfgs-mixed-deterministic-scaling
+date: 2026-07-18
+hypothesis: >-
+  With float32 MLIP inference, float64 BFGS/Frechet state, and deterministic
+  CUDA reductions, active native BFGS provides reproducible B1-B32 throughput
+  scaling relative to precision-matched common ASE BFGS.
+source_packet:
+  path: atombit_batch_lab_packet.zip
+  sha256: f8366816dadc7b1c764bf51065be16c0cdc6f3abf6c0699687d6c7c0ba25731d
+baseline:
+  command: python -m pytest -q
+  result: 40 passed in 30.07s
+pool:
+  manifest: benchmarks/t2_fixed_samples.json
+  atom_counts: [46, 92, 184, 276]
+  systems_per_group: 32
+  expansion: none
+methods: [common-ase-bfgs, active-batched-bfgs]
+batch_sizes: [1, 2, 4, 8, 16, 32]
+precision:
+  model_inference: float32
+  forces_and_stress: float32
+  bfgs_coordinates_hessian_eigensolve: float64
+determinism:
+  torch_deterministic_algorithms: true
+  cublas_workspace_config: ':4096:8'
+  cpu_threads_per_worker: 1
+parameters:
+  cell_filter: full Frechet log deformation
+  pressure_GPa: 0.0
+  fmax_eV_per_A: 0.05
+  convergence: ASE generalized filter-force maximum
+  max_steps: 500
+  alpha_eV_per_A2: 70.0
+  max_step_A: 0.2
+  cutoff_A: 6.0
+  skin_A: 0.0
+  repeats: 3
+timing:
+  cuda_synchronized: true
+  warmup: one stress/force evaluation
+  peak_gpu_memory: true
+commands:
+  active: >-
+    CUBLAS_WORKSPACE_CONFIG=:4096:8 OMP_NUM_THREADS=1
+    OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+    python benchmarks/benchmark_variable_cell_scaling.py --optimizer bfgs
+    --method active --optimizer-dtype float64 --atom-count ATOMS
+    --pool-size 32 --batch-sizes 1,2,4,8,16,32 --repeats 3
+    --deterministic --device cuda:0 --output OUTPUT
+  ase: >-
+    CUBLAS_WORKSPACE_CONFIG=:4096:8 OMP_NUM_THREADS=1
+    OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+    python benchmarks/benchmark_variable_cell_scaling.py --optimizer bfgs
+    --method ase --optimizer-dtype float64 --atom-count ATOMS
+    --pool-size 32 --repeats 3 --deterministic --device cuda:0
+    --output OUTPUT
+correctness_gates:
+  - Every method uses the identical ordered pool of 32 structures.
+  - Deterministic settings and mixed precision are identical across workers.
+  - Convergence flags, energy, force, stress, positions, cells, and steps are retained.
+  - Final-basin differences are reported but not treated as direct gradient errors.
+  - OOM, worker, and nonconvergence outcomes remain in raw artifacts.
+limitations:
+  - Model-forward, neighbor-list, transfer, and optimizer phase times are not isolated.
+  - Native and ASE calculator/filter paths are not bitwise identical.
+  - Full BFGS stores a dense Hessian and performs a dense eigensolve per system.
+fixed_step_validation:
+  steps: 3
+  structures: 128
+  passed: true
+  max_energy_error_eV_per_atom: 1.79678e-7
+  max_final_fmax_error_eV_per_A: 2.93374e-4
+  max_stress_error_eV_per_A3: 2.68221e-7
+  max_position_rmsd_A: 9.19223e-7
+  max_cell_rmsd_A: 1.22072e-6
+  max_step_difference: 0
+result:
+  b32_speedup_vs_ase:
+    46_atoms: 6.2867
+    92_atoms: 4.6760
+    184_atoms: 4.8923
+    276_atoms: 6.8859
+  conclusion: >-
+    Precision-matched deterministic active BFGS passes the fixed-step gate and
+    provides 4.68x-6.89x end-to-end B32 speedup over common ASE BFGS. Long
+    final-basin identity remains sensitive to non-bitwise calculator paths.
+final_checks:
+  pytest: 40 passed in 30.01s
+  ruff: All checks passed

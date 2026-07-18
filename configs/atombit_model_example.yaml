@@ -1,0 +1,27 @@
+# Illustrative only. These fields must match the checkpoint architecture.
+cutoff: 6.0
+num_rbf: 8
+hidden_dim: 128
+num_layers: 4
+num_atom_types: 2
+atom_types_map: [1, 8]
+use_L1: true
+use_L2: true
+use_gating: true
+use_direct_force: false
+outer_impl: 1
+mat_mul_sym_impl: 1
+gating_impl: 1
+active_paths:
+  - [0, 0, 0, prod]
+  - [0, 1, 1, prod]
+  - [1, 0, 1, prod]
+  - [1, 1, 0, dot]
+  - [1, 1, 1, cross]
+  - [1, 1, 2, outer]
+  - [0, 2, 2, prod]
+  - [2, 0, 2, prod]
+  - [2, 1, 1, mat_vec]
+  - [1, 2, 1, vec_mat]
+  - [2, 2, 0, double_dot]
+  - [2, 2, 2, mat_mul_sym]

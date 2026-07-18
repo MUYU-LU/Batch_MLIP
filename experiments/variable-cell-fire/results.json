@@ -1,0 +1,47 @@
+{
+  "baseline": {
+    "failed": 0,
+    "passed": 13,
+    "wall_seconds": 25.71
+  },
+  "final": {
+    "failed": 0,
+    "passed": 18,
+    "wall_seconds": 31.04
+  },
+  "lint": "passed",
+  "package_wheel": {
+    "filename": "atombit_batch_lab-0.1.0-py3-none-any.whl",
+    "sha256": "28eb62c91278e7072ecfc1b3cae481f87a5122313d3e9a3e48f627f8d4bb932c"
+  },
+  "scientific_validation": {
+    "anisotropic_ase_cell_max_abs_error_A": 2e-12,
+    "external_pressure_GPa": 1.0,
+    "external_pressure_ase_steps": 61,
+    "external_pressure_batch_steps": 61,
+    "graph_stress_finite_difference_max_abs_error_eV_per_A3": 3.4e-12,
+    "hydrostatic_ase_converged_steps": [52, 80],
+    "hydrostatic_batch_converged_steps": [52, 80]
+  },
+  "production_validation": {
+    "artifact": "production_smoke.json",
+    "atom_count": 46,
+    "checkpoint_epoch": 15,
+    "max_abs_energy_error_eV": 3.337860107421875e-06,
+    "max_abs_force_error_eV_per_A": 3.814697265625e-06,
+    "max_abs_stress_error_eV_per_A3": 1.3969838619232178e-08,
+    "passed": true,
+    "sample_count": 2,
+    "variable_cell_steps": 2
+  },
+  "performance": {
+    "benchmarked": false,
+    "reason": "Correctness experiment; every cell update currently forces a CPU neighbor-list rebuild."
+  },
+  "limitations": [
+    "Variable-cell active compaction is not implemented.",
+    "Variable-cell FixAtoms interaction is not implemented.",
+    "Only fully periodic, right-handed, full-rank cells are accepted.",
+    "NPT ensemble names are reserved but raise NotImplementedError."
+  ]
+}

@@ -1,0 +1,14 @@
+id: replace-me
+description: Describe the single change being evaluated.
+hypothesis: State a falsifiable prediction and mechanism.
+environment: {}
+commands:
+  - name: tests
+    command: [python, -m, pytest, -q]
+  - name: validation
+    command: [python, -m, atombit_batch.cli, validate, configs/relax_toy.yaml]
+  - name: benchmark
+    command: [python, benchmarks/benchmark_scaling.py, --output, runs/candidate_benchmark.json]
+collect_json:
+  - validation.json
+  - runs/candidate_benchmark.json

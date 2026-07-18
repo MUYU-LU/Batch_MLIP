@@ -1,0 +1,1351 @@
+{
+  "groups": {
+    "184": {
+      "ase": {
+        "atoms_per_second": 26.41863946199867,
+        "avoided_graph_evaluations": 0,
+        "float64_vs_mixed_memory_ratio": 1.8714562947192,
+        "float64_vs_mixed_time_ratio": 1.0048559831372854,
+        "graph_evaluations": 3485,
+        "median_seconds": 222.87294576503336,
+        "model_evaluations": 3485,
+        "neighbor_rebuilds": 3485,
+        "optimizer_steps_total": 3453,
+        "peak_memory_bytes": 955899392,
+        "status": "passed",
+        "systems_per_second": 0.14357956229347105,
+        "timing_samples_seconds": [
+          222.72015377995558,
+          222.87294576503336,
+          226.0935204050038
+        ]
+      },
+      "points": [
+        {
+          "atoms_per_second": 42.02163250537904,
+          "avoided_graph_evaluations": 0,
+          "batch_size": 1,
+          "float64_vs_mixed_memory_ratio": 1.8653628592142897,
+          "float64_vs_mixed_time_per_graph_ratio": 0.9828408401083445,
+          "float64_vs_mixed_time_ratio": 1.0115034484521284,
+          "graph_evaluations": 3529,
+          "median_seconds": 140.11830690409988,
+          "model_evaluations": 3529,
+          "neighbor_rebuilds": 3561,
+          "optimizer_steps_total": 3497,
+          "peak_memory_bytes": 959015936,
+          "speedup_vs_ase": 1.5906054725423753,
+          "status": "passed",
+          "systems_per_second": 0.22837843752923392,
+          "timing_samples_seconds": [
+            140.54736536601558,
+            140.11830690409988,
+            132.13312999811023
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [
+              "max_energy_error_eV_per_atom",
+              "max_position_rmsd_A"
+            ],
+            "max_cell_rmsd_A": 0.015525479656390217,
+            "max_energy_error_eV_per_atom": 0.00063049411696699,
+            "max_final_fmax_error_eV_per_A": 0.008784480088598952,
+            "max_position_rmsd_A": 0.07718878886637516,
+            "max_step_difference": 23,
+            "max_stress_tensor_error_eV_per_A3": 0.0008591484970739928,
+            "passed": false,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        },
+        {
+          "atoms_per_second": 56.673166267415056,
+          "avoided_graph_evaluations": 1370,
+          "batch_size": 2,
+          "float64_vs_mixed_memory_ratio": 1.9206777811537243,
+          "float64_vs_mixed_time_per_graph_ratio": 0.9907614067128792,
+          "float64_vs_mixed_time_ratio": 0.9589860481040581,
+          "graph_evaluations": 3350,
+          "median_seconds": 103.89396583591588,
+          "model_evaluations": 2360,
+          "neighbor_rebuilds": 2376,
+          "optimizer_steps_total": 3318,
+          "peak_memory_bytes": 1806011904,
+          "speedup_vs_ase": 2.145196248615882,
+          "status": "passed",
+          "systems_per_second": 0.3080063384098644,
+          "timing_samples_seconds": [
+            103.97717202710919,
+            103.72318236599676,
+            103.89396583591588
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [
+              "max_energy_error_eV_per_atom",
+              "max_position_rmsd_A",
+              "max_cell_rmsd_A",
+              "max_step_difference"
+            ],
+            "max_cell_rmsd_A": 0.45114586455846384,
+            "max_energy_error_eV_per_atom": 0.010450208794003258,
+            "max_final_fmax_error_eV_per_A": 0.01026636342219854,
+            "max_position_rmsd_A": 0.9089492920379253,
+            "max_step_difference": 170,
+            "max_stress_tensor_error_eV_per_A3": 0.002687633853295267,
+            "passed": false,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        },
+        {
+          "atoms_per_second": 69.59048498279031,
+          "avoided_graph_evaluations": 2835,
+          "batch_size": 4,
+          "float64_vs_mixed_memory_ratio": 1.9305069861837483,
+          "float64_vs_mixed_time_per_graph_ratio": 1.0266455458406645,
+          "float64_vs_mixed_time_ratio": 1.0585495117917374,
+          "graph_evaluations": 3517,
+          "median_seconds": 84.6092680839356,
+          "model_evaluations": 1588,
+          "neighbor_rebuilds": 1596,
+          "optimizer_steps_total": 3485,
+          "peak_memory_bytes": 3039034368,
+          "speedup_vs_ase": 2.6341434078348835,
+          "status": "passed",
+          "systems_per_second": 0.3782091575151647,
+          "timing_samples_seconds": [
+            84.6092680839356,
+            84.61967284115963,
+            84.54805257194676
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [
+              "max_energy_error_eV_per_atom",
+              "max_position_rmsd_A",
+              "max_cell_rmsd_A",
+              "max_step_difference"
+            ],
+            "max_cell_rmsd_A": 0.027365663025638955,
+            "max_energy_error_eV_per_atom": 0.0008861300188530176,
+            "max_final_fmax_error_eV_per_A": 0.00874124423537359,
+            "max_position_rmsd_A": 0.11540412652637926,
+            "max_step_difference": 33,
+            "max_stress_tensor_error_eV_per_A3": 0.00022723352587150349,
+            "passed": false,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        },
+        {
+          "atoms_per_second": 93.71755027729652,
+          "avoided_graph_evaluations": 3663,
+          "batch_size": 8,
+          "float64_vs_mixed_memory_ratio": 1.9626822649037547,
+          "float64_vs_mixed_time_per_graph_ratio": 1.0433654282661062,
+          "float64_vs_mixed_time_ratio": 0.9979107005227847,
+          "graph_evaluations": 3337,
+          "median_seconds": 62.82707969401963,
+          "model_evaluations": 875,
+          "neighbor_rebuilds": 879,
+          "optimizer_steps_total": 3305,
+          "peak_memory_bytes": 5220538368,
+          "speedup_vs_ase": 3.547402598536633,
+          "status": "passed",
+          "systems_per_second": 0.5093345123766115,
+          "timing_samples_seconds": [
+            62.81248955707997,
+            62.82707969401963,
+            62.90819456405006
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [
+              "max_energy_error_eV_per_atom",
+              "max_position_rmsd_A",
+              "max_cell_rmsd_A",
+              "max_step_difference"
+            ],
+            "max_cell_rmsd_A": 0.45096632010991794,
+            "max_energy_error_eV_per_atom": 0.01043136536467778,
+            "max_final_fmax_error_eV_per_A": 0.007526435712953569,
+            "max_position_rmsd_A": 0.9087957304145717,
+            "max_step_difference": 170,
+            "max_stress_tensor_error_eV_per_A3": 0.0026944156517372192,
+            "passed": false,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        },
+        {
+          "atoms_per_second": 108.27842209793803,
+          "avoided_graph_evaluations": 4311,
+          "batch_size": 16,
+          "float64_vs_mixed_memory_ratio": 1.974744262129486,
+          "float64_vs_mixed_time_per_graph_ratio": 1.071073375212205,
+          "float64_vs_mixed_time_ratio": 1.0477691735184955,
+          "graph_evaluations": 3417,
+          "median_seconds": 54.37833213596605,
+          "model_evaluations": 483,
+          "neighbor_rebuilds": 485,
+          "optimizer_steps_total": 3385,
+          "peak_memory_bytes": 9869114880,
+          "speedup_vs_ase": 4.0985616331109265,
+          "status": "passed",
+          "systems_per_second": 0.5884696853148806,
+          "timing_samples_seconds": [
+            54.623265265952796,
+            54.37833213596605,
+            54.218540912959725
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [
+              "max_energy_error_eV_per_atom",
+              "max_position_rmsd_A",
+              "max_cell_rmsd_A",
+              "max_step_difference"
+            ],
+            "max_cell_rmsd_A": 0.22492090676623108,
+            "max_energy_error_eV_per_atom": 0.005301516998396162,
+            "max_final_fmax_error_eV_per_A": 0.0063395536251892246,
+            "max_position_rmsd_A": 0.5055952942282226,
+            "max_step_difference": 89,
+            "max_stress_tensor_error_eV_per_A3": 0.002912645423383005,
+            "passed": false,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        },
+        {
+          "atoms_per_second": 124.77214893636705,
+          "avoided_graph_evaluations": 4604,
+          "batch_size": 32,
+          "float64_vs_mixed_memory_ratio": 1.9809130034445956,
+          "float64_vs_mixed_time_per_graph_ratio": 1.1020995979580013,
+          "float64_vs_mixed_time_ratio": 1.0409068898859202,
+          "graph_evaluations": 3300,
+          "median_seconds": 47.190018367022276,
+          "model_evaluations": 247,
+          "neighbor_rebuilds": 248,
+          "optimizer_steps_total": 3268,
+          "peak_memory_bytes": 19319105024,
+          "speedup_vs_ase": 4.722883217201359,
+          "status": "passed",
+          "systems_per_second": 0.6781095050889514,
+          "timing_samples_seconds": [
+            47.13542556902394,
+            47.190018367022276,
+            47.21003173105419
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [
+              "max_energy_error_eV_per_atom",
+              "max_position_rmsd_A",
+              "max_cell_rmsd_A",
+              "max_step_difference"
+            ],
+            "max_cell_rmsd_A": 0.43927210363034297,
+            "max_energy_error_eV_per_atom": 0.010179191589862078,
+            "max_final_fmax_error_eV_per_A": 0.008820281109766452,
+            "max_position_rmsd_A": 0.8890205261208071,
+            "max_step_difference": 160,
+            "max_stress_tensor_error_eV_per_A3": 0.0025815944690847302,
+            "passed": false,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        }
+      ],
+      "sample_files": [
+        "Aven12_5_322_z1.cif",
+        "Aven12_14_1278_z1.cif",
+        "Aven12_19_363_z1.cif",
+        "Aven12_33_292_z1.cif",
+        "Aven12_77_144_z1.cif",
+        "Aven12_14_350_z1.cif",
+        "Aven12_19_164_z1.cif",
+        "Aven12_19_457_z1.cif",
+        "Aven12_14_195_z1.cif",
+        "Aven12_9_194_z1.cif",
+        "Aven12_77_1310_z1.cif",
+        "Aven12_19_103_z1.cif",
+        "Aven12_19_37_z1.cif",
+        "Aven12_14_868_z1.cif",
+        "Aven12_9_465_z1.cif",
+        "Aven12_19_47_z1.cif",
+        "Aven12_14_1839_z1.cif",
+        "Aven12_5_900_z1.cif",
+        "Aven12_77_262_z1.cif",
+        "Aven12_19_372_z1.cif",
+        "Aven12_14_2082_z1.cif",
+        "Aven12_5_358_z1.cif",
+        "Aven12_33_151_z1.cif",
+        "Aven12_5_307_z1.cif",
+        "Aven12_14_498_z1.cif",
+        "Aven12_77_1346_z1.cif",
+        "Aven12_19_454_z1.cif",
+        "Aven12_77_494_z1.cif",
+        "Aven12_33_202_z1.cif",
+        "Aven12_19_81_z1.cif",
+        "Aven12_9_77_z1.cif",
+        "Aven12_77_1075_z1.cif"
+      ]
+    },
+    "276": {
+      "ase": {
+        "atoms_per_second": 36.720466358230205,
+        "avoided_graph_evaluations": 0,
+        "float64_vs_mixed_memory_ratio": 1.8559459440281563,
+        "float64_vs_mixed_time_ratio": 0.7921509706091278,
+        "graph_evaluations": 1872,
+        "median_seconds": 240.51982112205587,
+        "model_evaluations": 1872,
+        "neighbor_rebuilds": 1872,
+        "optimizer_steps_total": 1840,
+        "peak_memory_bytes": 1071328256,
+        "status": "passed",
+        "systems_per_second": 0.1330451679646022,
+        "timing_samples_seconds": [
+          244.38865327904932,
+          240.51982112205587,
+          238.2425595340319
+        ]
+      },
+      "points": [
+        {
+          "atoms_per_second": 106.21945707100912,
+          "avoided_graph_evaluations": 0,
+          "batch_size": 1,
+          "float64_vs_mixed_memory_ratio": 1.8433917976822436,
+          "float64_vs_mixed_time_per_graph_ratio": 0.9779888680462209,
+          "float64_vs_mixed_time_ratio": 0.7464338508682687,
+          "graph_evaluations": 1860,
+          "median_seconds": 83.14860801910982,
+          "model_evaluations": 1860,
+          "neighbor_rebuilds": 1892,
+          "optimizer_steps_total": 1828,
+          "peak_memory_bytes": 1076015104,
+          "speedup_vs_ase": 2.8926500016305488,
+          "status": "passed",
+          "systems_per_second": 0.3848531053297432,
+          "timing_samples_seconds": [
+            83.32419378100894,
+            82.78838386014104,
+            83.14860801910982
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [
+              "max_energy_error_eV_per_atom",
+              "max_position_rmsd_A",
+              "max_cell_rmsd_A",
+              "max_step_difference"
+            ],
+            "max_cell_rmsd_A": 0.07702720149790657,
+            "max_energy_error_eV_per_atom": 0.0016977141802232711,
+            "max_final_fmax_error_eV_per_A": 0.009224324450692108,
+            "max_position_rmsd_A": 0.27582707408274126,
+            "max_step_difference": 47,
+            "max_stress_tensor_error_eV_per_A3": 0.00027905721920314054,
+            "passed": false,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        },
+        {
+          "atoms_per_second": 127.45338293859427,
+          "avoided_graph_evaluations": 721,
+          "batch_size": 2,
+          "float64_vs_mixed_memory_ratio": 1.7998230798665817,
+          "float64_vs_mixed_time_per_graph_ratio": 1.0350455260992861,
+          "float64_vs_mixed_time_ratio": 0.8212908850766658,
+          "graph_evaluations": 1875,
+          "median_seconds": 69.29592448915355,
+          "model_evaluations": 1298,
+          "neighbor_rebuilds": 1314,
+          "optimizer_steps_total": 1843,
+          "peak_memory_bytes": 1784472576,
+          "speedup_vs_ase": 3.4709086125216917,
+          "status": "passed",
+          "systems_per_second": 0.4617876193427329,
+          "timing_samples_seconds": [
+            69.58895440888591,
+            69.29592448915355,
+            68.8735022561159
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [
+              "max_energy_error_eV_per_atom",
+              "max_position_rmsd_A",
+              "max_cell_rmsd_A",
+              "max_step_difference"
+            ],
+            "max_cell_rmsd_A": 0.10939821359086029,
+            "max_energy_error_eV_per_atom": 0.0017796914067744237,
+            "max_final_fmax_error_eV_per_A": 0.01443614376820761,
+            "max_position_rmsd_A": 0.2760618285755618,
+            "max_step_difference": 47,
+            "max_stress_tensor_error_eV_per_A3": 0.0011390687070147796,
+            "passed": false,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        },
+        {
+          "atoms_per_second": 145.66272916292223,
+          "avoided_graph_evaluations": 1657,
+          "batch_size": 4,
+          "float64_vs_mixed_memory_ratio": 1.9475927860390807,
+          "float64_vs_mixed_time_per_graph_ratio": 1.1191629189854702,
+          "float64_vs_mixed_time_ratio": 0.9033375040988807,
+          "graph_evaluations": 1963,
+          "median_seconds": 60.6332179189194,
+          "model_evaluations": 905,
+          "neighbor_rebuilds": 913,
+          "optimizer_steps_total": 1931,
+          "peak_memory_bytes": 3375404032,
+          "speedup_vs_ase": 3.9667995428460743,
+          "status": "passed",
+          "systems_per_second": 0.5277635114598632,
+          "timing_samples_seconds": [
+            60.89862856804393,
+            60.353973696008325,
+            60.6332179189194
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [
+              "max_energy_error_eV_per_atom",
+              "max_position_rmsd_A",
+              "max_cell_rmsd_A",
+              "max_step_difference"
+            ],
+            "max_cell_rmsd_A": 0.11744129020195505,
+            "max_energy_error_eV_per_atom": 0.0019132414265583863,
+            "max_final_fmax_error_eV_per_A": 0.013831803419905996,
+            "max_position_rmsd_A": 0.20435040407789018,
+            "max_step_difference": 41,
+            "max_stress_tensor_error_eV_per_A3": 0.0012205298051835855,
+            "passed": false,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        },
+        {
+          "atoms_per_second": 193.3155726729585,
+          "avoided_graph_evaluations": 1671,
+          "batch_size": 8,
+          "float64_vs_mixed_memory_ratio": 1.9612727654667457,
+          "float64_vs_mixed_time_per_graph_ratio": 1.1222656738406516,
+          "float64_vs_mixed_time_ratio": 0.8804593816316393,
+          "graph_evaluations": 1857,
+          "median_seconds": 45.68695567501709,
+          "model_evaluations": 441,
+          "neighbor_rebuilds": 445,
+          "optimizer_steps_total": 1825,
+          "peak_memory_bytes": 6329040896,
+          "speedup_vs_ase": 5.264518451019902,
+          "status": "passed",
+          "systems_per_second": 0.7004187415686902,
+          "timing_samples_seconds": [
+            45.920467796968296,
+            45.68695567501709,
+            45.60824084398337
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [
+              "max_energy_error_eV_per_atom",
+              "max_position_rmsd_A"
+            ],
+            "max_cell_rmsd_A": 0.005801137139003888,
+            "max_energy_error_eV_per_atom": 0.00015163421928708078,
+            "max_final_fmax_error_eV_per_A": 0.008315787039580379,
+            "max_position_rmsd_A": 0.02124187153932965,
+            "max_step_difference": 8,
+            "max_stress_tensor_error_eV_per_A3": 0.00014075461466706593,
+            "passed": false,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        },
+        {
+          "atoms_per_second": 197.67093615204413,
+          "avoided_graph_evaluations": 2994,
+          "batch_size": 16,
+          "float64_vs_mixed_memory_ratio": 1.9715926518776425,
+          "float64_vs_mixed_time_per_graph_ratio": 1.1897797465659141,
+          "float64_vs_mixed_time_ratio": 1.0101804134189567,
+          "graph_evaluations": 1918,
+          "median_seconds": 44.68031654995866,
+          "model_evaluations": 307,
+          "neighbor_rebuilds": 309,
+          "optimizer_steps_total": 1886,
+          "peak_memory_bytes": 12436756480,
+          "speedup_vs_ase": 5.383127061177421,
+          "status": "passed",
+          "systems_per_second": 0.7161990440291455,
+          "timing_samples_seconds": [
+            44.68031654995866,
+            44.553830669028684,
+            44.8878237339668
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [
+              "max_energy_error_eV_per_atom",
+              "max_position_rmsd_A",
+              "max_cell_rmsd_A",
+              "max_step_difference"
+            ],
+            "max_cell_rmsd_A": 0.10952073427181883,
+            "max_energy_error_eV_per_atom": 0.0017799831074438914,
+            "max_final_fmax_error_eV_per_A": 0.010280190300283105,
+            "max_position_rmsd_A": 0.1879913713603886,
+            "max_step_difference": 38,
+            "max_stress_tensor_error_eV_per_A3": 0.001142451230594915,
+            "passed": false,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        },
+        {
+          "atoms_per_second": 208.80637540013797,
+          "avoided_graph_evaluations": 3380,
+          "batch_size": 32,
+          "float64_vs_mixed_memory_ratio": 1.977947325081205,
+          "float64_vs_mixed_time_per_graph_ratio": 1.1868604800389693,
+          "float64_vs_mixed_time_ratio": 0.959256783043842,
+          "graph_evaluations": 1964,
+          "median_seconds": 42.2975590811111,
+          "model_evaluations": 167,
+          "neighbor_rebuilds": 168,
+          "optimizer_steps_total": 1932,
+          "peak_memory_bytes": 24456321536,
+          "speedup_vs_ase": 5.686375912634288,
+          "status": "passed",
+          "systems_per_second": 0.756544838406297,
+          "timing_samples_seconds": [
+            42.31133158411831,
+            42.2975590811111,
+            42.28232324519195
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [
+              "max_energy_error_eV_per_atom",
+              "max_position_rmsd_A",
+              "max_cell_rmsd_A",
+              "max_step_difference"
+            ],
+            "max_cell_rmsd_A": 0.10978126316559687,
+            "max_energy_error_eV_per_atom": 0.01657756041723048,
+            "max_final_fmax_error_eV_per_A": 0.011183576682155881,
+            "max_position_rmsd_A": 0.6637510101715448,
+            "max_step_difference": 99,
+            "max_stress_tensor_error_eV_per_A3": 0.0011436924911035955,
+            "passed": false,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        }
+      ],
+      "sample_files": [
+        "Aven12_148_562_z1.cif",
+        "Aven12_148_66_z1.cif",
+        "Aven12_148_854_z1.cif",
+        "Aven12_148_2222_z1.cif",
+        "Aven12_148_756_z1.cif",
+        "Aven12_148_211_z1.cif",
+        "Aven12_148_690_z1.cif",
+        "Aven12_148_1276_z1.cif",
+        "Aven12_148_1301_z1.cif",
+        "Aven12_148_541_z1.cif",
+        "Aven12_148_930_z1.cif",
+        "Aven12_148_551_z1.cif",
+        "Aven12_148_452_z1.cif",
+        "Aven12_148_2142_z1.cif",
+        "Aven12_148_1824_z1.cif",
+        "Aven12_148_457_z1.cif",
+        "Aven12_148_1618_z1.cif",
+        "Aven12_148_1635_z1.cif",
+        "Aven12_148_496_z1.cif",
+        "Aven12_148_2409_z1.cif",
+        "Aven12_148_1661_z1.cif",
+        "Aven12_148_184_z1.cif",
+        "Aven12_148_1942_z1.cif",
+        "Aven12_148_1025_z1.cif",
+        "Aven12_148_2382_z1.cif",
+        "Aven12_148_288_z1.cif",
+        "Aven12_148_469_z1.cif",
+        "Aven12_148_987_z1.cif",
+        "Aven12_148_843_z1.cif",
+        "Aven12_148_1778_z1.cif",
+        "Aven12_148_536_z1.cif",
+        "Aven12_148_2042_z1.cif"
+      ]
+    },
+    "46": {
+      "ase": {
+        "atoms_per_second": 11.186414505626505,
+        "avoided_graph_evaluations": 0,
+        "float64_vs_mixed_memory_ratio": 1.6700738253313168,
+        "float64_vs_mixed_time_ratio": 1.0250785365214328,
+        "graph_evaluations": 3958,
+        "median_seconds": 131.58818665798753,
+        "model_evaluations": 3958,
+        "neighbor_rebuilds": 3958,
+        "optimizer_steps_total": 3926,
+        "peak_memory_bytes": 266859520,
+        "status": "passed",
+        "systems_per_second": 0.24318292403535882,
+        "timing_samples_seconds": [
+          132.35826019803062,
+          131.58818665798753,
+          130.78619834897108
+        ]
+      },
+      "points": [
+        {
+          "atoms_per_second": 11.451539255679345,
+          "avoided_graph_evaluations": 0,
+          "batch_size": 1,
+          "float64_vs_mixed_memory_ratio": 1.668797303822037,
+          "float64_vs_mixed_time_per_graph_ratio": 0.992057735278093,
+          "float64_vs_mixed_time_ratio": 1.0109589382674284,
+          "graph_evaluations": 3958,
+          "median_seconds": 128.5416717468761,
+          "model_evaluations": 3958,
+          "neighbor_rebuilds": 3990,
+          "optimizer_steps_total": 3926,
+          "peak_memory_bytes": 267211776,
+          "speedup_vs_ase": 1.0237006012891339,
+          "status": "passed",
+          "systems_per_second": 0.2489465055582466,
+          "timing_samples_seconds": [
+            128.5416717468761,
+            128.55958521785215,
+            128.0219197080005
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [],
+            "max_cell_rmsd_A": 6.897363100589503e-07,
+            "max_energy_error_eV_per_atom": 7.92514266772346e-10,
+            "max_final_fmax_error_eV_per_A": 1.7022068363604925e-05,
+            "max_position_rmsd_A": 6.451018960840525e-07,
+            "max_step_difference": 0,
+            "max_stress_tensor_error_eV_per_A3": 4.183086603319619e-08,
+            "passed": true,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        },
+        {
+          "atoms_per_second": 16.45243603277576,
+          "avoided_graph_evaluations": 1204,
+          "batch_size": 2,
+          "float64_vs_mixed_memory_ratio": 1.774513963520612,
+          "float64_vs_mixed_time_per_graph_ratio": 0.9709988862137207,
+          "float64_vs_mixed_time_ratio": 0.995135575254766,
+          "graph_evaluations": 3958,
+          "median_seconds": 89.47003331710584,
+          "model_evaluations": 2581,
+          "neighbor_rebuilds": 2597,
+          "optimizer_steps_total": 3926,
+          "peak_memory_bytes": 421855744,
+          "speedup_vs_ase": 1.470751510638245,
+          "status": "passed",
+          "systems_per_second": 0.3576616528864296,
+          "timing_samples_seconds": [
+            89.47003331710584,
+            89.50392466387711,
+            89.30417531798594
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [],
+            "max_cell_rmsd_A": 6.882609087840114e-07,
+            "max_energy_error_eV_per_atom": 7.906829587202834e-10,
+            "max_final_fmax_error_eV_per_A": 1.6986904525728708e-05,
+            "max_position_rmsd_A": 6.437429344186441e-07,
+            "max_step_difference": 0,
+            "max_stress_tensor_error_eV_per_A3": 4.1741921897827695e-08,
+            "passed": true,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        },
+        {
+          "atoms_per_second": 23.869861605064088,
+          "avoided_graph_evaluations": 2598,
+          "batch_size": 4,
+          "float64_vs_mixed_memory_ratio": 1.815755561719392,
+          "float64_vs_mixed_time_per_graph_ratio": 0.9822492515984781,
+          "float64_vs_mixed_time_ratio": 1.0077093151443173,
+          "graph_evaluations": 3958,
+          "median_seconds": 61.667722434038296,
+          "model_evaluations": 1639,
+          "neighbor_rebuilds": 1647,
+          "optimizer_steps_total": 3926,
+          "peak_memory_bytes": 700503040,
+          "speedup_vs_ase": 2.1338259540675972,
+          "status": "passed",
+          "systems_per_second": 0.5189100348926976,
+          "timing_samples_seconds": [
+            61.99588525900617,
+            61.667722434038296,
+            61.5258094270248
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [],
+            "max_cell_rmsd_A": 1.5538766702560228e-06,
+            "max_energy_error_eV_per_atom": 1.882795870901942e-09,
+            "max_final_fmax_error_eV_per_A": 3.77243412121378e-05,
+            "max_position_rmsd_A": 1.4433367494954414e-06,
+            "max_step_difference": 0,
+            "max_stress_tensor_error_eV_per_A3": 9.40146893700167e-08,
+            "passed": true,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        },
+        {
+          "atoms_per_second": 35.06860723658414,
+          "avoided_graph_evaluations": 3938,
+          "batch_size": 8,
+          "float64_vs_mixed_memory_ratio": 1.892994408762716,
+          "float64_vs_mixed_time_per_graph_ratio": 0.9910444069256023,
+          "float64_vs_mixed_time_ratio": 1.01646897191281,
+          "graph_evaluations": 3958,
+          "median_seconds": 41.97486344608478,
+          "model_evaluations": 987,
+          "neighbor_rebuilds": 991,
+          "optimizer_steps_total": 3926,
+          "peak_memory_bytes": 1256578048,
+          "speedup_vs_ase": 3.13492828456745,
+          "status": "passed",
+          "systems_per_second": 0.7623610268822639,
+          "timing_samples_seconds": [
+            42.12986750807613,
+            41.97486344608478,
+            41.95243507716805
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [],
+            "max_cell_rmsd_A": 1.5563069647070399e-06,
+            "max_energy_error_eV_per_atom": 1.885819326783734e-09,
+            "max_final_fmax_error_eV_per_A": 3.7781995218456876e-05,
+            "max_position_rmsd_A": 1.4455732397720311e-06,
+            "max_step_difference": 0,
+            "max_stress_tensor_error_eV_per_A3": 9.416013973010621e-08,
+            "passed": true,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        },
+        {
+          "atoms_per_second": 49.64793606167214,
+          "avoided_graph_evaluations": 5018,
+          "batch_size": 16,
+          "float64_vs_mixed_memory_ratio": 1.9281609795239483,
+          "float64_vs_mixed_time_per_graph_ratio": 1.0690296413396394,
+          "float64_vs_mixed_time_ratio": 1.0910828572517515,
+          "graph_evaluations": 3958,
+          "median_seconds": 29.648765221005306,
+          "model_evaluations": 561,
+          "neighbor_rebuilds": 563,
+          "optimizer_steps_total": 3926,
+          "peak_memory_bytes": 2364670464,
+          "speedup_vs_ase": 4.4382349712412665,
+          "status": "passed",
+          "systems_per_second": 1.0793029578624378,
+          "timing_samples_seconds": [
+            29.75078434799798,
+            29.648765221005306,
+            29.637265841010958
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [],
+            "max_cell_rmsd_A": 1.5546421931967913e-06,
+            "max_energy_error_eV_per_atom": 1.8837563393217156e-09,
+            "max_final_fmax_error_eV_per_A": 3.7742635171172934e-05,
+            "max_position_rmsd_A": 1.444043154802857e-06,
+            "max_step_difference": 0,
+            "max_stress_tensor_error_eV_per_A3": 9.406061116372811e-08,
+            "passed": true,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        },
+        {
+          "atoms_per_second": 64.8671923552757,
+          "avoided_graph_evaluations": 5482,
+          "batch_size": 32,
+          "float64_vs_mixed_memory_ratio": 1.9551344895735723,
+          "float64_vs_mixed_time_per_graph_ratio": 1.0894422130717225,
+          "float64_vs_mixed_time_ratio": 1.1113433709633707,
+          "graph_evaluations": 3958,
+          "median_seconds": 22.69251907709986,
+          "model_evaluations": 295,
+          "neighbor_rebuilds": 296,
+          "optimizer_steps_total": 3926,
+          "peak_memory_bytes": 4623399936,
+          "speedup_vs_ase": 5.798747429093479,
+          "status": "passed",
+          "systems_per_second": 1.4101563555494718,
+          "timing_samples_seconds": [
+            22.750149806961417,
+            22.69251907709986,
+            22.666703674942255
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [],
+            "max_cell_rmsd_A": 1.553960427624103e-06,
+            "max_energy_error_eV_per_atom": 1.882888840012613e-09,
+            "max_final_fmax_error_eV_per_A": 3.7726316467118215e-05,
+            "max_position_rmsd_A": 1.443413586371326e-06,
+            "max_step_difference": 0,
+            "max_stress_tensor_error_eV_per_A3": 9.401966779827662e-08,
+            "passed": true,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        }
+      ],
+      "sample_files": [
+        "Aven12_1_295_z1.cif",
+        "Aven12_1_331_z1.cif",
+        "Aven12_1_241_z1.cif",
+        "Aven12_1_62_z1.cif",
+        "Aven12_1_204_z1.cif",
+        "Aven12_1_378_z1.cif",
+        "Aven12_1_263_z1.cif",
+        "Aven12_1_277_z1.cif",
+        "Aven12_1_474_z1.cif",
+        "Aven12_1_491_z1.cif",
+        "Aven12_1_401_z1.cif",
+        "Aven12_1_201_z1.cif",
+        "Aven12_1_234_z1.cif",
+        "Aven12_1_367_z1.cif",
+        "Aven12_1_18_z1.cif",
+        "Aven12_1_152_z1.cif",
+        "Aven12_1_191_z1.cif",
+        "Aven12_1_198_z1.cif",
+        "Aven12_1_65_z1.cif",
+        "Aven12_1_414_z1.cif",
+        "Aven12_1_74_z1.cif",
+        "Aven12_1_430_z1.cif",
+        "Aven12_1_303_z1.cif",
+        "Aven12_1_283_z1.cif",
+        "Aven12_1_78_z1.cif",
+        "Aven12_1_51_z1.cif",
+        "Aven12_1_330_z1.cif",
+        "Aven12_1_487_z1.cif",
+        "Aven12_1_161_z1.cif",
+        "Aven12_1_385_z1.cif",
+        "Aven12_1_505_z1.cif",
+        "Aven12_1_7_z1.cif"
+      ]
+    },
+    "92": {
+      "ase": {
+        "atoms_per_second": 19.279604272579544,
+        "avoided_graph_evaluations": 0,
+        "float64_vs_mixed_memory_ratio": 1.7462383181214032,
+        "float64_vs_mixed_time_ratio": 1.0145703772198833,
+        "graph_evaluations": 3847,
+        "median_seconds": 152.700229650829,
+        "model_evaluations": 3847,
+        "neighbor_rebuilds": 3847,
+        "optimizer_steps_total": 3815,
+        "peak_memory_bytes": 515942400,
+        "status": "passed",
+        "systems_per_second": 0.2095609160062994,
+        "timing_samples_seconds": [
+          152.700229650829,
+          153.0369225749746,
+          152.63621400902048
+        ]
+      },
+      "points": [
+        {
+          "atoms_per_second": 20.667971922326288,
+          "avoided_graph_evaluations": 0,
+          "batch_size": 1,
+          "float64_vs_mixed_memory_ratio": 1.7440620991258677,
+          "float64_vs_mixed_time_per_graph_ratio": 1.0107959405934015,
+          "float64_vs_mixed_time_ratio": 1.0147823184710192,
+          "graph_evaluations": 4073,
+          "median_seconds": 142.44261657912284,
+          "model_evaluations": 4073,
+          "neighbor_rebuilds": 4105,
+          "optimizer_steps_total": 4041,
+          "peak_memory_bytes": 517204992,
+          "speedup_vs_ase": 1.072012248286722,
+          "status": "passed",
+          "systems_per_second": 0.22465186872093793,
+          "timing_samples_seconds": [
+            142.44261657912284,
+            142.32853887602687,
+            142.66563537111506
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [
+              "max_energy_error_eV_per_atom",
+              "max_position_rmsd_A",
+              "max_cell_rmsd_A",
+              "max_step_difference"
+            ],
+            "max_cell_rmsd_A": 0.7666604883323646,
+            "max_energy_error_eV_per_atom": 0.031227345732853854,
+            "max_final_fmax_error_eV_per_A": 0.009932467016091434,
+            "max_position_rmsd_A": 0.7610469340096087,
+            "max_step_difference": 234,
+            "max_stress_tensor_error_eV_per_A3": 0.001523439696496128,
+            "passed": false,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        },
+        {
+          "atoms_per_second": 32.58597054621241,
+          "avoided_graph_evaluations": 841,
+          "batch_size": 2,
+          "float64_vs_mixed_memory_ratio": 1.867428324818625,
+          "float64_vs_mixed_time_per_graph_ratio": 0.9764619932157929,
+          "float64_vs_mixed_time_ratio": 0.9522174339720261,
+          "graph_evaluations": 3849,
+          "median_seconds": 90.34562882897444,
+          "model_evaluations": 2345,
+          "neighbor_rebuilds": 2361,
+          "optimizer_steps_total": 3817,
+          "peak_memory_bytes": 819722752,
+          "speedup_vs_ase": 1.690178391916367,
+          "status": "passed",
+          "systems_per_second": 0.35419533202404796,
+          "timing_samples_seconds": [
+            91.80269556702115,
+            90.34562882897444,
+            89.38807184901088
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [
+              "max_energy_error_eV_per_atom",
+              "max_position_rmsd_A"
+            ],
+            "max_cell_rmsd_A": 0.014033559578523182,
+            "max_energy_error_eV_per_atom": 0.00014820859550763828,
+            "max_final_fmax_error_eV_per_A": 0.009358116072899249,
+            "max_position_rmsd_A": 0.039876522982723824,
+            "max_step_difference": 8,
+            "max_stress_tensor_error_eV_per_A3": 0.0005438332409326955,
+            "passed": false,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        },
+        {
+          "atoms_per_second": 43.774858986675966,
+          "avoided_graph_evaluations": 2184,
+          "batch_size": 4,
+          "float64_vs_mixed_memory_ratio": 1.9093218749467151,
+          "float64_vs_mixed_time_per_graph_ratio": 0.9992025801808301,
+          "float64_vs_mixed_time_ratio": 0.9805588608330286,
+          "graph_evaluations": 3892,
+          "median_seconds": 67.25321493088268,
+          "model_evaluations": 1519,
+          "neighbor_rebuilds": 1527,
+          "optimizer_steps_total": 3860,
+          "peak_memory_bytes": 1490624512,
+          "speedup_vs_ase": 2.2705268410998896,
+          "status": "passed",
+          "systems_per_second": 0.4758136846377823,
+          "timing_samples_seconds": [
+            67.83030296093784,
+            66.95448018796742,
+            67.25321493088268
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [
+              "max_energy_error_eV_per_atom",
+              "max_position_rmsd_A",
+              "max_cell_rmsd_A",
+              "max_step_difference"
+            ],
+            "max_cell_rmsd_A": 0.6489844978225356,
+            "max_energy_error_eV_per_atom": 0.006369431902590853,
+            "max_final_fmax_error_eV_per_A": 0.011647185614141846,
+            "max_position_rmsd_A": 0.8243949741685122,
+            "max_step_difference": 78,
+            "max_stress_tensor_error_eV_per_A3": 0.0017607948861707427,
+            "passed": false,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        },
+        {
+          "atoms_per_second": 60.801048209558914,
+          "avoided_graph_evaluations": 2883,
+          "batch_size": 8,
+          "float64_vs_mixed_memory_ratio": 1.9554660891812616,
+          "float64_vs_mixed_time_per_graph_ratio": 1.0576824048795153,
+          "float64_vs_mixed_time_ratio": 1.0557840005630648,
+          "graph_evaluations": 3893,
+          "median_seconds": 48.4202178530395,
+          "model_evaluations": 847,
+          "neighbor_rebuilds": 851,
+          "optimizer_steps_total": 3861,
+          "peak_memory_bytes": 2647738880,
+          "speedup_vs_ase": 3.1536460681422454,
+          "status": "passed",
+          "systems_per_second": 0.6608809587995534,
+          "timing_samples_seconds": [
+            48.4202178530395,
+            48.37275523506105,
+            48.6886415311601
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [
+              "max_energy_error_eV_per_atom",
+              "max_position_rmsd_A",
+              "max_cell_rmsd_A",
+              "max_step_difference"
+            ],
+            "max_cell_rmsd_A": 0.10184317045591776,
+            "max_energy_error_eV_per_atom": 0.005791512160600534,
+            "max_final_fmax_error_eV_per_A": 0.006493792207053692,
+            "max_position_rmsd_A": 0.30508780269712915,
+            "max_step_difference": 79,
+            "max_stress_tensor_error_eV_per_A3": 0.001000112392260735,
+            "passed": false,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        },
+        {
+          "atoms_per_second": 76.08666185773532,
+          "avoided_graph_evaluations": 3747,
+          "batch_size": 16,
+          "float64_vs_mixed_memory_ratio": 1.9661542425095901,
+          "float64_vs_mixed_time_per_graph_ratio": 1.1126764341029667,
+          "float64_vs_mixed_time_ratio": 1.1075238290569536,
+          "graph_evaluations": 3869,
+          "median_seconds": 38.69272127491422,
+          "model_evaluations": 476,
+          "neighbor_rebuilds": 478,
+          "optimizer_steps_total": 3837,
+          "peak_memory_bytes": 5071818752,
+          "speedup_vs_ase": 3.946484626033001,
+          "status": "passed",
+          "systems_per_second": 0.8270289332362536,
+          "timing_samples_seconds": [
+            38.87436741311103,
+            38.63122367602773,
+            38.69272127491422
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [
+              "max_energy_error_eV_per_atom",
+              "max_position_rmsd_A",
+              "max_cell_rmsd_A",
+              "max_step_difference"
+            ],
+            "max_cell_rmsd_A": 0.1018949331652654,
+            "max_energy_error_eV_per_atom": 0.005548733283428154,
+            "max_final_fmax_error_eV_per_A": 0.00793912952712969,
+            "max_position_rmsd_A": 0.2841458205055501,
+            "max_step_difference": 68,
+            "max_stress_tensor_error_eV_per_A3": 0.0009175195736964877,
+            "passed": false,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        },
+        {
+          "atoms_per_second": 89.01027636837357,
+          "avoided_graph_evaluations": 4124,
+          "batch_size": 32,
+          "float64_vs_mixed_memory_ratio": 1.9829758149231114,
+          "float64_vs_mixed_time_per_graph_ratio": 1.0607285204646488,
+          "float64_vs_mixed_time_ratio": 1.0275807542001287,
+          "graph_evaluations": 3844,
+          "median_seconds": 33.074832706013694,
+          "model_evaluations": 249,
+          "neighbor_rebuilds": 250,
+          "optimizer_steps_total": 3812,
+          "peak_memory_bytes": 10001424896,
+          "speedup_vs_ase": 4.616810340602718,
+          "status": "passed",
+          "systems_per_second": 0.9675030040040605,
+          "timing_samples_seconds": [
+            33.074832706013694,
+            32.9133554501459,
+            33.095422965008765
+          ],
+          "validation_vs_ase": {
+            "candidate_converged_count": 32,
+            "convergence_flags_match": true,
+            "failed_checks": [
+              "max_energy_error_eV_per_atom",
+              "max_position_rmsd_A",
+              "max_cell_rmsd_A",
+              "max_step_difference"
+            ],
+            "max_cell_rmsd_A": 0.10186753118121361,
+            "max_energy_error_eV_per_atom": 0.005791834452478686,
+            "max_final_fmax_error_eV_per_A": 0.007702207308950146,
+            "max_position_rmsd_A": 0.3048933914643132,
+            "max_step_difference": 79,
+            "max_stress_tensor_error_eV_per_A3": 0.0009904361539375577,
+            "passed": false,
+            "reference_converged_count": 32,
+            "tolerances": {
+              "max_cell_rmsd_A": 0.02,
+              "max_energy_error_eV_per_atom": 0.0001,
+              "max_final_fmax_error_eV_per_A": 0.03,
+              "max_position_rmsd_A": 0.02,
+              "max_step_difference": 25,
+              "max_stress_tensor_error_eV_per_A3": 0.01
+            }
+          }
+        }
+      ],
+      "sample_files": [
+        "Aven12_2_240_z1.cif",
+        "Aven12_4_272_z1.cif",
+        "Aven12_4_421_z1.cif",
+        "Aven12_2_670_z1.cif",
+        "Aven12_2_3217_z1.cif",
+        "Aven12_2_1287_z1.cif",
+        "Aven12_4_58_z1.cif",
+        "Aven12_2_2324_z1.cif",
+        "Aven12_2_1900_z1.cif",
+        "Aven12_4_736_z1.cif",
+        "Aven12_2_1451_z1.cif",
+        "Aven12_2_844_z1.cif",
+        "Aven12_2_2105_z1.cif",
+        "Aven12_2_1571_z1.cif",
+        "Aven12_2_1204_z1.cif",
+        "Aven12_4_5_z1.cif",
+        "Aven12_2_3255_z1.cif",
+        "Aven12_2_1415_z1.cif",
+        "Aven12_2_1454_z1.cif",
+        "Aven12_2_1636_z1.cif",
+        "Aven12_4_666_z1.cif",
+        "Aven12_4_376_z1.cif",
+        "Aven12_4_629_z1.cif",
+        "Aven12_2_1911_z1.cif",
+        "Aven12_2_3126_z1.cif",
+        "Aven12_2_2582_z1.cif",
+        "Aven12_2_310_z1.cif",
+        "Aven12_2_445_z1.cif",
+        "Aven12_2_2221_z1.cif",
+        "Aven12_4_328_z1.cif",
+        "Aven12_4_13_z1.cif",
+        "Aven12_4_133_z1.cif"
+      ]
+    }
+  },
+  "ratio_convention": "ase_seconds / active_seconds; above 1 is faster",
+  "schema_version": 1,
+  "status": "complete"
+}

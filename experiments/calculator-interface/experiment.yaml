@@ -1,0 +1,25 @@
+name: calculator-interface
+date: 2026-07-17
+hypothesis: >-
+  If FIRE and MD depend only on a generic BatchCalculator contract, then a
+  non-AtomBit calculator and an ordinary ASE calculator adapter will execute
+  through the same public structure-level API without changing existing
+  numerical behavior.
+mechanism: >-
+  Move structure construction and energy/force evaluation behind calculator
+  adapters, leaving optimizer and integrator update equations unchanged.
+source_packet:
+  path: atombit_batch_lab_packet.zip
+  sha256: f8366816dadc7b1c764bf51065be16c0cdc6f3abf6c0699687d6c7c0ba25731d
+environment: /public/home/lmy/.conda/envs/lmy
+commands:
+  baseline: python -m pytest -q
+  lint: python -m ruff check atombit_batch tests
+  tests: python -m pytest -q
+correctness_gates:
+  - Custom non-model calculator drives single-point, FIRE, and NVE.
+  - Ordinary ASE calculator produces the same energies and forces through the adapter.
+  - Existing batch, relaxation, and MD regressions remain unchanged.
+performance_expectation: >-
+  No measurable native-path change because only Python dispatch and construction
+  move behind the interface; ASECalculatorAdapter is intentionally sequential.

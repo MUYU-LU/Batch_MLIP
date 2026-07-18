@@ -1,0 +1,33 @@
+schema_version: 1
+task: relax
+input: data/demo.extxyz
+output: runs/relax_toy/final.extxyz
+
+runtime:
+  device: cpu
+  dtype: float64
+  skin: 0.5
+
+model:
+  factory: atombit_batch.toy_models:build_quadratic_model
+  kwargs:
+    k: 1.0
+    center: 0.0
+  cutoff: 4.0
+  force_mode: autograd
+
+relax:
+  optimizer: fire
+  active_compaction: true
+  fmax: 0.0001
+  max_steps: 500
+  dt_start: 0.05
+  dt_max: 0.5
+  max_step: 0.2
+  callback_interval: 5
+
+reporting:
+  trajectory: runs/relax_toy/trajectory.extxyz
+  diagnostics: runs/relax_toy/diagnostics.jsonl
+  checkpoint: runs/relax_toy/latest_state.pt
+  summary: runs/relax_toy/summary.json

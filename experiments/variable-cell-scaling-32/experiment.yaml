@@ -1,0 +1,53 @@
+name: variable-cell-scaling-32
+date: 2026-07-17
+hypothesis: >-
+  Native batching and variable-cell active compaction reduce wall time versus
+  sequential ASE Frechet-FIRE on the same naturally converging structures,
+  while masked and active methods preserve ASE convergence and final states.
+source_packet:
+  path: atombit_batch_lab_packet.zip
+  sha256: f8366816dadc7b1c764bf51065be16c0cdc6f3abf6c0699687d6c7c0ba25731d
+pool:
+  manifest: benchmarks/t2_fixed_samples.json
+  atom_counts: [46, 92, 184, 276]
+  systems_per_group: 32
+  expansion: none
+methods: [ase, masked, active]
+batch_sizes: [1, 2, 4, 8, 16, 32]
+parameters:
+  cell_filter: full Frechet log deformation
+  pressure_GPa: 0.0
+  fmax_eV_per_A: 0.05
+  convergence: ASE generalized filter-force maximum
+  max_steps: 500
+  dtype: float32
+  cutoff_A: 6.0
+  skin_A: 0.0
+  batch_repeats: 3
+  ase_repeats: 1
+timing:
+  cuda_synchronized: true
+  warmup: one stress/force evaluation
+  peak_gpu_memory: true
+commands:
+  batch_worker: >-
+    python benchmarks/benchmark_variable_cell_scaling.py --method METHOD
+    --atom-count ATOMS --pool-size 32 --batch-sizes 1,2,4,8,16,32
+    --repeats 3 --device cuda:0 --output OUTPUT
+  ase_worker: >-
+    python benchmarks/benchmark_variable_cell_scaling.py --method ase
+    --atom-count ATOMS --pool-size 32 --repeats 1 --device cuda:0
+    --output OUTPUT
+  summarize: >-
+    python benchmarks/summarize_variable_cell_scaling.py
+    --raw-dir runs/variable_cell_scaling32_raw
+    --output runs/variable_cell_scaling32_summary.json
+correctness_gates:
+  - Every feasible point processes the identical ordered pool of 32 structures.
+  - ASE, masked, and active use the same Frechet generalized-force convergence criterion.
+  - Convergence flags, energy, force, stress, positions, cells, and step counts are compared.
+  - OOM and nonconvergence outcomes remain in raw artifacts.
+limitations:
+  - ASE has one timing sample, so its timing uncertainty is unavailable.
+  - Model-forward, neighbor-list, and host-to-device phase times are not isolated.
+  - Structures reaching 500 steps are retained in timing and validation.

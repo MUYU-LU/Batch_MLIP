@@ -1,0 +1,82 @@
+name: bfgs-b1-audit
+date: 2026-07-18
+hypothesis: >-
+  The long B1 divergence from common ASE BFGS is caused by storing Frechet
+  coordinates and the full BFGS Hessian in model float32. Keeping inference
+  float32 but optimizer state and eigensolves float64 will restore B1 final
+  states without changing the calculator contract.
+source_packet:
+  path: atombit_batch_lab_packet.zip
+  sha256: f8366816dadc7b1c764bf51065be16c0cdc6f3abf6c0699687d6c7c0ba25731d
+baseline:
+  command: python -m pytest -q
+  result: 38 passed in 32.93s
+audit:
+  sample: Aven12_1_295_z1.cif
+  initial_native_vs_ase:
+    energy_error_eV: 0.0
+    force_error_eV_per_A: 1.66893e-6
+    stress_error_eV_per_A3: 9.313226e-9
+  ase_adapter_bfgs:
+    ase_steps: 121
+    batched_steps: 121
+    final_energy_error_eV: 2.95639e-5
+    max_position_error_A: 0.002233
+parameters:
+  model_dtype: float32
+  optimizer_dtype_before: float32
+  optimizer_dtype_after: float64
+  variable_cell: full Frechet log deformation
+  fmax_eV_per_A: 0.05
+  max_steps: 500
+  alpha_eV_per_A2: 70.0
+  max_step_A: 0.2
+correctness_gates:
+  - Exact float64 unit references remain unchanged.
+  - B1 uses the same fixed 32-structure pools as the failed scaling experiment.
+  - Convergence flags and final energy, force, stress, positions, cells, and steps are compared.
+  - No performance claim is made unless the final-state gate passes.
+negative_results:
+  - Promoting BFGS and Frechet state to float64 did not restore the complete B1 pools.
+  - The first mixed-dtype run failed before stepping due to an output-buffer cast; the retained regression now covers this path.
+determinism_audit:
+  sample: Aven12_1_62_z1.cif
+  uncontrolled_native_outcomes:
+    steps: [111, 111, 111, 110, 111, 111, 111, 111, 185, 185]
+    energy_range_eV: [-4.3237801, -3.9478397]
+  uncontrolled_ase_outcomes:
+    steps: [110, 111, 185, 111, 111]
+    energy_range_eV: [-4.3237696, -3.9483547]
+  deterministic_native:
+    repeats: 3
+    steps: [111, 111, 111]
+    energy_eV: -3.9513707
+  deterministic_ase:
+    repeats: 3
+    steps: [111, 111, 111]
+    energy_eV: -3.9513645
+  conclusion: >-
+    Both paths amplify nondeterministic GPU reductions into different BFGS
+    basins. A single common ASE run is not a valid final-state reference.
+commands:
+  deterministic_worker: >-
+    CUBLAS_WORKSPACE_CONFIG=:4096:8 OMP_NUM_THREADS=1
+    OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+    python benchmarks/benchmark_variable_cell_scaling.py --optimizer bfgs
+    --method METHOD --atom-count ATOMS --pool-size 32 --batch-sizes 1
+    --repeats 1 --deterministic --device cuda:0 --output OUTPUT
+  deterministic_float64_control: >-
+    CUBLAS_WORKSPACE_CONFIG=:4096:8 OMP_NUM_THREADS=1
+    OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+    python benchmarks/benchmark_variable_cell_scaling.py --optimizer bfgs
+    --method active --optimizer-dtype float64 --atom-count ATOMS
+    --pool-size 32 --batch-sizes 1 --repeats 1 --deterministic
+    --device cuda:0 --output OUTPUT
+final_checks:
+  pytest: 40 passed in 30.07s
+  ruff: All checks passed
+result: >-
+  The float64-state hypothesis was rejected. The large single-run discrepancy
+  is caused by full BFGS amplifying micro-level GPU and implementation
+  differences into different basins; common ASE is likewise nondeterministic
+  without explicit CUDA controls.

@@ -1,0 +1,48 @@
+{
+  "full_tests": "38 passed in 33.49s",
+  "isolated_wheel": {
+    "console_script": true,
+    "legacy_cli_import": true,
+    "python_m_package": true
+  },
+  "known_limitation": "python -m atombit_batch.cli is replaced by python -m atombit_batch; ordinary imports of atombit_batch.cli remain compatible",
+  "layout_directories": [
+    "core",
+    "optimization",
+    "dynamics",
+    "models",
+    "interfaces"
+  ],
+  "legacy_module_aliases_tested": 17,
+  "passed": true,
+  "production_smoke": {
+    "energy_eV": -0.6735515594482422,
+    "energy_shape": [
+      1
+    ],
+    "finite": true,
+    "force_shape": [
+      46,
+      3
+    ],
+    "sample": "Aven12_1_295_z1.cif"
+  },
+  "root_python_files": [
+    "__init__.py",
+    "__main__.py"
+  ],
+  "ruff": "passed",
+  "schema_version": 1,
+  "status": "complete",
+  "targeted_tests": "13 passed in 25.33s",
+  "wheel": {
+    "entry_point": "[console_scripts]\natombit-batch = atombit_batch.interfaces.cli:main",
+    "package_python_files": 24,
+    "path": "runs/package_layout/checks/dist/atombit_batch_lab-0.1.0-py3-none-any.whl",
+    "root_python_files": [
+      "atombit_batch/__init__.py",
+      "atombit_batch/__main__.py"
+    ],
+    "sha256": "09c9dff9133a79ac10362f59fa94837eaa7a69a6196d8666c398308da875d601"
+  }
+}

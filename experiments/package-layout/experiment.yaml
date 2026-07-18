@@ -1,0 +1,38 @@
+name: package-layout
+date: 2026-07-17
+hypothesis: >-
+  Grouping modules by responsibility can make the package easier to navigate
+  without changing the public API, legacy imports, configuration factories,
+  serialized-model loading, or numerical behavior.
+source_packet:
+  path: atombit_batch_lab_packet.zip
+  sha256: f8366816dadc7b1c764bf51065be16c0cdc6f3abf6c0699687d6c7c0ba25731d
+baseline:
+  command: python -m pytest -q
+  result: 34 passed
+layout:
+  core: [calculator, state, types, neighbors, math_utils]
+  optimization: [fire, bfgs, cell_filters, registry]
+  dynamics: [integrators]
+  models: [potential, loaders, toy_models]
+  interfaces: [api, cli, config, reporting]
+compatibility_gates:
+  - Root public symbols retain their existing identities.
+  - All 17 legacy atombit_batch module paths import successfully.
+  - YAML factory strings using atombit_batch.toy_models still load.
+  - Legacy serialized toy-model module paths remain loadable.
+  - The console script and python -m atombit_batch work.
+  - Existing tests and production checkpoint imports pass.
+results:
+  targeted_tests: 13 passed in 25.33s
+  full_tests: 38 passed in 33.49s
+  ruff: passed
+  legacy_aliases: 17 passed
+  wheel_python_files: 24
+  wheel_root_python_files: [__init__.py, __main__.py]
+  isolated_console_script: passed
+  isolated_python_m_package: passed
+  production_smoke: passed
+compatibility_boundary: >-
+  Importing atombit_batch.cli remains supported. Execute the CLI with the
+  console command or python -m atombit_batch, not python -m atombit_batch.cli.

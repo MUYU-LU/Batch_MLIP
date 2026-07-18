@@ -1,0 +1,37 @@
+# Replace checkpoint/model_config/input paths before running.
+schema_version: 1
+task: relax
+input: data/your_structures.extxyz
+output: runs/atombit_relax/final.extxyz
+
+runtime:
+  device: cuda
+  dtype: float32
+  skin: 0.5
+
+model:
+  factory: examples.atombit_loader:load_atombit_state_dict
+  kwargs:
+    checkpoint: checkpoints/model.pt
+    model_config: configs/atombit_model_example.yaml
+    state_dict_key: state_dict
+    strict: true
+  cutoff: 6.0
+  force_mode: autograd
+  # e0: checkpoints/e0.pt
+
+relax:
+  optimizer: fire
+  active_compaction: true
+  fmax: 0.03
+  max_steps: 1000
+  dt_start: 0.1
+  dt_max: 1.0
+  max_step: 0.2
+  callback_interval: 10
+
+reporting:
+  trajectory: runs/atombit_relax/trajectory.extxyz
+  diagnostics: runs/atombit_relax/diagnostics.jsonl
+  checkpoint: runs/atombit_relax/latest_state.pt
+  summary: runs/atombit_relax/summary.json

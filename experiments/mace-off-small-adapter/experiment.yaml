@@ -1,0 +1,25 @@
+name: mace-off-small-adapter
+hypothesis: >-
+  A model-specific adapter using MACE AtomicData and native PyG batching can
+  satisfy the generic BatchCalculator contract, match the official MACE ASE
+  calculator, and accelerate single points and variable-cell BFGS.
+environment: /public/home/lmy/.conda/envs/MACE_clean
+model:
+  name: MACE-OFF23-Small
+  mace_torch: 0.3.14
+  dtype: float64
+  cutoff_A: 4.5
+data:
+  atom_count: 46
+  pool_size: 8
+  batch_sizes: [1, 2, 4, 8]
+validation:
+  single_point_repeats: 3
+  variable_cell_bfgs_pool_size: 4
+  variable_cell_bfgs_steps: 3
+  nve_systems: 2
+  nve_steps: 1
+result: >-
+  B8 single points were 4.57x faster and B4 three-step variable-cell BFGS was
+  3.40x faster than sequential MACE ASE while retaining near-roundoff
+  agreement. The NVE API smoke test passed.

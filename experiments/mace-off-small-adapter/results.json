@@ -1,0 +1,154 @@
+{
+  "atom_count": 46,
+  "device": "cuda:0",
+  "dtype": "float64",
+  "mace_version": "0.3.14",
+  "model": "MACE-OFF23-Small",
+  "nve_smoke": {
+    "finite_energy": true,
+    "finite_temperature": true,
+    "steps": 1,
+    "systems": 2
+  },
+  "pool_size": 8,
+  "sample_files": [
+    "Aven12_1_295_z1.cif",
+    "Aven12_1_331_z1.cif",
+    "Aven12_1_241_z1.cif",
+    "Aven12_1_62_z1.cif",
+    "Aven12_1_204_z1.cif",
+    "Aven12_1_378_z1.cif",
+    "Aven12_1_263_z1.cif",
+    "Aven12_1_277_z1.cif"
+  ],
+  "single_point": {
+    "ase_timing": {
+      "maximum_seconds": 2.431903738062829,
+      "median_seconds": 0.15398228215053678,
+      "minimum_seconds": 0.1535703658591956,
+      "samples_seconds": [
+        2.431903738062829,
+        0.1535703658591956,
+        0.15398228215053678
+      ]
+    },
+    "points": [
+      {
+        "batch_size": 1,
+        "errors_vs_ase": {
+          "max_energy_error_eV": 5.093170329928398e-11,
+          "max_force_error_eV_per_A": 5.10702591327572e-15,
+          "max_stress_error_eV_per_A3": 2.7755575615628914e-17
+        },
+        "passed": true,
+        "speedup_vs_ase": 0.9988041589608961,
+        "timing": {
+          "maximum_seconds": 0.16032449598424137,
+          "median_seconds": 0.15416664094664156,
+          "minimum_seconds": 0.1515558180399239,
+          "samples_seconds": [
+            0.15416664094664156,
+            0.16032449598424137,
+            0.1515558180399239
+          ]
+        }
+      },
+      {
+        "batch_size": 2,
+        "errors_vs_ase": {
+          "max_energy_error_eV": 5.820766091346741e-11,
+          "max_force_error_eV_per_A": 5.329070518200751e-15,
+          "max_stress_error_eV_per_A3": 4.2500725161431774e-17
+        },
+        "passed": true,
+        "speedup_vs_ase": 1.7375860769656974,
+        "timing": {
+          "maximum_seconds": 0.0925272221211344,
+          "median_seconds": 0.08861850597895682,
+          "minimum_seconds": 0.08804950793273747,
+          "samples_seconds": [
+            0.0925272221211344,
+            0.08804950793273747,
+            0.08861850597895682
+          ]
+        }
+      },
+      {
+        "batch_size": 4,
+        "errors_vs_ase": {
+          "max_energy_error_eV": 5.820766091346741e-11,
+          "max_force_error_eV_per_A": 4.884981308350689e-15,
+          "max_stress_error_eV_per_A3": 4.5102810375396984e-17
+        },
+        "passed": true,
+        "speedup_vs_ase": 2.762192105475615,
+        "timing": {
+          "maximum_seconds": 0.05828957702033222,
+          "median_seconds": 0.055746405851095915,
+          "minimum_seconds": 0.05168909812346101,
+          "samples_seconds": [
+            0.055746405851095915,
+            0.05828957702033222,
+            0.05168909812346101
+          ]
+        }
+      },
+      {
+        "batch_size": 8,
+        "errors_vs_ase": {
+          "max_energy_error_eV": 5.093170329928398e-11,
+          "max_force_error_eV_per_A": 6.217248937900877e-15,
+          "max_stress_error_eV_per_A3": 3.2959746043559335e-17
+        },
+        "passed": true,
+        "speedup_vs_ase": 4.568578711724082,
+        "timing": {
+          "maximum_seconds": 0.03526807203888893,
+          "median_seconds": 0.033704635920003057,
+          "minimum_seconds": 0.033304641023278236,
+          "samples_seconds": [
+            0.03526807203888893,
+            0.033704635920003057,
+            0.033304641023278236
+          ]
+        }
+      }
+    ]
+  },
+  "status": "passed",
+  "variable_cell_bfgs": {
+    "ase_timing": {
+      "maximum_seconds": 0.45236854208633304,
+      "median_seconds": 0.44104581605643034,
+      "minimum_seconds": 0.4336503630038351,
+      "samples_seconds": [
+        0.45236854208633304,
+        0.4336503630038351,
+        0.44104581605643034
+      ]
+    },
+    "batch_timing": {
+      "maximum_seconds": 1.0208221259526908,
+      "median_seconds": 0.12971863895654678,
+      "minimum_seconds": 0.12760743405669928,
+      "samples_seconds": [
+        1.0208221259526908,
+        0.12760743405669928,
+        0.12971863895654678
+      ]
+    },
+    "errors_vs_ase": {
+      "max_cell_rmsd_A": 7.12144480705551e-12,
+      "max_energy_error_eV": 8.003553375601768e-11,
+      "max_force_error_eV_per_A": 8.428890918565912e-11,
+      "max_position_rmsd_A": 7.108136313002675e-12,
+      "max_step_difference": 0,
+      "max_stress_error_eV_per_A3": 1.3993606620688048e-12
+    },
+    "graph_evaluations": 16,
+    "model_evaluations": 4,
+    "pool_size": 4,
+    "speedup_vs_ase": 3.40001883772595,
+    "steps": 3
+  }
+}

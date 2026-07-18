@@ -1,0 +1,241 @@
+{
+  "checkpoint": {
+    "epoch": 15,
+    "label_mode": "residual",
+    "model_config": {
+      "FINETUNE_MODE": true,
+      "PRETRAINED_CKPT": "Checkpoints_Old/model_epoch_50.pt",
+      "active_path_preset": "full",
+      "active_paths": {
+        "(0, 0, 0, 'prod')": true,
+        "(0, 1, 1, 'prod')": true,
+        "(0, 2, 2, 'prod')": true,
+        "(1, 0, 1, 'prod')": true,
+        "(1, 1, 0, 'dot')": true,
+        "(1, 1, 1, 'cross')": false,
+        "(1, 1, 2, 'outer')": true,
+        "(1, 2, 1, 'vec_mat')": true,
+        "(1, 2, 2, 'vec_cross_tensor')": false,
+        "(2, 0, 2, 'prod')": true,
+        "(2, 1, 1, 'mat_vec')": true,
+        "(2, 1, 2, 'tensor_cross_vector')": false,
+        "(2, 2, 0, 'double_dot')": true,
+        "(2, 2, 1, 'tensor_commutator')": false,
+        "(2, 2, 2, 'mat_mul_sym')": true
+      },
+      "atom_types_map": [
+        1,
+        5,
+        6,
+        7,
+        8,
+        9,
+        15,
+        16,
+        17,
+        35,
+        53
+      ],
+      "avg_neighborhood": 88.84019278034262,
+      "block_impls": {
+        "coupling": "leibniz",
+        "density": "cartesian_density",
+        "gating": "physics_gating",
+        "norm_l1": "equivariant_norm",
+        "norm_l2": "equivariant_norm",
+        "readout": "mlp_readout"
+      },
+      "cutoff": 6.0,
+      "gating_impl": 1,
+      "gating_layer_indices": null,
+      "hidden_dim": 64,
+      "mat_mul_sym_impl": 1,
+      "num_atom_types": 100,
+      "num_layers": 2,
+      "num_rbf": 10,
+      "outer_impl": 1,
+      "steps_per_epoch": null,
+      "use_L1": true,
+      "use_L2": true,
+      "use_direct_force": false,
+      "use_gating": true
+    },
+    "path": "../AtomBit-OMC-s/model_epoch_15.pt",
+    "precision_dtype": "torch.float32",
+    "sha256": "0a85106a1a32cc4984e035e4bf1893318c54db0eb96c2162525d5ecf8a52e402",
+    "state_tensor_count": 98
+  },
+  "environment": {
+    "ase": "3.26.0",
+    "cuda_version": "12.8",
+    "device": "cuda:0",
+    "gpu_capability": [
+      9,
+      0
+    ],
+    "gpu_name": "NVIDIA H100 80GB HBM3",
+    "gpu_total_memory_bytes": 85017886720,
+    "numpy": "2.3.5",
+    "platform": "Linux-6.12.43+deb13-amd64-x86_64-with-glibc2.41",
+    "python": "3.11.14",
+    "torch": "2.9.1+cu128"
+  },
+  "fixed_cell": {
+    "active_batch_sizes": [
+      2,
+      2,
+      2,
+      2
+    ],
+    "batch_size_one_control": {
+      "active_batch_sizes": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "batch_steps": 3,
+      "convergence_matches": [
+        true,
+        true
+      ],
+      "graph_evaluations": 8,
+      "max_cell_error_A": 0.0,
+      "max_energy_error_eV": 1.9073486328125e-06,
+      "max_force_error_eV_per_A": 9.953975677490234e-05,
+      "max_force_error_relative": 0.0001008118675489013,
+      "max_position_error_A": 9.5367431640625e-07,
+      "max_stress_error_eV_per_A3": 0.0,
+      "model_evaluations": 4,
+      "passed": true,
+      "reference_max_abs_force_eV_per_A": 0.9873813390731812,
+      "step_matches": [
+        true,
+        true
+      ],
+      "tolerances": {
+        "max_cell_error_A": 2e-05,
+        "max_energy_error_eV": 0.0002,
+        "max_force_error_eV_per_A": 0.0003,
+        "max_position_error_A": 2e-05,
+        "max_stress_error_eV_per_A3": 2e-07
+      }
+    },
+    "batch_steps": 3,
+    "convergence_matches": [
+      true,
+      true
+    ],
+    "graph_evaluations": 8,
+    "max_cell_error_A": 4.195080141045082e-07,
+    "max_energy_error_eV": 1.430511474609375e-06,
+    "max_force_error_eV_per_A": 0.00013500452041625977,
+    "max_force_error_relative": 0.00013672615411361612,
+    "max_position_error_A": 1.1961189461118238e-06,
+    "max_stress_error_eV_per_A3": 0.0,
+    "model_evaluations": 4,
+    "passed": true,
+    "reference_max_abs_force_eV_per_A": 0.9874081611633301,
+    "step_matches": [
+      true,
+      true
+    ],
+    "tolerances": {
+      "max_cell_error_A": 2e-05,
+      "max_energy_error_eV": 0.0002,
+      "max_force_error_eV_per_A": 0.0003,
+      "max_position_error_A": 2e-05,
+      "max_stress_error_eV_per_A3": 2e-07
+    }
+  },
+  "parameters": {
+    "alpha_eV_per_A2": 70.0,
+    "dtype": "float32",
+    "fmax_eV_per_A": 1e-30,
+    "max_step_A": 0.2,
+    "steps": 3
+  },
+  "passed": true,
+  "sample_files": [
+    "Aven12_1_295_z1.cif",
+    "Aven12_1_331_z1.cif"
+  ],
+  "schema_version": 1,
+  "status": "complete",
+  "tolerance_basis": {
+    "amended_force_tolerance_eV_per_A": 0.0003,
+    "observed_ase_relative_force_error": 0.00023928270048031582,
+    "observed_variable_cell_ase_vs_b2_force_error_eV_per_A": 0.0002371072769165039,
+    "observed_variable_cell_b1_vs_b2_force_error_eV_per_A": 0.00010201334953308105,
+    "original_force_tolerance_eV_per_A": 0.0002,
+    "reason": "Float32 ASE-calculator versus batched graph reduction and trajectory variation; float64 ASE algorithm tests are exact."
+  },
+  "variable_cell": {
+    "active_batch_sizes": [
+      2,
+      2,
+      2,
+      2
+    ],
+    "batch_size_one_control": {
+      "active_batch_sizes": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "batch_steps": 3,
+      "convergence_matches": [
+        true,
+        true
+      ],
+      "graph_evaluations": 8,
+      "max_cell_error_A": 1.9073486328125e-06,
+      "max_energy_error_eV": 9.059906005859375e-06,
+      "max_force_error_eV_per_A": 0.0001488029956817627,
+      "max_force_error_relative": 0.0001501699028235611,
+      "max_position_error_A": 2.86102294921875e-06,
+      "max_stress_error_eV_per_A3": 1.7415732145309448e-07,
+      "model_evaluations": 4,
+      "passed": true,
+      "reference_max_abs_force_eV_per_A": 0.9908975958824158,
+      "step_matches": [
+        true,
+        true
+      ],
+      "tolerances": {
+        "max_cell_error_A": 2e-05,
+        "max_energy_error_eV": 0.0002,
+        "max_force_error_eV_per_A": 0.0003,
+        "max_position_error_A": 2e-05,
+        "max_stress_error_eV_per_A3": 2e-07
+      }
+    },
+    "batch_steps": 3,
+    "convergence_matches": [
+      true,
+      true
+    ],
+    "graph_evaluations": 8,
+    "max_cell_error_A": 1.1608346213165532e-06,
+    "max_energy_error_eV": 3.814697265625e-06,
+    "max_force_error_eV_per_A": 0.00025451183319091797,
+    "max_force_error_relative": 0.00025684694093789555,
+    "max_position_error_A": 2.1385745494484354e-06,
+    "max_stress_error_eV_per_A3": 1.6670674085617065e-07,
+    "model_evaluations": 4,
+    "passed": true,
+    "reference_max_abs_force_eV_per_A": 0.9909085631370544,
+    "step_matches": [
+      true,
+      true
+    ],
+    "tolerances": {
+      "max_cell_error_A": 2e-05,
+      "max_energy_error_eV": 0.0002,
+      "max_force_error_eV_per_A": 0.0003,
+      "max_position_error_A": 2e-05,
+      "max_stress_error_eV_per_A3": 2e-07
+    }
+  }
+}

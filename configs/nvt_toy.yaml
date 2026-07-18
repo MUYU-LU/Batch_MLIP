@@ -1,0 +1,34 @@
+schema_version: 1
+task: nvt_langevin
+input: data/demo.extxyz
+output: runs/nvt_toy/final.extxyz
+
+runtime:
+  device: cpu
+  dtype: float64
+  skin: 1.0
+
+model:
+  factory: atombit_batch.toy_models:build_quadratic_model
+  kwargs:
+    k: 1.0
+  cutoff: 4.0
+  force_mode: autograd
+
+md:
+  timestep_fs: 0.1
+  n_steps: 1000
+  temperature_K: 300.0
+  friction_per_fs: 0.01
+  initialize_velocities: true
+  initial_temperature_K: 300.0
+  initialization_seed: 1234
+  remove_initial_com: true
+  force_exact_initial_temperature: true
+  seed: 1235
+  callback_interval: 20
+
+reporting:
+  trajectory: runs/nvt_toy/trajectory.extxyz
+  diagnostics: runs/nvt_toy/diagnostics.jsonl
+  summary: runs/nvt_toy/summary.json

@@ -1,0 +1,39 @@
+schema_version: 1
+task: relax
+input: data/periodic_structures.extxyz
+output: runs/relax_variable_cell/final.extxyz
+
+runtime:
+  device: cuda
+  dtype: float32
+  skin: 0.5
+
+model:
+  factory: examples.atombit_loader:load_pickled_model
+  kwargs:
+    checkpoint: checkpoints/model.pt
+    key: model
+  cutoff: 6.0
+  force_mode: autograd
+
+relax:
+  optimizer: fire
+  active_compaction: true
+  cell_filter:
+    type: frechet
+    pressure_GPa: 0.0
+    hydrostatic_strain: false
+    # Voigt order: xx, yy, zz, yz, xz, xy.
+    mask: [true, true, true, true, true, true]
+  fmax: 0.03
+  # 0.0006 eV/A^3 is approximately 0.096 GPa.
+  smax: 0.0006
+  max_steps: 1000
+  dt_start: 0.05
+  dt_max: 0.5
+  max_step: 0.2
+
+reporting:
+  trajectory: runs/relax_variable_cell/trajectory.extxyz
+  diagnostics: runs/relax_variable_cell/diagnostics.jsonl
+  summary: runs/relax_variable_cell/summary.json

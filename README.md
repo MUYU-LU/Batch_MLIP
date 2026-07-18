@@ -1,1 +1,410 @@
-# Batch_MLIP
+# AtomBit Batch Lab
+
+A reproducible project packet for developing and testing **true batched geometry optimization and molecular dynamics** with an AtomBit-like graph MLIP.
+
+The engine concatenates independent atomic systems into one heterogeneous graph batch and performs one model forward pass per simulation step. ASE is used at the boundary for structure I/O and neighbour-list construction; PyTorch owns the batched model evaluation, optimizer state, and MD integration.
+
+## What is included
+
+- A reusable package under `atombit_batch/`.
+- Compatibility copies of the uploaded model under the original `src.*` namespace.
+- Exact source snapshots under `original_uploads/`.
+- Fixed/variable-cell batched FIRE and full BFGS, plus steepest descent.
+- Fixed-cell NVE velocity-Verlet and NVT Langevin BAOAB.
+- Heterogeneous atom counts, cells, PBC flags, and per-system MD parameters.
+- Autograd or direct forces, E0 offsets, and strain-gradient stress evaluation.
+- `FixAtoms` support.
+- Neighbour-list skins and rebuild accounting.
+- extxyz trajectories, JSONL diagnostics, tensor checkpoints, and summary JSON.
+- YAML-driven CLI, deterministic toy models, tests, benchmarks, and an agent protocol.
+
+## Repository layout
+
+```text
+atombit_batch/          Public package and compatibility exports
+  core/                 Batch state, calculator contract, types, neighbors
+  optimization/         FIRE, BFGS, cell filters, optimizer registry
+  dynamics/             Molecular-dynamics integrators
+  models/               MLIP adapter, loaders, reference models
+  interfaces/           Python API, CLI/configuration, reporting
+src/                    Uploaded AtomBit code in checkpoint-compatible namespace
+original_uploads/       Immutable source snapshots
+configs/                Runnable YAML configurations
+examples/               Python API and checkpoint-loader examples
+data/                   Small demo extxyz batch
+benchmarks/              Scaling and profiling scripts
+experiments/             Reproducible experiment specifications
+runs/                    Generated outputs; ignored by Git
+tests/                   Correctness and regression tests
+docs/                    Architecture, validation, and roadmap
+AGENTS.md                Rules for autonomous experimental agents
+```
+
+New code should import from these functional subpackages when it needs an
+internal component. Existing public imports from `atombit_batch` are unchanged,
+and legacy module paths such as `atombit_batch.filters`,
+`atombit_batch.toy_models`, and `atombit_batch.cli` remain available as
+compatibility aliases for configs, scripts, and serialized models.
+
+## Installation
+
+Use a dedicated environment. Install the PyTorch build appropriate for your CPU/CUDA platform first when necessary, then install the project:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e '.[dev]'
+```
+
+Optional faster CPU neighbour lists:
+
+```bash
+python -m pip install -e '.[performance]'
+```
+
+## Verify the packet
+
+```bash
+pytest -q
+atombit-batch validate configs/relax_toy.yaml
+```
+
+The included tests check:
+
+- batch versus single-system energies and forces;
+- absence of cross-system edges;
+- neighbour-list skin behavior;
+- per-system FIRE convergence;
+- `FixAtoms` behavior;
+- NVE energy drift;
+- per-system Langevin parameters;
+- the uploaded `src.model.AtomBitModel` running with `num_graphs > 1`;
+- the YAML CLI.
+
+## Run the included examples
+
+```bash
+atombit-batch run configs/relax_toy.yaml
+atombit-batch run configs/nve_toy.yaml
+atombit-batch run configs/nvt_toy.yaml
+```
+
+Outputs are written under `runs/`, including final structures, trajectories, diagnostics, and summaries.
+
+The direct Python API is demonstrated by:
+
+```bash
+python examples/python_api.py
+```
+
+## Use a serialized complete model
+
+A YAML model factory can return any `torch.nn.Module` that accepts the generic graph fields. For a checkpoint containing the complete module:
+
+```yaml
+model:
+  factory: examples.atombit_loader:load_pickled_model
+  kwargs:
+    checkpoint: checkpoints/model.pt
+    key: model
+  cutoff: 6.0
+  force_mode: autograd
+```
+
+## Use an AtomBit state dictionary
+
+Edit `configs/atombit_model_example.yaml` so it exactly matches the trained architecture, then edit `configs/relax_atombit_template.yaml`:
+
+```yaml
+model:
+  factory: examples.atombit_loader:load_atombit_state_dict
+  kwargs:
+    checkpoint: checkpoints/model.pt
+    model_config: configs/atombit_model.yaml
+    state_dict_key: state_dict
+    strict: true
+  cutoff: 6.0
+  force_mode: autograd
+```
+
+Run:
+
+```bash
+atombit-batch validate configs/relax_atombit_template.yaml
+atombit-batch run configs/relax_atombit_template.yaml
+```
+
+Validation should precede long optimization or MD runs.
+
+## Model interface
+
+The engine sends an attribute container with:
+
+| Field | Shape | Meaning |
+|---|---:|---|
+| `z` | `[N]` | Atomic numbers |
+| `pos` | `[N, 3]` | Concatenated positions in Å |
+| `cell` | `[B, 3, 3]` | One row-vector cell per graph |
+| `edge_index` | `[2, E]` | Directed local edges |
+| `shifts_int` | `[E, 3]` | Integer periodic-image shifts |
+| `batch` | `[N]` | Atom-to-graph map |
+| `num_graphs` | scalar | Number of systems |
+
+The model must return one total energy per graph, as `[B]`, `[B, 1]`, or a dictionary containing `energy`. A dictionary may also contain direct forces under `force` or `forces` with shape `[N, 3]`.
+
+## Calculator-style Python API
+
+The public structure-level API uses one model-independent calculator for
+single-point evaluation, relaxation, and MD:
+
+```python
+import torch
+from ase.io import read
+
+from atombit_batch import (
+    BatchedFrechetCellFilter,
+    BatchedPotential,
+    evaluate,
+    molecular_dynamics,
+    relax,
+)
+
+systems = read("structures.extxyz", index=":")
+calculator = BatchedPotential(
+    model,
+    cutoff=6.0,
+    skin=0.5,
+    device="cuda",
+    dtype=torch.float32,
+    force_mode="autograd",
+    e0_dict=e0_dict,
+)
+
+single_points = evaluate(systems, calculator)
+relaxed = relax(
+    systems,
+    calculator,
+    fmax=0.03,
+    max_steps=1000,
+    active_compaction=True,
+)
+cell_relaxed = relax(
+    systems,
+    calculator,
+    cell_filter=BatchedFrechetCellFilter(pressure_GPa=0.0),
+    fmax=0.03,
+    smax=0.0006,
+    max_steps=1000,
+)
+trajectory_end = molecular_dynamics(
+    relaxed.structures,
+    calculator,
+    ensemble="nve",
+    timestep_fs=0.5,
+    n_steps=100,
+)
+```
+
+Each result exposes `.structures`, an input-ordered list of ASE `Atoms` with a
+`SinglePointCalculator` containing the final energy and forces. Integrators use
+only the `BatchCalculator` contract; model-specific graph and output conversion
+belongs in calculator adapters.
+
+An ordinary ASE calculator can be used as a correctness/reference fallback:
+
+```python
+from atombit_batch import ASECalculatorAdapter, relax
+
+calculator = ASECalculatorAdapter(existing_ase_calculator)
+result = relax(systems, calculator, fmax=0.03)
+```
+
+`ASECalculatorAdapter` evaluates structures sequentially. It makes existing
+ASE MLIPs functionally compatible, but true acceleration requires a native
+batch adapter for that MLIP.
+
+MACE models use the optional native adapter rather than the sequential ASE
+fallback:
+
+```python
+import torch
+
+from atombit_batch import load_mace_off_batch, relax
+
+calculator = load_mace_off_batch(
+    "small",
+    device="cuda:0",
+    dtype=torch.float64,
+)
+result = relax(systems, calculator, optimizer="bfgs", fmax=0.03)
+```
+
+Install the `mace` optional dependency or use an environment containing
+`mace-torch`. MACE-OFF checkpoints use the Academic Software License and do
+not permit commercial use. The adapter uses MACE's own `AtomicData` graph
+builder, direct forces, stress convention, cutoff, element table, and heads.
+
+`cell_filter=None` is the default and preserves fixed-cell FIRE. Passing
+`BatchedFrechetCellFilter` optimizes atomic positions and full-rank periodic
+cells together using log-deformation coordinates. Pressure is specified in
+GPa and is positive in compression; `smax` is in eV/Angstrom^3. Variable-cell
+FIRE requires calculator stress. Active compaction removes converged graph and
+cell optimizer state while preserving original output order.
+
+## Extensible optimizer interface
+
+`relax()` accepts either a registered optimizer name or a direct object that
+implements the runtime-checkable `BatchOptimizer` protocol:
+
+```python
+from atombit_batch import BatchedFIRE, create_optimizer, relax
+
+# Registered-name convenience path.
+result = relax(systems, calculator, optimizer="fire", fmax=0.03)
+
+# Configured optimizer object; call-time options override object defaults.
+optimizer = BatchedFIRE(dt_start=0.05, dt_max=0.5)
+result = relax(systems, calculator, optimizer=optimizer, fmax=0.03)
+
+# Equivalent explicit factory construction.
+optimizer = create_optimizer("fire", dt_start=0.05, dt_max=0.5)
+```
+
+A third-party batched optimizer declares its optional capabilities and returns
+a `RelaxationResult` from `run`:
+
+```python
+from atombit_batch import OptimizerCapabilities, register_optimizer
+
+class BatchedLBFGS:
+    def capabilities(self):
+        return OptimizerCapabilities(
+            variable_cell=True,
+            active_compaction=True,
+        )
+
+    def run(self, state, calculator, **options):
+        # Implement batched LBFGS state, updates, compaction, and result here.
+        ...
+
+register_optimizer("lbfgs", BatchedLBFGS)
+result = relax(systems, calculator, optimizer="lbfgs", fmax=0.03)
+```
+
+The built-in `BatchedFIRE` and `BatchedBFGS` support variable cells and active
+compaction. Full BFGS stores an independent dense Hessian for every active
+structure and follows ASE's update, eigensolve, and row-wise step clipping:
+
+```python
+from atombit_batch import BatchedBFGS
+
+result = relax(
+    systems,
+    calculator,
+    optimizer=BatchedBFGS(alpha=70.0, max_step=0.2),
+    cell_filter=BatchedFrechetCellFilter(),
+    active_compaction=True,
+    fmax=0.05,
+    smax=None,
+)
+```
+
+The BFGS Hessian costs `O(D^2)` memory and its eigensolve costs `O(D^3)` for
+`D = 3N` fixed-cell or `D = 3N + 9` variable-cell degrees of freedom. It is a
+strong ASE-compatible optimizer for small and medium structures; LBFGS remains
+the scalable follow-up for large systems.
+
+`BatchedGradientDescent` is a fixed-cell reference and rejects those options.
+Registering an optimizer does not adapt an ordinary ASE optimizer
+automatically: ASE classes operate on one `Atoms`/filter state and require a
+dedicated batched implementation to retain acceleration.
+
+## Low-level Python API
+
+```python
+import torch
+from ase.io import read, write
+
+from atombit_batch import AseGraphBatch, BatchedPotential, batched_fire_relax
+
+systems = read("structures.extxyz", index=":")
+state = AseGraphBatch.from_ase(
+    systems,
+    cutoff=6.0,
+    skin=0.5,
+    device="cuda",
+    dtype=torch.float32,
+)
+potential = BatchedPotential(
+    model,
+    device="cuda",
+    dtype=torch.float32,
+    force_mode="autograd",
+    e0_dict=e0_dict,
+)
+result = batched_fire_relax(
+    state,
+    potential,
+    fmax=0.03,
+    max_steps=1000,
+)
+write("relaxed.extxyz", result.state.to_ase(result.evaluation, wrap=True))
+```
+
+## Force modes
+
+- `autograd`: differentiate the graph energies. This is the default and the preferred starting point for NVE dynamics.
+- `direct`: use the model's direct force head. This is faster when the head exists, but it may not be exactly conservative.
+- `auto`: use direct forces when returned, otherwise autograd.
+
+Do not add E0 both inside the model and in `BatchedPotential`; choose one location.
+
+## Neighbour-list policy
+
+With `skin: 0`, the list is rebuilt every force evaluation. With a positive skin, edges are built to `cutoff + skin` and rebuilt after any atom moves more than `skin / 2` from the reference positions. The supplied AtomBit envelope becomes zero at the physical cutoff, so extra skin edges do not contribute.
+
+The baseline builder runs on CPU through matscipy when installed, otherwise ASE. GPU-native PBC cell lists are a priority experiment rather than an unverified default.
+
+## Current scientific scope
+
+Implemented:
+
+- independent fixed-cell and optional Frechet variable-cell systems;
+- heterogeneous sizes and cells;
+- FIRE, full BFGS, and gradient descent;
+- NVE/NVT fixed-cell MD;
+- `FixAtoms` for fixed-cell optimization and MD;
+- per-system time steps, temperatures, friction, and FIRE parameters;
+- finite-difference-validated strain-gradient stress calculation.
+
+Not yet implemented:
+
+- NPT dynamics (the public ensemble slot is reserved but raises explicitly);
+- SHAKE/RATTLE or general ASE constraints;
+- GPU-native periodic neighbour lists;
+- multi-GPU sharding.
+
+These are tracked in `docs/roadmap.md` and designed as controlled experiments rather than hidden behavior.
+
+## Autonomous experimentation
+
+Agents should read `AGENTS.md` before modifying the code. The required loop is:
+
+1. Establish a tested baseline.
+2. Register one falsifiable hypothesis.
+3. Change one primary variable.
+4. Run correctness tests before benchmarks.
+5. Store commands, environment, metrics, and artifacts.
+6. Compare against the baseline and record failures as well as wins.
+
+Use:
+
+```bash
+python tools/run_experiment.py experiments/baseline/experiment.yaml
+python tools/compare_runs.py runs/experiments/<run-a>/manifest.json runs/experiments/<run-b>/manifest.json
+```
+
+## Provenance and licensing
+
+The exact uploaded files are preserved under `original_uploads/`. No license was supplied for them; see `NOTICE.md` before redistribution.

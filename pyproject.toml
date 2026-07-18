@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "atombit-batch-lab"
+version = "0.1.0"
+description = "Torch-native batched geometry optimization and MD for AtomBit-like graph MLIPs"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{name = "Project owner"}]
+dependencies = [
+  "numpy>=1.24",
+  "torch>=2.1",
+  "ase>=3.23",
+  "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+performance = ["matscipy>=1.0"]
+mace = ["mace-torch>=0.3.14"]
+dev = [
+  "pytest>=8",
+  "pytest-cov>=5",
+  "ruff>=0.6",
+  "build>=1.2",
+]
+
+[project.scripts]
+atombit-batch = "atombit_batch.interfaces.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["atombit_batch*", "src*", "examples*"]
+exclude = ["tests*", "benchmarks*", "tools*", "original_uploads*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/*.py" = ["E", "F", "I", "B", "UP"]

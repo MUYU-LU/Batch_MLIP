@@ -1,0 +1,14 @@
+id: baseline-cpu
+summary: Deterministic correctness and CPU throughput baseline
+description: Establish the packet's initial tested baseline before agent changes.
+hypothesis: The unmodified engine passes all correctness gates and produces a reproducible throughput reference.
+commands:
+  - name: tests
+    command: [python, -m, pytest, -q]
+  - name: validate
+    command: [python, -m, atombit_batch.cli, validate, configs/relax_toy.yaml]
+  - name: benchmark
+    command: [python, benchmarks/benchmark_scaling.py, --systems, "16", --atoms, "8", --repeats, "5", --output, runs/baseline_benchmark.json]
+collect_json:
+  - validation.json
+  - runs/baseline_benchmark.json

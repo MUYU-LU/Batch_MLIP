@@ -1,0 +1,20 @@
+id: production-batch-scaling
+summary: Production AtomBit batch scaling against sequential ASE inference
+description: Evaluate true graph batching across fixed T2 atom-count strata and batch sizes.
+hypothesis: True graph batching increases production energy-plus-autograd-force throughput over sequential ASE inference, with gains that increase with batch size until GPU memory or kernel saturation limits scaling.
+environment:
+  conda: /public/home/lmy/.conda/envs/lmy
+  host: hopper-sxm-4
+  gpu: NVIDIA H100 80GB HBM3
+  dtype: float32
+  force_mode: autograd
+commands:
+  - name: tests
+    command: [/public/home/lmy/.conda/envs/lmy/bin/python, -m, pytest, -q]
+  - name: create_manifest
+    command: [/public/home/lmy/.conda/envs/lmy/bin/python, benchmarks/benchmark_production.py, --create-manifest]
+  - name: benchmark
+    command: [/public/home/lmy/.conda/envs/lmy/bin/python, benchmarks/benchmark_production.py, --output, runs/production_batch_scaling.json]
+collect_json:
+  - benchmarks/t2_fixed_samples.json
+  - runs/production_batch_scaling.json

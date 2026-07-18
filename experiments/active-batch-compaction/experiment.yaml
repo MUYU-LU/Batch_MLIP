@@ -1,0 +1,29 @@
+id: active-batch-compaction
+summary: Remove converged graphs from batched FIRE model calls
+description: Compare masked and actively compacted FIRE on the same fixed T2 structures and production AtomBit checkpoint.
+hypothesis: Active compaction makes graph evaluations equal useful per-structure evaluations and reduces relaxation wall time at large batch sizes without changing ASE validation outcomes.
+environment:
+  conda: /public/home/lmy/.conda/envs/lmy
+  host: hopper-sxm-4
+  gpus: 8x NVIDIA H100 80GB HBM3
+  dtype: float32
+parameters:
+  atom_counts: [46, 92, 184, 276]
+  sample_count_per_group: 16
+  batch_sizes: [1, 2, 4, 8, 16]
+  repeats: 3
+  fmax_ev_per_a: 0.05
+  max_steps: 500
+  cutoff_a: 6.0
+  skin_a: 0.0
+commands:
+  - name: tests
+    command: [/public/home/lmy/.conda/envs/lmy/bin/python, -m, pytest, -q]
+  - name: masked
+    command: [/public/home/lmy/.conda/envs/lmy/bin/python, benchmarks/benchmark_relaxation.py]
+  - name: active
+    command: [/public/home/lmy/.conda/envs/lmy/bin/python, benchmarks/benchmark_relaxation.py, --active-compaction]
+collect_json:
+  - benchmarks/t2_fixed_samples.json
+  - runs/active_batch_compaction_summary.json
+  - runs/compaction_paired_*.json

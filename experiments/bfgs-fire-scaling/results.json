@@ -1,0 +1,2458 @@
+{
+  "groups": {
+    "184": {
+      "ase_bfgs": {
+        "atoms_per_second": 30.406214734141013,
+        "avoided_graph_evaluations": 0,
+        "graph_evaluations": 3433,
+        "median_seconds": 193.64462336013094,
+        "model_evaluations": 3433,
+        "neighbor_rebuilds": 3433,
+        "optimizer_steps_total": 3401,
+        "peak_memory_bytes": 510432768,
+        "status": "passed",
+        "systems_per_second": 0.16525116703337506,
+        "timing_samples_seconds": [
+          193.64462336013094
+        ]
+      },
+      "ase_bfgs_speedup_vs_ase_fire": 0.4886862636668488,
+      "ase_fire": {
+        "atoms_per_second": 62.22031801341931,
+        "avoided_graph_evaluations": 0,
+        "graph_evaluations": 3780,
+        "median_seconds": 94.63146746903658,
+        "model_evaluations": 3780,
+        "neighbor_rebuilds": 3780,
+        "optimizer_steps_total": 3748,
+        "peak_memory_bytes": 507514880,
+        "status": "passed",
+        "systems_per_second": 0.33815390224684405,
+        "timing_samples_seconds": [
+          94.63146746903658
+        ]
+      },
+      "points": [
+        {
+          "active_bfgs": {
+            "atoms_per_second": 62.01073920651654,
+            "avoided_graph_evaluations": 0,
+            "graph_evaluations": 3441,
+            "median_seconds": 94.95129513600841,
+            "model_evaluations": 3441,
+            "neighbor_rebuilds": 3473,
+            "optimizer_steps_total": 3409,
+            "peak_memory_bytes": 513533952,
+            "speedup_vs_ase_bfgs": 2.039410026822215,
+            "speedup_vs_ase_fire": 0.996631666092456,
+            "status": "passed",
+            "systems_per_second": 0.3370148869919377,
+            "timing_samples_seconds": [
+              94.78976893099025,
+              95.65556635893881,
+              94.95129513600841
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A"
+              ],
+              "max_cell_rmsd_A": 0.022599928031244068,
+              "max_energy_error_eV_per_atom": 0.0013016617816427479,
+              "max_final_fmax_error_eV_per_A": 0.016259726136922836,
+              "max_position_rmsd_A": 0.06954356612916447,
+              "max_step_difference": 19,
+              "max_stress_tensor_error_eV_per_A3": 0.000416496186517179,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 0.8422146833541576,
+          "active_fire": {
+            "atoms_per_second": 73.62818582021866,
+            "avoided_graph_evaluations": 0,
+            "graph_evaluations": 3780,
+            "median_seconds": 79.9693749670405,
+            "model_evaluations": 3780,
+            "neighbor_rebuilds": 3812,
+            "optimizer_steps_total": 3748,
+            "peak_memory_bytes": 508132864,
+            "speedup_vs_ase_fire": 1.1833463436226568,
+            "status": "passed",
+            "systems_per_second": 0.4001531838055362,
+            "timing_samples_seconds": [
+              79.9693749670405,
+              80.50195258297026,
+              79.73957539605908
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 29,
+              "convergence_flags_match": true,
+              "failed_checks": [],
+              "max_cell_rmsd_A": 0.00038108613316089593,
+              "max_energy_error_eV_per_atom": 1.0397123253863791e-05,
+              "max_final_fmax_error_eV_per_A": 0.0062745101749897,
+              "max_position_rmsd_A": 0.000910031771110317,
+              "max_step_difference": 0,
+              "max_stress_tensor_error_eV_per_A3": 2.198386937379837e-05,
+              "passed": true,
+              "reference_converged_count": 29,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 1
+        },
+        {
+          "active_bfgs": {
+            "atoms_per_second": 77.50706465035022,
+            "avoided_graph_evaluations": 1313,
+            "graph_evaluations": 3453,
+            "median_seconds": 75.9672686168924,
+            "model_evaluations": 2383,
+            "neighbor_rebuilds": 2399,
+            "optimizer_steps_total": 3421,
+            "peak_memory_bytes": 938320896,
+            "speedup_vs_ase_bfgs": 2.549053386882878,
+            "speedup_vs_ase_fire": 1.2456873755231201,
+            "status": "passed",
+            "systems_per_second": 0.4212340470127729,
+            "timing_samples_seconds": [
+              75.9672686168924,
+              75.74231596593745,
+              76.01751648914069
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.037754488760750306,
+              "max_energy_error_eV_per_atom": 0.015306431314219599,
+              "max_final_fmax_error_eV_per_A": 0.01563357189297676,
+              "max_position_rmsd_A": 0.3527543945162585,
+              "max_step_difference": 103,
+              "max_stress_tensor_error_eV_per_A3": 0.0017710577812977135,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 0.8291375411666644,
+          "active_fire": {
+            "atoms_per_second": 93.47914043463939,
+            "avoided_graph_evaluations": 1854,
+            "graph_evaluations": 3780,
+            "median_seconds": 62.98731431015767,
+            "model_evaluations": 2817,
+            "neighbor_rebuilds": 2833,
+            "optimizer_steps_total": 3748,
+            "peak_memory_bytes": 917555712,
+            "speedup_vs_ase_fire": 1.5023893065682878,
+            "status": "passed",
+            "systems_per_second": 0.5080388067099967,
+            "timing_samples_seconds": [
+              62.7054624450393,
+              62.98731431015767,
+              63.28096505999565
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 29,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_final_fmax_error_eV_per_A"
+              ],
+              "max_cell_rmsd_A": 0.001328835082849392,
+              "max_energy_error_eV_per_atom": 7.03542128853176e-05,
+              "max_final_fmax_error_eV_per_A": 0.03349437937140465,
+              "max_position_rmsd_A": 0.0032011181549920107,
+              "max_step_difference": 0,
+              "max_stress_tensor_error_eV_per_A3": 3.459141589701176e-05,
+              "passed": false,
+              "reference_converged_count": 29,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 2
+        },
+        {
+          "active_bfgs": {
+            "atoms_per_second": 97.54337777365967,
+            "avoided_graph_evaluations": 2555,
+            "graph_evaluations": 3569,
+            "median_seconds": 60.3628881261684,
+            "model_evaluations": 1531,
+            "neighbor_rebuilds": 1539,
+            "optimizer_steps_total": 3537,
+            "peak_memory_bytes": 1554500608,
+            "speedup_vs_ase_bfgs": 3.20800792293738,
+            "speedup_vs_ase_fire": 1.5677094056739167,
+            "status": "passed",
+            "systems_per_second": 0.5301270531177156,
+            "timing_samples_seconds": [
+              60.917622639099136,
+              60.3628881261684,
+              60.02063539903611
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.0377533244284633,
+              "max_energy_error_eV_per_atom": 0.015307561210964037,
+              "max_final_fmax_error_eV_per_A": 0.016408782452344894,
+              "max_position_rmsd_A": 0.35284917435615615,
+              "max_step_difference": 103,
+              "max_stress_tensor_error_eV_per_A3": 0.000793860963312909,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 0.8413788209717018,
+          "active_fire": {
+            "atoms_per_second": 115.93277052185314,
+            "avoided_graph_evaluations": 4680,
+            "graph_evaluations": 3780,
+            "median_seconds": 50.78805564204231,
+            "model_evaluations": 2115,
+            "neighbor_rebuilds": 2123,
+            "optimizer_steps_total": 3748,
+            "peak_memory_bytes": 1547008512,
+            "speedup_vs_ase_fire": 1.8632622626076816,
+            "status": "passed",
+            "systems_per_second": 0.6300694050100715,
+            "timing_samples_seconds": [
+              50.78805564204231,
+              50.891939951106906,
+              49.96154943713918
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 29,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_final_fmax_error_eV_per_A"
+              ],
+              "max_cell_rmsd_A": 0.0017357839163971622,
+              "max_energy_error_eV_per_atom": 0.00010989023291546366,
+              "max_final_fmax_error_eV_per_A": 0.030056407675147057,
+              "max_position_rmsd_A": 0.004098905615289926,
+              "max_step_difference": 0,
+              "max_stress_tensor_error_eV_per_A3": 1.4405930414795876e-05,
+              "passed": false,
+              "reference_converged_count": 29,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 4
+        },
+        {
+          "active_bfgs": {
+            "atoms_per_second": 121.60270450031675,
+            "avoided_graph_evaluations": 3486,
+            "graph_evaluations": 3474,
+            "median_seconds": 48.41997572500259,
+            "model_evaluations": 870,
+            "neighbor_rebuilds": 874,
+            "optimizer_steps_total": 3442,
+            "peak_memory_bytes": 2649274368,
+            "speedup_vs_ase_bfgs": 3.9992713846020953,
+            "speedup_vs_ase_fire": 1.954388990330943,
+            "status": "passed",
+            "systems_per_second": 0.660884263588678,
+            "timing_samples_seconds": [
+              48.39461484295316,
+              48.592138261999935,
+              48.41997572500259
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.037762962850106815,
+              "max_energy_error_eV_per_atom": 0.01530673192894977,
+              "max_final_fmax_error_eV_per_A": 0.014169223606586456,
+              "max_position_rmsd_A": 0.3528132669435763,
+              "max_step_difference": 103,
+              "max_stress_tensor_error_eV_per_A3": 0.0017706939252093434,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 0.7669463374356077,
+          "active_fire": {
+            "atoms_per_second": 158.55438453088178,
+            "avoided_graph_evaluations": 6892,
+            "graph_evaluations": 3780,
+            "median_seconds": 37.135523041011766,
+            "model_evaluations": 1334,
+            "neighbor_rebuilds": 1338,
+            "optimizer_steps_total": 3748,
+            "peak_memory_bytes": 2637188096,
+            "speedup_vs_ase_fire": 2.5482734513938956,
+            "status": "passed",
+            "systems_per_second": 0.8617086115808793,
+            "timing_samples_seconds": [
+              37.135523041011766,
+              36.796905603958294,
+              37.353059428045526
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 29,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_final_fmax_error_eV_per_A"
+              ],
+              "max_cell_rmsd_A": 0.0027418902839695496,
+              "max_energy_error_eV_per_atom": 0.0001562159994374151,
+              "max_final_fmax_error_eV_per_A": 0.04810263589024544,
+              "max_position_rmsd_A": 0.006467351801851786,
+              "max_step_difference": 0,
+              "max_stress_tensor_error_eV_per_A3": 2.0436461795725336e-05,
+              "passed": false,
+              "reference_converged_count": 29,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 8
+        },
+        {
+          "active_bfgs": {
+            "atoms_per_second": 138.05037145533072,
+            "avoided_graph_evaluations": 4449,
+            "graph_evaluations": 3551,
+            "median_seconds": 42.65109856589697,
+            "model_evaluations": 500,
+            "neighbor_rebuilds": 502,
+            "optimizer_steps_total": 3519,
+            "peak_memory_bytes": 4974981632,
+            "speedup_vs_ase_bfgs": 4.540202477104906,
+            "speedup_vs_ase_fire": 2.2187345848273683,
+            "status": "passed",
+            "systems_per_second": 0.750273757909406,
+            "timing_samples_seconds": [
+              43.92946220492013,
+              42.27183984895237,
+              42.65109856589697
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.4381562246374737,
+              "max_energy_error_eV_per_atom": 0.015301849531090778,
+              "max_final_fmax_error_eV_per_A": 0.016394473612308502,
+              "max_position_rmsd_A": 0.8879078962156871,
+              "max_step_difference": 158,
+              "max_stress_tensor_error_eV_per_A3": 0.002758386035566218,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 0.6267956540856627,
+          "active_fire": {
+            "atoms_per_second": 220.24781211463804,
+            "avoided_graph_evaluations": 7132,
+            "graph_evaluations": 3780,
+            "median_seconds": 26.733523223083466,
+            "model_evaluations": 682,
+            "neighbor_rebuilds": 684,
+            "optimizer_steps_total": 3748,
+            "peak_memory_bytes": 4950191616,
+            "speedup_vs_ase_fire": 3.539805310335063,
+            "status": "passed",
+            "systems_per_second": 1.1969989788839024,
+            "timing_samples_seconds": [
+              26.94053187710233,
+              26.733523223083466,
+              26.649158406071365
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 29,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_final_fmax_error_eV_per_A"
+              ],
+              "max_cell_rmsd_A": 0.000527930840408838,
+              "max_energy_error_eV_per_atom": 3.2031017801036006e-06,
+              "max_final_fmax_error_eV_per_A": 0.03454053960740566,
+              "max_position_rmsd_A": 0.0012606856180237803,
+              "max_step_difference": 0,
+              "max_stress_tensor_error_eV_per_A3": 1.36552844196558e-05,
+              "passed": false,
+              "reference_converged_count": 29,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 16
+        },
+        {
+          "active_bfgs": {
+            "atoms_per_second": 150.57169606741257,
+            "avoided_graph_evaluations": 4520,
+            "graph_evaluations": 3416,
+            "median_seconds": 39.10429485607892,
+            "model_evaluations": 248,
+            "neighbor_rebuilds": 249,
+            "optimizer_steps_total": 3384,
+            "peak_memory_bytes": 9708888064,
+            "speedup_vs_ase_bfgs": 4.952003969713012,
+            "speedup_vs_ase_fire": 2.419976317622455,
+            "status": "passed",
+            "systems_per_second": 0.8183244351489813,
+            "timing_samples_seconds": [
+              38.400692406110466,
+              39.72408389602788,
+              39.10429485607892
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.037769231618155596,
+              "max_energy_error_eV_per_atom": 0.01531324179276176,
+              "max_final_fmax_error_eV_per_A": 0.016344700008630753,
+              "max_position_rmsd_A": 0.35273444577428303,
+              "max_step_difference": 103,
+              "max_stress_tensor_error_eV_per_A3": 0.0017698814626783133,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 0.61582984034003,
+          "active_fire": {
+            "atoms_per_second": 244.5021111420559,
+            "avoided_graph_evaluations": 12252,
+            "graph_evaluations": 3780,
+            "median_seconds": 24.08159165782854,
+            "model_evaluations": 501,
+            "neighbor_rebuilds": 502,
+            "optimizer_steps_total": 3748,
+            "peak_memory_bytes": 9666665472,
+            "speedup_vs_ase_fire": 3.9296184742952156,
+            "status": "passed",
+            "systems_per_second": 1.328815821424217,
+            "timing_samples_seconds": [
+              24.08159165782854,
+              24.108865092974156,
+              23.994736304040998
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 29,
+              "convergence_flags_match": true,
+              "failed_checks": [],
+              "max_cell_rmsd_A": 0.0018658437316935522,
+              "max_energy_error_eV_per_atom": 9.689123734183933e-05,
+              "max_final_fmax_error_eV_per_A": 0.02393777295947075,
+              "max_position_rmsd_A": 0.004452978179745512,
+              "max_step_difference": 0,
+              "max_stress_tensor_error_eV_per_A3": 1.532393491743278e-05,
+              "passed": true,
+              "reference_converged_count": 29,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 32
+        }
+      ],
+      "sample_files": [
+        "Aven12_5_322_z1.cif",
+        "Aven12_14_1278_z1.cif",
+        "Aven12_19_363_z1.cif",
+        "Aven12_33_292_z1.cif",
+        "Aven12_77_144_z1.cif",
+        "Aven12_14_350_z1.cif",
+        "Aven12_19_164_z1.cif",
+        "Aven12_19_457_z1.cif",
+        "Aven12_14_195_z1.cif",
+        "Aven12_9_194_z1.cif",
+        "Aven12_77_1310_z1.cif",
+        "Aven12_19_103_z1.cif",
+        "Aven12_19_37_z1.cif",
+        "Aven12_14_868_z1.cif",
+        "Aven12_9_465_z1.cif",
+        "Aven12_19_47_z1.cif",
+        "Aven12_14_1839_z1.cif",
+        "Aven12_5_900_z1.cif",
+        "Aven12_77_262_z1.cif",
+        "Aven12_19_372_z1.cif",
+        "Aven12_14_2082_z1.cif",
+        "Aven12_5_358_z1.cif",
+        "Aven12_33_151_z1.cif",
+        "Aven12_5_307_z1.cif",
+        "Aven12_14_498_z1.cif",
+        "Aven12_77_1346_z1.cif",
+        "Aven12_19_454_z1.cif",
+        "Aven12_77_494_z1.cif",
+        "Aven12_33_202_z1.cif",
+        "Aven12_19_81_z1.cif",
+        "Aven12_9_77_z1.cif",
+        "Aven12_77_1075_z1.cif"
+      ]
+    },
+    "276": {
+      "ase_bfgs": {
+        "atoms_per_second": 31.463935259704858,
+        "avoided_graph_evaluations": 0,
+        "graph_evaluations": 2284,
+        "median_seconds": 280.7023319588043,
+        "model_evaluations": 2284,
+        "neighbor_rebuilds": 2284,
+        "optimizer_steps_total": 2252,
+        "peak_memory_bytes": 577396224,
+        "status": "passed",
+        "systems_per_second": 0.11399976543371326,
+        "timing_samples_seconds": [
+          280.7023319588043
+        ]
+      },
+      "ase_bfgs_speedup_vs_ase_fire": 0.20015530070584328,
+      "ase_fire": {
+        "atoms_per_second": 157.19761179817863,
+        "avoided_graph_evaluations": 0,
+        "graph_evaluations": 2174,
+        "median_seconds": 56.18405966204591,
+        "model_evaluations": 2174,
+        "neighbor_rebuilds": 2174,
+        "optimizer_steps_total": 2142,
+        "peak_memory_bytes": 541843968,
+        "status": "passed",
+        "systems_per_second": 0.5695565644861544,
+        "timing_samples_seconds": [
+          56.18405966204591
+        ]
+      },
+      "points": [
+        {
+          "active_bfgs": {
+            "atoms_per_second": 102.95315852092762,
+            "avoided_graph_evaluations": 0,
+            "graph_evaluations": 2461,
+            "median_seconds": 85.78658612212166,
+            "model_evaluations": 2461,
+            "neighbor_rebuilds": 2493,
+            "optimizer_steps_total": 2429,
+            "peak_memory_bytes": 592916992,
+            "speedup_vs_ase_bfgs": 3.2721005071726474,
+            "speedup_vs_ase_fire": 0.6549282609528835,
+            "status": "passed",
+            "systems_per_second": 0.373018690293216,
+            "timing_samples_seconds": [
+              85.78658612212166,
+              85.86308500892483,
+              82.17385774711147
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.11312902627143553,
+              "max_energy_error_eV_per_atom": 0.004605652629465297,
+              "max_final_fmax_error_eV_per_A": 0.012093011289834976,
+              "max_position_rmsd_A": 0.4865210779361352,
+              "max_step_difference": 79,
+              "max_stress_tensor_error_eV_per_A3": 0.0011256459983997047,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 0.5700105532385936,
+          "active_fire": {
+            "atoms_per_second": 180.6162323416383,
+            "avoided_graph_evaluations": 0,
+            "graph_evaluations": 2173,
+            "median_seconds": 48.899259415920824,
+            "model_evaluations": 2173,
+            "neighbor_rebuilds": 2205,
+            "optimizer_steps_total": 2141,
+            "peak_memory_bytes": 542516736,
+            "speedup_vs_ase_fire": 1.1489756763832149,
+            "status": "passed",
+            "systems_per_second": 0.6544066389189793,
+            "timing_samples_seconds": [
+              49.14893962722272,
+              48.899259415920824,
+              48.716852656099945
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom"
+              ],
+              "max_cell_rmsd_A": 0.0006022104443757576,
+              "max_energy_error_eV_per_atom": 0.00024275848830955616,
+              "max_final_fmax_error_eV_per_A": 0.000863540917634964,
+              "max_position_rmsd_A": 0.004735568746904686,
+              "max_step_difference": 1,
+              "max_stress_tensor_error_eV_per_A3": 5.78780600335449e-06,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 1
+        },
+        {
+          "active_bfgs": {
+            "atoms_per_second": 134.47706654177568,
+            "avoided_graph_evaluations": 994,
+            "graph_evaluations": 2502,
+            "median_seconds": 65.67662596399896,
+            "model_evaluations": 1748,
+            "neighbor_rebuilds": 1764,
+            "optimizer_steps_total": 2470,
+            "peak_memory_bytes": 984985088,
+            "speedup_vs_ase_bfgs": 4.274006586645802,
+            "speedup_vs_ase_fire": 0.8554650735688454,
+            "status": "passed",
+            "systems_per_second": 0.48723574833976696,
+            "timing_samples_seconds": [
+              71.38983351085335,
+              65.67662596399896,
+              65.20626269606873
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.11856287307080914,
+              "max_energy_error_eV_per_atom": 0.016591058261152626,
+              "max_final_fmax_error_eV_per_A": 0.017943933606147766,
+              "max_position_rmsd_A": 0.6625594551471501,
+              "max_step_difference": 101,
+              "max_stress_tensor_error_eV_per_A3": 0.0011326318490318954,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 0.5035045891203748,
+          "active_fire": {
+            "atoms_per_second": 267.08210699073834,
+            "avoided_graph_evaluations": 433,
+            "graph_evaluations": 2173,
+            "median_seconds": 33.06848257081583,
+            "model_evaluations": 1303,
+            "neighbor_rebuilds": 1319,
+            "optimizer_steps_total": 2141,
+            "peak_memory_bytes": 920290816,
+            "speedup_vs_ase_fire": 1.6990214032872024,
+            "status": "passed",
+            "systems_per_second": 0.9676887934447042,
+            "timing_samples_seconds": [
+              32.995377289131284,
+              33.2175716930069,
+              33.06848257081583
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom"
+              ],
+              "max_cell_rmsd_A": 0.000601032586848759,
+              "max_energy_error_eV_per_atom": 0.00024233002593551856,
+              "max_final_fmax_error_eV_per_A": 0.0007533319294452667,
+              "max_position_rmsd_A": 0.004725822358003536,
+              "max_step_difference": 1,
+              "max_stress_tensor_error_eV_per_A3": 5.749345291405916e-06,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 2
+        },
+        {
+          "active_bfgs": {
+            "atoms_per_second": 157.3074065029907,
+            "avoided_graph_evaluations": 1494,
+            "graph_evaluations": 2278,
+            "median_seconds": 56.144845283124596,
+            "model_evaluations": 943,
+            "neighbor_rebuilds": 951,
+            "optimizer_steps_total": 2246,
+            "peak_memory_bytes": 1741671936,
+            "speedup_vs_ase_bfgs": 4.999610036207095,
+            "speedup_vs_ase_fire": 1.000698450208983,
+            "status": "passed",
+            "systems_per_second": 0.5699543713876474,
+            "timing_samples_seconds": [
+              51.984835198149085,
+              57.91421597194858,
+              56.144845283124596
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.057719860722111736,
+              "max_energy_error_eV_per_atom": 0.00543483789416327,
+              "max_final_fmax_error_eV_per_A": 0.013471055775880814,
+              "max_position_rmsd_A": 0.2869840762633088,
+              "max_step_difference": 80,
+              "max_stress_tensor_error_eV_per_A3": 0.0004482902259042021,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 0.442238351549942,
+          "active_fire": {
+            "atoms_per_second": 355.70729212350085,
+            "avoided_graph_evaluations": 999,
+            "graph_evaluations": 2173,
+            "median_seconds": 24.82940382603556,
+            "model_evaluations": 793,
+            "neighbor_rebuilds": 801,
+            "optimizer_steps_total": 2141,
+            "peak_memory_bytes": 1710048256,
+            "speedup_vs_ase_fire": 2.262803410653483,
+            "status": "passed",
+            "systems_per_second": 1.288794536679351,
+            "timing_samples_seconds": [
+              24.82940382603556,
+              25.0132646469865,
+              24.450970457866788
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom"
+              ],
+              "max_cell_rmsd_A": 0.0006018265920866759,
+              "max_energy_error_eV_per_atom": 0.0002424544182376585,
+              "max_final_fmax_error_eV_per_A": 0.0008798688650131226,
+              "max_position_rmsd_A": 0.00473226398846239,
+              "max_step_difference": 1,
+              "max_stress_tensor_error_eV_per_A3": 5.844020051881671e-06,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 4
+        },
+        {
+          "active_bfgs": {
+            "atoms_per_second": 195.05462610980143,
+            "avoided_graph_evaluations": 1965,
+            "graph_evaluations": 2339,
+            "median_seconds": 45.27962333499454,
+            "model_evaluations": 538,
+            "neighbor_rebuilds": 542,
+            "optimizer_steps_total": 2307,
+            "peak_memory_bytes": 3205557248,
+            "speedup_vs_ase_bfgs": 6.199308017252483,
+            "speedup_vs_ase_fire": 1.2408243603613158,
+            "status": "passed",
+            "systems_per_second": 0.7067196598181211,
+            "timing_samples_seconds": [
+              45.27962333499454,
+              45.46616654796526,
+              44.534043352119625
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.05771692237990309,
+              "max_energy_error_eV_per_atom": 0.005434824072796366,
+              "max_final_fmax_error_eV_per_A": 0.010802540928125381,
+              "max_position_rmsd_A": 0.2869679540864401,
+              "max_step_difference": 80,
+              "max_stress_tensor_error_eV_per_A3": 0.00044890932258567773,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 0.4254827495468539,
+          "active_fire": {
+            "atoms_per_second": 458.4313378569115,
+            "avoided_graph_evaluations": 1251,
+            "graph_evaluations": 2173,
+            "median_seconds": 19.265698635019362,
+            "model_evaluations": 428,
+            "neighbor_rebuilds": 432,
+            "optimizer_steps_total": 2141,
+            "peak_memory_bytes": 3181156352,
+            "speedup_vs_ase_fire": 2.916274188983723,
+            "status": "passed",
+            "systems_per_second": 1.6609831081772155,
+            "timing_samples_seconds": [
+              18.970720619196072,
+              19.301534111145884,
+              19.265698635019362
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom"
+              ],
+              "max_cell_rmsd_A": 0.0006014193618939221,
+              "max_energy_error_eV_per_atom": 0.00024239913277004075,
+              "max_final_fmax_error_eV_per_A": 0.0007536448538303375,
+              "max_position_rmsd_A": 0.004729076676613674,
+              "max_step_difference": 1,
+              "max_stress_tensor_error_eV_per_A3": 5.17592707183212e-06,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 8
+        },
+        {
+          "active_bfgs": {
+            "atoms_per_second": 195.9621735210599,
+            "avoided_graph_evaluations": 3101,
+            "graph_evaluations": 2547,
+            "median_seconds": 45.06992263509892,
+            "model_evaluations": 353,
+            "neighbor_rebuilds": 355,
+            "optimizer_steps_total": 2515,
+            "peak_memory_bytes": 6262156800,
+            "speedup_vs_ase_bfgs": 6.2281520700948105,
+            "speedup_vs_ase_fire": 1.246597650431547,
+            "status": "passed",
+            "systems_per_second": 0.710007875076304,
+            "timing_samples_seconds": [
+              46.489287059986964,
+              45.06992263509892,
+              43.07060030801222
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.11813602443469468,
+              "max_energy_error_eV_per_atom": 0.016579517419787422,
+              "max_final_fmax_error_eV_per_A": 0.011478487402200699,
+              "max_position_rmsd_A": 0.6623974054087047,
+              "max_step_difference": 100,
+              "max_stress_tensor_error_eV_per_A3": 0.0011206295457668602,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 0.3617259837081593,
+          "active_fire": {
+            "atoms_per_second": 541.7420432787109,
+            "avoided_graph_evaluations": 1539,
+            "graph_evaluations": 2173,
+            "median_seconds": 16.30296210083179,
+            "model_evaluations": 232,
+            "neighbor_rebuilds": 234,
+            "optimizer_steps_total": 2141,
+            "peak_memory_bytes": 6216943616,
+            "speedup_vs_ase_fire": 3.4462485598969375,
+            "status": "passed",
+            "systems_per_second": 1.9628334901402569,
+            "timing_samples_seconds": [
+              16.265909576090053,
+              16.30296210083179,
+              16.36862816591747
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom"
+              ],
+              "max_cell_rmsd_A": 0.000602142987308621,
+              "max_energy_error_eV_per_atom": 0.00024250970370527628,
+              "max_final_fmax_error_eV_per_A": 0.0007548443973064423,
+              "max_position_rmsd_A": 0.004726777479373235,
+              "max_step_difference": 1,
+              "max_stress_tensor_error_eV_per_A3": 4.8342772061005235e-06,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 16
+        },
+        {
+          "active_bfgs": {
+            "atoms_per_second": 225.1255413902268,
+            "avoided_graph_evaluations": 2262,
+            "graph_evaluations": 2346,
+            "median_seconds": 39.23144368897192,
+            "model_evaluations": 144,
+            "neighbor_rebuilds": 145,
+            "optimizer_steps_total": 2314,
+            "peak_memory_bytes": 12271716352,
+            "speedup_vs_ase_bfgs": 7.1550344714362515,
+            "speedup_vs_ase_fire": 1.4321180761909973,
+            "status": "passed",
+            "systems_per_second": 0.8156722514138652,
+            "timing_samples_seconds": [
+              39.23144368897192,
+              41.19186809589155,
+              39.21701024589129
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.07246515087341474,
+              "max_energy_error_eV_per_atom": 0.004646480947301007,
+              "max_final_fmax_error_eV_per_A": 0.010818090289831161,
+              "max_position_rmsd_A": 0.27685927452999054,
+              "max_step_difference": 80,
+              "max_stress_tensor_error_eV_per_A3": 0.00043060640746261925,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 0.3837519068989061,
+          "active_fire": {
+            "atoms_per_second": 586.6434468286118,
+            "avoided_graph_evaluations": 1827,
+            "graph_evaluations": 2173,
+            "median_seconds": 15.05514132604003,
+            "model_evaluations": 125,
+            "neighbor_rebuilds": 126,
+            "optimizer_steps_total": 2141,
+            "peak_memory_bytes": 12184319488,
+            "speedup_vs_ase_fire": 3.731885237428327,
+            "status": "passed",
+            "systems_per_second": 2.1255197348862747,
+            "timing_samples_seconds": [
+              15.05514132604003,
+              15.045320176985115,
+              15.130719332955778
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom"
+              ],
+              "max_cell_rmsd_A": 0.0006033495848539214,
+              "max_energy_error_eV_per_atom": 0.00024268938147503397,
+              "max_final_fmax_error_eV_per_A": 0.0008585900068283081,
+              "max_position_rmsd_A": 0.0047373912320101035,
+              "max_step_difference": 1,
+              "max_stress_tensor_error_eV_per_A3": 5.282010533846915e-06,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 32
+        }
+      ],
+      "sample_files": [
+        "Aven12_148_562_z1.cif",
+        "Aven12_148_66_z1.cif",
+        "Aven12_148_854_z1.cif",
+        "Aven12_148_2222_z1.cif",
+        "Aven12_148_756_z1.cif",
+        "Aven12_148_211_z1.cif",
+        "Aven12_148_690_z1.cif",
+        "Aven12_148_1276_z1.cif",
+        "Aven12_148_1301_z1.cif",
+        "Aven12_148_541_z1.cif",
+        "Aven12_148_930_z1.cif",
+        "Aven12_148_551_z1.cif",
+        "Aven12_148_452_z1.cif",
+        "Aven12_148_2142_z1.cif",
+        "Aven12_148_1824_z1.cif",
+        "Aven12_148_457_z1.cif",
+        "Aven12_148_1618_z1.cif",
+        "Aven12_148_1635_z1.cif",
+        "Aven12_148_496_z1.cif",
+        "Aven12_148_2409_z1.cif",
+        "Aven12_148_1661_z1.cif",
+        "Aven12_148_184_z1.cif",
+        "Aven12_148_1942_z1.cif",
+        "Aven12_148_1025_z1.cif",
+        "Aven12_148_2382_z1.cif",
+        "Aven12_148_288_z1.cif",
+        "Aven12_148_469_z1.cif",
+        "Aven12_148_987_z1.cif",
+        "Aven12_148_843_z1.cif",
+        "Aven12_148_1778_z1.cif",
+        "Aven12_148_536_z1.cif",
+        "Aven12_148_2042_z1.cif"
+      ]
+    },
+    "46": {
+      "ase_bfgs": {
+        "atoms_per_second": 15.116769295087407,
+        "avoided_graph_evaluations": 0,
+        "graph_evaluations": 3819,
+        "median_seconds": 97.37530362908728,
+        "model_evaluations": 3819,
+        "neighbor_rebuilds": 3819,
+        "optimizer_steps_total": 3787,
+        "peak_memory_bytes": 159789056,
+        "status": "passed",
+        "systems_per_second": 0.3286254194584219,
+        "timing_samples_seconds": [
+          97.37530362908728
+        ]
+      },
+      "ase_bfgs_speedup_vs_ase_fire": 1.2017290619661523,
+      "ase_fire": {
+        "atoms_per_second": 12.579182590753707,
+        "avoided_graph_evaluations": 0,
+        "graph_evaluations": 4827,
+        "median_seconds": 117.01873228885233,
+        "model_evaluations": 4827,
+        "neighbor_rebuilds": 4827,
+        "optimizer_steps_total": 4795,
+        "peak_memory_bytes": 154894848,
+        "status": "passed",
+        "systems_per_second": 0.2734604911033415,
+        "timing_samples_seconds": [
+          117.01873228885233
+        ]
+      },
+      "points": [
+        {
+          "active_bfgs": {
+            "atoms_per_second": 16.61529078807147,
+            "avoided_graph_evaluations": 0,
+            "graph_evaluations": 3888,
+            "median_seconds": 88.59309287904762,
+            "model_evaluations": 3888,
+            "neighbor_rebuilds": 3920,
+            "optimizer_steps_total": 3856,
+            "peak_memory_bytes": 160031744,
+            "speedup_vs_ase_bfgs": 1.099129745498666,
+            "speedup_vs_ase_fire": 1.3208561580372076,
+            "status": "passed",
+            "systems_per_second": 0.3612019736537276,
+            "timing_samples_seconds": [
+              89.80008634598926,
+              88.59309287904762,
+              87.8657855920028
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.18415125927880285,
+              "max_energy_error_eV_per_atom": 0.0023517194001570992,
+              "max_final_fmax_error_eV_per_A": 0.013490825891494751,
+              "max_position_rmsd_A": 0.1780049722009785,
+              "max_step_difference": 49,
+              "max_stress_tensor_error_eV_per_A3": 0.0016944483504630625,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 1.0813769575681353,
+          "active_fire": {
+            "atoms_per_second": 15.364938814154984,
+            "avoided_graph_evaluations": 0,
+            "graph_evaluations": 4839,
+            "median_seconds": 95.80252923909575,
+            "model_evaluations": 4839,
+            "neighbor_rebuilds": 4871,
+            "optimizer_steps_total": 4807,
+            "peak_memory_bytes": 155137024,
+            "speedup_vs_ase_fire": 1.2214576506305694,
+            "status": "passed",
+            "systems_per_second": 0.3340204090033692,
+            "timing_samples_seconds": [
+              95.70876551582478,
+              95.80252923909575,
+              96.24273981782608
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 30,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom"
+              ],
+              "max_cell_rmsd_A": 0.0020396374278184885,
+              "max_energy_error_eV_per_atom": 0.00016604299130647078,
+              "max_final_fmax_error_eV_per_A": 0.006689218804240227,
+              "max_position_rmsd_A": 0.003354066880564921,
+              "max_step_difference": 10,
+              "max_stress_tensor_error_eV_per_A3": 0.0005297698080539703,
+              "passed": false,
+              "reference_converged_count": 30,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 1
+        },
+        {
+          "active_bfgs": {
+            "atoms_per_second": 21.6922535105077,
+            "avoided_graph_evaluations": 1242,
+            "graph_evaluations": 3984,
+            "median_seconds": 67.858325520996,
+            "model_evaluations": 2613,
+            "neighbor_rebuilds": 2629,
+            "optimizer_steps_total": 3952,
+            "peak_memory_bytes": 239738880,
+            "speedup_vs_ase_bfgs": 1.434979464663602,
+            "speedup_vs_ase_fire": 1.724456526010882,
+            "status": "passed",
+            "systems_per_second": 0.4715707284892979,
+            "timing_samples_seconds": [
+              69.63180376798846,
+              67.858325520996,
+              67.63830347708426
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.3544465857838241,
+              "max_energy_error_eV_per_atom": 0.008043475773023523,
+              "max_final_fmax_error_eV_per_A": 0.010514095425605774,
+              "max_position_rmsd_A": 0.3672936916362941,
+              "max_step_difference": 73,
+              "max_stress_tensor_error_eV_per_A3": 0.0021143973572179675,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 1.012134493529435,
+          "active_fire": {
+            "atoms_per_second": 21.432184802697712,
+            "avoided_graph_evaluations": 1721,
+            "graph_evaluations": 4839,
+            "median_seconds": 68.68175193294883,
+            "model_evaluations": 3280,
+            "neighbor_rebuilds": 3296,
+            "optimizer_steps_total": 4807,
+            "peak_memory_bytes": 235290624,
+            "speedup_vs_ase_fire": 1.7037819944239763,
+            "status": "passed",
+            "systems_per_second": 0.4659170609282111,
+            "timing_samples_seconds": [
+              68.86341494414955,
+              68.68175193294883,
+              68.59113517496735
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 30,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom"
+              ],
+              "max_cell_rmsd_A": 0.005487369384767152,
+              "max_energy_error_eV_per_atom": 0.0002495516901430876,
+              "max_final_fmax_error_eV_per_A": 0.005917971953749657,
+              "max_position_rmsd_A": 0.008661931748230775,
+              "max_step_difference": 10,
+              "max_stress_tensor_error_eV_per_A3": 0.00052982522174716,
+              "passed": false,
+              "reference_converged_count": 30,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 2
+        },
+        {
+          "active_bfgs": {
+            "atoms_per_second": 28.756375923768296,
+            "avoided_graph_evaluations": 2643,
+            "graph_evaluations": 3945,
+            "median_seconds": 51.18864782899618,
+            "model_evaluations": 1647,
+            "neighbor_rebuilds": 1655,
+            "optimizer_steps_total": 3913,
+            "peak_memory_bytes": 385433600,
+            "speedup_vs_ase_bfgs": 1.902283177207278,
+            "speedup_vs_ase_fire": 2.286028978139294,
+            "status": "passed",
+            "systems_per_second": 0.6251386070384412,
+            "timing_samples_seconds": [
+              51.18864782899618,
+              50.80260187503882,
+              52.242088434053585
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.354856764368258,
+              "max_energy_error_eV_per_atom": 0.008096124814904255,
+              "max_final_fmax_error_eV_per_A": 0.015292447060346603,
+              "max_position_rmsd_A": 0.35692859684606865,
+              "max_step_difference": 74,
+              "max_stress_tensor_error_eV_per_A3": 0.0022532744333148003,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 1.037427155650372,
+          "active_fire": {
+            "atoms_per_second": 27.71893502801233,
+            "avoided_graph_evaluations": 4687,
+            "graph_evaluations": 4861,
+            "median_seconds": 53.1044933188241,
+            "model_evaluations": 2387,
+            "neighbor_rebuilds": 2395,
+            "optimizer_steps_total": 4829,
+            "peak_memory_bytes": 385047040,
+            "speedup_vs_ase_fire": 2.2035561395211047,
+            "status": "passed",
+            "systems_per_second": 0.6025855440872245,
+            "timing_samples_seconds": [
+              52.320294754114,
+              54.45880055706948,
+              53.1044933188241
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 30,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.002099844360031906,
+              "max_energy_error_eV_per_atom": 0.00016888328220533288,
+              "max_final_fmax_error_eV_per_A": 0.008787622675299644,
+              "max_position_rmsd_A": 0.003453751130481556,
+              "max_step_difference": 26,
+              "max_stress_tensor_error_eV_per_A3": 0.000529799610376358,
+              "passed": false,
+              "reference_converged_count": 30,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 4
+        },
+        {
+          "active_bfgs": {
+            "atoms_per_second": 39.41070645748109,
+            "avoided_graph_evaluations": 3419,
+            "graph_evaluations": 3941,
+            "median_seconds": 37.35025662602857,
+            "model_evaluations": 920,
+            "neighbor_rebuilds": 924,
+            "optimizer_steps_total": 3909,
+            "peak_memory_bytes": 663086592,
+            "speedup_vs_ase_bfgs": 2.607085263270416,
+            "speedup_vs_ase_fire": 3.1330101278957363,
+            "status": "passed",
+            "systems_per_second": 0.8567544882061107,
+            "timing_samples_seconds": [
+              37.35025662602857,
+              36.706148359924555,
+              38.04719254001975
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.35459206558524037,
+              "max_energy_error_eV_per_atom": 0.00809405160986859,
+              "max_final_fmax_error_eV_per_A": 0.010913636535406113,
+              "max_position_rmsd_A": 0.36371685096118855,
+              "max_step_difference": 74,
+              "max_stress_tensor_error_eV_per_A3": 0.0021139580057933927,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 1.083553309585465,
+          "active_fire": {
+            "atoms_per_second": 36.37172819171993,
+            "avoided_graph_evaluations": 9254,
+            "graph_evaluations": 4850,
+            "median_seconds": 40.470994180999696,
+            "model_evaluations": 1763,
+            "neighbor_rebuilds": 1767,
+            "optimizer_steps_total": 4818,
+            "peak_memory_bytes": 662347776,
+            "speedup_vs_ase_fire": 2.8914222310800124,
+            "status": "passed",
+            "systems_per_second": 0.7906897432982594,
+            "timing_samples_seconds": [
+              40.466792003950104,
+              40.71847116202116,
+              40.470994180999696
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 30,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_final_fmax_error_eV_per_A"
+              ],
+              "max_cell_rmsd_A": 0.003446279548488275,
+              "max_energy_error_eV_per_atom": 0.0002735905025316321,
+              "max_final_fmax_error_eV_per_A": 0.12920165993273258,
+              "max_position_rmsd_A": 0.007967440843146175,
+              "max_step_difference": 16,
+              "max_stress_tensor_error_eV_per_A3": 0.0005298360483720899,
+              "passed": false,
+              "reference_converged_count": 30,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 8
+        },
+        {
+          "active_bfgs": {
+            "atoms_per_second": 49.11206065955048,
+            "avoided_graph_evaluations": 4678,
+            "graph_evaluations": 4010,
+            "median_seconds": 29.972271173959598,
+            "model_evaluations": 543,
+            "neighbor_rebuilds": 545,
+            "optimizer_steps_total": 3978,
+            "peak_memory_bytes": 1224955904,
+            "speedup_vs_ase_bfgs": 3.2488463441398645,
+            "speedup_vs_ase_fire": 3.904233069615363,
+            "status": "passed",
+            "systems_per_second": 1.0676534925989234,
+            "timing_samples_seconds": [
+              30.06477202801034,
+              29.263173325918615,
+              29.972271173959598
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.3548326874027743,
+              "max_energy_error_eV_per_atom": 0.008096249207206394,
+              "max_final_fmax_error_eV_per_A": 0.017189141362905502,
+              "max_position_rmsd_A": 0.366324796260674,
+              "max_step_difference": 74,
+              "max_stress_tensor_error_eV_per_A3": 0.002249265438877046,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 0.880793009138265,
+          "active_fire": {
+            "atoms_per_second": 55.75891287738522,
+            "avoided_graph_evaluations": 11160,
+            "graph_evaluations": 4872,
+            "median_seconds": 26.39936691801995,
+            "model_evaluations": 1002,
+            "neighbor_rebuilds": 1004,
+            "optimizer_steps_total": 4840,
+            "peak_memory_bytes": 1223565312,
+            "speedup_vs_ase_fire": 4.432634034453928,
+            "status": "passed",
+            "systems_per_second": 1.212150279943157,
+            "timing_samples_seconds": [
+              26.514839531155303,
+              26.39936691801995,
+              26.0383626408875
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 30,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_final_fmax_error_eV_per_A"
+              ],
+              "max_cell_rmsd_A": 0.003908857472933008,
+              "max_energy_error_eV_per_atom": 0.000161761822907821,
+              "max_final_fmax_error_eV_per_A": 0.13019740022718906,
+              "max_position_rmsd_A": 0.00623221735266008,
+              "max_step_difference": 17,
+              "max_stress_tensor_error_eV_per_A3": 0.0005297589814290404,
+              "passed": false,
+              "reference_converged_count": 30,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 16
+        },
+        {
+          "active_bfgs": {
+            "atoms_per_second": 59.88910887263605,
+            "avoided_graph_evaluations": 4623,
+            "graph_evaluations": 3953,
+            "median_seconds": 24.57875943905674,
+            "model_evaluations": 268,
+            "neighbor_rebuilds": 269,
+            "optimizer_steps_total": 3921,
+            "peak_memory_bytes": 2361888256,
+            "speedup_vs_ase_bfgs": 3.961766413416033,
+            "speedup_vs_ase_fire": 4.760969835723457,
+            "status": "passed",
+            "systems_per_second": 1.3019371494051315,
+            "timing_samples_seconds": [
+              24.79894233099185,
+              24.43973359791562,
+              24.57875943905674
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.3545672925148357,
+              "max_energy_error_eV_per_atom": 0.00809559614762016,
+              "max_final_fmax_error_eV_per_A": 0.012365832924842834,
+              "max_position_rmsd_A": 0.36335628695550104,
+              "max_step_difference": 74,
+              "max_stress_tensor_error_eV_per_A3": 0.0022249992471188307,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 0.7012833468498977,
+          "active_fire": {
+            "atoms_per_second": 85.39930278061298,
+            "avoided_graph_evaluations": 11157,
+            "graph_evaluations": 4875,
+            "median_seconds": 17.236674680840224,
+            "model_evaluations": 501,
+            "neighbor_rebuilds": 502,
+            "optimizer_steps_total": 4843,
+            "peak_memory_bytes": 2342963200,
+            "speedup_vs_ase_fire": 6.788938960420648,
+            "status": "passed",
+            "systems_per_second": 1.8565065821872389,
+            "timing_samples_seconds": [
+              17.216740739997476,
+              17.279612089972943,
+              17.236674680840224
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 30,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom"
+              ],
+              "max_cell_rmsd_A": 0.006043654575464489,
+              "max_energy_error_eV_per_atom": 0.0002808156220809273,
+              "max_final_fmax_error_eV_per_A": 0.009540801867842674,
+              "max_position_rmsd_A": 0.009487847407506545,
+              "max_step_difference": 24,
+              "max_stress_tensor_error_eV_per_A3": 0.0005297490861266851,
+              "passed": false,
+              "reference_converged_count": 30,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 32
+        }
+      ],
+      "sample_files": [
+        "Aven12_1_295_z1.cif",
+        "Aven12_1_331_z1.cif",
+        "Aven12_1_241_z1.cif",
+        "Aven12_1_62_z1.cif",
+        "Aven12_1_204_z1.cif",
+        "Aven12_1_378_z1.cif",
+        "Aven12_1_263_z1.cif",
+        "Aven12_1_277_z1.cif",
+        "Aven12_1_474_z1.cif",
+        "Aven12_1_491_z1.cif",
+        "Aven12_1_401_z1.cif",
+        "Aven12_1_201_z1.cif",
+        "Aven12_1_234_z1.cif",
+        "Aven12_1_367_z1.cif",
+        "Aven12_1_18_z1.cif",
+        "Aven12_1_152_z1.cif",
+        "Aven12_1_191_z1.cif",
+        "Aven12_1_198_z1.cif",
+        "Aven12_1_65_z1.cif",
+        "Aven12_1_414_z1.cif",
+        "Aven12_1_74_z1.cif",
+        "Aven12_1_430_z1.cif",
+        "Aven12_1_303_z1.cif",
+        "Aven12_1_283_z1.cif",
+        "Aven12_1_78_z1.cif",
+        "Aven12_1_51_z1.cif",
+        "Aven12_1_330_z1.cif",
+        "Aven12_1_487_z1.cif",
+        "Aven12_1_161_z1.cif",
+        "Aven12_1_385_z1.cif",
+        "Aven12_1_505_z1.cif",
+        "Aven12_1_7_z1.cif"
+      ]
+    },
+    "92": {
+      "ase_bfgs": {
+        "atoms_per_second": 23.15324767514735,
+        "avoided_graph_evaluations": 0,
+        "graph_evaluations": 4049,
+        "median_seconds": 127.15278829587623,
+        "model_evaluations": 4049,
+        "neighbor_rebuilds": 4049,
+        "optimizer_steps_total": 4017,
+        "peak_memory_bytes": 295558656,
+        "status": "passed",
+        "systems_per_second": 0.25166573559942773,
+        "timing_samples_seconds": [
+          127.15278829587623
+        ]
+      },
+      "ase_bfgs_speedup_vs_ase_fire": 0.8935730280293459,
+      "ase_fire": {
+        "atoms_per_second": 25.9108622897993,
+        "avoided_graph_evaluations": 0,
+        "graph_evaluations": 4893,
+        "median_seconds": 113.6203020599205,
+        "model_evaluations": 4893,
+        "neighbor_rebuilds": 4893,
+        "optimizer_steps_total": 4861,
+        "peak_memory_bytes": 255218688,
+        "status": "passed",
+        "systems_per_second": 0.2816398074978185,
+        "timing_samples_seconds": [
+          113.6203020599205
+        ]
+      },
+      "points": [
+        {
+          "active_bfgs": {
+            "atoms_per_second": 26.525830734515452,
+            "avoided_graph_evaluations": 0,
+            "graph_evaluations": 3979,
+            "median_seconds": 110.98615645500831,
+            "model_evaluations": 3979,
+            "neighbor_rebuilds": 4011,
+            "optimizer_steps_total": 3947,
+            "peak_memory_bytes": 296218624,
+            "speedup_vs_ase_bfgs": 1.145663498559134,
+            "speedup_vs_ase_fire": 1.0237340015101795,
+            "status": "passed",
+            "systems_per_second": 0.2883242471142984,
+            "timing_samples_seconds": [
+              111.69814256788231,
+              107.78259050799534,
+              110.98615645500831
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.653288197558682,
+              "max_energy_error_eV_per_atom": 0.009172626163648523,
+              "max_final_fmax_error_eV_per_A": 0.010941483080387115,
+              "max_position_rmsd_A": 0.8279626256129025,
+              "max_step_difference": 77,
+              "max_stress_tensor_error_eV_per_A3": 0.0014207144267857075,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 0.8701725815510725,
+          "active_fire": {
+            "atoms_per_second": 30.48341363184929,
+            "avoided_graph_evaluations": 0,
+            "graph_evaluations": 4872,
+            "median_seconds": 96.57711027888581,
+            "model_evaluations": 4872,
+            "neighbor_rebuilds": 4904,
+            "optimizer_steps_total": 4840,
+            "peak_memory_bytes": 255545856,
+            "speedup_vs_ase_fire": 1.1764723725095838,
+            "status": "passed",
+            "systems_per_second": 0.331341452520101,
+            "timing_samples_seconds": [
+              96.57711027888581,
+              96.47496650717221,
+              96.63812674209476
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 28,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_final_fmax_error_eV_per_A",
+                "max_position_rmsd_A"
+              ],
+              "max_cell_rmsd_A": 0.010060812788970142,
+              "max_energy_error_eV_per_atom": 0.0007711286130158798,
+              "max_final_fmax_error_eV_per_A": 0.03947174455970526,
+              "max_position_rmsd_A": 0.02115325009545308,
+              "max_step_difference": 21,
+              "max_stress_tensor_error_eV_per_A3": 0.00014249910600483418,
+              "passed": false,
+              "reference_converged_count": 28,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 1
+        },
+        {
+          "active_bfgs": {
+            "atoms_per_second": 35.05989502690698,
+            "avoided_graph_evaluations": 921,
+            "graph_evaluations": 3987,
+            "median_seconds": 83.97058798209764,
+            "model_evaluations": 2454,
+            "neighbor_rebuilds": 2470,
+            "optimizer_steps_total": 3955,
+            "peak_memory_bytes": 438294528,
+            "speedup_vs_ase_bfgs": 1.5142538756901995,
+            "speedup_vs_ase_fire": 1.3530964209056644,
+            "status": "passed",
+            "systems_per_second": 0.3810858155098585,
+            "timing_samples_seconds": [
+              83.97058798209764,
+              84.50189843098633,
+              81.86879983893596
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.629833343574646,
+              "max_energy_error_eV_per_atom": 0.008177840191385021,
+              "max_final_fmax_error_eV_per_A": 0.009024910628795624,
+              "max_position_rmsd_A": 0.8048643961929263,
+              "max_step_difference": 67,
+              "max_stress_tensor_error_eV_per_A3": 0.00150529426173307,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 0.8261403999914184,
+          "active_fire": {
+            "atoms_per_second": 42.43818003243899,
+            "avoided_graph_evaluations": 1769,
+            "graph_evaluations": 4907,
+            "median_seconds": 69.37149514304474,
+            "model_evaluations": 3338,
+            "neighbor_rebuilds": 3354,
+            "optimizer_steps_total": 4875,
+            "peak_memory_bytes": 421738496,
+            "speedup_vs_ase_fire": 1.6378528648637927,
+            "status": "passed",
+            "systems_per_second": 0.4612845655699891,
+            "timing_samples_seconds": [
+              70.01363688684069,
+              69.14569127000868,
+              69.37149514304474
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 28,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_final_fmax_error_eV_per_A",
+                "max_position_rmsd_A"
+              ],
+              "max_cell_rmsd_A": 0.011974651180657636,
+              "max_energy_error_eV_per_atom": 0.0008860360021176546,
+              "max_final_fmax_error_eV_per_A": 0.3218134082853794,
+              "max_position_rmsd_A": 0.025136731665131536,
+              "max_step_difference": 14,
+              "max_stress_tensor_error_eV_per_A3": 0.0005185224581509829,
+              "passed": false,
+              "reference_converged_count": 28,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 2
+        },
+        {
+          "active_bfgs": {
+            "atoms_per_second": 46.63582210588488,
+            "avoided_graph_evaluations": 2004,
+            "graph_evaluations": 3988,
+            "median_seconds": 63.1274386739824,
+            "model_evaluations": 1498,
+            "neighbor_rebuilds": 1506,
+            "optimizer_steps_total": 3956,
+            "peak_memory_bytes": 780518400,
+            "speedup_vs_ase_bfgs": 2.0142237823484117,
+            "speedup_vs_ase_fire": 1.7998560443217926,
+            "status": "passed",
+            "systems_per_second": 0.5069111098465747,
+            "timing_samples_seconds": [
+              65.48789711203426,
+              63.1274386739824,
+              63.04244625195861
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.6507076329109001,
+              "max_energy_error_eV_per_atom": 0.0063815738843834915,
+              "max_final_fmax_error_eV_per_A": 0.012362543493509293,
+              "max_position_rmsd_A": 0.8257516108621107,
+              "max_step_difference": 76,
+              "max_stress_tensor_error_eV_per_A3": 0.001538145268568769,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 0.8542206752355296,
+          "active_fire": {
+            "atoms_per_second": 54.59458364552724,
+            "avoided_graph_evaluations": 4873,
+            "graph_evaluations": 4855,
+            "median_seconds": 53.92476328997873,
+            "model_evaluations": 2432,
+            "neighbor_rebuilds": 2440,
+            "optimizer_steps_total": 4823,
+            "peak_memory_bytes": 744663552,
+            "speedup_vs_ase_fire": 2.107015314076223,
+            "status": "passed",
+            "systems_per_second": 0.593419387451383,
+            "timing_samples_seconds": [
+              53.77967298985459,
+              53.92476328997873,
+              53.948434324003756
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 28,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_final_fmax_error_eV_per_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.007679230921563272,
+              "max_energy_error_eV_per_atom": 0.000571541164232337,
+              "max_final_fmax_error_eV_per_A": 0.2947970889508724,
+              "max_position_rmsd_A": 0.016329555772128856,
+              "max_step_difference": 31,
+              "max_stress_tensor_error_eV_per_A3": 0.0003269333392381668,
+              "passed": false,
+              "reference_converged_count": 28,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 4
+        },
+        {
+          "active_bfgs": {
+            "atoms_per_second": 54.22857745671429,
+            "avoided_graph_evaluations": 3299,
+            "graph_evaluations": 4133,
+            "median_seconds": 54.288718938827515,
+            "model_evaluations": 929,
+            "neighbor_rebuilds": 933,
+            "optimizer_steps_total": 4101,
+            "peak_memory_bytes": 1351370752,
+            "speedup_vs_ase_bfgs": 2.342158569612812,
+            "speedup_vs_ase_fire": 2.0928897251738023,
+            "status": "passed",
+            "systems_per_second": 0.5894410593121119,
+            "timing_samples_seconds": [
+              55.59894499601796,
+              54.288718938827515,
+              53.34742683288641
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.1461377577273373,
+              "max_energy_error_eV_per_atom": 0.008175072462662407,
+              "max_final_fmax_error_eV_per_A": 0.009870156645774841,
+              "max_position_rmsd_A": 0.47977494880228855,
+              "max_step_difference": 67,
+              "max_stress_tensor_error_eV_per_A3": 0.0013117687194608152,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 0.7431267196492297,
+          "active_fire": {
+            "atoms_per_second": 72.97352661779036,
+            "avoided_graph_evaluations": 8359,
+            "graph_evaluations": 4865,
+            "median_seconds": 40.3433976189699,
+            "model_evaluations": 1653,
+            "neighbor_rebuilds": 1657,
+            "optimizer_steps_total": 4833,
+            "peak_memory_bytes": 1348255232,
+            "speedup_vs_ase_fire": 2.816329530126015,
+            "status": "passed",
+            "systems_per_second": 0.7931905067151125,
+            "timing_samples_seconds": [
+              40.3433976189699,
+              40.620532349916175,
+              40.28747206390835
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 28,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_final_fmax_error_eV_per_A",
+                "max_position_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.009820237118435302,
+              "max_energy_error_eV_per_atom": 0.0007555277451224949,
+              "max_final_fmax_error_eV_per_A": 0.5402356944978237,
+              "max_position_rmsd_A": 0.02069108858728724,
+              "max_step_difference": 31,
+              "max_stress_tensor_error_eV_per_A3": 0.0002656378783285618,
+              "passed": false,
+              "reference_converged_count": 28,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 8
+        },
+        {
+          "active_bfgs": {
+            "atoms_per_second": 62.986709739017634,
+            "avoided_graph_evaluations": 3730,
+            "graph_evaluations": 3934,
+            "median_seconds": 46.740018842043355,
+            "model_evaluations": 479,
+            "neighbor_rebuilds": 481,
+            "optimizer_steps_total": 3902,
+            "peak_memory_bytes": 2574270976,
+            "speedup_vs_ase_bfgs": 2.720426551935841,
+            "speedup_vs_ase_fire": 2.430899791544742,
+            "status": "passed",
+            "systems_per_second": 0.6846381493371482,
+            "timing_samples_seconds": [
+              46.0391060479451,
+              46.740018842043355,
+              48.302246070001274
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.6505408007051949,
+              "max_energy_error_eV_per_atom": 0.009138874385667883,
+              "max_final_fmax_error_eV_per_A": 0.012257013469934464,
+              "max_position_rmsd_A": 0.8255808614046458,
+              "max_step_difference": 76,
+              "max_stress_tensor_error_eV_per_A3": 0.0015240774082485586,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 0.6212896208760486,
+          "active_fire": {
+            "atoms_per_second": 101.38059227547261,
+            "avoided_graph_evaluations": 11153,
+            "graph_evaluations": 4879,
+            "median_seconds": 29.039088586112484,
+            "model_evaluations": 1002,
+            "neighbor_rebuilds": 1004,
+            "optimizer_steps_total": 4847,
+            "peak_memory_bytes": 2566999040,
+            "speedup_vs_ase_fire": 3.9126676349703944,
+            "status": "passed",
+            "systems_per_second": 1.1019629595160065,
+            "timing_samples_seconds": [
+              29.10877596400678,
+              28.931032059015706,
+              29.039088586112484
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 28,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_final_fmax_error_eV_per_A",
+                "max_position_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.011407890247472055,
+              "max_energy_error_eV_per_atom": 0.0007878282795781674,
+              "max_final_fmax_error_eV_per_A": 0.284236129373312,
+              "max_position_rmsd_A": 0.02165996286378929,
+              "max_step_difference": 31,
+              "max_stress_tensor_error_eV_per_A3": 0.0003377143293619156,
+              "passed": false,
+              "reference_converged_count": 28,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 16
+        },
+        {
+          "active_bfgs": {
+            "atoms_per_second": 65.5879947931898,
+            "avoided_graph_evaluations": 4324,
+            "graph_evaluations": 4060,
+            "median_seconds": 44.8862632450182,
+            "model_evaluations": 262,
+            "neighbor_rebuilds": 263,
+            "optimizer_steps_total": 4028,
+            "peak_memory_bytes": 5033061888,
+            "speedup_vs_ase_bfgs": 2.8327773154515947,
+            "speedup_vs_ase_fire": 2.531293403500923,
+            "status": "passed",
+            "systems_per_second": 0.7129129868824977,
+            "timing_samples_seconds": [
+              43.99204060412012,
+              45.79394248803146,
+              44.8862632450182
+            ],
+            "validation_vs_ase_bfgs": {
+              "candidate_converged_count": 32,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.6310306183017297,
+              "max_energy_error_eV_per_atom": 0.008227700772492783,
+              "max_final_fmax_error_eV_per_A": 0.013574648648500443,
+              "max_position_rmsd_A": 0.8066125976936191,
+              "max_step_difference": 67,
+              "max_stress_tensor_error_eV_per_A3": 0.0015021107683423907,
+              "passed": false,
+              "reference_converged_count": 32,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "active_bfgs_speedup_vs_active_fire": 0.4607512540966946,
+          "active_fire": {
+            "atoms_per_second": 142.35011670619414,
+            "avoided_graph_evaluations": 11167,
+            "graph_evaluations": 4865,
+            "median_seconds": 20.681402081856504,
+            "model_evaluations": 501,
+            "neighbor_rebuilds": 502,
+            "optimizer_steps_total": 4833,
+            "peak_memory_bytes": 5019904000,
+            "speedup_vs_ase_fire": 5.493839422018586,
+            "status": "passed",
+            "systems_per_second": 1.5472838772412407,
+            "timing_samples_seconds": [
+              20.699283698108047,
+              20.645337441936135,
+              20.681402081856504
+            ],
+            "validation_vs_ase_fire": {
+              "candidate_converged_count": 28,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.01110995654663849,
+              "max_energy_error_eV_per_atom": 0.0008315521737803583,
+              "max_final_fmax_error_eV_per_A": 0.027911189943552017,
+              "max_position_rmsd_A": 0.023221904759191673,
+              "max_step_difference": 31,
+              "max_stress_tensor_error_eV_per_A3": 0.0003331026528030634,
+              "passed": false,
+              "reference_converged_count": 28,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "batch_size": 32
+        }
+      ],
+      "sample_files": [
+        "Aven12_2_240_z1.cif",
+        "Aven12_4_272_z1.cif",
+        "Aven12_4_421_z1.cif",
+        "Aven12_2_670_z1.cif",
+        "Aven12_2_3217_z1.cif",
+        "Aven12_2_1287_z1.cif",
+        "Aven12_4_58_z1.cif",
+        "Aven12_2_2324_z1.cif",
+        "Aven12_2_1900_z1.cif",
+        "Aven12_4_736_z1.cif",
+        "Aven12_2_1451_z1.cif",
+        "Aven12_2_844_z1.cif",
+        "Aven12_2_2105_z1.cif",
+        "Aven12_2_1571_z1.cif",
+        "Aven12_2_1204_z1.cif",
+        "Aven12_4_5_z1.cif",
+        "Aven12_2_3255_z1.cif",
+        "Aven12_2_1415_z1.cif",
+        "Aven12_2_1454_z1.cif",
+        "Aven12_2_1636_z1.cif",
+        "Aven12_4_666_z1.cif",
+        "Aven12_4_376_z1.cif",
+        "Aven12_4_629_z1.cif",
+        "Aven12_2_1911_z1.cif",
+        "Aven12_2_3126_z1.cif",
+        "Aven12_2_2582_z1.cif",
+        "Aven12_2_310_z1.cif",
+        "Aven12_2_445_z1.cif",
+        "Aven12_2_2221_z1.cif",
+        "Aven12_4_328_z1.cif",
+        "Aven12_4_13_z1.cif",
+        "Aven12_4_133_z1.cif"
+      ]
+    }
+  },
+  "ratio_convention": "reference_seconds / candidate_seconds; above 1 is faster",
+  "raw_dir": "runs/bfgs_fire_scaling_raw",
+  "schema_version": 1,
+  "status": "complete"
+}

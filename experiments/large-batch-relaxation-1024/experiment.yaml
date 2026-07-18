@@ -1,0 +1,27 @@
+id: large-batch-relaxation-1024
+summary: ASE, masked, and active FIRE scaling through B1024
+hypothesis: Active compaction improves large-batch relaxation throughput until the initial unconverged batch reaches the H100 memory limit.
+environment:
+  conda: /public/home/lmy/.conda/envs/lmy
+  host: hopper-sxm-4
+  gpus: 8x NVIDIA H100 80GB HBM3
+  dtype: float32
+parameters:
+  atom_counts: [46, 92, 184, 276]
+  fixed_base_samples: 16
+  pool_size: 1024
+  expansion: 64 cyclic repetitions
+  batch_sizes: [64, 128, 256, 512, 1024]
+  repeats: 3
+  reference_repeats: 1
+  fmax_ev_per_a: 0.05
+  max_steps: 500
+commands:
+  - name: masked
+    command: [/public/home/lmy/.conda/envs/lmy/bin/python, benchmarks/benchmark_relaxation.py, --sample-count, '16', --pool-size, '1024', --batch-sizes, '64,128,256,512,1024']
+  - name: active
+    command: [/public/home/lmy/.conda/envs/lmy/bin/python, benchmarks/benchmark_relaxation.py, --sample-count, '16', --pool-size, '1024', --batch-sizes, '64,128,256,512,1024', --active-compaction]
+collect_json:
+  - benchmarks/t2_fixed_samples.json
+  - runs/large_pool1024_atoms*.json
+  - runs/large_batch_relaxation_1024_summary.json

@@ -1,0 +1,51 @@
+{
+  "baseline": {
+    "command": "python -m pytest -q tests/test_variable_cell.py tests/test_relaxation.py",
+    "failed": 0,
+    "passed": 8,
+    "wall_seconds": 16.27
+  },
+  "final": {
+    "failed": 0,
+    "passed": 19,
+    "wall_seconds": 32.01
+  },
+  "lint": "passed",
+  "package_wheel": {
+    "filename": "atombit_batch_lab-0.1.0-py3-none-any.whl",
+    "sha256": "ba2b9b10d26ccb61e8e32bac34c038b474a2f7d367926179b5e10b0a2947a6b7"
+  },
+  "masked_active_regression": {
+    "active_batch_sizes_first": [3, 2],
+    "active_batch_size_last": 1,
+    "active_graph_evaluations": 138,
+    "converged_steps": [0, 54, 81],
+    "graph_evaluation_reduction_fraction": 0.43902439024390244,
+    "masked_graph_evaluations": 246,
+    "model_evaluations_equal": true,
+    "trajectory_callbacks_equal": true
+  },
+  "production_validation": {
+    "active_batch_sizes": [2, 1, 1],
+    "artifact": "production_smoke.json",
+    "atom_count": 46,
+    "checkpoint_epoch": 15,
+    "converged_steps": [0, -1],
+    "graph_evaluations": 4,
+    "max_abs_energy_error_eV": 1.9073486328125e-06,
+    "max_abs_force_error_eV_per_A": 2.384185791015625e-06,
+    "max_abs_stress_error_eV_per_A3": 7.450580596923828e-09,
+    "model_evaluations": 3,
+    "passed": true,
+    "sample_count": 2
+  },
+  "performance": {
+    "benchmarked": false,
+    "reason": "Correctness and eliminated graph work are established; production wall-time needs a natural convergence-distribution benchmark."
+  },
+  "limitations": [
+    "Variable-cell FixAtoms interaction is not implemented.",
+    "Only fully periodic, right-handed, full-rank cells are accepted.",
+    "NPT ensemble names are reserved but raise NotImplementedError."
+  ]
+}

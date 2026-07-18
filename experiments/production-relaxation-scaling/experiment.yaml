@@ -1,0 +1,17 @@
+id: production-relaxation-scaling
+summary: Production batched FIRE scaling against sequential ASE FIRE
+description: Relax the same fixed T2 structures to 0.05 eV/A with matched FIRE controls and compare final states and wall time.
+hypothesis: Batched FIRE reduces fixed-pool relaxation wall time versus sequential ASE FIRE while preserving convergence, optimizer steps, energies, forces, and final structures.
+environment:
+  conda: /public/home/lmy/.conda/envs/lmy
+  host: hopper-sxm-4
+  gpu: NVIDIA H100 80GB HBM3
+  dtype: float32
+commands:
+  - name: tests
+    command: [/public/home/lmy/.conda/envs/lmy/bin/python, -m, pytest, -q]
+  - name: benchmark
+    command: [/public/home/lmy/.conda/envs/lmy/bin/python, benchmarks/benchmark_relaxation.py, --output, runs/production_relaxation_scaling.json]
+collect_json:
+  - benchmarks/t2_fixed_samples.json
+  - runs/production_relaxation_scaling.json
