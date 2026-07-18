@@ -1,0 +1,28 @@
+id: bfgs-lazy-refill
+date: 2026-07-18
+hypothesis: >-
+  Deferring common neighbor-list construction until queued structures enter
+  the resident BFGS batch reduces refill setup time and peak memory without
+  changing convergence or final outputs.
+baseline_commit: a2519f58a67b0976f0c6755411963a6cc64a1b8c
+models: [AtomBit, MACE-OFF-Small]
+optimizer: full variable-cell BFGS with active refill
+pool:
+  atom_counts: [46, 92, 184, 276]
+  workload: 256
+resident_batch_sizes: [64, 128]
+repeats: 1
+comparison:
+  baseline: eager refill results in experiments/bfgs-active-refill/results.json
+  candidate: lazy pending neighbor construction
+correctness_gates:
+  - The full pending workload never builds a common neighbor list.
+  - Each resident batch constructs valid graph state before AtomBit evaluation.
+  - MACE constructs native AtomicData only for resident structures.
+  - Convergence flags and output order match the eager refill baseline.
+result:
+  timing_ratio_range_eager_over_lazy: [0.983, 1.011]
+  peak_memory_saved_MiB_range: [8.7, 90.1]
+  exact_output_comparisons: 16 of 16
+  conclusion: retain as cleanup; no measurable end-to-end BFGS speedup
+  next_step: target dense BFGS eigensolves or a batched limited-memory optimizer

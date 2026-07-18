@@ -349,7 +349,9 @@ result = relax(
 ```
 
 The step limit applies independently from the time each queued structure
-enters. Finished Hessians are released, and results retain workload order.
+enters. Finished Hessians are released, results retain workload order, and
+neighbor graphs for pending structures are built only when those structures
+enter the resident batch.
 
 The BFGS Hessian costs `O(D^2)` memory and its eigensolve costs `O(D^3)` for
 `D = 3N` fixed-cell or `D = 3N + 9` variable-cell degrees of freedom. It is a

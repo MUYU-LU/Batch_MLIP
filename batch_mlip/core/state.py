@@ -79,6 +79,7 @@ class AseGraphBatch:
         device: str | torch.device = "cpu",
         dtype: torch.dtype = torch.float64,
         skin: float = 0.0,
+        build_neighbors: bool = True,
     ) -> AseGraphBatch:
         if not systems:
             raise ValueError("systems must contain at least one ASE Atoms object")
@@ -137,7 +138,8 @@ class AseGraphBatch:
             edge_index=torch.empty((2, 0), device=device_obj, dtype=torch.long),
             shifts_int=torch.empty((0, 3), device=device_obj, dtype=torch.long),
         )
-        batch.rebuild_neighbor_list()
+        if build_neighbors:
+            batch.rebuild_neighbor_list()
         return batch
 
     @property

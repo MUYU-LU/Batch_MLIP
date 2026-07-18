@@ -123,7 +123,12 @@ class MACEBatchCalculator(BatchCalculator):
         self.energy_units_to_eV = float(energy_units_to_eV)
         self.length_units_to_A = float(length_units_to_A)
 
-    def create_state(self, systems: Sequence[Atoms]) -> AseGraphBatch:
+    def create_state(
+        self,
+        systems: Sequence[Atoms],
+        *,
+        build_neighbors: bool = True,
+    ) -> AseGraphBatch:
         unsupported = sorted(
             {
                 int(number)
@@ -134,7 +139,10 @@ class MACEBatchCalculator(BatchCalculator):
         )
         if unsupported:
             raise ValueError(f"atomic numbers not supported by MACE model: {unsupported}")
-        return super().create_state(systems)
+        return super().create_state(
+            systems,
+            build_neighbors=build_neighbors,
+        )
 
     def _build_batch(self, state: AseGraphBatch) -> Any:
         systems = state.to_ase(evaluation=None, wrap=False)

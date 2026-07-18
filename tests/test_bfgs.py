@@ -289,6 +289,37 @@ def test_variable_cell_bfgs_refill_preserves_state_and_output_order():
     assert refill.active_batch_sizes[-1] == 1
 
 
+def test_structure_api_does_not_build_neighbors_for_pending_refill_jobs(
+    monkeypatch,
+):
+    systems = [
+        Atoms("H", positions=[[value, 0.0, 0.0]])
+        for value in (0.1, 0.2, 0.3)
+    ]
+    rebuilt_sizes = []
+    original = type(_quadratic_potential().create_state(systems)).rebuild_neighbor_list
+
+    def record_rebuild(state):
+        rebuilt_sizes.append(state.n_systems)
+        return original(state)
+
+    monkeypatch.setattr(
+        "batch_mlip.core.state.AseGraphBatch.rebuild_neighbor_list",
+        record_rebuild,
+    )
+    result = relax(
+        systems,
+        _quadratic_potential(),
+        optimizer="bfgs",
+        refill_batch_size=1,
+        fmax=1e-30,
+        max_steps=0,
+    )
+
+    assert result.state.n_systems == 3
+    assert rebuilt_sizes == [1, 1, 1]
+
+
 @pytest.mark.parametrize(
     "kwargs,error",
     [

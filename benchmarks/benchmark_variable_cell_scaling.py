@@ -196,7 +196,7 @@ def run_batch(
         for start in range(0, len(systems), batch_size)
     ]
     for chunk in chunks:
-        state = calculator.create_state(chunk)
+        state = calculator.create_state(chunk, build_neighbors=not refill)
         common = {
             "cell_filter": FrechetCellFilter(),
             "active_compaction": active_compaction,

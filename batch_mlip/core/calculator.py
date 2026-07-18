@@ -41,8 +41,17 @@ class BatchCalculator(ABC):
         self.device = torch.device(device)
         self.dtype = dtype
 
-    def create_state(self, systems: Sequence[Atoms]) -> AseGraphBatch:
-        """Convert ASE structures to the common tensor batch representation."""
+    def create_state(
+        self,
+        systems: Sequence[Atoms],
+        *,
+        build_neighbors: bool = True,
+    ) -> AseGraphBatch:
+        """Convert ASE structures to the common tensor batch representation.
+
+        ``build_neighbors=False`` creates a lightweight state shell whose
+        graph is constructed on its first AtomBit evaluation.
+        """
 
         if self.cutoff is None:
             raise ValueError(
@@ -55,6 +64,7 @@ class BatchCalculator(ABC):
             skin=self.skin,
             device=self.device,
             dtype=self.dtype,
+            build_neighbors=build_neighbors,
         )
 
     @abstractmethod

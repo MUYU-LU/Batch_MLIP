@@ -44,12 +44,22 @@ def relax(
 ) -> RelaxationResult:
     """Relax structures with a registered name or optimizer object."""
 
-    state = calculator.create_state(_normalize_systems(systems))
     resolved = create_optimizer(optimizer) if isinstance(optimizer, str) else optimizer
     if not isinstance(resolved, BatchOptimizer):
         raise TypeError(
             "optimizer must be a registered name or implement BatchOptimizer"
         )
+    normalized = _normalize_systems(systems)
+    capabilities = resolved.capabilities()
+    lazy_refill = (
+        optimizer_kwargs.get("refill_batch_size") is not None
+        and getattr(capabilities, "active_refill", False)
+    )
+    state = (
+        calculator.create_state(normalized, build_neighbors=False)
+        if lazy_refill
+        else calculator.create_state(normalized)
+    )
     return resolved.run(state, calculator, **optimizer_kwargs)
 
 
