@@ -1,0 +1,53 @@
+id: mace-variable-cell-scaling-32
+date: 2026-07-18
+hypothesis: >-
+  MACE-OFF-Small native batching and active compaction reduce synchronized
+  variable-cell FIRE relaxation time versus common sequential MACE ASE on the
+  same 32-structure T2 pools used for AtomBit, without changing convergence or
+  final states beyond the existing validation tolerances.
+baseline_commit: ea9c0da4c7f2c350043be66aaeeda22ffa56261a
+pool:
+  manifest: benchmarks/t2_fixed_samples.json
+  atom_counts: [46, 92, 184, 276]
+  systems_per_group: 32
+  expansion: none
+methods: [ase, masked, active]
+batch_sizes: [1, 2, 4, 8, 16, 32]
+parameters:
+  model: MACE-OFF23-Small
+  optimizer: FIRE
+  cell_filter: full Frechet log deformation
+  pressure_GPa: 0.0
+  fmax_eV_per_A: 0.05
+  convergence: ASE generalized filter-force maximum
+  max_steps: 500
+  dtype: float64
+  cutoff_A: 4.5
+  batch_repeats: 3
+  ase_repeats: 1
+timing:
+  cuda_synchronized: true
+  warmup: one stress/force evaluation through each calculator
+  peak_gpu_memory: true
+  visible_gpus: 7
+commands:
+  worker: >-
+    OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+    /public/home/lmy/.conda/envs/MACE_clean/bin/python
+    benchmarks/benchmark_mace_variable_cell_scaling.py --optimizer fire
+    --method METHOD --atom-count ATOMS --pool-size 32
+    --batch-sizes 1,2,4,8,16,32 --repeats REPEATS --max-steps 500
+    --device cuda:0 --output OUTPUT
+  summarize: >-
+    python benchmarks/summarize_variable_cell_scaling.py
+    --raw-dir runs/mace_variable_cell_scaling32_raw
+    --output runs/mace_variable_cell_scaling32_summary.json
+correctness_gates:
+  - Every method processes the identical ordered pool of 32 structures.
+  - ASE, masked, and active use full Frechet variable-cell FIRE.
+  - Convergence flags, energy, force, stress, positions, cells, and step counts are compared.
+  - OOM, failure, and nonconvergence outcomes remain in raw artifacts.
+limitations:
+  - ASE has one timing sample per atom-count group.
+  - Graph construction, model inference, transfers, and optimizer phases are not isolated.
+  - MACE is float64 while the historical AtomBit scaling experiment used float32.

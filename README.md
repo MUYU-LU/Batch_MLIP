@@ -263,6 +263,10 @@ make test-mace PYTHON=/path/to/pytest/python \
   MACE_SITE_PACKAGES=/path/to/mace/environment/lib/python3.11/site-packages
 ```
 
+The reproducible B1-B32 ASE/masked/active optimization benchmark is implemented
+in `benchmarks/benchmark_mace_variable_cell_scaling.py`; its fixed-pool results
+are recorded under `experiments/mace-variable-cell-scaling-32/`.
+
 `cell_filter=None` is the default and preserves fixed-cell FIRE. Passing
 `FrechetCellFilter` optimizes atomic positions and full-rank periodic
 cells together using log-deformation coordinates. Pressure is specified in
