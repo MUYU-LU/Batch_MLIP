@@ -1,0 +1,778 @@
+{
+  "groups": {
+    "atombit": {
+      "184": {
+        "ase": {
+          "equivalent_256_seconds": 1774.3672685846686,
+          "extrapolation_factor": 8,
+          "measured_pool_size": 32,
+          "measured_seconds": 221.79590857308358,
+          "source": "experiments/bfgs-mixed-deterministic-scaling/results.json"
+        },
+        "points": {
+          "128": {
+            "active_drain": {
+              "converged_count_equivalent_256": 256,
+              "equivalent_256_seconds": 282.3391437022947,
+              "extrapolation_factor": 2,
+              "measured_pool_size": 128,
+              "measured_seconds": 141.16957185114734,
+              "peak_memory_bytes": 38625056768
+            },
+            "active_refill": {
+              "converged_count": 256,
+              "graph_evaluations": 25580,
+              "measured_pool_size": 256,
+              "measured_seconds": 283.04958660691045,
+              "model_evaluations": 397,
+              "peak_memory_bytes": 39605890048
+            },
+            "refill_speedup_vs_ase": 6.268750609584352,
+            "refill_speedup_vs_drain": 0.9974900408330134,
+            "validation_first_resident_block": {
+              "candidate_converged_count": 128,
+              "convergence_flags_match": true,
+              "failed_checks": [],
+              "max_cell_rmsd_A": 0.0011349470356641332,
+              "max_energy_error_eV_per_atom": 8.276234502377717e-05,
+              "max_final_fmax_error_eV_per_A": 0.0087193064391613,
+              "max_position_rmsd_A": 0.003882143086560905,
+              "max_step_difference": 2,
+              "max_stress_tensor_error_eV_per_A3": 0.0002451749587635277,
+              "passed": true,
+              "reference_converged_count": 128,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "64": {
+            "active_drain": {
+              "converged_count_equivalent_256": 256,
+              "equivalent_256_seconds": 297.858127980493,
+              "extrapolation_factor": 4,
+              "measured_pool_size": 64,
+              "measured_seconds": 74.46453199512325,
+              "peak_memory_bytes": 19354498560
+            },
+            "active_refill": {
+              "converged_count": 256,
+              "graph_evaluations": 25680,
+              "measured_pool_size": 256,
+              "measured_seconds": 284.6221742918715,
+              "model_evaluations": 566,
+              "peak_memory_bytes": 20084963328
+            },
+            "refill_speedup_vs_ase": 6.234114657437436,
+            "refill_speedup_vs_drain": 1.0465035927771686,
+            "validation_first_resident_block": {
+              "candidate_converged_count": 64,
+              "convergence_flags_match": true,
+              "failed_checks": [],
+              "max_cell_rmsd_A": 0.0005856603245016463,
+              "max_energy_error_eV_per_atom": 4.873068436332371e-05,
+              "max_final_fmax_error_eV_per_A": 0.0038161203265190125,
+              "max_position_rmsd_A": 0.0037015950131759966,
+              "max_step_difference": 2,
+              "max_stress_tensor_error_eV_per_A3": 0.0002612544340081513,
+              "passed": true,
+              "reference_converged_count": 64,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          }
+        }
+      },
+      "276": {
+        "ase": {
+          "equivalent_256_seconds": 2429.0301222465932,
+          "extrapolation_factor": 8,
+          "measured_pool_size": 32,
+          "measured_seconds": 303.62876528082415,
+          "source": "experiments/bfgs-mixed-deterministic-scaling/results.json"
+        },
+        "points": {
+          "128": {
+            "active_drain": {
+              "converged_count_equivalent_256": 256,
+              "equivalent_256_seconds": 320.32945511396974,
+              "extrapolation_factor": 2,
+              "measured_pool_size": 128,
+              "measured_seconds": 160.16472755698487,
+              "peak_memory_bytes": 51251227136
+            },
+            "active_refill": {
+              "converged_count": 256,
+              "graph_evaluations": 20236,
+              "measured_pool_size": 256,
+              "measured_seconds": 321.8849762061145,
+              "model_evaluations": 271,
+              "peak_memory_bytes": 54171471360
+            },
+            "refill_speedup_vs_ase": 7.5462674613654475,
+            "refill_speedup_vs_drain": 0.995167462891624,
+            "validation_first_resident_block": {
+              "candidate_converged_count": 128,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.034364990198712426,
+              "max_energy_error_eV_per_atom": 0.0020483818607053895,
+              "max_final_fmax_error_eV_per_A": 0.005065388977527618,
+              "max_position_rmsd_A": 0.25763198265766035,
+              "max_step_difference": 65,
+              "max_stress_tensor_error_eV_per_A3": 7.773481775075197e-05,
+              "passed": false,
+              "reference_converged_count": 128,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "64": {
+            "active_drain": {
+              "converged_count_equivalent_256": 256,
+              "equivalent_256_seconds": 326.206029728055,
+              "extrapolation_factor": 4,
+              "measured_pool_size": 64,
+              "measured_seconds": 81.55150743201375,
+              "peak_memory_bytes": 25669626368
+            },
+            "active_refill": {
+              "converged_count": 256,
+              "graph_evaluations": 20103,
+              "measured_pool_size": 256,
+              "measured_seconds": 324.75442756013945,
+              "model_evaluations": 416,
+              "peak_memory_bytes": 27429265920
+            },
+            "refill_speedup_vs_ase": 7.479590472394021,
+            "refill_speedup_vs_drain": 1.0044698456579064,
+            "validation_first_resident_block": {
+              "candidate_converged_count": 64,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom"
+              ],
+              "max_cell_rmsd_A": 0.001935360885708071,
+              "max_energy_error_eV_per_atom": 0.00011069532753764719,
+              "max_final_fmax_error_eV_per_A": 0.0007004663348197937,
+              "max_position_rmsd_A": 0.013204563789635063,
+              "max_step_difference": 5,
+              "max_stress_tensor_error_eV_per_A3": 0.0002833227626979351,
+              "passed": false,
+              "reference_converged_count": 64,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          }
+        }
+      },
+      "46": {
+        "ase": {
+          "equivalent_256_seconds": 1026.9510635118932,
+          "extrapolation_factor": 8,
+          "measured_pool_size": 32,
+          "measured_seconds": 128.36888293898664,
+          "source": "experiments/bfgs-mixed-deterministic-scaling/results.json"
+        },
+        "points": {
+          "128": {
+            "active_drain": {
+              "converged_count_equivalent_256": 256,
+              "equivalent_256_seconds": 112.9321940857917,
+              "extrapolation_factor": 2,
+              "measured_pool_size": 128,
+              "measured_seconds": 56.46609704289585,
+              "peak_memory_bytes": 9303764480
+            },
+            "active_refill": {
+              "converged_count": 256,
+              "graph_evaluations": 27963,
+              "measured_pool_size": 256,
+              "measured_seconds": 109.42709802510217,
+              "model_evaluations": 398,
+              "peak_memory_bytes": 9708154368
+            },
+            "refill_speedup_vs_ase": 9.384796654995954,
+            "refill_speedup_vs_drain": 1.0320313352354962,
+            "validation_first_resident_block": {
+              "candidate_converged_count": 128,
+              "convergence_flags_match": true,
+              "failed_checks": [],
+              "max_cell_rmsd_A": 0.0029107574214907355,
+              "max_energy_error_eV_per_atom": 1.957105553668478e-05,
+              "max_final_fmax_error_eV_per_A": 0.0195402130484581,
+              "max_position_rmsd_A": 0.004315270307963109,
+              "max_step_difference": 1,
+              "max_stress_tensor_error_eV_per_A3": 0.00010616490544634871,
+              "passed": true,
+              "reference_converged_count": 128,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "64": {
+            "active_drain": {
+              "converged_count_equivalent_256": 256,
+              "equivalent_256_seconds": 125.21237795613706,
+              "extrapolation_factor": 4,
+              "measured_pool_size": 64,
+              "measured_seconds": 31.303094489034265,
+              "peak_memory_bytes": 4682018816
+            },
+            "active_refill": {
+              "converged_count": 256,
+              "graph_evaluations": 27945,
+              "measured_pool_size": 256,
+              "measured_seconds": 115.39684699196368,
+              "model_evaluations": 610,
+              "peak_memory_bytes": 4889528320
+            },
+            "refill_speedup_vs_ase": 8.89929916008373,
+            "refill_speedup_vs_drain": 1.0850589181596697,
+            "validation_first_resident_block": {
+              "candidate_converged_count": 64,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.39401510208473506,
+              "max_energy_error_eV_per_atom": 0.0027917779010275135,
+              "max_final_fmax_error_eV_per_A": 0.01681273803114891,
+              "max_position_rmsd_A": 0.31464774540575413,
+              "max_step_difference": 45,
+              "max_stress_tensor_error_eV_per_A3": 0.001428043789928779,
+              "passed": false,
+              "reference_converged_count": 64,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          }
+        }
+      },
+      "92": {
+        "ase": {
+          "equivalent_256_seconds": 1204.0582542475313,
+          "extrapolation_factor": 8,
+          "measured_pool_size": 32,
+          "measured_seconds": 150.5072817809414,
+          "source": "experiments/bfgs-mixed-deterministic-scaling/results.json"
+        },
+        "points": {
+          "128": {
+            "active_drain": {
+              "converged_count_equivalent_256": 256,
+              "equivalent_256_seconds": 206.22574024600908,
+              "extrapolation_factor": 2,
+              "measured_pool_size": 128,
+              "measured_seconds": 103.11287012300454,
+              "peak_memory_bytes": 19978154496
+            },
+            "active_refill": {
+              "converged_count": 256,
+              "graph_evaluations": 32504,
+              "measured_pool_size": 256,
+              "measured_seconds": 209.83668131101876,
+              "model_evaluations": 397,
+              "peak_memory_bytes": 20636440576
+            },
+            "refill_speedup_vs_ase": 5.738073280252097,
+            "refill_speedup_vs_drain": 0.9827916594827499,
+            "validation_first_resident_block": {
+              "candidate_converged_count": 128,
+              "convergence_flags_match": true,
+              "failed_checks": [],
+              "max_cell_rmsd_A": 0.0009225624597457953,
+              "max_energy_error_eV_per_atom": 8.458676545516305e-06,
+              "max_final_fmax_error_eV_per_A": 0.0012225881218910217,
+              "max_position_rmsd_A": 0.0028564946646831057,
+              "max_step_difference": 1,
+              "max_stress_tensor_error_eV_per_A3": 0.00011640647426247597,
+              "passed": true,
+              "reference_converged_count": 128,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "64": {
+            "active_drain": {
+              "converged_count_equivalent_256": 256,
+              "equivalent_256_seconds": 230.69418387953192,
+              "extrapolation_factor": 4,
+              "measured_pool_size": 64,
+              "measured_seconds": 57.67354596988298,
+              "peak_memory_bytes": 10029307904
+            },
+            "active_refill": {
+              "converged_count": 256,
+              "graph_evaluations": 32035,
+              "measured_pool_size": 256,
+              "measured_seconds": 213.50331676495261,
+              "model_evaluations": 685,
+              "peak_memory_bytes": 10331890176
+            },
+            "refill_speedup_vs_ase": 5.639529504701269,
+            "refill_speedup_vs_drain": 1.080518033045383,
+            "validation_first_resident_block": {
+              "candidate_converged_count": 64,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.6296312081210971,
+              "max_energy_error_eV_per_atom": 0.0061536768208379335,
+              "max_final_fmax_error_eV_per_A": 0.004180792719125748,
+              "max_position_rmsd_A": 0.8042638273908266,
+              "max_step_difference": 66,
+              "max_stress_tensor_error_eV_per_A3": 0.0014937893429305404,
+              "passed": false,
+              "reference_converged_count": 64,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          }
+        }
+      }
+    },
+    "mace": {
+      "184": {
+        "ase": {
+          "equivalent_256_seconds": 1795.5440507028252,
+          "extrapolation_factor": 8,
+          "measured_pool_size": 32,
+          "measured_seconds": 224.44300633785315,
+          "source": "runs/bfgs_active_refill_matrix_raw/mace_atoms184_ase.json"
+        },
+        "points": {
+          "128": {
+            "active_drain": {
+              "converged_count_equivalent_256": 256,
+              "equivalent_256_seconds": 277.48586404602975,
+              "extrapolation_factor": 2,
+              "measured_pool_size": 128,
+              "measured_seconds": 138.74293202301487,
+              "peak_memory_bytes": 36556262912
+            },
+            "active_refill": {
+              "converged_count": 256,
+              "graph_evaluations": 27282,
+              "measured_pool_size": 256,
+              "measured_seconds": 270.48270538286306,
+              "model_evaluations": 403,
+              "peak_memory_bytes": 36703390208
+            },
+            "refill_speedup_vs_ase": 6.638295221726902,
+            "refill_speedup_vs_drain": 1.0258913362067044,
+            "validation_first_resident_block": {
+              "candidate_converged_count": 128,
+              "convergence_flags_match": true,
+              "failed_checks": [],
+              "max_cell_rmsd_A": 3.656887513789972e-05,
+              "max_energy_error_eV_per_atom": 2.414241822881867e-08,
+              "max_final_fmax_error_eV_per_A": 0.0004771333367324382,
+              "max_position_rmsd_A": 7.374691275834622e-05,
+              "max_step_difference": 0,
+              "max_stress_tensor_error_eV_per_A3": 3.914914613055258e-06,
+              "passed": true,
+              "reference_converged_count": 128,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "64": {
+            "active_drain": {
+              "converged_count_equivalent_256": 256,
+              "equivalent_256_seconds": 296.3651342075318,
+              "extrapolation_factor": 4,
+              "measured_pool_size": 64,
+              "measured_seconds": 74.09128355188295,
+              "peak_memory_bytes": 18315485184
+            },
+            "active_refill": {
+              "converged_count": 256,
+              "graph_evaluations": 27328,
+              "measured_pool_size": 256,
+              "measured_seconds": 276.93838176107965,
+              "model_evaluations": 601,
+              "peak_memory_bytes": 18443172352
+            },
+            "refill_speedup_vs_ase": 6.483550742532602,
+            "refill_speedup_vs_drain": 1.0701482846939288,
+            "validation_first_resident_block": {
+              "candidate_converged_count": 64,
+              "convergence_flags_match": true,
+              "failed_checks": [],
+              "max_cell_rmsd_A": 2.2293058812321046e-07,
+              "max_energy_error_eV_per_atom": 1.7411682916724164e-09,
+              "max_final_fmax_error_eV_per_A": 1.3513763765168885e-05,
+              "max_position_rmsd_A": 5.199247129847058e-07,
+              "max_step_difference": 0,
+              "max_stress_tensor_error_eV_per_A3": 3.181929244839166e-08,
+              "passed": true,
+              "reference_converged_count": 64,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          }
+        }
+      },
+      "276": {
+        "ase": {
+          "equivalent_256_seconds": 3094.0482204239815,
+          "extrapolation_factor": 8,
+          "measured_pool_size": 32,
+          "measured_seconds": 386.7560275529977,
+          "source": "runs/bfgs_active_refill_matrix_raw/mace_atoms276_ase.json"
+        },
+        "points": {
+          "128": {
+            "active_drain": {
+              "converged_count_equivalent_256": 256,
+              "equivalent_256_seconds": 329.4608916360885,
+              "extrapolation_factor": 2,
+              "measured_pool_size": 128,
+              "measured_seconds": 164.73044581804425,
+              "peak_memory_bytes": 54511658496
+            },
+            "active_refill": {
+              "converged_count": 256,
+              "graph_evaluations": 22088,
+              "measured_pool_size": 256,
+              "measured_seconds": 313.40660859202035,
+              "model_evaluations": 325,
+              "peak_memory_bytes": 54700697088
+            },
+            "refill_speedup_vs_ase": 9.872313268453393,
+            "refill_speedup_vs_drain": 1.0512250941873627,
+            "validation_first_resident_block": {
+              "candidate_converged_count": 128,
+              "convergence_flags_match": true,
+              "failed_checks": [
+                "max_energy_error_eV_per_atom",
+                "max_position_rmsd_A",
+                "max_cell_rmsd_A",
+                "max_step_difference"
+              ],
+              "max_cell_rmsd_A": 0.08374054727002926,
+              "max_energy_error_eV_per_atom": 0.002400320835463851,
+              "max_final_fmax_error_eV_per_A": 0.007651939514150226,
+              "max_position_rmsd_A": 0.33582525752455467,
+              "max_step_difference": 77,
+              "max_stress_tensor_error_eV_per_A3": 0.0002460618124078681,
+              "passed": false,
+              "reference_converged_count": 128,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "64": {
+            "active_drain": {
+              "converged_count_equivalent_256": 256,
+              "equivalent_256_seconds": 340.9509164839983,
+              "extrapolation_factor": 4,
+              "measured_pool_size": 64,
+              "measured_seconds": 85.23772912099957,
+              "peak_memory_bytes": 27296998400
+            },
+            "active_refill": {
+              "converged_count": 256,
+              "graph_evaluations": 21803,
+              "measured_pool_size": 256,
+              "measured_seconds": 315.65627946006134,
+              "model_evaluations": 494,
+              "peak_memory_bytes": 27495849472
+            },
+            "refill_speedup_vs_ase": 9.801953649445641,
+            "refill_speedup_vs_drain": 1.0801334827464992,
+            "validation_first_resident_block": {
+              "candidate_converged_count": 64,
+              "convergence_flags_match": true,
+              "failed_checks": [],
+              "max_cell_rmsd_A": 6.4551933311265265e-06,
+              "max_energy_error_eV_per_atom": 4.104641856679666e-08,
+              "max_final_fmax_error_eV_per_A": 0.00043014306181867606,
+              "max_position_rmsd_A": 4.63329961360081e-05,
+              "max_step_difference": 0,
+              "max_stress_tensor_error_eV_per_A3": 6.277958180468299e-07,
+              "passed": true,
+              "reference_converged_count": 64,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          }
+        }
+      },
+      "46": {
+        "ase": {
+          "equivalent_256_seconds": 1327.6330663841218,
+          "extrapolation_factor": 8,
+          "measured_pool_size": 32,
+          "measured_seconds": 165.95413329801522,
+          "source": "runs/bfgs_active_refill_matrix_raw/mace_atoms46_ase.json"
+        },
+        "points": {
+          "128": {
+            "active_drain": {
+              "converged_count_equivalent_256": 256,
+              "equivalent_256_seconds": 130.03522940399125,
+              "extrapolation_factor": 2,
+              "measured_pool_size": 128,
+              "measured_seconds": 65.01761470199563,
+              "peak_memory_bytes": 9100210688
+            },
+            "active_refill": {
+              "converged_count": 256,
+              "graph_evaluations": 33860,
+              "measured_pool_size": 256,
+              "measured_seconds": 123.64565534610301,
+              "model_evaluations": 486,
+              "peak_memory_bytes": 9171417600
+            },
+            "refill_speedup_vs_ase": 10.73740167147705,
+            "refill_speedup_vs_drain": 1.0516764947381518,
+            "validation_first_resident_block": {
+              "candidate_converged_count": 128,
+              "convergence_flags_match": true,
+              "failed_checks": [],
+              "max_cell_rmsd_A": 8.33709920928665e-10,
+              "max_energy_error_eV_per_atom": 7.908649580634158e-13,
+              "max_final_fmax_error_eV_per_A": 1.4269163073343805e-09,
+              "max_position_rmsd_A": 8.153648986535345e-10,
+              "max_step_difference": 0,
+              "max_stress_tensor_error_eV_per_A3": 9.144467453224558e-11,
+              "passed": true,
+              "reference_converged_count": 128,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "64": {
+            "active_drain": {
+              "converged_count_equivalent_256": 256,
+              "equivalent_256_seconds": 151.209811931476,
+              "extrapolation_factor": 4,
+              "measured_pool_size": 64,
+              "measured_seconds": 37.802452982869,
+              "peak_memory_bytes": 4592439808
+            },
+            "active_refill": {
+              "converged_count": 256,
+              "graph_evaluations": 33860,
+              "measured_pool_size": 256,
+              "measured_seconds": 129.90546287503093,
+              "model_evaluations": 725,
+              "peak_memory_bytes": 4630153728
+            },
+            "refill_speedup_vs_ase": 10.219994117270533,
+            "refill_speedup_vs_drain": 1.1639988695236,
+            "validation_first_resident_block": {
+              "candidate_converged_count": 64,
+              "convergence_flags_match": true,
+              "failed_checks": [],
+              "max_cell_rmsd_A": 9.005814723852501e-09,
+              "max_energy_error_eV_per_atom": 2.5307678658029307e-12,
+              "max_final_fmax_error_eV_per_A": 4.879012679981365e-09,
+              "max_position_rmsd_A": 8.813625367732899e-09,
+              "max_step_difference": 0,
+              "max_stress_tensor_error_eV_per_A3": 9.827149514063035e-10,
+              "passed": true,
+              "reference_converged_count": 64,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          }
+        }
+      },
+      "92": {
+        "ase": {
+          "equivalent_256_seconds": 1309.9100035112351,
+          "extrapolation_factor": 8,
+          "measured_pool_size": 32,
+          "measured_seconds": 163.7387504389044,
+          "source": "runs/bfgs_active_refill_matrix_raw/mace_atoms92_ase.json"
+        },
+        "points": {
+          "128": {
+            "active_drain": {
+              "converged_count_equivalent_256": 256,
+              "equivalent_256_seconds": 213.9056283342652,
+              "extrapolation_factor": 2,
+              "measured_pool_size": 128,
+              "measured_seconds": 106.9528141671326,
+              "peak_memory_bytes": 18276434432
+            },
+            "active_refill": {
+              "converged_count": 256,
+              "graph_evaluations": 35795,
+              "measured_pool_size": 256,
+              "measured_seconds": 203.6734018989373,
+              "model_evaluations": 504,
+              "peak_memory_bytes": 18372613632
+            },
+            "refill_speedup_vs_ase": 6.4314239920302025,
+            "refill_speedup_vs_drain": 1.050238402952611,
+            "validation_first_resident_block": {
+              "candidate_converged_count": 128,
+              "convergence_flags_match": true,
+              "failed_checks": [],
+              "max_cell_rmsd_A": 1.661896531432035e-05,
+              "max_energy_error_eV_per_atom": 7.598851959261557e-08,
+              "max_final_fmax_error_eV_per_A": 2.1123319187292544e-05,
+              "max_position_rmsd_A": 2.7973215461620196e-05,
+              "max_step_difference": 0,
+              "max_stress_tensor_error_eV_per_A3": 1.696928193664106e-06,
+              "passed": true,
+              "reference_converged_count": 128,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          },
+          "64": {
+            "active_drain": {
+              "converged_count_equivalent_256": 256,
+              "equivalent_256_seconds": 235.02684565167874,
+              "extrapolation_factor": 4,
+              "measured_pool_size": 64,
+              "measured_seconds": 58.756711412919685,
+              "peak_memory_bytes": 9178503680
+            },
+            "active_refill": {
+              "converged_count": 256,
+              "graph_evaluations": 35592,
+              "measured_pool_size": 256,
+              "measured_seconds": 208.45607617404312,
+              "model_evaluations": 811,
+              "peak_memory_bytes": 9254294016
+            },
+            "refill_speedup_vs_ase": 6.2838657790793855,
+            "refill_speedup_vs_drain": 1.127464595733114,
+            "validation_first_resident_block": {
+              "candidate_converged_count": 64,
+              "convergence_flags_match": true,
+              "failed_checks": [],
+              "max_cell_rmsd_A": 0.0019636008514604696,
+              "max_energy_error_eV_per_atom": 1.43848159021455e-05,
+              "max_final_fmax_error_eV_per_A": 0.007105306319192262,
+              "max_position_rmsd_A": 0.002359842039426695,
+              "max_step_difference": 1,
+              "max_stress_tensor_error_eV_per_A3": 3.572639092335123e-05,
+              "passed": true,
+              "reference_converged_count": 64,
+              "tolerances": {
+                "max_cell_rmsd_A": 0.02,
+                "max_energy_error_eV_per_atom": 0.0001,
+                "max_final_fmax_error_eV_per_A": 0.03,
+                "max_position_rmsd_A": 0.02,
+                "max_step_difference": 25,
+                "max_stress_tensor_error_eV_per_A3": 0.01
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "measured_repeats": 1,
+  "schema_version": 1,
+  "status": "complete",
+  "workload_size": 256
+}

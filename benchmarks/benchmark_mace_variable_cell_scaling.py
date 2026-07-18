@@ -142,6 +142,7 @@ def run_batch(
     max_step: float,
     optimizer_name: str,
     alpha: float,
+    refill: bool = False,
 ) -> dict[str, Any]:
     records = []
     model_evaluations = 0
@@ -150,8 +151,11 @@ def run_batch(
     neighbor_rebuilds = 0
     active_batch_sizes = []
 
-    for start in range(0, len(systems), batch_size):
-        chunk = systems[start : start + batch_size]
+    chunks = [systems] if refill else [
+        systems[start : start + batch_size]
+        for start in range(0, len(systems), batch_size)
+    ]
+    for chunk in chunks:
         state = calculator.create_state(chunk)
         common = {
             "cell_filter": FrechetCellFilter(),
@@ -176,6 +180,7 @@ def run_batch(
                 calculator,
                 alpha=alpha,
                 optimizer_dtype="float64",
+                refill_batch_size=batch_size if refill else None,
                 **common,
             )
         model_evaluations += result.model_evaluations
@@ -225,7 +230,11 @@ def run_batch(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--method", choices=("ase", "masked", "active"), required=True)
+    parser.add_argument(
+        "--method",
+        choices=("ase", "masked", "active", "refill"),
+        required=True,
+    )
     parser.add_argument("--optimizer", choices=("fire", "bfgs"), default="fire")
     parser.add_argument("--atom-count", type=int, required=True)
     parser.add_argument(
@@ -252,6 +261,8 @@ def main() -> None:
     args = parser.parse_args()
 
     torch.use_deterministic_algorithms(args.deterministic)
+    if args.method == "refill" and args.optimizer != "bfgs":
+        raise ValueError("active refill is currently implemented only for BFGS")
     if args.pool_size <= 0 or args.repeats <= 0:
         raise ValueError("pool size and repeats must be positive")
     if args.method != "ase" and any(
@@ -259,8 +270,10 @@ def main() -> None:
     ):
         raise ValueError("every batch size must divide the fixed pool")
 
-    manifest = load_manifest(args.manifest, args.pool_size)
-    names = manifest["samples"][str(args.atom_count)][: args.pool_size]
+    manifest = load_manifest(args.manifest, min(args.pool_size, 32))
+    available_names = manifest["samples"][str(args.atom_count)]
+    base_names = available_names[: min(args.pool_size, len(available_names))]
+    names = [base_names[i % len(base_names)] for i in range(args.pool_size)]
     systems = []
     for name in names:
         atoms = read(args.dataset_dir / name)
@@ -353,7 +366,8 @@ def main() -> None:
                         calculator,
                         **common,
                         batch_size=batch_size,
-                        active_compaction=args.method == "active",
+                        active_compaction=args.method in ("active", "refill"),
+                        refill=args.method == "refill",
                     )
 
             output, timing, peak_memory = timed_repeats(

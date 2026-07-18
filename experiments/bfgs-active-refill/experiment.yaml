@@ -1,0 +1,53 @@
+id: bfgs-active-refill
+date: 2026-07-18
+hypothesis: >-
+  Replacing converged variable-cell BFGS systems from a pending queue keeps a
+  bounded resident batch occupied and reduces end-to-end time versus draining
+  independent active-compacted chunks without changing per-system trajectories.
+baseline_commit: b2b11644987f35923f056d63a91b09d4656e16ac
+models: [AtomBit, MACE-OFF-Small]
+optimizer: full BFGS
+cell_filter: full Frechet log deformation
+pool:
+  manifest: benchmarks/t2_fixed_samples.json
+  atom_counts: [46, 92, 184, 276]
+  unique_systems_per_group: 32
+  workload_systems_per_group: 256
+  expansion: repeat each ordered 32-system block eight times
+methods:
+  active_drain:
+    resident_batches: [64, 128]
+    timing_extrapolation: [4, 2]
+  active_refill:
+    workload: 256
+    resident_batches: [64, 128]
+parameters:
+  fmax_eV_per_A: 0.05
+  smax: null
+  max_steps_per_system: 500
+  alpha_eV_per_A2: 70.0
+  max_step_A: 0.2
+  repeats: 1
+precision:
+  AtomBit:
+    model: float32
+    optimizer: float64
+  MACE-OFF-Small:
+    model: float64
+    optimizer: float64
+correctness_gates:
+  - New systems start with an independent alpha-times-identity Hessian.
+  - Survivor Hessian, coordinate, force, and Frechet state survive refill.
+  - Per-system step limits start when each queued system enters.
+  - Results retain original workload order.
+  - Refill agrees with current active BFGS within declared deterministic tolerances.
+execution:
+  pilot: AtomBit 46 atoms at resident batches 64 and 128
+  measured_repeats: 1
+result:
+  convergence: all refill points completed 256 of 256 jobs
+  b64_refill_gain_range: [1.004, 1.164]
+  b128_mace_refill_gain_range: [1.026, 1.052]
+  b128_atombit_refill_gain_range: [0.983, 1.032]
+  capacity: all requested points completed without OOM
+  next_step: construct pending graph state lazily instead of materializing all 256 jobs

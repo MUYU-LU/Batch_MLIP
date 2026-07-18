@@ -20,6 +20,7 @@ class OptimizerCapabilities:
 
     variable_cell: bool = False
     active_compaction: bool = False
+    active_refill: bool = False
 
 
 @runtime_checkable
@@ -72,6 +73,10 @@ def _validate_capabilities(
         raise ValueError(
             f"{type(optimizer).__name__} does not support active-batch compaction"
         )
+    if options.get("refill_batch_size") is not None and not capabilities.active_refill:
+        raise ValueError(
+            f"{type(optimizer).__name__} does not support active-batch refill"
+        )
 
 
 class BatchedFIRE:
@@ -101,7 +106,11 @@ class BatchedBFGS:
         self.options = MappingProxyType(dict(options))
 
     def capabilities(self) -> OptimizerCapabilities:
-        return OptimizerCapabilities(variable_cell=True, active_compaction=True)
+        return OptimizerCapabilities(
+            variable_cell=True,
+            active_compaction=True,
+            active_refill=True,
+        )
 
     def run(
         self,

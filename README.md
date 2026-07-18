@@ -332,6 +332,25 @@ result = relax(
 )
 ```
 
+For workloads larger than the desired GPU-resident batch, BFGS can refill
+converged slots from a pending queue while preserving each survivor's Hessian
+and Frechet state:
+
+```python
+result = relax(
+    workload,
+    calculator,
+    optimizer="bfgs",
+    cell_filter=FrechetCellFilter(),
+    refill_batch_size=64,
+    fmax=0.05,
+    smax=None,
+)
+```
+
+The step limit applies independently from the time each queued structure
+enters. Finished Hessians are released, and results retain workload order.
+
 The BFGS Hessian costs `O(D^2)` memory and its eigensolve costs `O(D^3)` for
 `D = 3N` fixed-cell or `D = 3N + 9` variable-cell degrees of freedom. It is a
 strong ASE-compatible optimizer for small and medium structures; LBFGS remains

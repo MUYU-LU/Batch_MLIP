@@ -49,7 +49,9 @@ def _quadratic_potential() -> AtomBitBatchCalculator:
 
 def test_bfgs_is_registered_and_constructible():
     assert "bfgs" in available_optimizers()
-    assert isinstance(create_optimizer("BFGS"), BatchedBFGS)
+    optimizer = create_optimizer("BFGS")
+    assert isinstance(optimizer, BatchedBFGS)
+    assert optimizer.capabilities().active_refill
     result = relax(
         Atoms("H", positions=[[0.1, 0.0, 0.0]]),
         _quadratic_potential(),
@@ -249,6 +251,44 @@ def test_variable_cell_active_bfgs_matches_masked_and_ase():
         )
 
 
+def test_variable_cell_bfgs_refill_preserves_state_and_output_order():
+    systems = [
+        bulk("Ar", "fcc", a=a, cubic=True)
+        for a in (5.2686752, 5.0, 6.2, 5.4, 5.8)
+    ]
+
+    def run(*, refill_batch_size: int | None):
+        calculator = ASECalculatorAdapter(
+            LennardJones(sigma=3.4, epsilon=0.0103, rc=8.5)
+        )
+        return batched_bfgs_relax(
+            calculator.create_state(systems),
+            calculator,
+            cell_filter=FrechetCellFilter(hydrostatic_strain=True),
+            active_compaction=True,
+            refill_batch_size=refill_batch_size,
+            fmax=2e-5,
+            smax=None,
+            max_steps=200,
+            alpha=70.0,
+            max_step=0.2,
+        )
+
+    active = run(refill_batch_size=None)
+    refill = run(refill_batch_size=2)
+
+    assert bool(refill.converged.all())
+    torch.testing.assert_close(refill.converged_step, active.converged_step)
+    torch.testing.assert_close(refill.state.positions, active.state.positions)
+    torch.testing.assert_close(refill.state.cells, active.state.cells)
+    torch.testing.assert_close(refill.evaluation.energy, active.evaluation.energy)
+    torch.testing.assert_close(refill.evaluation.forces, active.evaluation.forces)
+    torch.testing.assert_close(refill.evaluation.stress, active.evaluation.stress)
+    assert refill.active_batch_sizes[0] == 2
+    assert max(refill.active_batch_sizes) == 2
+    assert refill.active_batch_sizes[-1] == 1
+
+
 @pytest.mark.parametrize(
     "kwargs,error",
     [
@@ -256,6 +296,8 @@ def test_variable_cell_active_bfgs_matches_masked_and_ase():
         ({"max_step": 0.0}, "max_step must be positive"),
         ({"max_steps": -1}, "max_steps must be non-negative"),
         ({"optimizer_dtype": "float16"}, "optimizer_dtype must be"),
+        ({"refill_batch_size": 0}, "refill_batch_size must be"),
+        ({"refill_batch_size": 1.5}, "refill_batch_size must be"),
     ],
 )
 def test_bfgs_rejects_invalid_options(kwargs, error):
