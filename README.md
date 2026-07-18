@@ -245,6 +245,24 @@ Install the `mace` optional dependency or use an environment containing
 not permit commercial use. The adapter uses MACE's own `AtomicData` graph
 builder, direct forces, stress convention, cutoff, element table, and heads.
 
+The opt-in integration suite runs the fixed T2 structures through common ASE,
+masked batching, and active batching with both FIRE and BFGS:
+
+```bash
+python -m pip install -e '.[mace,dev]'
+make test-mace
+```
+
+This test requires CUDA, the MACE-OFF-Small checkpoint, and the extracted
+`data/T2_test/structures` dataset. The ordinary test suite skips it because
+MACE is an optional dependency. If pytest and MACE are in separate compatible
+environments, pass the MACE site-packages directory explicitly:
+
+```bash
+make test-mace PYTHON=/path/to/pytest/python \
+  MACE_SITE_PACKAGES=/path/to/mace/environment/lib/python3.11/site-packages
+```
+
 `cell_filter=None` is the default and preserves fixed-cell FIRE. Passing
 `FrechetCellFilter` optimizes atomic positions and full-rank periodic
 cells together using log-deformation coordinates. Pressure is specified in

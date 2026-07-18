@@ -1,0 +1,39 @@
+{
+  "baseline_commit": "7673a3933fdd155aa4f821e40abe0eee09d8f7ea",
+  "device": "cuda:0",
+  "dtype": "torch.float64",
+  "model": "MACE-OFF23-Small",
+  "pool": {
+    "atom_count": 46,
+    "systems": 4,
+    "sample_files": [
+      "Aven12_1_295_z1.cif",
+      "Aven12_1_331_z1.cif",
+      "Aven12_1_241_z1.cif",
+      "Aven12_1_62_z1.cif"
+    ]
+  },
+  "protocol": {
+    "methods": ["ase", "masked", "active"],
+    "optimizers": ["fire", "bfgs"],
+    "variable_cell": true,
+    "forced_steps": 3,
+    "model_evaluations_per_batch_run": 4,
+    "graph_evaluations_per_batch_run": 16
+  },
+  "tolerances": {
+    "energy_eV_atol": 2e-08,
+    "force_eV_per_A_atol": 2e-08,
+    "stress_eV_per_A3_atol": 2e-10,
+    "position_A_atol": 2e-09,
+    "cell_A_atol": 2e-09,
+    "masked_active_tensor_atol": 1e-12
+  },
+  "results": {
+    "default_suite": "41 passed, 2 skipped",
+    "fire": "passed",
+    "bfgs": "passed",
+    "mace_suite": "2 passed"
+  },
+  "status": "passed"
+}

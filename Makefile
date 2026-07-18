@@ -1,10 +1,19 @@
-.PHONY: install test lint demo relax validate benchmark package clean
+.PHONY: install test test-mace lint demo relax validate benchmark package clean
+
+PYTHON ?= python
+MACE_SITE_PACKAGES ?=
 
 install:
 	python -m pip install -e '.[dev]'
 
 test:
-	pytest -q
+	$(PYTHON) -m pytest -q
+
+test-mace:
+	@if [ -n "$(MACE_SITE_PACKAGES)" ]; then \
+		export PYTHONPATH="$(MACE_SITE_PACKAGES):$$PYTHONPATH"; \
+	fi; \
+	BATCH_MLIP_RUN_MACE_TESTS=1 $(PYTHON) -m pytest -q -m mace tests/test_mace_optimization.py
 
 lint:
 	ruff check batch_mlip atombit_batch src examples tests tools benchmarks

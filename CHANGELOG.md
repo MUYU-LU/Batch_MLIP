@@ -14,6 +14,8 @@
 
 ## 0.2.0 - Unreleased
 
+- Add an opt-in MACE-OFF-Small variable-cell optimization test covering common
+  ASE, masked batching, and active batching with both FIRE and BFGS.
 - Rename the canonical distribution/package to `batch-mlip`/`batch_mlip` and
   retain `atombit_batch` as a thin compatibility namespace.
 - Rename the canonical AtomBit adapter and cell filter to

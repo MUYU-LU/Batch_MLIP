@@ -1,0 +1,24 @@
+id: mace-batch-optimization-test
+description: Add an opt-in formal MACE optimization gate matching the AtomBit ASE/masked/active protocol.
+hypothesis: MACE-OFF-Small variable-cell FIRE and BFGS produce equivalent three-step states through common ASE, masked batching, and active batching.
+baseline_commit: 7673a3933fdd155aa4f821e40abe0eee09d8f7ea
+environment: {}
+commands:
+  - name: default-tests
+    command: [/public/home/lmy/.conda/envs/lmy/bin/python, -m, pytest, -q]
+  - name: mace-optimization
+    command:
+      - env
+      - BATCH_MLIP_RUN_MACE_TESTS=1
+      - BATCH_MLIP_MACE_DEVICE=cuda:0
+      - CUDA_VISIBLE_DEVICES=0
+      - PYTHONPATH=/public/home/lmy/.conda/envs/MACE_clean/lib/python3.11/site-packages
+      - /public/home/lmy/.conda/envs/lmy/bin/python
+      - -m
+      - pytest
+      - -q
+      - -m
+      - mace
+      - tests/test_mace_optimization.py
+  - name: lint
+    command: [/public/home/lmy/.conda/envs/lmy/bin/ruff, check, batch_mlip, atombit_batch, src, examples, tests, tools, benchmarks]

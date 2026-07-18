@@ -38,6 +38,9 @@ exclude = ["tests*", "benchmarks*", "tools*", "original_uploads*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
+markers = [
+  "mace: optional MACE foundation-model integration tests",
+]
 
 [tool.ruff]
 line-length = 100
