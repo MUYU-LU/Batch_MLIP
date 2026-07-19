@@ -100,6 +100,31 @@ def test_skin_candidates_are_filtered_at_physical_cutoff_and_activate_safely():
     torch.testing.assert_close(evaluation.forces, reference.forces)
 
 
+def test_skin_physical_cutoff_matches_ase_for_float32_rounding_boundary():
+    separation = [-4.3417268, -2.5232267, 3.2837074]
+    atoms = Atoms("H2", positions=[[0.0, 0.0, 0.0], separation])
+    cached = AseGraphBatch.from_ase(
+        [atoms],
+        cutoff=6.0,
+        skin=0.5,
+        device="cpu",
+        dtype=torch.float32,
+    )
+    fresh = AseGraphBatch.from_ase(
+        [atoms],
+        cutoff=6.0,
+        skin=0.0,
+        device="cpu",
+        dtype=torch.float32,
+    )
+
+    assert torch.linalg.vector_norm(cached.positions[1]).item() == 6.0
+    assert cached.as_model_data().edge_index.shape[1] == 2
+    torch.testing.assert_close(
+        cached.as_model_data().edge_index, fresh.as_model_data().edge_index
+    )
+
+
 def test_variable_cell_cache_reuses_safe_affine_compression():
     atoms = Atoms(
         "H2",

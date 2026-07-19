@@ -406,13 +406,16 @@ class AseGraphBatch:
         shifts_int = self.shifts_int
         if self.skin > 0.0 and edge_index.shape[1] > 0:
             center, neighbor = edge_index
-            edge_cells = self.cells[self.system_idx[center]]
+            # ASE evaluates neighbor cutoffs in float64 even when the stored
+            # model geometry is float32. Match that topology decision here.
+            topology_positions = self.positions.to(torch.float64)
+            edge_cells = self.cells[self.system_idx[center]].to(torch.float64)
             cartesian_shifts = torch.bmm(
-                shifts_int.unsqueeze(1).to(self.dtype), edge_cells
+                shifts_int.unsqueeze(1).to(torch.float64), edge_cells
             ).squeeze(1)
             vectors = (
-                self.positions[center]
-                - self.positions[neighbor]
+                topology_positions[center]
+                - topology_positions[neighbor]
                 - cartesian_shifts
             )
             physical = torch.linalg.vector_norm(vectors, dim=-1) < self.cutoff

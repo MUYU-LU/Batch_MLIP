@@ -18,6 +18,10 @@
   model evaluation, BFGS updates, compaction, refill, and occupancy events.
 - Add generic per-structure variable-cell neighbor caching, exact-cutoff GPU
   edge filtering, and canonical neighbor ordering.
+- Match ASE's float64 physical-cutoff decision for cached float32 geometries,
+  preventing boundary-edge loss without changing model precision.
+- Validate exact AtomBit B64/B128 cache scaling on 256-job variable-cell BFGS
+  workloads; B64 with a 0.5 A skin is preferred for the 276-atom case.
 - Fix active-refill state aliasing when resident capacity equals pool size.
 - Add an opt-in MACE-OFF-Small variable-cell optimization test covering common
   ASE, masked batching, and active batching with both FIRE and BFGS.

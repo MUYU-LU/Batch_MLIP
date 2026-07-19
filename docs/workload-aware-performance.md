@@ -35,6 +35,11 @@ The existing BFGS experiments establish the following baseline:
 - Preliminary one-shot measurements estimate raw neighbor search at 18-25% of
   AtomBit BFGS time for 92-276 atom structures. For MACE, raw search is about
   7-9%, while complete `AtomicData` graph preparation is about 17-22%.
+- The corrected AtomBit variable-cell cache is bitwise exact against `skin=0`
+  on paired 256-job B64 and B128 workloads. At B64 it improves wall time by
+  5.4% for 46 atoms and 14.1% for 276 atoms.
+- B128 is not automatically better: cached 276-atom B128 is 6.8% slower than
+  cached B64 and uses 54.1 GB rather than 27.3 GB of peak allocated memory.
 
 The phase percentages are estimates from isolated graph timings multiplied by
 logged graph-evaluation counts. The next benchmark must add direct phase timing
@@ -193,6 +198,13 @@ Proceed to B128 confirmation only if the cache is correct and either reduces
 wall time by at least 5% or removes at least half of graph-preparation time
 without a wall-time regression. Record candidate-edge inflation, physical-edge
 count, mean evaluations per rebuild, and dirty-system distribution.
+
+**Result:** AtomBit passes the gate. Paired physical graphs and final records
+are exact after matching ASE's float64 cutoff decision. B64 speedups are 5.4%
+at 46 atoms and 14.1% at 276 atoms. B128 confirms a 3.1% and 6.3% cache benefit
+against its own baseline, but cached B128 does not beat cached B64. Use B64 with
+`skin=0.5 A` for the measured 276-atom workload and proceed to Stage 2. The MACE
+cache adapter remains unimplemented and is not included in this conclusion.
 
 ### Stage 2: refill policy
 

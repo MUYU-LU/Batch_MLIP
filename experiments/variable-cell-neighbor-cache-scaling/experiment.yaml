@@ -1,0 +1,39 @@
+id: variable-cell-neighbor-cache-scaling
+date: 2026-07-19
+hypothesis: >-
+  A deformation-aware skin cache reduces full variable-cell BFGS wall time at
+  production resident sizes without changing physical graphs or final results.
+model: AtomBit
+optimizer: full variable-cell BFGS with active refill
+samples:
+  workload_size: 256
+  atom_counts: [46, 276]
+  selection: fixed benchmark manifest, cycled to workload size
+parameters:
+  resident_batch_sizes: [64, 128]
+  cutoff_A: 6.0
+  baseline_skin_A: 0.0
+  candidate_skin_A: 0.5
+  fmax_eV_per_A: 0.05
+  max_steps: 500
+  repeats: 1
+  model_dtype: float32
+  optimizer_dtype: float64
+  cutoff_filter_dtype: float64
+  deterministic_algorithms: true
+correctness:
+  paired_active_histories_exact: true
+  paired_physical_edge_counts_exact: true
+  paired_optimizer_steps_exact: true
+  paired_final_records_exact: true
+result:
+  b64_speedup_percent:
+    atoms_46: 5.444752659778929
+    atoms_276: 14.145363473980478
+  b128_speedup_percent:
+    atoms_46: 3.062903106509851
+    atoms_276: 6.338029886832874
+  selected_large_system_policy:
+    resident_batch_size: 64
+    skin_A: 0.5
+  conclusion: cache gate passes; B64 is preferred to B128 for 276 atoms
