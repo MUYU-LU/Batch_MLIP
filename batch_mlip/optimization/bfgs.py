@@ -169,6 +169,35 @@ def _resolve_optimizer_dtype(
     return resolved
 
 
+_REFILL_POLICIES = frozenset(("drain", "immediate", "threshold"))
+
+
+def _refill_insert_count(
+    *,
+    policy: str,
+    capacity: int,
+    survivors: int,
+    pending: int,
+    low_watermark: float,
+    min_chunk: int,
+) -> int:
+    """Return how many pending systems to insert after active compaction."""
+
+    slots = capacity - survivors
+    if slots <= 0 or pending <= 0:
+        return 0
+    if policy == "immediate":
+        return min(slots, pending)
+    if survivors == 0:
+        return min(slots, pending)
+    if policy == "drain":
+        return 0
+    low_water_count = int(capacity * low_watermark)
+    if survivors > low_water_count or slots < min_chunk:
+        return 0
+    return min(slots, pending)
+
+
 def batched_bfgs_relax(
     state: AseGraphBatch,
     potential: BatchCalculator,
@@ -185,6 +214,9 @@ def batched_bfgs_relax(
     smax: float | None = 0.005,
     optimizer_dtype: torch.dtype | str | None = None,
     refill_batch_size: int | None = None,
+    refill_policy: str = "immediate",
+    refill_low_watermark: float = 0.8,
+    refill_min_chunk: int | None = None,
 ) -> RelaxationResult:
     """Relax systems with independent full BFGS Hessians.
 
@@ -205,6 +237,21 @@ def batched_bfgs_relax(
     )
 
     optimizer_dtype = _resolve_optimizer_dtype(optimizer_dtype, state.dtype)
+    if refill_policy not in _REFILL_POLICIES:
+        choices = ", ".join(sorted(_REFILL_POLICIES))
+        raise ValueError(f"refill_policy must be one of: {choices}")
+    if not 0.0 <= refill_low_watermark < 1.0:
+        raise ValueError("refill_low_watermark must be in [0, 1)")
+    if refill_min_chunk is not None and (
+        isinstance(refill_min_chunk, bool)
+        or not isinstance(refill_min_chunk, int)
+        or refill_min_chunk <= 0
+    ):
+        raise ValueError("refill_min_chunk must be a positive integer or None")
+    if refill_batch_size is None and (
+        refill_policy != "immediate" or refill_min_chunk is not None
+    ):
+        raise ValueError("refill policy options require refill_batch_size")
     if refill_batch_size is not None:
         if (
             isinstance(refill_batch_size, bool)
@@ -216,6 +263,13 @@ def batched_bfgs_relax(
             state,
             potential,
             refill_batch_size=refill_batch_size,
+            refill_policy=refill_policy,
+            refill_low_watermark=refill_low_watermark,
+            refill_min_chunk=(
+                max(8, refill_batch_size // 8)
+                if refill_min_chunk is None
+                else refill_min_chunk
+            ),
             fmax=fmax,
             max_steps=max_steps,
             max_step=max_step,
@@ -570,6 +624,9 @@ def _batched_bfgs_refill_relax(
     potential: BatchCalculator,
     *,
     refill_batch_size: int,
+    refill_policy: str,
+    refill_low_watermark: float,
+    refill_min_chunk: int,
     fmax: float,
     max_steps: int,
     max_step: float,
@@ -833,8 +890,16 @@ def _batched_bfgs_refill_relax(
                 for system_id in active_system_ids[finish_now].tolist():
                     histories[system_id] = None
 
-                slots = capacity - len(remaining_list)
-                refill_stop = min(next_pending + slots, n_systems)
+                pending_before = n_systems - next_pending
+                insert_count = _refill_insert_count(
+                    policy=refill_policy,
+                    capacity=capacity,
+                    survivors=len(remaining_list),
+                    pending=pending_before,
+                    low_watermark=refill_low_watermark,
+                    min_chunk=refill_min_chunk,
+                )
+                refill_stop = next_pending + insert_count
                 refill_ids = torch.arange(
                     next_pending,
                     refill_stop,
@@ -878,10 +943,14 @@ def _batched_bfgs_refill_relax(
                 ready_count = len(remaining_list)
             profile_event(
                 "refill",
+                policy=refill_policy,
+                low_watermark=refill_low_watermark,
+                min_chunk=refill_min_chunk,
                 scheduler_step=scheduler_step,
                 systems_before=systems_before,
                 survivors=ready_count,
                 inserted=refill_ids.numel(),
+                triggered=bool(refill_ids.numel()),
                 systems_after=active_state.n_systems,
                 pending_after=n_systems - next_pending,
             )

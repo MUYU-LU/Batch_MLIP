@@ -22,6 +22,7 @@ from batch_mlip import (
     create_optimizer,
     relax,
 )
+from batch_mlip.optimization.bfgs import _refill_insert_count
 
 
 class QuadraticCalculator(Calculator):
@@ -270,13 +271,17 @@ def test_variable_cell_active_bfgs_matches_masked_and_ase():
         )
 
 
-def test_variable_cell_bfgs_refill_preserves_state_and_output_order():
+def test_variable_cell_bfgs_refill_policies_preserve_state_and_output_order():
     systems = [
         bulk("Ar", "fcc", a=a, cubic=True)
         for a in (5.2686752, 5.0, 6.2, 5.4, 5.8)
     ]
 
-    def run(*, refill_batch_size: int | None):
+    def run(
+        *,
+        refill_batch_size: int | None,
+        refill_policy: str = "immediate",
+    ):
         calculator = ASECalculatorAdapter(
             LennardJones(sigma=3.4, epsilon=0.0103, rc=8.5)
         )
@@ -286,6 +291,9 @@ def test_variable_cell_bfgs_refill_preserves_state_and_output_order():
             cell_filter=FrechetCellFilter(hydrostatic_strain=True),
             active_compaction=True,
             refill_batch_size=refill_batch_size,
+            refill_policy=refill_policy,
+            refill_low_watermark=0.5,
+            refill_min_chunk=(1 if refill_batch_size is not None else None),
             fmax=2e-5,
             smax=None,
             max_steps=200,
@@ -294,18 +302,47 @@ def test_variable_cell_bfgs_refill_preserves_state_and_output_order():
         )
 
     active = run(refill_batch_size=None)
-    refill = run(refill_batch_size=2)
+    results = {
+        policy: run(refill_batch_size=2, refill_policy=policy)
+        for policy in ("drain", "immediate", "threshold")
+    }
 
-    assert bool(refill.converged.all())
-    torch.testing.assert_close(refill.converged_step, active.converged_step)
-    torch.testing.assert_close(refill.state.positions, active.state.positions)
-    torch.testing.assert_close(refill.state.cells, active.state.cells)
-    torch.testing.assert_close(refill.evaluation.energy, active.evaluation.energy)
-    torch.testing.assert_close(refill.evaluation.forces, active.evaluation.forces)
-    torch.testing.assert_close(refill.evaluation.stress, active.evaluation.stress)
-    assert refill.active_batch_sizes[0] == 2
-    assert max(refill.active_batch_sizes) == 2
-    assert refill.active_batch_sizes[-1] == 1
+    for refill in results.values():
+        assert bool(refill.converged.all())
+        torch.testing.assert_close(refill.converged_step, active.converged_step)
+        torch.testing.assert_close(refill.state.positions, active.state.positions)
+        torch.testing.assert_close(refill.state.cells, active.state.cells)
+        torch.testing.assert_close(refill.evaluation.energy, active.evaluation.energy)
+        torch.testing.assert_close(refill.evaluation.forces, active.evaluation.forces)
+        torch.testing.assert_close(refill.evaluation.stress, active.evaluation.stress)
+        assert refill.active_batch_sizes[0] == 2
+        assert max(refill.active_batch_sizes) == 2
+        assert refill.active_batch_sizes[-1] == 1
+
+
+@pytest.mark.parametrize(
+    "policy,survivors,pending,expected",
+    [
+        ("immediate", 7, 20, 1),
+        ("threshold", 7, 20, 0),
+        ("threshold", 6, 20, 2),
+        ("threshold", 0, 3, 3),
+        ("drain", 1, 20, 0),
+        ("drain", 0, 20, 8),
+    ],
+)
+def test_refill_policy_insert_count(policy, survivors, pending, expected):
+    assert (
+        _refill_insert_count(
+            policy=policy,
+            capacity=8,
+            survivors=survivors,
+            pending=pending,
+            low_watermark=0.8,
+            min_chunk=2,
+        )
+        == expected
+    )
 
 
 def test_structure_api_does_not_build_neighbors_for_pending_refill_jobs(
@@ -348,6 +385,16 @@ def test_structure_api_does_not_build_neighbors_for_pending_refill_jobs(
         ({"optimizer_dtype": "float16"}, "optimizer_dtype must be"),
         ({"refill_batch_size": 0}, "refill_batch_size must be"),
         ({"refill_batch_size": 1.5}, "refill_batch_size must be"),
+        ({"refill_policy": "sometimes"}, "refill_policy must be"),
+        ({"refill_policy": "drain"}, "require refill_batch_size"),
+        (
+            {"refill_batch_size": 1, "refill_low_watermark": 1.0},
+            "refill_low_watermark must be",
+        ),
+        (
+            {"refill_batch_size": 1, "refill_min_chunk": 0},
+            "refill_min_chunk must be",
+        ),
     ],
 )
 def test_bfgs_rejects_invalid_options(kwargs, error):

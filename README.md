@@ -366,6 +366,7 @@ result = relax(
     optimizer="bfgs",
     cell_filter=FrechetCellFilter(),
     refill_batch_size=64,
+    refill_policy="immediate",
     fmax=0.05,
     smax=None,
 )
@@ -375,6 +376,11 @@ The step limit applies independently from the time each queued structure
 enters. Finished Hessians are released, results retain workload order, and
 neighbor graphs for pending structures are built only when those structures
 enter the resident batch.
+
+`refill_policy` accepts `"drain"`, `"immediate"`, or `"threshold"`.
+Immediate is the measured default. Threshold refill also accepts
+`refill_low_watermark` and `refill_min_chunk`, but it is workload-dependent and
+did not beat immediate refill by the project performance gate.
 
 The BFGS Hessian costs `O(D^2)` memory and its eigensolve costs `O(D^3)` for
 `D = 3N` fixed-cell or `D = 3N + 9` variable-cell degrees of freedom. It is a

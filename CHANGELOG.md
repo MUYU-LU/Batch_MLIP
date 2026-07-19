@@ -22,6 +22,10 @@
   preventing boundary-edge loss without changing model precision.
 - Validate exact AtomBit B64/B128 cache scaling on 256-job variable-cell BFGS
   workloads; B64 with a 0.5 A skin is preferred for the 276-atom case.
+- Add explicit BFGS `drain`, `immediate`, and low-water `threshold` refill
+  policies with profiler-visible insertion decisions.
+- Benchmark refill policies on AtomBit and MACE; threshold fails the 5% gate,
+  so immediate refill remains the default and selected production policy.
 - Fix active-refill state aliasing when resident capacity equals pool size.
 - Add an opt-in MACE-OFF-Small variable-cell optimization test covering common
   ASE, masked batching, and active batching with both FIRE and BFGS.

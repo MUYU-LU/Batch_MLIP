@@ -1,0 +1,35 @@
+id: refill-policy-stage2
+date: 2026-07-19
+hypothesis: >-
+  Low-water chunk refill preserves most immediate-refill occupancy while
+  reducing insertion and repacking overhead.
+workload_size: 256
+repeats: 1
+resident_batch_size: 64
+policies: [drain, immediate, threshold]
+threshold:
+  low_watermark: 0.8
+  min_chunk: 8
+cases:
+  - model: AtomBit
+    atom_count: 276
+    graph_policy: skin=0.5 A
+    model_dtype: float32
+    optimizer_dtype: float64
+  - model: MACE-OFF-Small
+    atom_count: 46
+    graph_policy: native
+    model_dtype: float64
+    optimizer_dtype: float64
+correctness:
+  all_converged: true
+  convergence_flags_match: true
+  mace_step_counts_match: true
+  atombit_policy_dependent_trajectories: true
+result:
+  mace_threshold_speedup_vs_immediate_percent: 0.7919357530083548
+  atombit_threshold_regression_vs_immediate_percent: 1.9940614263931122
+  threshold_gate_percent: 5.0
+  threshold_gate_passed: false
+  selected_policy: immediate
+  mixed_extension_run: false

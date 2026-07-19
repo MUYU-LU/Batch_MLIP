@@ -40,6 +40,9 @@ The existing BFGS experiments establish the following baseline:
   5.4% for 46 atoms and 14.1% for 276 atoms.
 - B128 is not automatically better: cached 276-atom B128 is 6.8% slower than
   cached B64 and uses 54.1 GB rather than 27.3 GB of peak allocated memory.
+- Low-water chunk refill reduces triggered insertions from 123 to 15 for the
+  AtomBit 276/B64 workload, but is 2.0% slower than immediate refill. For MACE
+  46/B64 it is only 0.8% faster. Immediate remains the selected policy.
 
 The phase percentages are estimates from isolated graph timings multiplied by
 logged graph-evaluation counts. The next benchmark must add direct phase timing
@@ -134,8 +137,8 @@ on their owning GPU.
 | Optimization, few small systems | Use if multiple steps | Off | Usually one GPU and one batch |
 | Optimization, few large systems | Use if valid long enough | Off | Small batches; shard independent systems if useful |
 | Many homogeneous systems, similar convergence | Use if profitable | Usually off | Large static resident batches |
-| Many homogeneous systems, varied convergence | Use if profitable | Threshold refill | Keep each GPU near its memory-safe target |
-| Many mixed systems | Per-structure policy | Threshold refill within compatible buckets | Edge/Hessian-aware packing and work stealing |
+| Many homogeneous systems, varied convergence | Use if profitable | Immediate refill; threshold is experimental | Keep each GPU near its memory-safe target |
+| Many mixed systems | Per-structure policy | Immediate refill within compatible buckets | Edge/Hessian-aware packing and work stealing |
 | Fixed-length MD replicas | High priority | Off | Persistent replica batches across GPUs |
 
 ## Generic runtime design
@@ -214,7 +217,7 @@ refill while reducing repeated insertion and packing overhead.
 Use cases are selected from existing evidence rather than a full matrix:
 
 - MACE 46 atoms, B64: known positive immediate-refill case.
-- AtomBit 276 atoms, B128: known neutral immediate-refill case.
+- AtomBit 276 atoms, B64 with `skin=0.5 A`: selected Stage 1 operating point.
 - A 256-job 50:50 mixture of 46- and 276-atom structures for each MLIP.
 
 For the two homogeneous cases, add threshold refill and reuse matched drain and
@@ -225,6 +228,14 @@ count and size, packing time, graph/model time, and completed systems per second
 Retain threshold refill only when it improves a representative case by at least
 5% without degrading the known positive MACE case. A pool no larger than the
 resident capacity must select `none` without a timing experiment.
+
+**Result:** the threshold policy does not pass. It reduces triggered refill
+insertions to 15 for both workloads, but finished systems still force active
+compaction and resident-state reconstruction. AtomBit threshold is 2.0% slower
+than immediate; MACE is only 0.8% faster. Immediate remains the default and the
+conditional mixed matrix was not run. Another threshold attempt requires
+topology-preserving or in-place compaction before chunking can remove the
+dominant repeated work.
 
 ### Stage 3: memory-aware resident planning and bucketing
 

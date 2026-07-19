@@ -72,6 +72,7 @@ def test_profiled_refill_bfgs_preserves_results_and_reports_runtime_phases():
     ]
     assert refill_events
     assert sum(event["inserted"] for event in refill_events) == 1
+    assert {event["policy"] for event in refill_events} == {"immediate"}
 
     evaluations = [
         event

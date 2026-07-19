@@ -144,6 +144,9 @@ def run_batch(
     optimizer_name: str,
     alpha: float,
     refill: bool = False,
+    refill_policy: str = "immediate",
+    refill_low_watermark: float = 0.8,
+    refill_min_chunk: int | None = None,
 ) -> dict[str, Any]:
     records = []
     model_evaluations = 0
@@ -182,6 +185,9 @@ def run_batch(
                 alpha=alpha,
                 optimizer_dtype="float64",
                 refill_batch_size=batch_size if refill else None,
+                refill_policy=refill_policy,
+                refill_low_watermark=refill_low_watermark,
+                refill_min_chunk=refill_min_chunk,
                 **common,
             )
         model_evaluations += result.model_evaluations
@@ -253,6 +259,13 @@ def main() -> None:
     parser.add_argument("--alpha", type=float, default=70.0)
     parser.add_argument("--deterministic", action="store_true")
     parser.add_argument("--profile-runtime", action="store_true")
+    parser.add_argument(
+        "--refill-policy",
+        choices=("drain", "immediate", "threshold"),
+        default="immediate",
+    )
+    parser.add_argument("--refill-low-watermark", type=float, default=0.8)
+    parser.add_argument("--refill-min-chunk", type=int)
     parser.add_argument(
         "--dataset-dir", type=Path, default=Path("data/T2_test/structures")
     )
@@ -338,6 +351,9 @@ def main() -> None:
             "repeats": args.repeats,
             "deterministic_algorithms": args.deterministic,
             "profile_runtime": args.profile_runtime,
+            "refill_policy": args.refill_policy,
+            "refill_low_watermark": args.refill_low_watermark,
+            "refill_min_chunk": args.refill_min_chunk,
         },
         "points": [],
     }
@@ -371,6 +387,9 @@ def main() -> None:
                         batch_size=batch_size,
                         active_compaction=args.method in ("active", "refill"),
                         refill=args.method == "refill",
+                        refill_policy=args.refill_policy,
+                        refill_low_watermark=args.refill_low_watermark,
+                        refill_min_chunk=args.refill_min_chunk,
                     )
 
             runtime_profiles = []
