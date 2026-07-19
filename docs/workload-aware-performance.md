@@ -273,16 +273,31 @@ OOM-prevention and inspection interface rather than applying it automatically.
 **Hypothesis:** independent memory-aware GPU workers scale aggregate completed
 systems per second without changing per-job results.
 
-Only the winning single-GPU policies advance to this stage. Measure 1, 4, and 8
+Only the winning single-GPU policies advance to this stage. Measure 1, 4, and 7
 GPU workers on one homogeneous and one mixed 256-job workload for each MLIP.
 Report aggregate throughput, per-GPU occupancy and memory, load imbalance,
 scheduler overhead, and parallel efficiency. Do not split one structure or one
 BFGS history across GPUs.
 
-Also compare 1 versus 8 workers for the small 32-job mixed pool. This is a
+Also compare 1 versus 7 workers for the small 32-job mixed pool. This is a
 deliberate negative-control case: the planner should use fewer GPUs when
 dispatch and model-replication overhead would dominate. Correctness is checked
 by original job identifier, independent of completion order or owning GPU.
+
+### MACE tensor-state cache result
+
+The MACE adapter can now consume the generic cached topology without exposing
+`AtomicData` to the optimizer or scheduler. MACE-OFF-Small B64 immediate-refill
+BFGS improves by 3.3% at 46 atoms and 9.7% at 276 atoms versus native graph
+rebuilding. Peak allocated memory changes by less than 0.2%.
+
+Cached B1/B2 predictions, B1 BFGS, and short NVE drift pass against the native
+path. All 256 production structures converge. The 276-atom workload has 83
+step-count differences and local-minimum outliers because canonical cached-edge
+ordering changes floating-point reductions relative to MACE's matscipy order.
+For that reason cached mode is explicit rather than the compatibility default.
+The multi-GPU stage should measure both the default rebuild path and the cached
+276-atom operating point.
 
 ## Measurement and decision rules
 
@@ -303,7 +318,6 @@ by original job identifier, independent of completion order or owning GPU.
 
 ## Execution order
 
-The next code change is Stage 0 instrumentation. The first acceleration tested
-afterward is the generic variable-cell neighbor cache. Refill-policy changes,
-memory-aware planning, and multi-GPU scheduling follow only after their required
-measurements are available.
+Stages 0-3, topology-preserving compaction, and the conditional MACE tensor
+cache are complete. The next experiment is independent-process multi-GPU
+sharding using the selected single-GPU policies.

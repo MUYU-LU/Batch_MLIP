@@ -260,14 +260,19 @@ calculator = MACEBatchCalculator.from_off(
     model="small",
     device="cuda:0",
     dtype=torch.float64,
+    graph_mode="cached",
+    skin=0.5,
 )
 result = relax(systems, calculator, optimizer="bfgs", fmax=0.03)
 ```
 
 Install the `mace` optional dependency or use an environment containing
 `mace-torch`. MACE-OFF checkpoints use the Academic Software License and do
-not permit commercial use. The adapter uses MACE's own `AtomicData` graph
-builder, direct forces, stress convention, cutoff, element table, and heads.
+not permit commercial use. `graph_mode="cached"` projects the persistent common
+tensor state directly into MACE and filters a skin candidate graph to the exact
+model cutoff before every forward. `graph_mode="rebuild"` is the default and
+retains MACE `AtomicData` construction for compatibility. Both modes use MACE's
+direct forces, stress convention, cutoff, element table, and heads.
 
 The opt-in integration suite runs the fixed T2 structures through common ASE,
 masked batching, and active batching with both FIRE and BFGS:
@@ -290,6 +295,8 @@ make test-mace PYTHON=/path/to/pytest/python \
 The reproducible B1-B32 ASE/masked/active optimization benchmark is implemented
 in `benchmarks/benchmark_mace_variable_cell_scaling.py`; its fixed-pool results
 are recorded under `experiments/mace-variable-cell-scaling-32/`.
+The B64 cached-versus-rebuild BFGS experiment is recorded under
+`experiments/mace-tensor-state-cache/`.
 
 `cell_filter=None` is the default and preserves fixed-cell FIRE. Passing
 `FrechetCellFilter` optimizes atomic positions and full-rank periodic

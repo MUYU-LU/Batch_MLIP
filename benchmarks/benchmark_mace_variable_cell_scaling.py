@@ -251,6 +251,10 @@ def main() -> None:
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--model", default="small")
+    parser.add_argument(
+        "--graph-mode", choices=("cached", "rebuild"), default="rebuild"
+    )
+    parser.add_argument("--skin", type=float, default=0.0)
     parser.add_argument("--fmax", type=float, default=0.05)
     parser.add_argument("--max-steps", type=int, default=500)
     parser.add_argument("--dt-start", type=float, default=0.1)
@@ -302,6 +306,8 @@ def main() -> None:
         model=args.model,
         device=device,
         dtype=torch.float64,
+        graph_mode=args.graph_mode,
+        skin=args.skin,
     )
     ase_calculator = make_counting_ase_calculator(
         calculator.model,
@@ -337,6 +343,8 @@ def main() -> None:
         "parameters": {
             "batch_sizes": args.batch_sizes,
             "cutoff_A": calculator.cutoff,
+            "skin_A": calculator.skin,
+            "graph_mode": calculator.graph_mode,
             "fmax_eV_per_A": args.fmax,
             "smax": None,
             "convergence": "ASE FrechetCellFilter generalized-force fmax",

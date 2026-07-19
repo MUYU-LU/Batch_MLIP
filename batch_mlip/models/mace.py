@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from threading import RLock
-from typing import Any
+from typing import Any, Literal
 
 import torch
 from ase import Atoms
@@ -16,6 +16,7 @@ from ..core.types import BatchEvaluation
 from ..profiling.runtime import profile_event, profile_phase
 
 _DEFAULT_DTYPE_LOCK = RLock()
+MACEGraphMode = Literal["cached", "rebuild"]
 
 
 def _mace_imports() -> tuple[Any, Any, Any, Any]:
@@ -33,9 +34,9 @@ def _mace_imports() -> tuple[Any, Any, Any, Any]:
 class MACEBatchCalculator(BatchCalculator):
     """Evaluate heterogeneous structures with one native MACE graph batch.
 
-    MACE remains responsible for constructing its ``AtomicData`` graphs and
-    computing direct forces and stress. The common state only supplies ASE
-    structures and keeps optimizer/MD state independent of MACE internals.
+    Cached mode projects the common tensor state directly into MACE inputs and
+    reuses its candidate graph. Rebuild mode retains MACE ``AtomicData`` graph
+    construction as a compatibility and validation path.
     """
 
     @classmethod
@@ -75,6 +76,7 @@ class MACEBatchCalculator(BatchCalculator):
         dtype: torch.dtype | None = None,
         cutoff: float | None = None,
         skin: float = 0.0,
+        graph_mode: MACEGraphMode = "rebuild",
         head: str | None = None,
         energy_units_to_eV: float = 1.0,
         length_units_to_A: float = 1.0,
@@ -83,6 +85,8 @@ class MACEBatchCalculator(BatchCalculator):
         resolved_dtype = model_dtype(model) if dtype is None else dtype
         if resolved_dtype not in (torch.float32, torch.float64):
             raise ValueError("MACE adapter dtype must be float32 or float64")
+        if graph_mode not in ("cached", "rebuild"):
+            raise ValueError("MACE graph_mode must be 'cached' or 'rebuild'")
 
         model_cutoff = float(torch.as_tensor(model.r_max).detach().cpu())
         if cutoff is not None and abs(float(cutoff) - model_cutoff) > 1e-12:
@@ -99,6 +103,19 @@ class MACEBatchCalculator(BatchCalculator):
             dtype=resolved_dtype,
         )
         self.model = model.to(device=self.device, dtype=self.dtype).eval()
+        self.graph_mode = graph_mode
+        cached_base_supported = any(
+            base.__name__ in {"MACE", "ScaleShiftMACE"}
+            for base in type(self.model).mro()
+        )
+        embedding_specs = getattr(self.model, "embedding_specs", {})
+        if graph_mode == "cached" and (
+            not cached_base_supported or embedding_specs
+        ):
+            raise ValueError(
+                "cached MACE graphs currently support standard energy MACE models "
+                "without additional embedding features; use graph_mode='rebuild'"
+            )
         for parameter in self.model.parameters():
             parameter.requires_grad_(False)
 
@@ -107,6 +124,15 @@ class MACEBatchCalculator(BatchCalculator):
         self.z_table = utils.AtomicNumberTable(
             [int(value) for value in self.model.atomic_numbers]
         )
+        max_atomic_number = max(self.z_table.zs)
+        self._z_to_index = torch.full(
+            (max_atomic_number + 1,),
+            -1,
+            device=self.device,
+            dtype=torch.long,
+        )
+        for index, atomic_number in enumerate(self.z_table.zs):
+            self._z_to_index[int(atomic_number)] = index
         self.available_heads = list(getattr(self.model, "heads", ["Default"]))
         if not self.available_heads:
             self.available_heads = ["Default"]
@@ -121,6 +147,7 @@ class MACEBatchCalculator(BatchCalculator):
             )
         else:
             self.head = head
+        self._head_index = self.available_heads.index(self.head)
         self.energy_units_to_eV = float(energy_units_to_eV)
         self.length_units_to_A = float(length_units_to_A)
 
@@ -142,7 +169,7 @@ class MACEBatchCalculator(BatchCalculator):
             raise ValueError(f"atomic numbers not supported by MACE model: {unsupported}")
         return super().create_state(
             systems,
-            build_neighbors=build_neighbors,
+            build_neighbors=build_neighbors and self.graph_mode == "cached",
         )
 
     def _build_batch(self, state: AseGraphBatch) -> Any:
@@ -203,11 +230,60 @@ class MACEBatchCalculator(BatchCalculator):
         profile_event(
             "native_graph",
             adapter="mace",
+            graph_mode="rebuild",
             systems=state.n_systems,
             atoms=state.n_atoms,
             edges=batch.edge_index.shape[1],
         )
         return batch
+
+    def _build_cached_input(self, state: AseGraphBatch) -> dict[str, torch.Tensor]:
+        """Project persistent common tensors into the native MACE input schema."""
+
+        graph = state.as_model_data()
+        with profile_phase(
+            "graph.mace_tensor_state",
+            device=state.device,
+            systems=state.n_systems,
+            atoms=state.n_atoms,
+            edges=graph.edge_index.shape[1],
+        ):
+            node_indices = self._z_to_index[state.z]
+            if bool((node_indices < 0).any()):
+                raise ValueError("state contains atomic numbers unsupported by MACE")
+            node_attrs = torch.nn.functional.one_hot(
+                node_indices, num_classes=len(self.z_table)
+            ).to(dtype=self.dtype)
+            unit_shifts = graph.shifts_int.to(dtype=self.dtype)
+            edge_systems = state.system_idx[graph.edge_index[0]]
+            shifts = torch.einsum(
+                "ei,eij->ej", unit_shifts, state.cells[edge_systems]
+            )
+            model_input = {
+                "positions": state.positions.detach().clone(),
+                "cell": state.cells.detach(),
+                "ptr": state.ptr,
+                "batch": state.system_idx,
+                "edge_index": graph.edge_index,
+                "unit_shifts": unit_shifts,
+                "shifts": shifts,
+                "node_attrs": node_attrs,
+                "head": torch.full(
+                    (state.n_systems,),
+                    self._head_index,
+                    device=state.device,
+                    dtype=torch.long,
+                ),
+            }
+        profile_event(
+            "native_graph",
+            adapter="mace",
+            graph_mode="cached",
+            systems=state.n_systems,
+            atoms=state.n_atoms,
+            edges=graph.edge_index.shape[1],
+        )
+        return model_input
 
     def calculate(
         self,
@@ -221,16 +297,33 @@ class MACEBatchCalculator(BatchCalculator):
         if state.device != self.device or state.dtype != self.dtype:
             raise ValueError("state device and dtype must match the MACE adapter")
 
-        batch = self._build_batch(state)
+        rebuilds_before = state.neighbor_rebuild_count
+        if self.graph_mode == "cached":
+            with profile_phase(
+                "calculator.neighbor_update",
+                device=state.device,
+                systems=state.n_systems,
+                atoms=state.n_atoms,
+            ):
+                if neighbor_policy == "always":
+                    state.rebuild_neighbor_list()
+                elif neighbor_policy == "auto":
+                    state.ensure_neighbor_list()
+            model_input = self._build_cached_input(state)
+            edge_count = model_input["edge_index"].shape[1]
+        else:
+            batch = self._build_batch(state)
+            model_input = batch.to_dict()
+            edge_count = batch.edge_index.shape[1]
         with profile_phase(
             "model.forward",
             device=state.device,
             systems=state.n_systems,
             atoms=state.n_atoms,
-            edges=batch.edge_index.shape[1],
+            edges=edge_count,
         ):
             output = self.model(
-                batch.to_dict(),
+                model_input,
                 compute_force=True,
                 compute_stress=compute_stress,
                 training=False,
@@ -246,10 +339,15 @@ class MACEBatchCalculator(BatchCalculator):
         profile_event(
             "model_evaluation",
             adapter="mace",
+            graph_mode=self.graph_mode,
             systems=state.n_systems,
             atoms=state.n_atoms,
-            edges=batch.edge_index.shape[1],
-            neighbor_rebuilds=1,
+            edges=edge_count,
+            neighbor_rebuilds=(
+                state.neighbor_rebuild_count - rebuilds_before
+                if self.graph_mode == "cached"
+                else 1
+            ),
             compute_stress=compute_stress,
         )
         return BatchEvaluation(

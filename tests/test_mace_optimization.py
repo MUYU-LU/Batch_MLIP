@@ -13,7 +13,13 @@ from ase.filters import FrechetCellFilter as ASEFrechetCellFilter
 from ase.io import read
 from ase.optimize import BFGS, FIRE
 
-from batch_mlip import FrechetCellFilter, MACEBatchCalculator, relax
+from batch_mlip import (
+    FrechetCellFilter,
+    MACEBatchCalculator,
+    batched_velocity_verlet,
+    initialize_maxwell_boltzmann,
+    relax,
+)
 
 RUN_MACE_TESTS = os.environ.get("BATCH_MLIP_RUN_MACE_TESTS") == "1"
 DEVICE = os.environ.get("BATCH_MLIP_MACE_DEVICE", "cuda:0")
@@ -54,6 +60,20 @@ def mace_calculator() -> MACEBatchCalculator:
         model="small",
         device=device,
         dtype=torch.float64,
+        graph_mode="cached",
+        skin=0.5,
+    )
+
+
+@pytest.fixture(scope="module")
+def mace_rebuild_calculator(
+    mace_calculator: MACEBatchCalculator,
+) -> MACEBatchCalculator:
+    return MACEBatchCalculator(
+        mace_calculator.model,
+        device=mace_calculator.device,
+        dtype=mace_calculator.dtype,
+        graph_mode="rebuild",
     )
 
 
@@ -144,6 +164,103 @@ def _assert_batch_matches_ase(reference, result) -> None:
         np.testing.assert_allclose(
             cells[system_id], expected["cell"], atol=2e-9, rtol=0.0
         )
+
+
+@pytest.mark.parametrize("batch_size", [1, 2])
+def test_mace_cached_tensor_state_matches_atomic_data(
+    mace_systems: list[Any],
+    mace_calculator: MACEBatchCalculator,
+    mace_rebuild_calculator: MACEBatchCalculator,
+    batch_size: int,
+) -> None:
+    systems = mace_systems[:batch_size]
+    cached_state = mace_calculator.create_state(systems)
+    cached = mace_calculator(cached_state, compute_stress=True)
+    rebuild_count = cached_state.neighbor_rebuild_count
+    cached_again = mace_calculator(cached_state, compute_stress=True)
+
+    rebuilt = mace_rebuild_calculator(
+        mace_rebuild_calculator.create_state(systems), compute_stress=True
+    )
+
+    assert cached_state.neighbor_rebuild_count == rebuild_count == 1
+    torch.testing.assert_close(cached.energy, rebuilt.energy, atol=2e-8, rtol=0.0)
+    torch.testing.assert_close(cached.forces, rebuilt.forces, atol=2e-8, rtol=0.0)
+    torch.testing.assert_close(cached.stress, rebuilt.stress, atol=2e-10, rtol=0.0)
+    torch.testing.assert_close(cached_again.energy, cached.energy)
+    torch.testing.assert_close(cached_again.forces, cached.forces)
+    torch.testing.assert_close(cached_again.stress, cached.stress)
+
+
+def test_mace_cached_b1_bfgs_matches_ase(
+    mace_systems: list[Any],
+    mace_calculator: MACEBatchCalculator,
+) -> None:
+    systems = mace_systems[:1]
+    reference = _run_ase(systems, mace_calculator, "bfgs")
+    result = relax(
+        systems,
+        mace_calculator,
+        optimizer="bfgs",
+        cell_filter=FrechetCellFilter(),
+        **_optimizer_options("bfgs"),
+    )
+    _assert_batch_matches_ase(reference, result)
+
+
+def test_mace_cached_nve_matches_rebuilt_energy_drift(
+    mace_systems: list[Any],
+    mace_calculator: MACEBatchCalculator,
+    mace_rebuild_calculator: MACEBatchCalculator,
+) -> None:
+    systems = mace_systems[:2]
+    cached_state = mace_calculator.create_state(systems)
+    rebuilt_state = mace_rebuild_calculator.create_state(systems)
+    initialize_maxwell_boltzmann(
+        cached_state,
+        300.0,
+        seed=17,
+        remove_com=True,
+        force_exact_temperature=True,
+    )
+    rebuilt_state.velocities = cached_state.velocities.clone()
+    cached_energy = []
+    rebuilt_energy = []
+
+    def record_cached(step, state, evaluation, diagnostics):
+        cached_energy.append(diagnostics["total_energy"].clone())
+
+    def record_rebuilt(step, state, evaluation, diagnostics):
+        rebuilt_energy.append(diagnostics["total_energy"].clone())
+
+    cached = batched_velocity_verlet(
+        cached_state,
+        mace_calculator,
+        timestep_fs=0.1,
+        n_steps=4,
+        callback=record_cached,
+    )
+    rebuilt = batched_velocity_verlet(
+        rebuilt_state,
+        mace_rebuild_calculator,
+        timestep_fs=0.1,
+        n_steps=4,
+        callback=record_rebuilt,
+    )
+
+    cached_energy = torch.stack(cached_energy)
+    rebuilt_energy = torch.stack(rebuilt_energy)
+    cached_drift = cached_energy - cached_energy[0]
+    rebuilt_drift = rebuilt_energy - rebuilt_energy[0]
+    assert bool(torch.isfinite(cached_drift).all())
+    assert float(cached_drift.abs().max()) < 1e-3
+    torch.testing.assert_close(cached_drift, rebuilt_drift, atol=2e-9, rtol=0.0)
+    torch.testing.assert_close(
+        cached.state.positions, rebuilt.state.positions, atol=2e-10, rtol=0.0
+    )
+    torch.testing.assert_close(
+        cached.state.velocities, rebuilt.state.velocities, atol=2e-11, rtol=0.0
+    )
 
 
 @pytest.mark.parametrize("optimizer_name", ["fire", "bfgs"])

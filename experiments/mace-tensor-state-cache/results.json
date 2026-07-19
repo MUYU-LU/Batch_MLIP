@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "status": "complete",
+  "baseline_commit": "df4475561468b26f48ea7bec5d2517d141c84959",
+  "model": "MACE-OFF-Small",
+  "workload_size": 256,
+  "resident_batch_size": 64,
+  "repeats": 1,
+  "points": [
+    {
+      "atom_count": 46,
+      "graph_mode": "rebuild",
+      "skin_A": 0.0,
+      "wall_seconds": 131.43933904217556,
+      "systems_per_second": 1.9476665195178444,
+      "peak_memory_bytes": 4621302272,
+      "model_evaluations": 725,
+      "graph_evaluations": 33860,
+      "graph_preparation_seconds": 32.9872137603462,
+      "model_forward_seconds": 25.956524515151987
+    },
+    {
+      "atom_count": 46,
+      "graph_mode": "cached",
+      "skin_A": 0.5,
+      "wall_seconds": 127.10896178102121,
+      "systems_per_second": 2.014020069183066,
+      "peak_memory_bytes": 4628400640,
+      "model_evaluations": 725,
+      "graph_evaluations": 33860,
+      "neighbor_rebuild_calls": 584,
+      "rebuilt_systems": 2900,
+      "neighbor_update_seconds": 27.75435042148826,
+      "tensor_projection_seconds": 0.23455907189846054,
+      "model_forward_seconds": 25.702746334075925,
+      "time_reduction_percent": 3.2945823470436397,
+      "throughput_increase_percent": 3.4068229340229905
+    },
+    {
+      "atom_count": 276,
+      "graph_mode": "rebuild",
+      "skin_A": 0.0,
+      "wall_seconds": 320.55495560495183,
+      "systems_per_second": 0.7986150128825068,
+      "peak_memory_bytes": 27443382784,
+      "model_evaluations": 494,
+      "graph_evaluations": 21803,
+      "graph_preparation_seconds": 54.93407693505287,
+      "model_forward_seconds": 70.77202706718445
+    },
+    {
+      "atom_count": 276,
+      "graph_mode": "cached",
+      "skin_A": 0.5,
+      "wall_seconds": 289.45434194616973,
+      "systems_per_second": 0.8844227323686467,
+      "peak_memory_bytes": 27487059456,
+      "model_evaluations": 494,
+      "graph_evaluations": 22243,
+      "neighbor_rebuild_calls": 402,
+      "rebuilt_systems": 1521,
+      "neighbor_update_seconds": 21.08438242709636,
+      "tensor_projection_seconds": 0.22130921649932864,
+      "model_forward_seconds": 71.39387491035461,
+      "time_reduction_percent": 9.702116006938333,
+      "throughput_increase_percent": 10.74456629314129
+    }
+  ],
+  "correctness": {
+    "b1_b2_atomic_data_tolerances_passed": true,
+    "b1_bfgs_ase_tolerances_passed": true,
+    "five_point_nve_drift_comparison_passed": true,
+    "production_convergence_flags_match": true,
+    "production_all_converged": true,
+    "atom46_step_mismatches": 0,
+    "atom46_max_position_difference_A": 1.0524247120669017e-05,
+    "atom276_step_mismatches": 83,
+    "atom276_median_position_difference_A": 0.00031635502196891707,
+    "atom276_max_position_difference_A": 1.9532784362058617,
+    "atom276_median_energy_difference_eV": 2.158895949833095e-05,
+    "atom276_max_energy_difference_eV": 2.7138139909657184
+  },
+  "rejected_prototype": {
+    "description": "Passed cutoff+skin candidate edges directly to MACE",
+    "reason": "Changed floating-point reductions unnecessarily and increased cached edge memory; physical-cutoff filtering is required."
+  },
+  "decision": {
+    "cached_mode_retained": true,
+    "cached_mode_automatic_default": false,
+    "recommended_cached_case": "large repeated variable-cell workloads",
+    "compatibility_default": "rebuild"
+  }
+}
