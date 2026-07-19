@@ -376,6 +376,46 @@ def test_structure_api_does_not_build_neighbors_for_pending_refill_jobs(
     assert rebuilt_sizes == [1, 1, 1]
 
 
+def test_refill_preserves_survivor_neighbor_cache(monkeypatch):
+    systems = [
+        Atoms("H", positions=[[0.0, 0.0, 0.0]]),
+        Atoms("H", positions=[[0.5, 0.0, 0.0]]),
+        Atoms("H", positions=[[0.6, 0.0, 0.0]]),
+    ]
+    calculator = AtomBitBatchCalculator(
+        QuadraticWellModel(k=1.0),
+        cutoff=2.5,
+        skin=0.4,
+        device="cpu",
+        dtype=torch.float64,
+    )
+    rebuilds = []
+    original = type(calculator.create_state(systems)).rebuild_neighbor_list
+
+    def record_rebuild(state, system_ids=None):
+        rebuilds.append(
+            list(range(state.n_systems))
+            if system_ids is None
+            else list(system_ids)
+        )
+        return original(state, system_ids)
+
+    monkeypatch.setattr(
+        "batch_mlip.core.state.AseGraphBatch.rebuild_neighbor_list",
+        record_rebuild,
+    )
+    relax(
+        systems,
+        calculator,
+        optimizer="bfgs",
+        refill_batch_size=2,
+        fmax=0.05,
+        max_steps=1,
+    )
+
+    assert rebuilds[:2] == [[0, 1], [1]]
+
+
 @pytest.mark.parametrize(
     "kwargs,error",
     [

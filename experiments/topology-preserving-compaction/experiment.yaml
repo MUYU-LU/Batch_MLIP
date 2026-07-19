@@ -1,0 +1,32 @@
+id: topology-preserving-compaction
+date: 2026-07-19
+hypothesis: >-
+  Retaining survivor candidate graphs across active refill compaction reduces
+  variable-cell neighbor construction enough to improve BFGS throughput.
+model: AtomBit
+optimizer: BFGS
+workload_size: 256
+atom_count: 276
+resident_batch_size: 64
+repeats: 1
+model_dtype: float32
+optimizer_dtype: float64
+cell_filter: FrechetCellFilter
+skin_A: 0.5
+policies: [immediate, threshold]
+threshold:
+  low_watermark: 0.8
+  min_chunk: 8
+correctness:
+  all_converged: true
+  convergence_flags_match: true
+  step_counts_match: true
+  final_positions_match_exactly: true
+  final_cells_match_exactly: true
+result:
+  immediate_time_reduction_percent: 16.20194526090896
+  immediate_throughput_increase_percent: 19.33878102114197
+  threshold_time_reduction_percent: 16.222627254018534
+  threshold_throughput_increase_percent: 19.36817983769807
+  selected_policy: immediate
+  retained: true

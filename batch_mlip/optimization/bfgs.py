@@ -909,9 +909,20 @@ def _batched_bfgs_refill_relax(
                 next_pending = refill_stop
                 active_system_ids = torch.cat((survivor_ids, refill_ids))
                 active_atom_ids = _global_atom_ids(state, active_system_ids)
-                active_state = state.select_systems(
-                    active_system_ids.tolist(), rebuild_neighbors=False
-                )
+                state_parts = []
+                if remaining_list:
+                    state_parts.append(
+                        active_state.select_systems(
+                            remaining_list, rebuild_neighbors=False
+                        )
+                    )
+                if refill_ids.numel():
+                    state_parts.append(
+                        state.select_systems(
+                            refill_ids.tolist(), rebuild_neighbors=False
+                        )
+                    )
+                active_state = AseGraphBatch.concatenate(state_parts)
                 active_filter = (
                     None
                     if full_filter is None

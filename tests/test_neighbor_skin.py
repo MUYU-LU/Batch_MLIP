@@ -218,3 +218,72 @@ def test_heterogeneous_cache_rebuilds_only_invalid_system():
         state.edge_index[:, state.system_idx[state.edge_index[0]] == 1],
         second_edges,
     )
+
+
+def test_select_systems_preserves_and_remaps_neighbor_cache():
+    systems = [
+        Atoms("H2", positions=[[0.0, 0.0, 0.0], [1.0, 0.0, 0.0]]),
+        Atoms(
+            "H3",
+            positions=[[0.0, 0.0, 0.0], [0.8, 0.0, 0.0], [0.0, 0.9, 0.0]],
+        ),
+    ]
+    state = AseGraphBatch.from_ase(
+        systems,
+        cutoff=2.0,
+        skin=0.4,
+        device="cpu",
+        dtype=torch.float64,
+    )
+
+    selected = state.select_systems([1, 0], rebuild_neighbors=False)
+
+    assert selected.counts.tolist() == [3, 2]
+    assert selected.neighbor_list_invalid_systems().tolist() == [False, False]
+    assert selected.edge_index.shape[1] == state.edge_index.shape[1]
+    assert not selected.ensure_neighbor_list()
+    selected.assert_graph_integrity()
+
+
+def test_concatenate_rebuilds_only_cache_cold_appended_system():
+    survivor = AseGraphBatch.from_ase(
+        [Atoms("H2", positions=[[0.0, 0.0, 0.0], [1.0, 0.0, 0.0]])],
+        cutoff=2.0,
+        skin=0.4,
+        device="cpu",
+        dtype=torch.float64,
+    )
+    pending = AseGraphBatch.from_ase(
+        [
+            Atoms(
+                "H3",
+                positions=[
+                    [0.0, 0.0, 0.0],
+                    [0.8, 0.0, 0.0],
+                    [0.0, 0.9, 0.0],
+                ],
+            )
+        ],
+        cutoff=2.0,
+        skin=0.4,
+        device="cpu",
+        dtype=torch.float64,
+        build_neighbors=False,
+    )
+    survivor_edges = survivor.edge_index.clone()
+    survivor_reference = survivor._neighbor_reference_positions.clone()
+
+    packed = AseGraphBatch.concatenate([survivor, pending])
+
+    assert packed.neighbor_list_invalid_systems().tolist() == [False, True]
+    assert packed.ensure_neighbor_list()
+    assert packed.neighbor_rebuild_count == 1
+    assert packed.neighbor_list_invalid_systems().tolist() == [False, False]
+    torch.testing.assert_close(
+        packed.edge_index[:, packed.system_idx[packed.edge_index[0]] == 0],
+        survivor_edges,
+    )
+    torch.testing.assert_close(
+        packed._neighbor_reference_positions[packed.atom_slice(0)],
+        survivor_reference,
+    )

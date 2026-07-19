@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "status": "complete",
+  "workload_size": 256,
+  "atom_count": 276,
+  "resident_batch_size": 64,
+  "points": [
+    {
+      "implementation": "rebuild-resident-baseline",
+      "policy": "immediate",
+      "wall_seconds": 334.48539518378675,
+      "systems_per_second": 0.765355850422354,
+      "model_evaluations": 514,
+      "graph_evaluations": 20134,
+      "neighbor_rebuild_calls": 217,
+      "rebuilt_systems": 9350,
+      "neighbor_search_seconds": 70.13066567754748,
+      "refill_repack_seconds": 1.890363550186158
+    },
+    {
+      "implementation": "topology-preserving",
+      "policy": "immediate",
+      "wall_seconds": 280.2822287287563,
+      "systems_per_second": 0.9133650790530302,
+      "peak_memory_bytes": 27349307392,
+      "model_evaluations": 514,
+      "graph_evaluations": 20134,
+      "neighbor_rebuild_calls": 368,
+      "rebuilt_systems": 1430,
+      "neighbor_search_seconds": 10.502645993471157,
+      "refill_repack_seconds": 3.4385809590816505,
+      "time_reduction_percent": 16.20194526090896,
+      "throughput_increase_percent": 19.33878102114197
+    },
+    {
+      "implementation": "rebuild-resident-baseline",
+      "policy": "threshold",
+      "wall_seconds": 341.15523942606524,
+      "systems_per_second": 0.7503916516694825,
+      "model_evaluations": 553,
+      "graph_evaluations": 20339,
+      "neighbor_rebuild_calls": 238,
+      "rebuilt_systems": 8914,
+      "neighbor_search_seconds": 68.90529369163512,
+      "refill_repack_seconds": 1.944848894119263
+    },
+    {
+      "implementation": "topology-preserving",
+      "policy": "threshold",
+      "wall_seconds": 285.8008222039789,
+      "systems_per_second": 0.8957287037379138,
+      "peak_memory_bytes": 27095781888,
+      "model_evaluations": 553,
+      "graph_evaluations": 20339,
+      "neighbor_rebuild_calls": 400,
+      "rebuilt_systems": 1451,
+      "neighbor_search_seconds": 10.716831531524656,
+      "refill_repack_seconds": 3.3434464523792244,
+      "time_reduction_percent": 16.222627254018534,
+      "throughput_increase_percent": 19.36817983769807
+    }
+  ],
+  "correctness": {
+    "all_converged": true,
+    "convergence_flags_match": true,
+    "step_mismatches": 0,
+    "max_position_difference_A": 0.0,
+    "max_cell_difference_A": 0.0,
+    "max_energy_difference_eV": 0.0
+  },
+  "decision": {
+    "topology_preserving_compaction_retained": true,
+    "selected_refill_policy": "immediate",
+    "mace_retested": false,
+    "mace_reason": "The native MACE adapter reconstructs AtomicData graphs and does not consume the generic cached topology."
+  }
+}
