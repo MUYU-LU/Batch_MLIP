@@ -89,6 +89,9 @@ The fictitious velocity is atomic: `velocity[N,3]`. The atom-to-graph map
 broadcasts per-system parameters to atoms. Masked optimization freezes
 converged graphs, active compaction removes them from the inference batch, and
 active refill can insert pending systems up to a bounded resident capacity.
+The optional `planning` layer profiles atoms, directed edges, and optimizer
+state, then emits memory-safe queues and resident capacities. It does not enter
+the calculator or optimizer contracts and does not execute work automatically.
 
 ## Runtime profiling
 

@@ -1,0 +1,31 @@
+id: memory-aware-planning-stage3
+date: 2026-07-19
+hypothesis: >-
+  Atom-, edge-, and Hessian-aware bucketing can select memory-safe heterogeneous
+  BFGS capacities and improve throughput over a fixed resident count.
+calibration:
+  fit_batch_size: 64
+  validation_batch_size: 128
+  atom_counts: [46, 92, 184, 276]
+workload:
+  systems: 256
+  atoms_46: 128
+  atoms_276: 128
+  ordering: interleaved
+planner:
+  memory_budget_GiB: 32
+  max_batch_size: 128
+  max_cost_ratio: 2.0
+  variable_cell: true
+  optimizer_dtype: float64
+result:
+  atombit_max_memory_validation_error_percent: 1.3043824299211467
+  mace_max_memory_validation_error_percent: 0.3616940560770354
+  atombit_speedup_percent: 4.818815563712109
+  mace_speedup_percent: 3.989184796798928
+  all_converged: true
+  memory_budget_respected: true
+  throughput_gate_percent: 5.0
+  throughput_gate_passed: false
+  automatic_planning_selected: false
+  extended_matrix_run: false

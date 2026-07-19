@@ -26,6 +26,10 @@
   policies with profiler-visible insertion decisions.
 - Benchmark refill policies on AtomBit and MACE; threshold fails the 5% gate,
   so immediate refill remains the default and selected production policy.
+- Add a generic atom/edge/Hessian-aware `BatchPlanner`, non-negative memory
+  calibration, heterogeneous bucketing, and original-order queue metadata.
+- Validate held-out B128 memory prediction and a 32 GiB mixed workload; memory
+  safety passes, while 4.82%/3.99% speedups remain below the automatic-use gate.
 - Fix active-refill state aliasing when resident capacity equals pool size.
 - Add an opt-in MACE-OFF-Small variable-cell optimization test covering common
   ASE, masked batching, and active batching with both FIRE and BFGS.

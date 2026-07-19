@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "status": "complete",
+  "memory_budget_bytes": 34359738368,
+  "throughput_gate_percent": 5.0,
+  "calibration": {
+    "fit_batch_size": 64,
+    "validation_batch_size": 128,
+    "atombit_max_abs_validation_error": 0.013043824299211467,
+    "mace_max_abs_validation_error": 0.003616940560770354
+  },
+  "points": [
+    {
+      "model": "AtomBit",
+      "policy": "fixed64",
+      "wall_seconds": 225.58006307296455,
+      "systems_per_second": 1.1348520632215446,
+      "peak_memory_bytes": 14904163840,
+      "model_evaluations": 600,
+      "optimizer_steps_total": 24981
+    },
+    {
+      "model": "AtomBit",
+      "policy": "planned",
+      "wall_seconds": 215.20951353991404,
+      "systems_per_second": 1.1895384910691724,
+      "peak_memory_bytes": 27935297024,
+      "model_evaluations": 507,
+      "optimizer_steps_total": 24989,
+      "buckets": [
+        {"atom_count": 276, "systems": 128, "resident_capacity": 69},
+        {"atom_count": 46, "systems": 128, "resident_capacity": 128}
+      ],
+      "predicted_peak_bytes": 34346039356,
+      "speedup_percent": 4.818815563712109
+    },
+    {
+      "model": "MACE-OFF-Small",
+      "policy": "fixed64",
+      "wall_seconds": 234.30181467486545,
+      "systems_per_second": 1.0926078415365437,
+      "peak_memory_bytes": 15883180032,
+      "model_evaluations": 609,
+      "optimizer_steps_total": 29793
+    },
+    {
+      "model": "MACE-OFF-Small",
+      "policy": "planned",
+      "wall_seconds": 225.31363731017336,
+      "systems_per_second": 1.1361939874397522,
+      "peak_memory_bytes": 33540425728,
+      "model_evaluations": 541,
+      "optimizer_steps_total": 29472,
+      "buckets": [
+        {"atom_count": 276, "systems": 128, "resident_capacity": 79},
+        {"atom_count": 46, "systems": 128, "resident_capacity": 128}
+      ],
+      "predicted_peak_bytes": 34011324214,
+      "speedup_percent": 3.989184796798928
+    }
+  ],
+  "decision": {
+    "all_converged": true,
+    "memory_budget_respected": true,
+    "throughput_gate_passed": false,
+    "automatic_planning_selected": false,
+    "extended_matrix_run": false
+  }
+}

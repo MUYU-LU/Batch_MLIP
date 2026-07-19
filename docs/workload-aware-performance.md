@@ -43,6 +43,9 @@ The existing BFGS experiments establish the following baseline:
 - Low-water chunk refill reduces triggered insertions from 123 to 15 for the
   AtomBit 276/B64 workload, but is 2.0% slower than immediate refill. For MACE
   46/B64 it is only 0.8% faster. Immediate remains the selected policy.
+- The atom/edge/Hessian memory model predicts held-out B128 peaks within 1.30%
+  for AtomBit and 0.36% for MACE. Mixed-workload bucketing is memory-safe but
+  improves throughput by only 4.82% and 3.99%, below the 5% gate.
 
 The phase percentages are estimates from isolated graph timings multiplied by
 logged graph-evaluation counts. The next benchmark must add direct phase timing
@@ -257,6 +260,13 @@ counts, and the mixed case tests memory-aware packing. Compare with the best
 existing fixed B64/B128 policy where it applies. Require no OOM, bounded
 prediction error, unchanged numerical gates, and at least a 5% throughput gain
 in one regime without a material regression in the others.
+
+**Result:** memory prediction and safety pass, but automatic execution does not
+pass the throughput gate. A 32 GiB mixed-workload plan selects B128 for 46-atom
+systems and B69/B79 for 276-atom AtomBit/MACE systems. All runs converge and
+stay within budget. Speedups versus fixed B64 are 4.82% and 3.99%, so the
+conditional endpoint matrix is stopped. Keep `BatchPlanner` as an explicit
+OOM-prevention and inspection interface rather than applying it automatically.
 
 ### Stage 4: multi-GPU sharding
 

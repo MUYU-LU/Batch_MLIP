@@ -29,6 +29,7 @@ atombit_batch/          Thin compatibility namespace for the former package name
   models/               MLIP adapter, loaders, reference models
   interfaces/           Python API, CLI/configuration, reporting
   profiling/            Opt-in phase timing and runtime event collection
+  planning/             Memory calibration and heterogeneous workload bucketing
 src/                    Uploaded AtomBit code in checkpoint-compatible namespace
 original_uploads/       Immutable source snapshots
 configs/                Runnable YAML configurations
@@ -381,6 +382,30 @@ enter the resident batch.
 Immediate is the measured default. Threshold refill also accepts
 `refill_low_watermark` and `refill_min_chunk`, but it is workload-dependent and
 did not beat immediate refill by the project performance gate.
+
+For heterogeneous workloads, `BatchPlanner` provides calibrated memory-safe
+queues without coupling planning to a particular MLIP or optimizer:
+
+```python
+from batch_mlip import BatchPlanner
+
+planner = BatchPlanner(
+    coefficients,
+    memory_budget_bytes=32 * 1024**3,
+    max_batch_size=128,
+    max_cost_ratio=2.0,
+)
+plan = planner.plan(
+    structures,
+    cutoff=calculator.cutoff,
+    skin=calculator.skin,
+)
+```
+
+Each planned bucket reports original system indices, a resident capacity, and a
+predicted peak. Calibration uses `fit_memory_coefficients` with measured batch
+peaks. Planning is an explicit safety tool; it is not automatically applied by
+`relax` because workload-dependent speedups did not pass the project 5% gate.
 
 The BFGS Hessian costs `O(D^2)` memory and its eigensolve costs `O(D^3)` for
 `D = 3N` fixed-cell or `D = 3N + 9` variable-cell degrees of freedom. It is a
