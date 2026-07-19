@@ -65,7 +65,14 @@ r_ji = r_center - r_neighbor - S_ij @ cell_graph
 
 ## Neighbour skin
 
-A neighbour list built at `cutoff + skin` remains valid until an atom has moved more than `skin/2` from the rebuild reference. Internally unwrapped coordinates are retained during MD, avoiding false rebuild triggers at periodic boundaries. Optional output wrapping does not alter the model state unless `wrap_interval` is requested.
+A neighbour list built at `cutoff + skin` stores candidate topology. Current
+distances are filtered at the exact physical cutoff on GPU before model
+evaluation, so skin-only edges do not enter message passing. Fixed cells use
+the standard `skin/2` displacement criterion. Fully periodic changing cells
+use a conservative bound combining non-affine atomic motion and inverse cell
+deformation. Invalidity and rebuilding are per structure. Internally unwrapped
+coordinates are retained during MD, avoiding false rebuild triggers at
+periodic boundaries.
 
 ## Per-system optimizer state
 

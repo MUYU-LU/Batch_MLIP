@@ -166,38 +166,126 @@ class AseGraphBatch:
         stop = int(self.ptr[system + 1].item())
         return slice(start, stop)
 
-    def neighbor_list_needs_rebuild(self) -> bool:
-        if self._neighbor_reference_positions is None or self._neighbor_reference_cells is None:
-            return True
-        if self.skin <= 0.0:
-            return True
-        if not torch.equal(self.cells, self._neighbor_reference_cells):
-            return True
-        displacement = torch.linalg.vector_norm(
-            self.positions - self._neighbor_reference_positions, dim=-1
+    def neighbor_list_invalid_systems(self) -> torch.Tensor:
+        """Return structures whose cached candidate topology is no longer safe.
+
+        For a fully periodic changing cell, reference fractional coordinates
+        separate affine cell motion from non-affine atomic motion. The inverse
+        deformation norm then bounds every possible periodic pair, including a
+        pair that was outside the cached candidate list at the reference state.
+        """
+
+        invalid = torch.ones(
+            self.n_systems, device=self.device, dtype=torch.bool
         )
-        return bool((displacement.max() > 0.5 * self.skin).item())
+        if (
+            self._neighbor_reference_positions is None
+            or self._neighbor_reference_cells is None
+            or self.skin <= 0.0
+        ):
+            return invalid
+
+        for system_id in range(self.n_systems):
+            atom_slice = self.atom_slice(system_id)
+            positions = self.positions[atom_slice]
+            reference_positions = self._neighbor_reference_positions[atom_slice]
+            cell = self.cells[system_id]
+            reference_cell = self._neighbor_reference_cells[system_id]
+            periodic = self.pbc[system_id]
+
+            if not bool(periodic.any()):
+                displacement = torch.linalg.vector_norm(
+                    positions - reference_positions, dim=-1
+                ).max()
+                invalid[system_id] = displacement > 0.5 * self.skin
+                continue
+
+            if not bool(periodic.all()):
+                if not torch.equal(cell, reference_cell):
+                    continue
+                displacement = torch.linalg.vector_norm(
+                    positions - reference_positions, dim=-1
+                ).max()
+                invalid[system_id] = displacement > 0.5 * self.skin
+                continue
+
+            try:
+                reference_fractional = torch.linalg.solve(
+                    reference_cell.transpose(0, 1),
+                    reference_positions.transpose(0, 1),
+                ).transpose(0, 1)
+                affine_positions = reference_fractional @ cell
+                non_affine = torch.linalg.vector_norm(
+                    positions - affine_positions, dim=-1
+                ).max()
+                inverse_deformation = torch.linalg.solve(cell, reference_cell)
+                inverse_stretch = torch.linalg.svdvals(inverse_deformation).max()
+            except RuntimeError:
+                continue
+
+            reference_distance_bound = (
+                self.cutoff + 2.0 * non_affine
+            ) * inverse_stretch
+            invalid[system_id] = reference_distance_bound > (
+                self.cutoff + self.skin
+            )
+        return invalid
+
+    def neighbor_list_needs_rebuild(self) -> bool:
+        return bool(self.neighbor_list_invalid_systems().any().item())
 
     def ensure_neighbor_list(self) -> bool:
         """Rebuild only when required; return whether a rebuild occurred."""
 
-        if self.neighbor_list_needs_rebuild():
-            self.rebuild_neighbor_list()
+        invalid = self.neighbor_list_invalid_systems()
+        system_ids = torch.nonzero(invalid, as_tuple=False).flatten().tolist()
+        if system_ids:
+            self.rebuild_neighbor_list(system_ids)
             return True
         return False
 
-    def rebuild_neighbor_list(self) -> None:
-        """Build directed neighbour lists independently, then concatenate."""
+    def rebuild_neighbor_list(
+        self, system_ids: Sequence[int] | None = None
+    ) -> None:
+        """Rebuild selected candidate lists and retain clean graph topology."""
+
+        ids = (
+            list(range(self.n_systems))
+            if system_ids is None
+            else [int(value) for value in system_ids]
+        )
+        if len(set(ids)) != len(ids):
+            raise ValueError("neighbor rebuild system_ids must be unique")
+        if any(value < 0 or value >= self.n_systems for value in ids):
+            raise IndexError("neighbor rebuild system id outside the batch")
+        if not ids:
+            return
+        if (
+            self._neighbor_reference_positions is None
+            or self._neighbor_reference_cells is None
+        ):
+            ids = list(range(self.n_systems))
+        rebuild_set = set(ids)
 
         with profile_phase(
             "graph.geometry_to_host",
             device=self.device,
-            systems=self.n_systems,
-            atoms=self.n_atoms,
+            systems=len(ids),
+            atoms=sum(
+                self.atom_slice(value).stop - self.atom_slice(value).start
+                for value in ids
+            ),
         ):
             pos_cpu = self.positions.detach().cpu().numpy()
             cell_cpu = self.cells.detach().cpu().numpy()
             pbc_cpu = self.pbc.detach().cpu().numpy()
+            old_edges = self.edge_index.detach().cpu().numpy()
+            old_shifts = self.shifts_int.detach().cpu().numpy()
+            old_edge_owners = (
+                self.system_idx[self.edge_index[0]].detach().cpu().numpy()
+                if self.edge_index.shape[1] > 0
+                else np.empty(0, dtype=np.int64)
+            )
 
         edge_blocks: list[np.ndarray] = []
         shift_blocks: list[np.ndarray] = []
@@ -205,11 +293,19 @@ class AseGraphBatch:
         with profile_phase(
             "graph.neighbor_search",
             device=self.device,
-            systems=self.n_systems,
-            atoms=self.n_atoms,
+            systems=len(ids),
+            atoms=sum(
+                self.atom_slice(value).stop - self.atom_slice(value).start
+                for value in ids
+            ),
         ):
             for graph_idx, template in enumerate(self.templates):
                 atom_slice = self.atom_slice(graph_idx)
+                if graph_idx not in rebuild_set:
+                    edge_mask = old_edge_owners == graph_idx
+                    edge_blocks.append(old_edges[:, edge_mask])
+                    shift_blocks.append(old_shifts[edge_mask])
+                    continue
                 atoms = template.copy()
                 atoms.positions[:] = pos_cpu[atom_slice]
                 atoms.set_cell(cell_cpu[graph_idx], scale_atoms=False)
@@ -218,12 +314,19 @@ class AseGraphBatch:
                 i_idx, j_idx, shifts = neighbor_list(
                     "ijS", atoms, self.cutoff + self.skin
                 )
+                shifts = np.asarray(shifts, dtype=np.int64)
+                order = np.lexsort(
+                    (shifts[:, 2], shifts[:, 1], shifts[:, 0], j_idx, i_idx)
+                )
+                i_idx = i_idx[order]
+                j_idx = j_idx[order]
+                shifts = shifts[order]
                 edge_block = np.stack((i_idx, j_idx), axis=0).astype(
                     np.int64, copy=False
                 )
                 edge_block += atom_slice.start
                 edge_blocks.append(edge_block)
-                shift_blocks.append(np.asarray(shifts, dtype=np.int64))
+                shift_blocks.append(shifts)
 
         edge_np = (
             np.concatenate(edge_blocks, axis=1)
@@ -249,13 +352,27 @@ class AseGraphBatch:
             self.shifts_int = torch.as_tensor(
                 shifts_np, device=self.device, dtype=torch.long
             )
-            self._neighbor_reference_positions = self.positions.detach().clone()
-            self._neighbor_reference_cells = self.cells.detach().clone()
+            if len(ids) == self.n_systems:
+                self._neighbor_reference_positions = self.positions.detach().clone()
+                self._neighbor_reference_cells = self.cells.detach().clone()
+            else:
+                if (
+                    self._neighbor_reference_positions is None
+                    or self._neighbor_reference_cells is None
+                ):
+                    raise RuntimeError("partial neighbor rebuild references are missing")
+                for system_id in ids:
+                    atom_slice = self.atom_slice(system_id)
+                    self._neighbor_reference_positions[atom_slice] = self.positions[
+                        atom_slice
+                    ]
+                    self._neighbor_reference_cells[system_id] = self.cells[system_id]
             self.neighbor_rebuild_count += 1
             self.assert_graph_integrity()
         profile_event(
             "neighbor_rebuild",
-            systems=self.n_systems,
+            resident_systems=self.n_systems,
+            rebuilt_systems=len(ids),
             atoms=self.n_atoms,
             edges=edge_np.shape[1],
             rebuild_count=self.neighbor_rebuild_count,
@@ -285,12 +402,28 @@ class AseGraphBatch:
         positions: torch.Tensor | None = None,
         cells: torch.Tensor | None = None,
     ) -> GraphData:
+        edge_index = self.edge_index
+        shifts_int = self.shifts_int
+        if self.skin > 0.0 and edge_index.shape[1] > 0:
+            center, neighbor = edge_index
+            edge_cells = self.cells[self.system_idx[center]]
+            cartesian_shifts = torch.bmm(
+                shifts_int.unsqueeze(1).to(self.dtype), edge_cells
+            ).squeeze(1)
+            vectors = (
+                self.positions[center]
+                - self.positions[neighbor]
+                - cartesian_shifts
+            )
+            physical = torch.linalg.vector_norm(vectors, dim=-1) < self.cutoff
+            edge_index = edge_index[:, physical]
+            shifts_int = shifts_int[physical]
         return GraphData(
             z=self.z,
             pos=self.positions if positions is None else positions,
             cell=self.cells if cells is None else cells,
-            edge_index=self.edge_index,
-            shifts_int=self.shifts_int,
+            edge_index=edge_index,
+            shifts_int=shifts_int,
             batch=self.system_idx,
             num_graphs=self.n_systems,
         )

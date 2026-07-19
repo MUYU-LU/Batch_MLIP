@@ -318,9 +318,9 @@ def test_structure_api_does_not_build_neighbors_for_pending_refill_jobs(
     rebuilt_sizes = []
     original = type(_quadratic_potential().create_state(systems)).rebuild_neighbor_list
 
-    def record_rebuild(state):
+    def record_rebuild(state, system_ids=None):
         rebuilt_sizes.append(state.n_systems)
-        return original(state)
+        return original(state, system_ids)
 
     monkeypatch.setattr(
         "batch_mlip.core.state.AseGraphBatch.rebuild_neighbor_list",

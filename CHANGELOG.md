@@ -16,6 +16,8 @@
 
 - Add opt-in deferred-CUDA runtime phase profiling for graph construction,
   model evaluation, BFGS updates, compaction, refill, and occupancy events.
+- Add generic per-structure variable-cell neighbor caching, exact-cutoff GPU
+  edge filtering, and canonical neighbor ordering.
 - Fix active-refill state aliasing when resident capacity equals pool size.
 - Add an opt-in MACE-OFF-Small variable-cell optimization test covering common
   ASE, masked batching, and active batching with both FIRE and BFGS.

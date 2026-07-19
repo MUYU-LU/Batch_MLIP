@@ -261,8 +261,6 @@ class BoundFrechetCellFilter:
             .to(dtype=state.dtype)
             .detach()
         )
-        state._neighbor_reference_positions = None
-        state._neighbor_reference_cells = None
 
 
 # Public compatibility alias retained for the pre-0.2 API.

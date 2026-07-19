@@ -135,7 +135,7 @@ class AtomBitBatchCalculator(BatchCalculator):
             device=state.device,
             systems=state.n_systems,
             atoms=state.n_atoms,
-            edges=state.edge_index.shape[1],
+            candidate_edges=state.edge_index.shape[1],
         ):
             data = state.as_model_data(positions=model_positions, cells=model_cells)
         no_grad_ok = self.force_mode == "direct" and not compute_stress
@@ -145,7 +145,7 @@ class AtomBitBatchCalculator(BatchCalculator):
             device=state.device,
             systems=state.n_systems,
             atoms=state.n_atoms,
-            edges=state.edge_index.shape[1],
+            edges=data.edge_index.shape[1],
         ):
             with context:
                 raw = self.model(data, **self.model_call_kwargs)
@@ -190,7 +190,7 @@ class AtomBitBatchCalculator(BatchCalculator):
                 device=state.device,
                 systems=state.n_systems,
                 atoms=state.n_atoms,
-                edges=state.edge_index.shape[1],
+                edges=data.edge_index.shape[1],
             ):
                 gradients = torch.autograd.grad(
                     model_energy.sum(),
@@ -229,7 +229,8 @@ class AtomBitBatchCalculator(BatchCalculator):
             adapter="atombit",
             systems=state.n_systems,
             atoms=state.n_atoms,
-            edges=state.edge_index.shape[1],
+            edges=data.edge_index.shape[1],
+            candidate_edges=state.edge_index.shape[1],
             neighbor_rebuilds=rebuilt,
             compute_stress=compute_stress,
         )

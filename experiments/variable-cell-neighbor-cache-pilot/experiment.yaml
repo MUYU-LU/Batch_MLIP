@@ -1,0 +1,34 @@
+id: variable-cell-neighbor-cache-pilot
+date: 2026-07-19
+hypothesis: >-
+  A generic cutoff-plus-skin candidate cache with deformation-aware per-system
+  invalidation and exact-cutoff GPU filtering can reuse topology during
+  variable-cell BFGS without changing AtomBit outputs.
+baseline_commit: 27bdfe33d580b0151bdfeff100aa209ac11f23ba
+model: AtomBit
+optimizer: full variable-cell BFGS
+samples:
+  atom_counts: [46, 92, 184, 276]
+  selection: first fixed-manifest structure at each atom count
+modes: [four independent B1 runs, one heterogeneous B4 run]
+parameters:
+  cutoff_A: 6.0
+  baseline_skin_A: 0.0
+  candidate_skin_A: 0.5
+  max_steps: 3
+  model_dtype: float32
+  optimizer_dtype: float64
+  deterministic_algorithms: true
+correctness_gates:
+  - Fixed-cell cache activation agrees with a fresh skin-zero graph.
+  - Safe affine cell compression reuses candidates without missing an edge.
+  - Unsafe compression rebuilds before an omitted pair enters the cutoff.
+  - Heterogeneous invalidation rebuilds only dirty structures.
+  - Production energies, forces, stresses, positions, cells, and steps match skin zero.
+result:
+  b1_bitwise_equal: true
+  heterogeneous_b4_bitwise_equal: true
+  reference_rebuilt_systems: 20
+  candidate_rebuilt_systems: 4
+  candidate_to_physical_edge_ratio: 1.1796585391322507
+  conclusion: correctness and reuse gates pass; proceed to AtomBit B64 screening
