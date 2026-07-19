@@ -1,0 +1,40 @@
+id: runtime-phase-profiling
+date: 2026-07-19
+hypothesis: >-
+  Deferred CUDA-event instrumentation can expose graph, model, full-BFGS, and
+  scheduler phase costs without changing numerical outputs or producing a
+  measurable runtime regression.
+baseline_commit: a022db111394b7f8a3675d5a5453e9fae2a6c330
+models: [AtomBit, MACE-OFF-Small]
+optimizer: full variable-cell BFGS with active refill
+implementation:
+  public_api: RuntimeProfiler context manager
+  timing: deferred CUDA events resolved once at context exit
+  benchmark_flag: --profile-runtime
+atomBit_screen:
+  atom_count: 46
+  workload: 128
+  resident_batch: 64
+  max_steps_per_system: 20
+  fmax_eV_per_A: 1.0e-30
+  repeats: 3
+  comparison: profiler disabled versus enabled
+mace_smoke:
+  atom_count: 46
+  workload: 4
+  resident_batch: 2
+  max_steps_per_system: 2
+  fmax_eV_per_A: 1.0e-30
+  repeats: 1
+correctness_gates:
+  - The default test suite passes.
+  - Profiling leaves complete AtomBit output records bitwise identical.
+  - Both native AtomBit and MACE adapter phase paths execute on CUDA.
+  - Refill events preserve active and pending system counts.
+result:
+  atomBit_unprofiled_median_seconds: 9.871384497964755
+  atomBit_profiled_median_seconds: 9.859376231906936
+  observed_profiled_over_unprofiled_delta_percent: -0.12164723256696819
+  interpretation: below the 1% profiler-overhead gate
+  output_records_bitwise_equal: true
+  next_step: generic variable-cell neighbor-cache correctness pilot

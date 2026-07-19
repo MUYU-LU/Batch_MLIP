@@ -13,6 +13,7 @@ from batch_mlip.models.mace import MACEBatchCalculator
 from batch_mlip.models.potential import AtomBitBatchCalculator
 from batch_mlip.models.toy_models import QuadraticWellModel
 from batch_mlip.optimization.registry import BatchedBFGS
+from batch_mlip.profiling import RuntimeProfiler
 
 LEGACY_MODULES = {
     "api": "interfaces.api",
@@ -41,6 +42,7 @@ def test_root_public_symbols_keep_their_new_canonical_identities():
     assert batch_mlip.AtomBitBatchCalculator is AtomBitBatchCalculator
     assert batch_mlip.BatchedBFGS is BatchedBFGS
     assert batch_mlip.MACEBatchCalculator is MACEBatchCalculator
+    assert batch_mlip.RuntimeProfiler is RuntimeProfiler
     assert callable(batch_mlip.MACEBatchCalculator.from_off)
     assert batch_mlip.relax is relax
 
@@ -50,6 +52,7 @@ def test_pre_rename_root_symbols_are_compatibility_aliases():
     assert atombit_batch.BatchedPotential is AtomBitBatchCalculator
     assert batch_mlip.BatchedPotential is AtomBitBatchCalculator
     assert atombit_batch.FrechetCellFilter is batch_mlip.FrechetCellFilter
+    assert atombit_batch.RuntimeProfiler is RuntimeProfiler
     assert atombit_batch.BatchedFrechetCellFilter is batch_mlip.FrechetCellFilter
     assert atombit_batch.relax is relax
 

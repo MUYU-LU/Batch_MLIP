@@ -1,0 +1,68 @@
+{
+  "atombit": {
+    "active_batch_size": 64,
+    "atom_count": 46,
+    "graph_evaluations": 2688,
+    "model_evaluations": 42,
+    "neighbor_rebuilds": 42,
+    "output_records_bitwise_equal": true,
+    "phase_seconds": {
+      "bfgs_update": 4.361654346466065,
+      "model_autograd": 1.2846584033966062,
+      "model_forward": 0.6407464323043823,
+      "neighbor_update": 3.1027446823120117,
+      "refill_repack": 0.01028656005859375,
+      "unaccounted": 0.45897804227843686
+    },
+    "phase_share_percent": {
+      "bfgs_update": 44.24002491864857,
+      "model_autograd": 13.030220935380882,
+      "model_forward": 6.499056523048023,
+      "neighbor_update": 31.470972057403888,
+      "refill_repack": 0.10433602417121368,
+      "unaccounted": 4.655389541347408
+    },
+    "profile_total_seconds": 9.859068466816097,
+    "profiled_median_seconds": 9.859376231906936,
+    "profiled_samples_seconds": [
+      10.049277990823612,
+      9.859376231906936,
+      9.829136163927615
+    ],
+    "profiled_vs_unprofiled_delta_percent": -0.12164723256696819,
+    "profiling_interpretation": "observed overhead is below the 1% gate",
+    "refill_events": 1,
+    "unprofiled_median_seconds": 9.871384497964755,
+    "unprofiled_samples_seconds": [
+      10.108193880878389,
+      9.870874434011057,
+      9.871384497964755
+    ],
+    "workload": 128
+  },
+  "mace_smoke": {
+    "active_batch_size": 2,
+    "atom_count": 46,
+    "graph_evaluations": 12,
+    "model_evaluations": 6,
+    "phase_seconds": {
+      "bfgs_update": 0.23530786323547365,
+      "mace_atomic_data": 0.011113759994506837,
+      "mace_collate": 0.006992128372192383,
+      "model_forward": 2.856974709510803,
+      "refill_repack": 0.0014832324981689453,
+      "state_to_ase": 0.0021270084381103515,
+      "to_device": 0.004943808555603027
+    },
+    "profile_total_seconds": 3.5386183708906174,
+    "refill_events": 1,
+    "wall_seconds": 3.5388453691266477,
+    "workload": 4
+  },
+  "schema_version": 2,
+  "tests": {
+    "default": "50 passed, 2 skipped",
+    "mace_adapter": "profiled CUDA benchmark passed",
+    "targeted_bfgs_profiling_and_layout": "23 passed"
+  }
+}

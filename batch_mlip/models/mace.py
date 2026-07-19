@@ -13,6 +13,7 @@ from ..core.calculator import BatchCalculator, NeighborPolicy
 from ..core.math_utils import model_dtype
 from ..core.state import AseGraphBatch
 from ..core.types import BatchEvaluation
+from ..profiling.runtime import profile_event, profile_phase
 
 _DEFAULT_DTYPE_LOCK = RLock()
 
@@ -145,7 +146,13 @@ class MACEBatchCalculator(BatchCalculator):
         )
 
     def _build_batch(self, state: AseGraphBatch) -> Any:
-        systems = state.to_ase(evaluation=None, wrap=False)
+        with profile_phase(
+            "graph.state_to_ase",
+            device=state.device,
+            systems=state.n_systems,
+            atoms=state.n_atoms,
+        ):
+            systems = state.to_ase(evaluation=None, wrap=False)
 
         # AtomicData.from_config follows torch's default dtype. Limit the
         # temporary change to graph construction and restore process state.
@@ -153,25 +160,54 @@ class MACEBatchCalculator(BatchCalculator):
             previous_dtype = torch.get_default_dtype()
             torch.set_default_dtype(self.dtype)
             try:
-                dataset = [
-                    self._data.AtomicData.from_config(
-                        self._data.config_from_atoms(atoms, head_name=self.head),
-                        z_table=self.z_table,
-                        cutoff=self.cutoff,
-                        heads=self.available_heads,
+                with profile_phase(
+                    "graph.mace_atomic_data",
+                    device=state.device,
+                    systems=state.n_systems,
+                    atoms=state.n_atoms,
+                ):
+                    dataset = [
+                        self._data.AtomicData.from_config(
+                            self._data.config_from_atoms(
+                                atoms, head_name=self.head
+                            ),
+                            z_table=self.z_table,
+                            cutoff=self.cutoff,
+                            heads=self.available_heads,
+                        )
+                        for atoms in systems
+                    ]
+                with profile_phase(
+                    "graph.mace_collate",
+                    device=state.device,
+                    systems=state.n_systems,
+                    atoms=state.n_atoms,
+                ):
+                    loader = self._torch_geometric.dataloader.DataLoader(
+                        dataset=dataset,
+                        batch_size=len(dataset),
+                        shuffle=False,
+                        drop_last=False,
                     )
-                    for atoms in systems
-                ]
-                loader = self._torch_geometric.dataloader.DataLoader(
-                    dataset=dataset,
-                    batch_size=len(dataset),
-                    shuffle=False,
-                    drop_last=False,
-                )
-                batch = next(iter(loader))
+                    batch = next(iter(loader))
             finally:
                 torch.set_default_dtype(previous_dtype)
-        return batch.to(self.device)
+        with profile_phase(
+            "graph.to_device",
+            device=state.device,
+            systems=state.n_systems,
+            atoms=state.n_atoms,
+            edges=batch.edge_index.shape[1],
+        ):
+            batch = batch.to(self.device)
+        profile_event(
+            "native_graph",
+            adapter="mace",
+            systems=state.n_systems,
+            atoms=state.n_atoms,
+            edges=batch.edge_index.shape[1],
+        )
+        return batch
 
     def calculate(
         self,
@@ -186,12 +222,19 @@ class MACEBatchCalculator(BatchCalculator):
             raise ValueError("state device and dtype must match the MACE adapter")
 
         batch = self._build_batch(state)
-        output = self.model(
-            batch.to_dict(),
-            compute_force=True,
-            compute_stress=compute_stress,
-            training=False,
-        )
+        with profile_phase(
+            "model.forward",
+            device=state.device,
+            systems=state.n_systems,
+            atoms=state.n_atoms,
+            edges=batch.edge_index.shape[1],
+        ):
+            output = self.model(
+                batch.to_dict(),
+                compute_force=True,
+                compute_stress=compute_stress,
+                training=False,
+            )
         energy = output["energy"].reshape(state.n_systems)
         forces = output["forces"].reshape(state.n_atoms, 3)
         stress = output["stress"] if compute_stress else None
@@ -200,6 +243,15 @@ class MACEBatchCalculator(BatchCalculator):
 
         energy_scale = self.energy_units_to_eV
         length_scale = self.length_units_to_A
+        profile_event(
+            "model_evaluation",
+            adapter="mace",
+            systems=state.n_systems,
+            atoms=state.n_atoms,
+            edges=batch.edge_index.shape[1],
+            neighbor_rebuilds=1,
+            compute_stress=compute_stress,
+        )
         return BatchEvaluation(
             energy=(energy * energy_scale).detach(),
             forces=(forces * energy_scale / length_scale).detach(),

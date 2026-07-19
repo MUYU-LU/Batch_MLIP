@@ -11,6 +11,7 @@ import torch
 from ase import Atoms
 from ase.calculators.calculator import Calculator
 
+from ..profiling.runtime import profile_event, profile_phase
 from .state import AseGraphBatch
 from .types import BatchEvaluation
 
@@ -122,17 +123,33 @@ class ASECalculatorAdapter(BatchCalculator):
         if state.device != self.device or state.dtype != self.dtype:
             raise ValueError("state device and dtype must match the calculator")
 
-        energies: list[float] = []
-        forces: list[np.ndarray] = []
-        stresses: list[np.ndarray] = []
-        for atoms in state.to_ase(evaluation=None, wrap=False):
-            atoms.calc = self.calculator
-            energies.append(float(atoms.get_potential_energy()))
-            forces.append(np.asarray(atoms.get_forces(), dtype=np.float64))
-            if compute_stress:
-                stresses.append(
-                    np.asarray(atoms.get_stress(voigt=False), dtype=np.float64)
-                )
+        with profile_phase(
+            "model.ase_sequential",
+            device=state.device,
+            systems=state.n_systems,
+            atoms=state.n_atoms,
+        ):
+            energies: list[float] = []
+            forces: list[np.ndarray] = []
+            stresses: list[np.ndarray] = []
+            for atoms in state.to_ase(evaluation=None, wrap=False):
+                atoms.calc = self.calculator
+                energies.append(float(atoms.get_potential_energy()))
+                forces.append(np.asarray(atoms.get_forces(), dtype=np.float64))
+                if compute_stress:
+                    stresses.append(
+                        np.asarray(atoms.get_stress(voigt=False), dtype=np.float64)
+                    )
+
+        profile_event(
+            "model_evaluation",
+            adapter="ase",
+            systems=state.n_systems,
+            atoms=state.n_atoms,
+            edges=0,
+            neighbor_rebuilds=0,
+            compute_stress=compute_stress,
+        )
 
         return BatchEvaluation(
             energy=torch.as_tensor(energies, device=state.device, dtype=state.dtype),

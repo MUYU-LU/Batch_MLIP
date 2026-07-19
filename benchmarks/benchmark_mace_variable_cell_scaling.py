@@ -36,6 +36,7 @@ from benchmark_variable_cell_scaling import (  # noqa: E402
 from batch_mlip import (  # noqa: E402
     FrechetCellFilter,
     MACEBatchCalculator,
+    RuntimeProfiler,
     batched_bfgs_relax,
     batched_fire_relax,
 )
@@ -251,6 +252,7 @@ def main() -> None:
     parser.add_argument("--max-step", type=float, default=0.2)
     parser.add_argument("--alpha", type=float, default=70.0)
     parser.add_argument("--deterministic", action="store_true")
+    parser.add_argument("--profile-runtime", action="store_true")
     parser.add_argument(
         "--dataset-dir", type=Path, default=Path("data/T2_test/structures")
     )
@@ -335,6 +337,7 @@ def main() -> None:
             "dtype": "float64",
             "repeats": args.repeats,
             "deterministic_algorithms": args.deterministic,
+            "profile_runtime": args.profile_runtime,
         },
         "points": [],
     }
@@ -370,8 +373,18 @@ def main() -> None:
                         refill=args.method == "refill",
                     )
 
+            runtime_profiles = []
+
+            def measured_fn(benchmark_fn=fn, profiles=runtime_profiles):
+                if not args.profile_runtime:
+                    return benchmark_fn()
+                with RuntimeProfiler(device=device) as profiler:
+                    current = benchmark_fn()
+                profiles.append(profiler.summary())
+                return current
+
             output, timing, peak_memory = timed_repeats(
-                fn,
+                measured_fn,
                 repeats=args.repeats,
                 device=device,
             )
@@ -390,6 +403,8 @@ def main() -> None:
                     **output,
                 }
             )
+            if runtime_profiles:
+                point["runtime_profiles"] = runtime_profiles
         except torch.cuda.OutOfMemoryError as exc:
             point.update({"status": "oom", "error": str(exc)})
             torch.cuda.empty_cache()

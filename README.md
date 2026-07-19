@@ -28,6 +28,7 @@ atombit_batch/          Thin compatibility namespace for the former package name
   dynamics/             Molecular-dynamics integrators
   models/               MLIP adapter, loaders, reference models
   interfaces/           Python API, CLI/configuration, reporting
+  profiling/            Opt-in phase timing and runtime event collection
 src/                    Uploaded AtomBit code in checkpoint-compatible namespace
 original_uploads/       Immutable source snapshots
 configs/                Runnable YAML configurations
@@ -210,6 +211,28 @@ Each result exposes `.structures`, an input-ordered list of ASE `Atoms` with a
 `SinglePointCalculator` containing the final energy and forces. Integrators use
 only the `BatchCalculator` contract; model-specific graph and output conversion
 belongs in calculator adapters.
+
+Internal phase timing is opt-in and does not change calculator or optimizer
+signatures:
+
+```python
+from batch_mlip import RuntimeProfiler, relax
+
+with RuntimeProfiler(device=calculator.device) as profiler:
+    result = relax(
+        systems,
+        calculator,
+        optimizer="bfgs",
+        refill_batch_size=64,
+    )
+
+profile = profiler.summary()
+print(profile["phases"])
+```
+
+CUDA events are resolved once when the context exits. The variable-cell
+benchmark scripts accept `--profile-runtime` and store the full phase samples
+and scheduler events in their JSON point results.
 
 An ordinary ASE calculator can be used as a correctness/reference fallback:
 

@@ -36,6 +36,8 @@ _CANONICAL_MODULES = (
     "optimization.cell_filters",
     "optimization.fire",
     "optimization.registry",
+    "profiling",
+    "profiling.runtime",
 )
 
 for _module_name in _CANONICAL_MODULES:

@@ -78,7 +78,19 @@ n_positive[B]
 converged_step[B]
 ```
 
-The fictitious velocity is atomic: `velocity[N,3]`. The atom-to-graph map broadcasts per-system parameters to atoms. Converged graphs are frozen but are not yet physically removed from the inference batch.
+The fictitious velocity is atomic: `velocity[N,3]`. The atom-to-graph map
+broadcasts per-system parameters to atoms. Masked optimization freezes
+converged graphs, active compaction removes them from the inference batch, and
+active refill can insert pending systems up to a bounded resident capacity.
+
+## Runtime profiling
+
+`RuntimeProfiler` activates instrumentation through a context-local collector,
+so public calculator and optimizer protocols remain unchanged. CPU work uses
+`perf_counter`; CUDA phases use deferred events and synchronize once when the
+profile closes. Calculator adapters report their own graph translation phases,
+while optimizers report only generic update, compaction, refill, and occupancy
+events. Model-native types therefore do not enter the scheduler contract.
 
 ## Units
 

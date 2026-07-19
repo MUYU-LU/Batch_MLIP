@@ -62,6 +62,25 @@ def test_bfgs_is_registered_and_constructible():
     assert result.steps == 0
 
 
+def test_refill_capacity_equal_to_pool_does_not_alias_output_assignments():
+    systems = [
+        Atoms("H", positions=[[0.1, 0.0, 0.0]]),
+        Atoms("H", positions=[[-0.2, 0.0, 0.0]]),
+    ]
+    calculator = _quadratic_potential()
+    result = relax(
+        systems,
+        calculator,
+        optimizer="bfgs",
+        fmax=1e-30,
+        max_steps=1,
+        refill_batch_size=len(systems),
+    )
+
+    assert result.steps == 1
+    assert result.active_batch_sizes == (2, 2)
+
+
 def test_float32_bfgs_promotes_frechet_optimizer_state():
     atoms = bulk("Ar", "fcc", a=5.5, cubic=True)
     calculator = AtomBitBatchCalculator(

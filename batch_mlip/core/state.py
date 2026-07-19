@@ -12,6 +12,7 @@ from ase import Atoms
 from ase.calculators.singlepoint import SinglePointCalculator
 from ase.constraints import FixAtoms
 
+from ..profiling.runtime import profile_event, profile_phase
 from .math_utils import scatter_sum
 from .neighbors import neighbor_list
 from .types import BatchEvaluation, GraphData
@@ -188,27 +189,41 @@ class AseGraphBatch:
     def rebuild_neighbor_list(self) -> None:
         """Build directed neighbour lists independently, then concatenate."""
 
-        pos_cpu = self.positions.detach().cpu().numpy()
-        cell_cpu = self.cells.detach().cpu().numpy()
-        pbc_cpu = self.pbc.detach().cpu().numpy()
+        with profile_phase(
+            "graph.geometry_to_host",
+            device=self.device,
+            systems=self.n_systems,
+            atoms=self.n_atoms,
+        ):
+            pos_cpu = self.positions.detach().cpu().numpy()
+            cell_cpu = self.cells.detach().cpu().numpy()
+            pbc_cpu = self.pbc.detach().cpu().numpy()
 
         edge_blocks: list[np.ndarray] = []
         shift_blocks: list[np.ndarray] = []
 
-        for graph_idx, template in enumerate(self.templates):
-            atom_slice = self.atom_slice(graph_idx)
-            atoms = template.copy()
-            atoms.positions[:] = pos_cpu[atom_slice]
-            atoms.set_cell(cell_cpu[graph_idx], scale_atoms=False)
-            atoms.pbc = pbc_cpu[graph_idx]
+        with profile_phase(
+            "graph.neighbor_search",
+            device=self.device,
+            systems=self.n_systems,
+            atoms=self.n_atoms,
+        ):
+            for graph_idx, template in enumerate(self.templates):
+                atom_slice = self.atom_slice(graph_idx)
+                atoms = template.copy()
+                atoms.positions[:] = pos_cpu[atom_slice]
+                atoms.set_cell(cell_cpu[graph_idx], scale_atoms=False)
+                atoms.pbc = pbc_cpu[graph_idx]
 
-            i_idx, j_idx, shifts = neighbor_list(
-                "ijS", atoms, self.cutoff + self.skin
-            )
-            edge_block = np.stack((i_idx, j_idx), axis=0).astype(np.int64, copy=False)
-            edge_block += atom_slice.start
-            edge_blocks.append(edge_block)
-            shift_blocks.append(np.asarray(shifts, dtype=np.int64))
+                i_idx, j_idx, shifts = neighbor_list(
+                    "ijS", atoms, self.cutoff + self.skin
+                )
+                edge_block = np.stack((i_idx, j_idx), axis=0).astype(
+                    np.int64, copy=False
+                )
+                edge_block += atom_slice.start
+                edge_blocks.append(edge_block)
+                shift_blocks.append(np.asarray(shifts, dtype=np.int64))
 
         edge_np = (
             np.concatenate(edge_blocks, axis=1)
@@ -221,12 +236,30 @@ class AseGraphBatch:
             else np.empty((0, 3), dtype=np.int64)
         )
 
-        self.edge_index = torch.as_tensor(edge_np, device=self.device, dtype=torch.long)
-        self.shifts_int = torch.as_tensor(shifts_np, device=self.device, dtype=torch.long)
-        self._neighbor_reference_positions = self.positions.detach().clone()
-        self._neighbor_reference_cells = self.cells.detach().clone()
-        self.neighbor_rebuild_count += 1
-        self.assert_graph_integrity()
+        with profile_phase(
+            "graph.to_device",
+            device=self.device,
+            systems=self.n_systems,
+            atoms=self.n_atoms,
+            edges=edge_np.shape[1],
+        ):
+            self.edge_index = torch.as_tensor(
+                edge_np, device=self.device, dtype=torch.long
+            )
+            self.shifts_int = torch.as_tensor(
+                shifts_np, device=self.device, dtype=torch.long
+            )
+            self._neighbor_reference_positions = self.positions.detach().clone()
+            self._neighbor_reference_cells = self.cells.detach().clone()
+            self.neighbor_rebuild_count += 1
+            self.assert_graph_integrity()
+        profile_event(
+            "neighbor_rebuild",
+            systems=self.n_systems,
+            atoms=self.n_atoms,
+            edges=edge_np.shape[1],
+            rebuild_count=self.neighbor_rebuild_count,
+        )
 
     def assert_graph_integrity(self) -> None:
         """Raise if an edge crosses systems or tensor shapes are inconsistent."""

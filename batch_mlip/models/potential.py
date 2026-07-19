@@ -12,6 +12,7 @@ from ..core.calculator import BatchCalculator, NeighborPolicy
 from ..core.math_utils import model_dtype, scatter_sum
 from ..core.state import AseGraphBatch
 from ..core.types import BatchEvaluation
+from ..profiling.runtime import profile_event, profile_phase
 
 ForceMode = Literal["auto", "autograd", "direct"]
 
@@ -94,8 +95,16 @@ class AtomBitBatchCalculator(BatchCalculator):
         if state.dtype != self.dtype:
             raise ValueError(f"state dtype is {state.dtype}, model dtype is {self.dtype}")
 
-        self._update_neighbors(state, neighbor_policy)
-        state.assert_graph_integrity()
+        rebuilds_before = state.neighbor_rebuild_count
+        with profile_phase(
+            "calculator.neighbor_update",
+            device=state.device,
+            systems=state.n_systems,
+            atoms=state.n_atoms,
+        ):
+            self._update_neighbors(state, neighbor_policy)
+            state.assert_graph_integrity()
+        rebuilt = state.neighbor_rebuild_count - rebuilds_before
 
         # ``auto`` needs a position graph because direct-force availability is
         # known only after the forward call.
@@ -121,11 +130,25 @@ class AtomBitBatchCalculator(BatchCalculator):
             model_positions = base_positions + displacement
             model_cells = base_cells + torch.bmm(base_cells, sym_strain)
 
-        data = state.as_model_data(positions=model_positions, cells=model_cells)
+        with profile_phase(
+            "calculator.graph_view",
+            device=state.device,
+            systems=state.n_systems,
+            atoms=state.n_atoms,
+            edges=state.edge_index.shape[1],
+        ):
+            data = state.as_model_data(positions=model_positions, cells=model_cells)
         no_grad_ok = self.force_mode == "direct" and not compute_stress
         context = torch.no_grad() if no_grad_ok else nullcontext()
-        with context:
-            raw = self.model(data, **self.model_call_kwargs)
+        with profile_phase(
+            "model.forward",
+            device=state.device,
+            systems=state.n_systems,
+            atoms=state.n_atoms,
+            edges=state.edge_index.shape[1],
+        ):
+            with context:
+                raw = self.model(data, **self.model_call_kwargs)
 
         direct_forces = None
         if isinstance(raw, dict):
@@ -162,13 +185,20 @@ class AtomBitBatchCalculator(BatchCalculator):
 
         gradients: tuple[torch.Tensor, ...] = ()
         if grad_targets:
-            gradients = torch.autograd.grad(
-                model_energy.sum(),
-                grad_targets,
-                create_graph=False,
-                retain_graph=False,
-                allow_unused=False,
-            )
+            with profile_phase(
+                "model.autograd",
+                device=state.device,
+                systems=state.n_systems,
+                atoms=state.n_atoms,
+                edges=state.edge_index.shape[1],
+            ):
+                gradients = torch.autograd.grad(
+                    model_energy.sum(),
+                    grad_targets,
+                    create_graph=False,
+                    retain_graph=False,
+                    allow_unused=False,
+                )
 
         gradient_idx = 0
         if use_direct_forces:
@@ -194,6 +224,15 @@ class AtomBitBatchCalculator(BatchCalculator):
                 stress = stress.masked_fill(nonperiodic.view(-1, 1, 1), torch.nan)
 
         total_energy = model_energy + self._e0_per_system(state)
+        profile_event(
+            "model_evaluation",
+            adapter="atombit",
+            systems=state.n_systems,
+            atoms=state.n_atoms,
+            edges=state.edge_index.shape[1],
+            neighbor_rebuilds=rebuilt,
+            compute_stress=compute_stress,
+        )
         return BatchEvaluation(
             energy=total_energy.detach(),
             forces=forces.detach(),

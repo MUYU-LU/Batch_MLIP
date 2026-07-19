@@ -48,6 +48,7 @@ from .optimization.registry import (
     create_optimizer,
     register_optimizer,
 )
+from .profiling import RuntimeProfiler
 
 
 def _install_legacy_module_aliases() -> None:
@@ -111,6 +112,7 @@ __all__ = [
     "OptimizerCapabilities",
     "OptimizerFactory",
     "RelaxationResult",
+    "RuntimeProfiler",
     "TorchStateCheckpointReporter",
     "available_optimizers",
     "batched_bfgs_relax",

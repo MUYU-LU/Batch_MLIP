@@ -14,6 +14,9 @@
 
 ## 0.2.0 - Unreleased
 
+- Add opt-in deferred-CUDA runtime phase profiling for graph construction,
+  model evaluation, BFGS updates, compaction, refill, and occupancy events.
+- Fix active-refill state aliasing when resident capacity equals pool size.
 - Add an opt-in MACE-OFF-Small variable-cell optimization test covering common
   ASE, masked batching, and active batching with both FIRE and BFGS.
 - Add MACE-OFF-Small ASE/masked/active variable-cell FIRE scaling on the same
