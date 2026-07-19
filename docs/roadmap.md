@@ -9,6 +9,8 @@
 
 ## P1 — throughput
 
+- Follow the decision-gated [workload-aware performance strategy](workload-aware-performance.md)
+  for neighbor caching, refill, resident planning, and multi-GPU experiments.
 - GPU-native periodic cell-list neighbour construction.
 - Active-batch compaction after graphs converge.
 - Atom-count/edge-count bucketing and adaptive batch sizing.
