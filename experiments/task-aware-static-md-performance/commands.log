@@ -6,3 +6,21 @@ Baseline: f7663768a34e052643d4abcbfe32ef5eefab8547
 /public/home/lmy/.conda/envs/MACE_clean/bin/python benchmarks/benchmark_controlled_matrix.py --model mace --task eval --pool-size 32 --distributions H46 --batch-sizes 8 --device cuda:0 --code-commit development --output runs/task_aware_static_md_performance/pilots/mace_eval_h46_r32.json
 /public/home/lmy/.conda/envs/lmy/bin/python benchmarks/benchmark_controlled_matrix.py --model atombit --task nve --pool-size 32 --distributions MIX --batch-sizes 8 --validation-only --device cuda:0 --code-commit development --output runs/task_aware_static_md_performance/pilots/atombit_nve_short_fixed.json
 /public/home/lmy/.conda/envs/MACE_clean/bin/python benchmarks/benchmark_controlled_matrix.py --model mace --task nve --pool-size 32 --distributions MIX --batch-sizes 8 --validation-only --device cuda:0 --code-commit development --output runs/task_aware_static_md_performance/pilots/mace_nve_short.json
+
+Formal EVAL matrix:
+/public/home/lmy/.conda/envs/lmy/bin/python benchmarks/benchmark_controlled_matrix.py --model atombit --task eval --pool-size 32 --distributions H46,H276,MIX --batch-sizes 8,16,32 --device cuda:0 --cpu-threads 1 --concurrent-workers 4 --code-commit a9862b466741f836335a2d224b3850b50228061b --output runs/task_aware_static_md_performance/eval/atombit_eval_r32.json
+/public/home/lmy/.conda/envs/MACE_clean/bin/python benchmarks/benchmark_controlled_matrix.py --model mace --task eval --pool-size 32 --distributions H46,H276,MIX --batch-sizes 8,16,32 --device cuda:0 --cpu-threads 1 --concurrent-workers 4 --code-commit a9862b466741f836335a2d224b3850b50228061b --output runs/task_aware_static_md_performance/eval/mace_eval_r32.json
+/public/home/lmy/.conda/envs/lmy/bin/python benchmarks/benchmark_controlled_matrix.py --model atombit --task eval --pool-size 256 --distributions H46,H276,MIX --batch-sizes 32,64,128,256 --device cuda:0 --cpu-threads 1 --concurrent-workers 4 --code-commit a9862b466741f836335a2d224b3850b50228061b --output runs/task_aware_static_md_performance/eval/atombit_eval_r256.json
+/public/home/lmy/.conda/envs/MACE_clean/bin/python benchmarks/benchmark_controlled_matrix.py --model mace --task eval --pool-size 256 --distributions H46,H276,MIX --batch-sizes 32,64,128,256 --device cuda:0 --cpu-threads 1 --concurrent-workers 4 --code-commit a9862b466741f836335a2d224b3850b50228061b --output runs/task_aware_static_md_performance/eval/mace_eval_r256.json
+
+Formal exact R32 NVE matrix (one process/GPU for each model and distribution):
+benchmarks/benchmark_controlled_matrix.py --model MODEL --task nve --pool-size 32 --distributions DISTRIBUTION --batch-sizes 8,16,32 --device cuda:0 --cpu-threads 1 --concurrent-workers 6 --code-commit a9862b466741f836335a2d224b3850b50228061b --output runs/task_aware_static_md_performance/nve_r32/MODEL_nve_DISTRIBUTION_r32.json
+
+Decision-gated native R256 NVE matrix:
+benchmarks/benchmark_controlled_matrix.py --model MODEL --task nve --pool-size 256 --distributions DISTRIBUTION --batch-sizes SELECTED_CAPACITY_POINTS --skip-ase --device cuda:0 --cpu-threads 1 --concurrent-workers 6 --code-commit a9862b466741f836335a2d224b3850b50228061b --output runs/task_aware_static_md_performance/nve_r256/MODEL_nve_DISTRIBUTION_r256.json
+
+Summary generation:
+python benchmarks/summarize_controlled_matrix.py experiments/task-aware-static-md-performance/raw/eval/*.json experiments/task-aware-static-md-performance/raw/nve_r32/*.json experiments/task-aware-static-md-performance/raw/nve_r256/*.json --output-json experiments/task-aware-static-md-performance/results.json --output-csv experiments/task-aware-static-md-performance/results.csv --output-markdown experiments/task-aware-static-md-performance/results.md
+PYTHONPATH=. /public/home/lmy/.conda/envs/lmy/bin/python tools/validate_controlled_workloads.py
+/public/home/lmy/.conda/envs/lmy/bin/ruff check batch_mlip tests benchmarks
+/public/home/lmy/.conda/envs/lmy/bin/python -m pytest -q

@@ -686,11 +686,16 @@ def main() -> int:
                     )
                 else:
                     point["status"] = "passed_without_reference"
-                total_memory = native_result.summary["peak_allocated_GB"]
+                allocated_memory = native_result.summary["peak_allocated_GB"]
+                reserved_memory = native_result.summary["peak_reserved_GB"]
                 gpu_memory = native_result.telemetry.values["gpu_memory_GB"]
-                if total_memory is not None and gpu_memory is not None:
-                    point["allocated_memory_fraction"] = total_memory / gpu_memory
-                    memory_limit_reached = point["allocated_memory_fraction"] >= 0.85
+                if allocated_memory is not None and gpu_memory is not None:
+                    point["allocated_memory_fraction"] = allocated_memory / gpu_memory
+                    point["reserved_memory_fraction"] = reserved_memory / gpu_memory
+                    point["memory_gate_fraction"] = max(
+                        point["allocated_memory_fraction"], point["reserved_memory_fraction"]
+                    )
+                    memory_limit_reached = point["memory_gate_fraction"] >= 0.85
             except torch.cuda.OutOfMemoryError as error:
                 point.update({"status": "oom", "error": str(error)})
                 memory_limit_reached = True

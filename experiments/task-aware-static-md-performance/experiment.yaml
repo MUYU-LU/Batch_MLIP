@@ -19,7 +19,7 @@ methods:
   batch: native BatchCalculator, ordered contiguous resident batches
 resident_matrix:
   R32: [8, 16, 32]
-  R256: [32, 64, 128, 256]
+  R256: [16, 32, 64, 128, 256]
 replication:
   screening_repeats: 1
   interpretation: differences below 2 percent are inconclusive
@@ -32,7 +32,7 @@ timing:
   md_physical_warmup_steps: 100
   md_measured_steps: 1000
 metrics:
-  primary: [speedup_vs_ASE_B1, wall_time_s, peak_allocated_GB]
+  primary: [speedup_vs_ASE_B1, wall_time_s, peak_memory_GB]
   throughput: [structures_per_s, replica_steps_per_s, atoms_per_s]
   supporting:
     - peak_reserved_GB
@@ -53,4 +53,8 @@ execution_gates:
   - run exact R32 NVE and use measured cost and memory to select R256 points
   - do not substitute an extrapolated ASE time for a measured result without labeling it derived
   - stop any point before OOM using 85 percent memory headroom
+selection:
+  memory_measure: max(peak_allocated_GB, peak_reserved_GB)
+  memory_limit_fraction: 0.85
+  rule: smallest safe resident batch within 2 percent of maximum throughput
 performance_claim: screening only until a selected point receives confirmation timing
