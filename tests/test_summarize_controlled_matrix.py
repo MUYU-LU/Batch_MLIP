@@ -1,7 +1,13 @@
-from benchmarks.summarize_controlled_matrix import (
-    _add_derived_r256_speedups,
-    _best_rows,
-)
+import importlib.util
+from pathlib import Path
+
+_MODULE_PATH = Path(__file__).resolve().parents[1] / "benchmarks" / "summarize_controlled_matrix.py"
+_SPEC = importlib.util.spec_from_file_location("summarize_controlled_matrix", _MODULE_PATH)
+assert _SPEC is not None and _SPEC.loader is not None
+_MODULE = importlib.util.module_from_spec(_SPEC)
+_SPEC.loader.exec_module(_MODULE)
+_add_derived_r256_speedups = _MODULE._add_derived_r256_speedups
+_best_rows = _MODULE._best_rows
 
 
 def _row(
