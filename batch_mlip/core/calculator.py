@@ -12,6 +12,7 @@ from ase import Atoms
 from ase.calculators.calculator import Calculator
 
 from ..profiling.runtime import profile_event, profile_phase
+from .neighbors import NeighborBackend, validate_neighbor_backend
 from .state import AseGraphBatch
 from .types import BatchEvaluation
 
@@ -32,6 +33,7 @@ class BatchCalculator(ABC):
         skin: float = 0.0,
         device: str | torch.device = "cpu",
         dtype: torch.dtype = torch.float64,
+        neighbor_backend: NeighborBackend = "auto",
     ) -> None:
         if cutoff is not None and cutoff <= 0.0:
             raise ValueError("cutoff must be positive")
@@ -41,6 +43,7 @@ class BatchCalculator(ABC):
         self.skin = float(skin)
         self.device = torch.device(device)
         self.dtype = dtype
+        self.neighbor_backend = validate_neighbor_backend(neighbor_backend)
 
     def create_state(
         self,
@@ -65,6 +68,7 @@ class BatchCalculator(ABC):
             skin=self.skin,
             device=self.device,
             dtype=self.dtype,
+            neighbor_backend=self.neighbor_backend,
             build_neighbors=build_neighbors,
         )
 

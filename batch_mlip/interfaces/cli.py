@@ -61,6 +61,7 @@ def _prepare(config: Mapping[str, Any]):
         model_call_kwargs=_as_mapping(model_cfg.get("call_kwargs"), "model.call_kwargs"),
         cutoff=cutoff,
         skin=float(runtime.get("skin", 0.0)),
+        neighbor_backend=str(runtime.get("neighbor_backend", "auto")),
     )
 
     input_file = Path(str(required(config, "input", "config")))
@@ -76,6 +77,7 @@ def _prepare(config: Mapping[str, Any]):
         device=device,
         dtype=dtype,
         skin=float(runtime.get("skin", 0.0)),
+        neighbor_backend=str(runtime.get("neighbor_backend", "auto")),
     )
     return state, potential, model, input_file
 
@@ -113,6 +115,7 @@ def _summary_base(config: Mapping[str, Any], state, model, input_file: Path) -> 
         "counts": state.counts.detach().cpu().tolist(),
         "cutoff": state.cutoff,
         "skin": state.skin,
+        "neighbor_backend": state.neighbor_backend,
         "neighbor_rebuild_count": state.neighbor_rebuild_count,
         "device": str(state.device),
         "dtype": str(state.dtype),

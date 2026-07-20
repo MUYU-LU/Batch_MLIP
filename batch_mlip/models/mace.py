@@ -11,6 +11,7 @@ from ase import Atoms
 
 from ..core.calculator import BatchCalculator, NeighborPolicy
 from ..core.math_utils import model_dtype
+from ..core.neighbors import NeighborBackend
 from ..core.state import AseGraphBatch
 from ..core.types import BatchEvaluation
 from ..profiling.runtime import profile_event, profile_phase
@@ -76,6 +77,7 @@ class MACEBatchCalculator(BatchCalculator):
         dtype: torch.dtype | None = None,
         cutoff: float | None = None,
         skin: float = 0.0,
+        neighbor_backend: NeighborBackend = "auto",
         graph_mode: MACEGraphMode = "rebuild",
         head: str | None = None,
         energy_units_to_eV: float = 1.0,
@@ -101,6 +103,7 @@ class MACEBatchCalculator(BatchCalculator):
             skin=skin,
             device=device,
             dtype=resolved_dtype,
+            neighbor_backend=neighbor_backend,
         )
         self.model = model.to(device=self.device, dtype=self.dtype).eval()
         self.graph_mode = graph_mode

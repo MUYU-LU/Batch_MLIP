@@ -6,6 +6,7 @@ import sys as _sys
 from types import ModuleType as _ModuleType
 
 from .core.calculator import ASECalculatorAdapter, BatchCalculator
+from .core.neighbors import NeighborBackend
 from .core.state import AseGraphBatch
 from .core.types import (
     BatchEvaluation,
@@ -144,6 +145,7 @@ __all__ = [
     "MemoryCoefficients",
     "MDResult",
     "MultiGPUExecution",
+    "NeighborBackend",
     "OptimizerCapabilities",
     "OptimizerFactory",
     "ParallelWorkerError",

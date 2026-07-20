@@ -21,7 +21,12 @@ def test_yaml_cli_run_and_validation(tmp_path: Path):
         "input": str(input_file),
         "output": str(output_file),
         "validation_output": str(tmp_path / "validation.json"),
-        "runtime": {"device": "cpu", "dtype": "float64", "skin": 0.2},
+        "runtime": {
+            "device": "cpu",
+            "dtype": "float64",
+            "skin": 0.2,
+            "neighbor_backend": "matscipy",
+        },
         "model": {
             "factory": "batch_mlip.toy_models:build_quadratic_model",
             "kwargs": {"k": 1.0},
@@ -47,6 +52,7 @@ def test_yaml_cli_run_and_validation(tmp_path: Path):
     assert (tmp_path / "trajectory.extxyz").exists()
     assert (tmp_path / "diagnostics.jsonl").exists()
     assert all(summary["converged"])
+    assert summary["neighbor_backend"] == "matscipy"
     assert summary["model_evaluations"] == len(summary["active_batch_sizes"])
     assert summary["graph_evaluations"] == sum(summary["active_batch_sizes"])
 

@@ -328,6 +328,8 @@ def batched_bfgs_relax(
         neighbor_policy="auto",
         compute_stress=active_filter is not None,
     )
+    if full_energy.dtype != evaluation.energy.dtype:
+        full_energy = full_energy.to(evaluation.energy.dtype)
     _profile_optimizer_evaluation(
         active_state, scheduler_step=0, pending_systems=0
     )
@@ -768,6 +770,8 @@ def _batched_bfgs_refill_relax(
                 )
 
     evaluation = evaluate_active(0)
+    if full_energy.dtype != evaluation.energy.dtype:
+        full_energy = full_energy.to(evaluation.energy.dtype)
     active_batch_sizes = [active_state.n_systems]
     scheduler_step = 0
 

@@ -9,7 +9,7 @@ list[ase.Atoms]
 AseGraphBatch.from_ase
   - concatenate z, positions, masses, velocities
   - create system_idx and ptr
-  - build each graph's ijS neighbour list
+  - select CPU or dense CUDA neighbour construction
   - offset atom indices and concatenate edges
        |
        v
@@ -36,7 +36,19 @@ reporters -> extxyz, JSONL, tensor checkpoint, summary JSON
 
 For systems with atom counts `n_0 ... n_(B-1)`, `N = sum n_g`. Atomic tensors are concatenated. `ptr[g]:ptr[g+1]` selects graph `g`; `system_idx[i]` gives the graph owning atom `i`.
 
-Neighbour lists are constructed per ASE object before concatenation. The atom offset is added to both rows of each local `edge_index`, which guarantees graph isolation. `assert_graph_integrity()` checks this invariant after every rebuild.
+Neighbour lists are constructed independently per system. The CPU path uses
+matscipy for fully periodic full-rank cells and ASE otherwise. The dense CUDA
+path groups compatible atom counts and image ranges, evaluates candidates in
+float64 under a temporary-memory budget, and emits canonical center, neighbor,
+and integer-shift ordering. The atom offset is added to both rows of each local
+`edge_index`, which guarantees graph isolation. `assert_graph_integrity()`
+checks this invariant after every rebuild.
+
+`neighbor_backend="auto"` uses conservative cutover rules measured for short
+(MACE-like) and long (AtomBit-like) cutoffs. Explicit `matscipy` and
+`cuda_dense` modes are available for validation. Auto falls back to CPU for
+degenerate periodic geometry; explicit CUDA raises instead of silently changing
+the requested method.
 
 ## Why no runtime PyTorch Geometric dependency
 

@@ -43,6 +43,23 @@ def test_fire_converges_multiple_heterogeneous_systems():
     assert float(torch.linalg.vector_norm(result.state.positions, dim=-1).max()) < 2e-5
 
 
+def test_compacted_float32_fire_accepts_float64_energy_offsets():
+    calculator = AtomBitBatchCalculator(
+        QuadraticWellModel(k=1.0),
+        cutoff=2.5,
+        device="cpu",
+        dtype=torch.float32,
+        e0_dict={1: -13.605693122994},
+    )
+    state = calculator.create_state([Atoms("H", positions=[[0.1, 0.0, 0.0]])])
+
+    result = batched_fire_relax(
+        state, calculator, fmax=1e-30, max_steps=0, active_compaction=True
+    )
+
+    assert result.evaluation.energy.dtype == torch.float64
+
+
 def test_fixatoms_position_is_unchanged():
     atoms = Atoms("H2", positions=[[1.0, 0.0, 0.0], [1.0, 1.0, 0.0]])
     atoms.set_constraint(FixAtoms(indices=[0]))

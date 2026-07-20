@@ -264,6 +264,8 @@ def _batched_fire_relax_compacted(
     full_alpha = torch.full((n_systems,), cfg.alpha_start, device=device, dtype=dtype)
 
     evaluation = potential(active_state, neighbor_policy="auto")
+    if full_energy.dtype != evaluation.energy.dtype:
+        full_energy = full_energy.to(evaluation.energy.dtype)
     neighbor_rebuilds = active_state.neighbor_rebuild_count
     active_batch_sizes = [n_systems]
     first_update = True
@@ -730,6 +732,8 @@ def _batched_fire_relax_variable_cell_compacted(
     evaluation = potential(
         active_state, neighbor_policy="auto", compute_stress=True
     )
+    if full_energy.dtype != evaluation.energy.dtype:
+        full_energy = full_energy.to(evaluation.energy.dtype)
     neighbor_rebuilds = active_state.neighbor_rebuild_count
     active_batch_sizes = [n_systems]
     first_update = True

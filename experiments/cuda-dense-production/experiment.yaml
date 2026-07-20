@@ -1,0 +1,50 @@
+name: cuda-dense-production
+date: 2026-07-20
+hypothesis: >-
+  A generalized, exact, memory-bounded dense CUDA backend can retain a
+  cutoff-aware small-batch CPU fallback while accelerating rebuild-heavy
+  batched MLIP workloads end to end.
+backend:
+  names: [auto, matscipy, cuda_dense]
+  topology_dtype: float64
+  max_work_bytes: 536870912
+  ordering: [system, center, neighbor, shift_x, shift_y, shift_z]
+  cpu_policy: matscipy for fully periodic rank-3 cells, ASE otherwise
+auto_policy:
+  long_cutoff_boundary_A: 5.5
+  long_cutoff_minimum_systems: 2
+  long_cutoff_pair_work: 8192
+  short_cutoff_minimum_systems: 4
+  short_cutoff_pair_work: 32768
+correctness:
+  frozen_ordered_points: 24
+  randomized_systems: 20
+  cases:
+    - triclinic
+    - partial and nonperiodic PBC
+    - rank-deficient nonperiodic dimensions
+    - unwrapped coordinates
+    - multiple periodic images
+    - selective position and cell rebuild
+measurement:
+  gpu: NVIDIA H100 80GB HBM3
+  repeats: 1
+  integrated_warmup: one complete rebuild per resident chunk and backend
+  end_to_end_warmup: two same-shape model calls per backend
+  cpu_threads: OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+result:
+  integrated_status: passed
+  integrated_cuda_speedup_range: [0.39, 9.69]
+  atombit_eval_speedup_range: [2.03, 2.59]
+  mace_eval_speedup_range: [1.38, 1.64]
+  atombit_three_step_bfgs_speedup: [1.39, 1.50]
+  mace_bfgs_status: initialization_bias_requires_longer_isolated_run
+limitations:
+  - Dense work remains O(B*N^2*images) and is not a large-system cell list.
+  - Auto thresholds are conservative H100 screening rules, not portable calibration.
+  - Timing uncertainty is unavailable because each point has one measured run.
+  - Cached MD end-to-end performance was not rerun in this stage.
+final_checks:
+  pytest_main: 107 passed, 6 skipped in 46.21s
+  pytest_mace_optional: 6 passed in 46.82s
+  ruff: All checks passed

@@ -10,6 +10,7 @@ import torch
 
 from ..core.calculator import BatchCalculator, NeighborPolicy
 from ..core.math_utils import model_dtype, scatter_sum
+from ..core.neighbors import NeighborBackend
 from ..core.state import AseGraphBatch
 from ..core.types import BatchEvaluation
 from ..profiling.runtime import profile_event, profile_phase
@@ -39,6 +40,7 @@ class AtomBitBatchCalculator(BatchCalculator):
         model_call_kwargs: Mapping[str, object] | None = None,
         cutoff: float | None = None,
         skin: float = 0.0,
+        neighbor_backend: NeighborBackend = "auto",
     ) -> None:
         if force_mode not in ("auto", "autograd", "direct"):
             raise ValueError(f"unsupported force_mode={force_mode!r}")
@@ -49,6 +51,7 @@ class AtomBitBatchCalculator(BatchCalculator):
             skin=skin,
             device=device,
             dtype=resolved_dtype,
+            neighbor_backend=neighbor_backend,
         )
         self.model = model.to(device=self.device, dtype=self.dtype).eval()
         self.force_mode = force_mode
@@ -257,6 +260,7 @@ def load_atombit_batch(
     model_call_kwargs: Mapping[str, object] | None = None,
     cutoff: float | None = None,
     skin: float = 0.0,
+    neighbor_backend: NeighborBackend = "auto",
 ) -> AtomBitBatchCalculator:
     """Construct a generic AtomBit-style calculator from a model factory."""
 
@@ -272,4 +276,5 @@ def load_atombit_batch(
         model_call_kwargs=model_call_kwargs,
         cutoff=infer_cutoff(model, cutoff),
         skin=skin,
+        neighbor_backend=neighbor_backend,
     )

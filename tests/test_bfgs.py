@@ -108,6 +108,21 @@ def test_float32_bfgs_promotes_frechet_optimizer_state():
     assert result.state.positions.dtype == torch.float32
 
 
+def test_float32_bfgs_accepts_float64_energy_offsets():
+    calculator = AtomBitBatchCalculator(
+        QuadraticWellModel(k=1.0),
+        cutoff=2.5,
+        device="cpu",
+        dtype=torch.float32,
+        e0_dict={1: -13.605693122994},
+    )
+    state = calculator.create_state([Atoms("H", positions=[[0.1, 0.0, 0.0]])])
+
+    result = batched_bfgs_relax(state, calculator, fmax=1e-30, max_steps=0)
+
+    assert result.evaluation.energy.dtype == torch.float64
+
+
 def test_fixed_cell_bfgs_matches_ase_update_order():
     initial = Atoms(
         "H2",

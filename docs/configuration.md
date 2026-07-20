@@ -22,7 +22,13 @@ runtime:
   device: cuda
   dtype: float32
   skin: 0.5
+  neighbor_backend: auto  # auto | matscipy | cuda_dense
 ```
+
+`auto` uses the CPU backend for small rebuilds and the integrated dense CUDA
+backend above a cutoff-aware work threshold. `matscipy` forces CPU construction
+(with ASE fallback outside matscipy's validated fully periodic path), while
+`cuda_dense` requires CUDA and raises for unsupported degenerate periodic cells.
 
 ## Model
 

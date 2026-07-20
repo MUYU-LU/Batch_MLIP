@@ -2,7 +2,7 @@
 
 A model-independent interface for **true batched geometry optimization and molecular dynamics** with graph MLIPs. Native adapters are included for AtomBit-style models and MACE.
 
-The engine concatenates independent atomic systems into one heterogeneous graph batch and performs one model forward pass per simulation step. ASE is used at the boundary for structure I/O and neighbour-list construction; PyTorch owns the batched model evaluation, optimizer state, and MD integration.
+The engine concatenates independent atomic systems into one heterogeneous graph batch and performs one model forward pass per simulation step. ASE is used at the boundary for structure I/O. An adaptive matscipy/ASE CPU or dense CUDA backend constructs neighbour lists, while PyTorch owns batched model evaluation, optimizer state, and MD integration.
 
 ## What is included
 
@@ -15,6 +15,7 @@ The engine concatenates independent atomic systems into one heterogeneous graph 
 - Autograd or direct forces, E0 offsets, and strain-gradient stress evaluation.
 - `FixAtoms` support.
 - Neighbour-list skins and rebuild accounting.
+- Exact ordered CUDA neighbour construction with adaptive CPU fallback.
 - extxyz trajectories, JSONL diagnostics, tensor checkpoints, and summary JSON.
 - YAML-driven CLI, deterministic toy models, tests, benchmarks, and an agent protocol.
 
@@ -183,6 +184,7 @@ calculator = AtomBitBatchCalculator(
     dtype=torch.float32,
     force_mode="autograd",
     e0_dict=e0_dict,
+    neighbor_backend="auto",  # auto | matscipy | cuda_dense
 )
 
 single_points = evaluate(systems, calculator)

@@ -1,0 +1,639 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "scope": "resident AseGraphBatch geometry through integrated graph replacement",
+  "screening_repeats": 1,
+  "warmup": "one complete rebuild per resident chunk and backend",
+  "environment": {
+    "python": "3.11.14",
+    "torch": "2.9.1+cu128",
+    "cuda": "12.8",
+    "gpu": "NVIDIA H100 80GB HBM3"
+  },
+  "points": [
+    {
+      "distribution": "H46",
+      "pool_size": 32,
+      "resident_batch_size": 1,
+      "cutoff_A": 4.5,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.06324238236993551,
+          "structures_per_s": 505.989793566226,
+          "directed_edges": 27482,
+          "peak_allocated_GB": 0.001421312,
+          "peak_reserved_GB": 0.002097152,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.1526266853325069,
+          "structures_per_s": 209.66189451265336,
+          "directed_edges": 27482,
+          "peak_allocated_GB": 0.035214848,
+          "peak_reserved_GB": 0.035651584,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 0.41435992816169714
+        }
+      }
+    },
+    {
+      "distribution": "H46",
+      "pool_size": 32,
+      "resident_batch_size": 2,
+      "cutoff_A": 4.5,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.03266343614086509,
+          "structures_per_s": 979.6887217252975,
+          "directed_edges": 27482,
+          "peak_allocated_GB": 0.034943488,
+          "peak_reserved_GB": 0.035651584,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.08365980116650462,
+          "structures_per_s": 382.50150674290666,
+          "directed_edges": 27482,
+          "peak_allocated_GB": 0.03540736,
+          "peak_reserved_GB": 0.035651584,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 0.3904316731025503
+        }
+      }
+    },
+    {
+      "distribution": "H46",
+      "pool_size": 32,
+      "resident_batch_size": 4,
+      "cutoff_A": 4.5,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.0271379379555583,
+          "structures_per_s": 1179.1610715745583,
+          "directed_edges": 27482,
+          "peak_allocated_GB": 0.035008512,
+          "peak_reserved_GB": 0.035651584,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.045470016077160835,
+          "structures_per_s": 703.7604725209961,
+          "directed_edges": 27482,
+          "peak_allocated_GB": 0.035921408,
+          "peak_reserved_GB": 0.037748736,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 0.596831501214037
+        }
+      }
+    },
+    {
+      "distribution": "H46",
+      "pool_size": 32,
+      "resident_batch_size": 8,
+      "cutoff_A": 4.5,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.024415230844169855,
+          "structures_per_s": 1310.657278001585,
+          "directed_edges": 27482,
+          "peak_allocated_GB": 0.035208192,
+          "peak_reserved_GB": 0.035651584,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.026406907942146063,
+          "structures_per_s": 1211.8041260304933,
+          "directed_edges": 27482,
+          "peak_allocated_GB": 0.037019136,
+          "peak_reserved_GB": 0.037748736,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 0.9245774210922497
+        }
+      }
+    },
+    {
+      "distribution": "H46",
+      "pool_size": 32,
+      "resident_batch_size": 16,
+      "cutoff_A": 4.5,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.02297448692843318,
+          "structures_per_s": 1392.84938548059,
+          "directed_edges": 27482,
+          "peak_allocated_GB": 0.035652608,
+          "peak_reserved_GB": 0.037748736,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.016411002725362778,
+          "structures_per_s": 1949.9113208082547,
+          "directed_edges": 27482,
+          "peak_allocated_GB": 0.039261184,
+          "peak_reserved_GB": 0.04194304,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.399944129734785
+        }
+      }
+    },
+    {
+      "distribution": "H46",
+      "pool_size": 32,
+      "resident_batch_size": 32,
+      "cutoff_A": 4.5,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.022009775042533875,
+          "structures_per_s": 1453.8994577709234,
+          "directed_edges": 27482,
+          "peak_allocated_GB": 0.036547584,
+          "peak_reserved_GB": 0.037748736,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.011127305217087269,
+          "structures_per_s": 2875.8085965737946,
+          "directed_edges": 27482,
+          "peak_allocated_GB": 0.043755008,
+          "peak_reserved_GB": 0.060817408,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.977996883624196
+        }
+      }
+    },
+    {
+      "distribution": "H46",
+      "pool_size": 32,
+      "resident_batch_size": 1,
+      "cutoff_A": 6.0,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.07001670217141509,
+          "structures_per_s": 457.0338077571478,
+          "directed_edges": 52122,
+          "peak_allocated_GB": 0.036025344,
+          "peak_reserved_GB": 0.037748736,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.1538604130037129,
+          "structures_per_s": 207.98072340562214,
+          "directed_edges": 52122,
+          "peak_allocated_GB": 0.036335616,
+          "peak_reserved_GB": 0.037748736,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 0.4550663865027158
+        }
+      }
+    },
+    {
+      "distribution": "H46",
+      "pool_size": 32,
+      "resident_batch_size": 2,
+      "cutoff_A": 6.0,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.05921109579503536,
+          "structures_per_s": 540.4392465691047,
+          "directed_edges": 52122,
+          "peak_allocated_GB": 0.036051456,
+          "peak_reserved_GB": 0.037748736,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.08712752722203732,
+          "structures_per_s": 367.27772519528344,
+          "directed_edges": 52122,
+          "peak_allocated_GB": 0.03665408,
+          "peak_reserved_GB": 0.037748736,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 0.6795911428100188
+        }
+      }
+    },
+    {
+      "distribution": "H46",
+      "pool_size": 32,
+      "resident_batch_size": 4,
+      "cutoff_A": 6.0,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.05378420604392886,
+          "structures_per_s": 594.9702032203215,
+          "directed_edges": 52122,
+          "peak_allocated_GB": 0.036226048,
+          "peak_reserved_GB": 0.037748736,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.04604614898562431,
+          "structures_per_s": 694.9549681123269,
+          "directed_edges": 52122,
+          "peak_allocated_GB": 0.037401088,
+          "peak_reserved_GB": 0.037748736,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.1680500373814189
+        }
+      }
+    },
+    {
+      "distribution": "H46",
+      "pool_size": 32,
+      "resident_batch_size": 8,
+      "cutoff_A": 6.0,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.05055278120562434,
+          "structures_per_s": 633.0017703643134,
+          "directed_edges": 52122,
+          "peak_allocated_GB": 0.036616704,
+          "peak_reserved_GB": 0.037748736,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.0260089123621583,
+          "structures_per_s": 1230.34748836935,
+          "directed_edges": 52122,
+          "peak_allocated_GB": 0.038904832,
+          "peak_reserved_GB": 0.039845888,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.9436714808257871
+        }
+      }
+    },
+    {
+      "distribution": "H46",
+      "pool_size": 32,
+      "resident_batch_size": 16,
+      "cutoff_A": 6.0,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.049621145240962505,
+          "structures_per_s": 644.8863653711853,
+          "directed_edges": 52122,
+          "peak_allocated_GB": 0.037430272,
+          "peak_reserved_GB": 0.039845888,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.01636672392487526,
+          "structures_per_s": 1955.1866425365815,
+          "directed_edges": 52122,
+          "peak_allocated_GB": 0.041930752,
+          "peak_reserved_GB": 0.044040192,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 3.0318312613280485
+        }
+      }
+    },
+    {
+      "distribution": "H46",
+      "pool_size": 32,
+      "resident_batch_size": 32,
+      "cutoff_A": 6.0,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.04783186176791787,
+          "structures_per_s": 669.010128756127,
+          "directed_edges": 52122,
+          "peak_allocated_GB": 0.039110144,
+          "peak_reserved_GB": 0.058720256,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.011313614435493946,
+          "structures_per_s": 2828.450640814409,
+          "directed_edges": 52122,
+          "peak_allocated_GB": 0.048091648,
+          "peak_reserved_GB": 0.06291456,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 4.227814377150423
+        }
+      }
+    },
+    {
+      "distribution": "H276",
+      "pool_size": 32,
+      "resident_batch_size": 1,
+      "cutoff_A": 4.5,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.0868681431747973,
+          "structures_per_s": 368.3743986055872,
+          "directed_edges": 158160,
+          "peak_allocated_GB": 0.040914944,
+          "peak_reserved_GB": 0.04194304,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.15493886219337583,
+          "structures_per_s": 206.53307728606845,
+          "directed_edges": 158160,
+          "peak_allocated_GB": 0.048743424,
+          "peak_reserved_GB": 0.065011712,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 0.5606607790005522
+        }
+      }
+    },
+    {
+      "distribution": "H276",
+      "pool_size": 32,
+      "resident_batch_size": 2,
+      "cutoff_A": 4.5,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.07580748805776238,
+          "structures_per_s": 422.121888217919,
+          "directed_edges": 158160,
+          "peak_allocated_GB": 0.041151488,
+          "peak_reserved_GB": 0.04194304,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.08549599768593907,
+          "structures_per_s": 374.28652645880305,
+          "directed_edges": 158160,
+          "peak_allocated_GB": 0.056830464,
+          "peak_reserved_GB": 0.065011712,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 0.8866787932720962
+        }
+      }
+    },
+    {
+      "distribution": "H276",
+      "pool_size": 32,
+      "resident_batch_size": 4,
+      "cutoff_A": 4.5,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.0701046041212976,
+          "structures_per_s": 456.4607474943073,
+          "directed_edges": 158160,
+          "peak_allocated_GB": 0.041779712,
+          "peak_reserved_GB": 0.044040192,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.04702003486454487,
+          "structures_per_s": 680.560958582559,
+          "directed_edges": 158160,
+          "peak_allocated_GB": 0.07316736,
+          "peak_reserved_GB": 0.088080384,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.4909517681825346
+        }
+      }
+    },
+    {
+      "distribution": "H276",
+      "pool_size": 32,
+      "resident_batch_size": 8,
+      "cutoff_A": 4.5,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.06660569179803133,
+          "structures_per_s": 480.4394209587029,
+          "directed_edges": 158160,
+          "peak_allocated_GB": 0.043021824,
+          "peak_reserved_GB": 0.044040192,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.027404274325817823,
+          "structures_per_s": 1167.7010534758988,
+          "directed_edges": 158160,
+          "peak_allocated_GB": 0.106371584,
+          "peak_reserved_GB": 0.132120576,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 2.430485515001632
+        }
+      }
+    },
+    {
+      "distribution": "H276",
+      "pool_size": 32,
+      "resident_batch_size": 16,
+      "cutoff_A": 4.5,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.06480323523283005,
+          "structures_per_s": 493.8025066962774,
+          "directed_edges": 158160,
+          "peak_allocated_GB": 0.045564416,
+          "peak_reserved_GB": 0.060817408,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.017545622773468494,
+          "structures_per_s": 1823.8167099083312,
+          "directed_edges": 158160,
+          "peak_allocated_GB": 0.1729536,
+          "peak_reserved_GB": 0.182452224,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 3.6934132273048674
+        }
+      }
+    },
+    {
+      "distribution": "H276",
+      "pool_size": 32,
+      "resident_batch_size": 32,
+      "cutoff_A": 4.5,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.06408092705532908,
+          "structures_per_s": 499.3685558320715,
+          "directed_edges": 158160,
+          "peak_allocated_GB": 0.05068032,
+          "peak_reserved_GB": 0.06291456,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.014698036946356297,
+          "structures_per_s": 2177.1614887614587,
+          "directed_edges": 158160,
+          "peak_allocated_GB": 0.302949888,
+          "peak_reserved_GB": 0.320864256,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 4.359828954656085
+        }
+      }
+    },
+    {
+      "distribution": "H276",
+      "pool_size": 32,
+      "resident_batch_size": 1,
+      "cutoff_A": 6.0,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.16549068503081799,
+          "structures_per_s": 193.36435760140157,
+          "directed_edges": 278232,
+          "peak_allocated_GB": 0.046042624,
+          "peak_reserved_GB": 0.048234496,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.15629096794873476,
+          "structures_per_s": 204.74631656575554,
+          "directed_edges": 278232,
+          "peak_allocated_GB": 0.053546496,
+          "peak_reserved_GB": 0.071303168,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0588627558126125
+        }
+      }
+    },
+    {
+      "distribution": "H276",
+      "pool_size": 32,
+      "resident_batch_size": 2,
+      "cutoff_A": 6.0,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.15464133489876986,
+          "structures_per_s": 206.93044340924502,
+          "directed_edges": 278232,
+          "peak_allocated_GB": 0.0465152,
+          "peak_reserved_GB": 0.048234496,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.08655077591538429,
+          "structures_per_s": 369.72516608383216,
+          "directed_edges": 278232,
+          "peak_allocated_GB": 0.06163456,
+          "peak_reserved_GB": 0.071303168,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.7867122884022875
+        }
+      }
+    },
+    {
+      "distribution": "H276",
+      "pool_size": 32,
+      "resident_batch_size": 4,
+      "cutoff_A": 6.0,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.14869298972189426,
+          "structures_per_s": 215.208531752914,
+          "directed_edges": 278232,
+          "peak_allocated_GB": 0.047653888,
+          "peak_reserved_GB": 0.050331648,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.04735047277063131,
+          "structures_per_s": 675.8116261058263,
+          "directed_edges": 278232,
+          "peak_allocated_GB": 0.077968896,
+          "peak_reserved_GB": 0.096468992,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 3.1402640992028212
+        }
+      }
+    },
+    {
+      "distribution": "H276",
+      "pool_size": 32,
+      "resident_batch_size": 8,
+      "cutoff_A": 6.0,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.1447901031933725,
+          "structures_per_s": 221.0095807257132,
+          "directed_edges": 278232,
+          "peak_allocated_GB": 0.049806336,
+          "peak_reserved_GB": 0.060817408,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.02848991984501481,
+          "structures_per_s": 1123.2042832721197,
+          "directed_edges": 278232,
+          "peak_allocated_GB": 0.112261632,
+          "peak_reserved_GB": 0.13631488,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 5.082152002569006
+        }
+      }
+    },
+    {
+      "distribution": "H276",
+      "pool_size": 32,
+      "resident_batch_size": 16,
+      "cutoff_A": 6.0,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.14300870802253485,
+          "structures_per_s": 223.76259769410368,
+          "directed_edges": 278232,
+          "peak_allocated_GB": 0.054303232,
+          "peak_reserved_GB": 0.06291456,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.017859179060906172,
+          "structures_per_s": 1791.79568617732,
+          "directed_edges": 278232,
+          "peak_allocated_GB": 0.177126912,
+          "peak_reserved_GB": 0.19922944,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 8.007574566267808
+        }
+      }
+    },
+    {
+      "distribution": "H276",
+      "pool_size": 32,
+      "resident_batch_size": 32,
+      "cutoff_A": 6.0,
+      "methods": {
+        "matscipy": {
+          "wall_time_s": 0.14279513293877244,
+          "structures_per_s": 224.097273775577,
+          "directed_edges": 278232,
+          "peak_allocated_GB": 0.063168512,
+          "peak_reserved_GB": 0.088080384,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 1.0
+        },
+        "cuda_dense": {
+          "wall_time_s": 0.014743268955498934,
+          "structures_per_s": 2170.4820075241632,
+          "directed_edges": 278232,
+          "peak_allocated_GB": 0.30775296,
+          "peak_reserved_GB": 0.320864256,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_matscipy": 9.68544583767583
+        }
+      }
+    }
+  ]
+}
