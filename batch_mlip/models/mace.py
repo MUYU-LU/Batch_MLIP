@@ -365,14 +365,16 @@ def load_mace_off_batch(
     model: str = "small",
     *,
     device: str | torch.device = "cpu",
-    dtype: torch.dtype = torch.float64,
+    dtype: str | torch.dtype = torch.float64,
     **adapter_kwargs: Any,
 ) -> MACEBatchCalculator:
     """Compatibility wrapper for :meth:`MACEBatchCalculator.from_off`."""
 
+    from .loaders import parse_dtype
+
     return MACEBatchCalculator.from_off(
         model=model,
         device=device,
-        dtype=dtype,
+        dtype=parse_dtype(dtype),
         **adapter_kwargs,
     )

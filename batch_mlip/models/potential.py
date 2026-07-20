@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from contextlib import nullcontext
-from typing import Literal
+from typing import Any, Literal
 
 import torch
 
@@ -243,3 +243,32 @@ class AtomBitBatchCalculator(BatchCalculator):
 
 # Public compatibility alias retained for existing scripts and checkpoints.
 BatchedPotential = AtomBitBatchCalculator
+
+
+def load_atombit_batch(
+    model_factory: str,
+    *,
+    model_kwargs: Mapping[str, Any] | None = None,
+    device: str | torch.device = "cpu",
+    dtype: str | torch.dtype = torch.float32,
+    force_mode: ForceMode = "autograd",
+    e0: str | Mapping[int, float] | None = None,
+    model_call_kwargs: Mapping[str, object] | None = None,
+    cutoff: float | None = None,
+    skin: float = 0.0,
+) -> AtomBitBatchCalculator:
+    """Construct a generic AtomBit-style calculator from a model factory."""
+
+    from .loaders import build_model, infer_cutoff, load_e0, parse_dtype
+
+    model = build_model(model_factory, model_kwargs)
+    return AtomBitBatchCalculator(
+        model,
+        device=device,
+        dtype=parse_dtype(dtype),
+        force_mode=force_mode,
+        e0_dict=load_e0(e0),
+        model_call_kwargs=model_call_kwargs,
+        cutoff=infer_cutoff(model, cutoff),
+        skin=skin,
+    )

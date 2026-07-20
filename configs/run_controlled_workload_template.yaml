@@ -1,0 +1,29 @@
+schema_version: 1
+
+workload:
+  manifest: benchmarks/workloads/manifests/EVAL-MIX-R32-v1.json
+  dataset_dir: /public/home/lmy/Batch_imple_project/atombit_batch_lab/data/T2_test/structures
+
+calculator:
+  factory: batch_mlip.models.mace:load_mace_off_batch
+  kwargs:
+    model: small
+    device: cuda:0
+    dtype: float64
+    graph_mode: cached
+    skin: 0.0
+
+run:
+  run_id: replace-with-unique-run-id
+  study_id: task-aware-eval-screening
+  model_name: MACE-OFF-Small
+  model_checkpoint_sha256: 165cce4cfec5a34b9c64d4ebf95de15d71106bb584b7291c8470f0749977c46f
+  code_commit: replace-with-git-commit
+  resident_batch_size: 32
+  equivalence_tier: K1
+  validation_pass: false
+  repeat_index: 0
+
+output:
+  directory: runs/controlled/example
+  registry: runs/controlled/registry.csv

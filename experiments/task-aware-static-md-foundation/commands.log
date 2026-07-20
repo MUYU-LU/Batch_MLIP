@@ -1,0 +1,8 @@
+Baseline: 159c1fa3c3fdb9f752a55f81e8c4c4d145897b3a
+
+PYTHONPATH=. /public/home/lmy/.conda/envs/lmy/bin/python tools/generate_controlled_workloads.py
+PYTHONPATH=. /public/home/lmy/.conda/envs/lmy/bin/python tools/validate_controlled_workloads.py --output experiments/task-aware-static-md-foundation/validation.json
+find benchmarks/workloads -type f -print0 | sort -z | xargs -0 sha256sum
+/public/home/lmy/.conda/envs/lmy/bin/ruff check batch_mlip tests tools
+/public/home/lmy/.conda/envs/lmy/bin/python -m compileall -q batch_mlip tests tools
+/public/home/lmy/.conda/envs/lmy/bin/python -m pytest -q

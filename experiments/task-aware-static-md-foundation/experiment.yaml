@@ -1,0 +1,36 @@
+id: task-aware-static-md-foundation
+date: 2026-07-20
+baseline_commit: 159c1fa3c3fdb9f752a55f81e8c4c4d145897b3a
+hypothesis: >-
+  Frozen small/large single-point and fixed-horizon MD workloads, executed by
+  one manifest-driven calculator-independent runner, can preserve job identity
+  and MD initial conditions across resident batch sizes while emitting directly
+  comparable wall-time and peak-memory telemetry.
+scope:
+  models: [AtomBit, MACE-OFF-Small, generic BatchCalculator]
+  pool_sizes: [32, 256]
+  structure_distributions: [H46, H276, MIX]
+  tasks: [force_evaluation, md_nve]
+  gpu_count: 1
+deliverables:
+  - six force-evaluation workload manifests
+  - six fixed-horizon NVE workload manifests
+  - batch-size-invariant per-system velocity initialization
+  - generic manifest materialization and ordered microbatch execution
+  - unified telemetry JSON, registry CSV, summary JSON, and final extxyz output
+correctness_gates:
+  - source and normalized structure hashes verified when materialized
+  - output order equals manifest order
+  - single-point chunking preserves energies and forces
+  - MD initial velocities are invariant to resident batch partitioning
+  - NVE state agrees across equivalent chunkings within declared tolerance
+  - every run declares an equivalence tier and validation status
+  - no numerical MLIP, optimizer, or integrator algorithm change
+performance_measurement:
+  screening_md_warmup_steps: 100
+  screening_md_measured_steps: 1000
+  resident_batches_R32: [8, 16, 32]
+  resident_batches_R256: [32, 64, 128, all_if_safe]
+  primary_metrics: [wall_time_s, speedup_vs_ASE_B1, peak_allocated_GB]
+  supporting_metrics: [throughput, peak_reserved_GB, memory_fraction]
+performance_claim: none

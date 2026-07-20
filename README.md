@@ -275,6 +275,21 @@ The frozen suite and its model-specific profiles are indexed by
 `PYTHONPATH=. python tools/generate_controlled_workloads.py` and
 `PYTHONPATH=. python tools/validate_controlled_workloads.py`.
 
+Static force evaluation and fixed-horizon NVE workloads use the same signed
+manifest runner for every native `BatchCalculator`:
+
+```bash
+batch-mlip-workload configs/run_controlled_workload_template.yaml
+```
+
+The YAML selects a calculator factory, model options, resident batch size, and
+output paths without changing task definitions. Each run writes input-ordered
+final structures, runtime phase data, telemetry, and a concise summary.
+`wall_time_s` and throughput cover only the synchronized measured region;
+`end_to_end_time_s` also includes verified dataset loading and model/physical
+warm-up, but not calculator construction or output serialization. Peak allocated
+and reserved GPU memory cover the measured region.
+
 CUDA events are resolved once when the context exits. The variable-cell
 benchmark scripts accept `--profile-runtime` and store the full phase samples
 and scheduler events in their JSON point results.

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pytest
 import torch
 from ase import Atoms
 from batch_mlip.toy_models import QuadraticWellModel
@@ -60,3 +61,33 @@ def test_langevin_supports_per_system_temperature_and_friction():
     )
     assert result.temperature.shape == (2,)
     assert torch.isfinite(result.temperature).all()
+
+
+def test_per_system_velocity_seeds_are_invariant_to_batch_partitioning():
+    systems = [
+        Atoms("H2", positions=[[0.1 + offset, 0, 0], [-0.1 + offset, 0, 0]])
+        for offset in (0.0, 0.2, 0.4)
+    ]
+    seeds = [101, 202, 303]
+    combined = AseGraphBatch.from_ase(systems, cutoff=2.0, device="cpu", dtype=torch.float64)
+    initialize_maxwell_boltzmann(
+        combined,
+        300.0,
+        seed=seeds,
+        force_exact_temperature=True,
+    )
+
+    partitioned = []
+    for atoms, seed in zip(systems, seeds, strict=True):
+        state = AseGraphBatch.from_ase([atoms], cutoff=2.0, device="cpu", dtype=torch.float64)
+        initialize_maxwell_boltzmann(
+            state,
+            300.0,
+            seed=[seed],
+            force_exact_temperature=True,
+        )
+        partitioned.append(state.velocities)
+
+    torch.testing.assert_close(combined.velocities, torch.cat(partitioned), rtol=0, atol=0)
+    with pytest.raises(ValueError, match="one value per system"):
+        initialize_maxwell_boltzmann(combined, 300.0, seed=[1, 2])

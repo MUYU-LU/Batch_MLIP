@@ -21,7 +21,7 @@ def initialize_maxwell_boltzmann(
     state: AseGraphBatch,
     temperature_K: float | Sequence[float] | torch.Tensor,
     *,
-    seed: int | None = None,
+    seed: int | Sequence[int] | torch.Tensor | None = None,
     remove_com: bool = True,
     force_exact_temperature: bool = False,
 ) -> None:
@@ -37,23 +37,41 @@ def initialize_maxwell_boltzmann(
     if bool((temperatures < 0.0).any()):
         raise ValueError("temperature must be non-negative")
 
-    generator = None
-    if seed is not None:
-        generator = torch.Generator(device=state.device)
-        generator.manual_seed(seed)
-
     atom_temperature = temperatures[state.system_idx]
     sigma = torch.sqrt(
         KB_EV_PER_K
         * atom_temperature
         / (state.masses * AMU_A2_PER_FS2_TO_EV)
     )
-    state.velocities = torch.randn(
-        state.positions.shape,
-        device=state.device,
-        dtype=state.dtype,
-        generator=generator,
-    ) * sigma.unsqueeze(-1)
+    if seed is None or isinstance(seed, int):
+        generator = None
+        if seed is not None:
+            generator = torch.Generator(device=state.device)
+            generator.manual_seed(seed)
+        noise = torch.randn(
+            state.positions.shape,
+            device=state.device,
+            dtype=state.dtype,
+            generator=generator,
+        )
+    else:
+        seed_values = torch.as_tensor(seed, device="cpu", dtype=torch.int64).reshape(-1)
+        if seed_values.numel() != state.n_systems:
+            raise ValueError("seed sequence must contain one value per system")
+        if bool((seed_values < 0).any()):
+            raise ValueError("per-system seeds must be non-negative")
+        noise = torch.empty_like(state.positions)
+        for system_id, seed_value in enumerate(seed_values.tolist()):
+            generator = torch.Generator(device=state.device)
+            generator.manual_seed(seed_value)
+            atom_slice = state.atom_slice(system_id)
+            noise[atom_slice] = torch.randn(
+                noise[atom_slice].shape,
+                device=state.device,
+                dtype=state.dtype,
+                generator=generator,
+            )
+    state.velocities = noise * sigma.unsqueeze(-1)
     state.zero_fixed_motion_()
 
     if remove_com:

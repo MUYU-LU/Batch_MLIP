@@ -22,6 +22,18 @@ from batch_mlip.workloads import (
 )
 
 EXPECTED = {
+    "EVAL-H276-R256-v1": (256, 32, {276: 256}, "fixed"),
+    "EVAL-H276-R32-v1": (32, 32, {276: 32}, "fixed"),
+    "EVAL-H46-R256-v1": (256, 32, {46: 256}, "fixed"),
+    "EVAL-H46-R32-v1": (32, 32, {46: 32}, "fixed"),
+    "EVAL-MIX-R256-v1": (256, 64, {46: 128, 276: 128}, "fixed"),
+    "EVAL-MIX-R32-v1": (32, 32, {46: 16, 276: 16}, "fixed"),
+    "MD-NVE-H276-R256-v1": (256, 32, {276: 256}, "fixed"),
+    "MD-NVE-H276-R32-v1": (32, 32, {276: 32}, "fixed"),
+    "MD-NVE-H46-R256-v1": (256, 32, {46: 256}, "fixed"),
+    "MD-NVE-H46-R32-v1": (32, 32, {46: 32}, "fixed"),
+    "MD-NVE-MIX-R256-v1": (256, 64, {46: 128, 276: 128}, "fixed"),
+    "MD-NVE-MIX-R32-v1": (32, 32, {46: 16, 276: 16}, "fixed"),
     "OPT-FIXED50-v1": (256, 32, {276: 256}, "variable"),
     "OPT-H276-FIXED-R256-v1": (256, 32, {276: 256}, "fixed"),
     "OPT-H276-R256-v1": (256, 32, {276: 256}, "variable"),
@@ -132,6 +144,26 @@ def _validate_manifest(
         provenance = manifest.metadata.get("reference_provenance", {})
         if len(provenance.get("model_checkpoint_sha256", "")) != 64:
             raise ValueError(f"missing model hash for {workload_id}")
+    if workload_id.startswith("EVAL-"):
+        if manifest.operation != "force_evaluation":
+            raise ValueError(f"unexpected evaluation operation for {workload_id}")
+        if manifest.metadata.get("compute_stress") is not False:
+            raise ValueError(f"evaluation stress policy is not frozen for {workload_id}")
+    if workload_id.startswith("MD-NVE-"):
+        if manifest.operation != "md_nve":
+            raise ValueError(f"unexpected MD operation for {workload_id}")
+        seeds = [job.random_seed for job in manifest.jobs]
+        if seeds != [2026072000 + index for index in range(expected_jobs)]:
+            raise ValueError(f"MD per-job seeds differ for {workload_id}")
+        required_md = {
+            "ensemble": "nve",
+            "initial_temperature_K": 300.0,
+            "timestep_fs": 0.5,
+            "warmup_steps": 100,
+            "measured_steps": 1000,
+        }
+        if any(manifest.metadata.get(key) != value for key, value in required_md.items()):
+            raise ValueError(f"MD execution definition differs for {workload_id}")
 
     with Path(entry["manifest_csv"]).open(newline="", encoding="utf-8") as handle:
         if sum(1 for _ in csv.DictReader(handle)) != expected_jobs:

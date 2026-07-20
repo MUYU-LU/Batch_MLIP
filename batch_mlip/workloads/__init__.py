@@ -6,6 +6,12 @@ from .generator import (
     normalized_structure_sha256,
     topology_key,
 )
+from .materialize import materialize_workload
+from .runner import (
+    WorkloadExecutionResult,
+    WorkloadRunSpec,
+    execute_workload,
+)
 from .schema import (
     TaskProfile,
     WorkloadJob,
@@ -20,8 +26,12 @@ __all__ = [
     "TaskProfile",
     "WorkloadJob",
     "WorkloadManifest",
+    "WorkloadExecutionResult",
+    "WorkloadRunSpec",
     "build_t2_workloads",
     "normalized_structure_sha256",
+    "execute_workload",
+    "materialize_workload",
     "read_workload_manifest",
     "topology_key",
     "write_workload_jobs_csv",

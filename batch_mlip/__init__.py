@@ -36,7 +36,11 @@ from .interfaces.reporting import (
     build_reporter,
 )
 from .models.mace import MACEBatchCalculator, load_mace_off_batch
-from .models.potential import AtomBitBatchCalculator, BatchedPotential
+from .models.potential import (
+    AtomBitBatchCalculator,
+    BatchedPotential,
+    load_atombit_batch,
+)
 from .optimization.bfgs import batched_bfgs_relax
 from .optimization.cell_filters import BatchedFrechetCellFilter, FrechetCellFilter
 from .optimization.fire import (
@@ -66,7 +70,15 @@ from .planning import (
     fit_memory_coefficients,
 )
 from .profiling import RunTelemetry, RuntimeProfiler
-from .workloads import TaskProfile, WorkloadJob, WorkloadManifest
+from .workloads import (
+    TaskProfile,
+    WorkloadExecutionResult,
+    WorkloadJob,
+    WorkloadManifest,
+    WorkloadRunSpec,
+    execute_workload,
+    materialize_workload,
+)
 
 
 def _install_legacy_module_aliases() -> None:
@@ -146,6 +158,8 @@ __all__ = [
     "WorkerShard",
     "WorkloadJob",
     "WorkloadManifest",
+    "WorkloadExecutionResult",
+    "WorkloadRunSpec",
     "available_optimizers",
     "balance_work",
     "batched_bfgs_relax",
@@ -156,10 +170,13 @@ __all__ = [
     "build_reporter",
     "create_optimizer",
     "evaluate",
+    "execute_workload",
     "fit_memory_coefficients",
     "initialize_maxwell_boltzmann",
     "load_mace_off_batch",
+    "load_atombit_batch",
     "max_force_per_system",
+    "materialize_workload",
     "molecular_dynamics",
     "register_optimizer",
     "relax",

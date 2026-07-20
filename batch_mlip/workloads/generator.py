@@ -97,6 +97,7 @@ def _job(
     dataset_id: str,
     order: int,
     reference: dict[str, Any] | None = None,
+    random_seed: int | None = None,
 ) -> WorkloadJob:
     atoms = record.atoms
     return WorkloadJob(
@@ -117,6 +118,7 @@ def _job(
         volume_A3=float(atoms.get_volume()) if atoms.cell.rank == 3 else 0.0,
         constraints=_constraint_names(atoms),
         topology_edge_counts=dict(record.topology_edge_counts),
+        random_seed=random_seed,
         reference=reference,
     )
 
@@ -131,7 +133,10 @@ def _manifest(
     cell_mode: str = "variable",
     metadata: dict[str, Any],
     references: dict[str, dict[str, Any]] | None = None,
+    random_seeds: list[int | None] | None = None,
 ) -> WorkloadManifest:
+    if random_seeds is not None and len(random_seeds) != len(records):
+        raise ValueError("random_seeds must contain one value per workload job")
     jobs = tuple(
         _job(
             record,
@@ -139,6 +144,7 @@ def _manifest(
             dataset_id=inputs.dataset_id,
             order=index,
             reference=(references or {}).get(record.source_path),
+            random_seed=None if random_seeds is None else random_seeds[index],
         )
         for index, record in enumerate(records)
     )
@@ -354,6 +360,59 @@ def build_t2_workloads(
         },
     )
     workloads[fixed.workload_id] = fixed
+
+    pool_records = {
+        ("H46", 32): small,
+        ("H46", 256): [small[index % 32] for index in range(256)],
+        ("H276", 32): large,
+        ("H276", 256): [large[index % 32] for index in range(256)],
+        ("MIX", 32): [record for index in range(16) for record in (small[index], large[index])],
+        ("MIX", 256): [
+            record for index in range(128) for record in (small[index % 32], large[index % 32])
+        ],
+    }
+    for (distribution, pool_size), records in pool_records.items():
+        common = {
+            **base_metadata,
+            "source_distribution": distribution,
+            "pool_size": pool_size,
+            "unique_structures": len({record.normalized_sha256 for record in records}),
+        }
+        evaluation_id = f"EVAL-{distribution}-R{pool_size}-v1"
+        workloads[evaluation_id] = _manifest(
+            evaluation_id,
+            records,
+            inputs=inputs,
+            family="static_one_shot",
+            operation="force_evaluation",
+            cell_mode="fixed",
+            metadata={
+                **common,
+                "requested_properties": ["energy", "forces"],
+                "compute_stress": False,
+            },
+        )
+        md_id = f"MD-NVE-{distribution}-R{pool_size}-v1"
+        workloads[md_id] = _manifest(
+            md_id,
+            records,
+            inputs=inputs,
+            family="fixed_horizon_persistent",
+            operation="md_nve",
+            cell_mode="fixed",
+            metadata={
+                **common,
+                "ensemble": "nve",
+                "initial_temperature_K": 300.0,
+                "remove_initial_com": True,
+                "force_exact_initial_temperature": True,
+                "timestep_fs": 0.5,
+                "warmup_steps": 100,
+                "measured_steps": 1000,
+                "seed_rule": "2026072000 + output order",
+            },
+            random_seeds=[2026072000 + index for index in range(pool_size)],
+        )
 
     for model_key, path in (
         ("atombit", atombit_reference),
