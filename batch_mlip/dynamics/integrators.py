@@ -209,6 +209,7 @@ def batched_velocity_verlet(
         steps=n_steps,
         kinetic_energy=state.kinetic_energy(),
         temperature=state.temperature(com_removed=com_removed_for_temperature),
+        initial_total_energy=initial_total,
     )
 
 

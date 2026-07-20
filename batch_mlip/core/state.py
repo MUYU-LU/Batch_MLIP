@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 
 import numpy as np
 import torch
-from ase import Atoms
+from ase import Atoms, units
 from ase.calculators.singlepoint import SinglePointCalculator
 from ase.constraints import FixAtoms
 
@@ -119,7 +119,9 @@ class AseGraphBatch:
             velocity = atoms.get_velocities()
             if velocity is None:
                 velocity = np.zeros((len(atoms), 3), dtype=np.float64)
-            velocity_arrays.append(np.asarray(velocity, dtype=np.float64))
+            # ASE velocities are Angstrom per ASE time unit; tensor-state MD
+            # uses Angstrom/fs explicitly.
+            velocity_arrays.append(np.asarray(velocity, dtype=np.float64) * units.fs)
         velocities_np = np.concatenate(velocity_arrays, axis=0)
 
         batch = cls(
@@ -531,7 +533,7 @@ class AseGraphBatch:
             atoms = template.copy()
             atoms.positions[:] = pos_cpu[atom_slice]
             atoms.set_cell(cell_cpu[graph_idx], scale_atoms=False)
-            atoms.set_velocities(vel_cpu[atom_slice])
+            atoms.set_velocities(vel_cpu[atom_slice] / units.fs)
             if wrap:
                 atoms.wrap()
 

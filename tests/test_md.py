@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import numpy as np
 import pytest
 import torch
-from ase import Atoms
+from ase import Atoms, units
 from batch_mlip.toy_models import QuadraticWellModel
 
 from batch_mlip import (
@@ -31,7 +32,26 @@ def test_velocity_verlet_has_small_energy_drift_for_quadratic_well():
         state, potential, timestep_fs=0.05, n_steps=1000
     )
     final = result.evaluation.energy + result.kinetic_energy
+    assert result.initial_total_energy is not None
+    torch.testing.assert_close(result.initial_total_energy, initial)
     assert float(torch.abs(final - initial).max()) < 2e-6
+
+
+def test_ase_velocity_boundary_preserves_velocity_and_kinetic_energy():
+    atoms = Atoms("H2", positions=[[0.1, 0, 0], [-0.1, 0, 0]])
+    atoms.set_velocities([[0.2, -0.1, 0.0], [-0.05, 0.15, 0.1]])
+    state = AseGraphBatch.from_ase(
+        [atoms], cutoff=2.0, device="cpu", dtype=torch.float64, build_neighbors=False
+    )
+
+    torch.testing.assert_close(
+        state.velocities,
+        torch.as_tensor(atoms.get_velocities() * units.fs, dtype=torch.float64),
+    )
+    assert float(state.kinetic_energy()[0]) == pytest.approx(atoms.get_kinetic_energy())
+    np.testing.assert_allclose(
+        state.to_ase(evaluation=None)[0].get_velocities(), atoms.get_velocities()
+    )
 
 
 def test_langevin_supports_per_system_temperature_and_friction():

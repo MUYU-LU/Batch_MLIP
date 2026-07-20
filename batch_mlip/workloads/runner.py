@@ -153,7 +153,15 @@ def _run_evaluation(
     *,
     resident_batch_size: int,
     compute_stress: bool,
-) -> tuple[list[Atoms], list[dict[str, Any]], float, float, int | None, int | None]:
+) -> tuple[
+    list[Atoms],
+    list[dict[str, Any]],
+    float,
+    float,
+    int | None,
+    int | None,
+    dict[str, Any] | None,
+]:
     startup_started = time.perf_counter()
     evaluate([systems[0]], calculator, compute_stress=compute_stress)
     _synchronize(calculator.device)
@@ -177,6 +185,7 @@ def _run_evaluation(
         first_result_seconds,
         allocated,
         reserved,
+        None,
     )
 
 
@@ -186,7 +195,15 @@ def _run_nve(
     calculator: BatchCalculator,
     *,
     resident_batch_size: int,
-) -> tuple[list[Atoms], list[dict[str, Any]], float, float, int | None, int | None]:
+) -> tuple[
+    list[Atoms],
+    list[dict[str, Any]],
+    float,
+    float,
+    int | None,
+    int | None,
+    dict[str, Any],
+]:
     metadata = manifest.metadata
     timestep_fs = float(metadata["timestep_fs"])
     warmup_steps = int(metadata["warmup_steps"])
@@ -199,6 +216,8 @@ def _run_nve(
     peak_allocated = None
     peak_reserved = None
     measured_elapsed = 0.0
+    initial_total_energy_eV: list[float] = []
+    final_total_energy_eV: list[float] = []
 
     for start, stop in _chunks(len(systems), resident_batch_size):
         startup_started = time.perf_counter()
@@ -237,10 +256,34 @@ def _run_nve(
         if not output:
             first_result_seconds = measured_elapsed
         output.extend(result.structures)
+        if result.initial_total_energy is None:
+            raise RuntimeError("NVE integrator did not report its initial total energy")
+        initial_total_energy_eV.extend(result.initial_total_energy.detach().cpu().tolist())
+        final_total_energy_eV.extend(
+            (result.evaluation.energy + result.kinetic_energy).detach().cpu().tolist()
+        )
         allocated, reserved = _memory_snapshot(calculator.device)
         if allocated is not None:
             peak_allocated = max(peak_allocated or 0, allocated)
             peak_reserved = max(peak_reserved or 0, int(reserved or 0))
+    drift_eV = [
+        final - initial
+        for initial, final in zip(initial_total_energy_eV, final_total_energy_eV, strict=True)
+    ]
+    abs_drift_per_atom = [
+        abs(drift) / job.atom_count for drift, job in zip(drift_eV, manifest.jobs, strict=True)
+    ]
+    diagnostics = {
+        "initial_total_energy_eV": initial_total_energy_eV,
+        "final_total_energy_eV": final_total_energy_eV,
+        "total_energy_drift_eV": drift_eV,
+        "mean_abs_energy_drift_eV_per_atom": sum(abs_drift_per_atom) / len(abs_drift_per_atom),
+        "rms_energy_drift_eV_per_atom": (
+            sum(value * value for value in abs_drift_per_atom) / len(abs_drift_per_atom)
+        )
+        ** 0.5,
+        "max_abs_energy_drift_eV_per_atom": max(abs_drift_per_atom),
+    }
     return (
         output,
         profiles,
@@ -248,6 +291,7 @@ def _run_nve(
         first_result_seconds,
         peak_allocated,
         peak_reserved,
+        diagnostics,
     )
 
 
@@ -290,7 +334,9 @@ def execute_workload(
         algorithm = "velocity_verlet"
         useful_units = len(systems) * int(manifest.metadata["measured_steps"])
         useful_unit_name = "replica_steps"
-    structures, profiles, startup_seconds, first_result, allocated, reserved = run_output
+    structures, profiles, startup_seconds, first_result, allocated, reserved, diagnostics = (
+        run_output
+    )
     ended_at = datetime.now(timezone.utc)
     profile = _merge_runtime_profiles(profiles)
     measured = runtime_profile_registry_fields(profile)
@@ -368,6 +414,8 @@ def execute_workload(
         "peak_reserved_GB": telemetry.values["peak_reserved_GB"],
         "output_system_ids": [atoms.info["workload_system_id"] for atoms in structures],
     }
+    if diagnostics is not None:
+        summary["md_energy"] = diagnostics
     result = WorkloadExecutionResult(structures, telemetry, profile, summary)
     if output_dir is not None:
         output = Path(output_dir)

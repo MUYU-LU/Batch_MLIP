@@ -1,0 +1,8 @@
+Baseline: f7663768a34e052643d4abcbfe32ef5eefab8547
+
+/public/home/lmy/.conda/envs/lmy/bin/ruff check batch_mlip tests benchmarks/benchmark_controlled_matrix.py
+/public/home/lmy/.conda/envs/lmy/bin/python -m pytest -q
+/public/home/lmy/.conda/envs/lmy/bin/python benchmarks/benchmark_controlled_matrix.py --model atombit --task eval --pool-size 32 --distributions H46 --batch-sizes 8 --device cuda:0 --code-commit development --output runs/task_aware_static_md_performance/pilots/atombit_eval_h46_r32_e0fixed.json
+/public/home/lmy/.conda/envs/MACE_clean/bin/python benchmarks/benchmark_controlled_matrix.py --model mace --task eval --pool-size 32 --distributions H46 --batch-sizes 8 --device cuda:0 --code-commit development --output runs/task_aware_static_md_performance/pilots/mace_eval_h46_r32.json
+/public/home/lmy/.conda/envs/lmy/bin/python benchmarks/benchmark_controlled_matrix.py --model atombit --task nve --pool-size 32 --distributions MIX --batch-sizes 8 --validation-only --device cuda:0 --code-commit development --output runs/task_aware_static_md_performance/pilots/atombit_nve_short_fixed.json
+/public/home/lmy/.conda/envs/MACE_clean/bin/python benchmarks/benchmark_controlled_matrix.py --model mace --task nve --pool-size 32 --distributions MIX --batch-sizes 8 --validation-only --device cuda:0 --code-commit development --output runs/task_aware_static_md_performance/pilots/mace_nve_short.json

@@ -61,15 +61,15 @@ class AtomBitBatchCalculator(BatchCalculator):
             parameter.requires_grad_(False)
 
     def _e0_per_system(self, state: AseGraphBatch) -> torch.Tensor:
-        offsets = torch.zeros(state.n_systems, device=state.device, dtype=state.dtype)
         if not self.e0_dict:
-            return offsets
+            return torch.zeros(state.n_systems, device=state.device, dtype=state.dtype)
 
-        atom_offsets = torch.zeros(state.n_atoms, device=state.device, dtype=state.dtype)
+        offset_dtype = torch.float64 if state.dtype == torch.float32 else state.dtype
+        atom_offsets = torch.zeros(state.n_atoms, device=state.device, dtype=offset_dtype)
         for atomic_number, energy in self.e0_dict.items():
             atom_offsets = torch.where(
                 state.z == atomic_number,
-                torch.as_tensor(energy, device=state.device, dtype=state.dtype),
+                torch.as_tensor(energy, device=state.device, dtype=offset_dtype),
                 atom_offsets,
             )
         return scatter_sum(atom_offsets, state.system_idx, state.n_systems)
@@ -223,7 +223,8 @@ class AtomBitBatchCalculator(BatchCalculator):
             if bool(nonperiodic.any()):
                 stress = stress.masked_fill(nonperiodic.view(-1, 1, 1), torch.nan)
 
-        total_energy = model_energy + self._e0_per_system(state)
+        e0 = self._e0_per_system(state)
+        total_energy = model_energy.to(e0.dtype) + e0
         profile_event(
             "model_evaluation",
             adapter="atombit",

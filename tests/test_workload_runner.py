@@ -147,6 +147,8 @@ def test_nve_workload_is_invariant_to_resident_batch_partitioning(tmp_path):
 
     assert full.summary["useful_unit"] == "replica_steps"
     assert full.summary["useful_units"] == 8
+    assert len(full.summary["md_energy"]["total_energy_drift_eV"]) == 4
+    assert full.summary["md_energy"]["max_abs_energy_drift_eV_per_atom"] >= 0.0
     for expected, actual in zip(full.structures, chunked.structures, strict=True):
         np.testing.assert_allclose(expected.positions, actual.positions, rtol=0, atol=1e-15)
         np.testing.assert_allclose(

@@ -41,6 +41,28 @@ def test_batch_matches_single_system_evaluations():
     torch.testing.assert_close(batched.forces, torch.cat(forces), atol=1e-12, rtol=1e-12)
 
 
+def test_float32_model_accumulates_e0_in_float64():
+    systems = [Atoms("H46", positions=torch.zeros(46, 3).numpy())]
+    state = AseGraphBatch.from_ase(
+        systems, cutoff=3.0, device="cpu", dtype=torch.float32, build_neighbors=False
+    )
+    residual = AtomBitBatchCalculator(
+        QuadraticWellModel(k=1.7), device="cpu", dtype=torch.float32, cutoff=3.0
+    )(state, neighbor_policy="never")
+    e0_value = -13.605693122994
+    total = AtomBitBatchCalculator(
+        QuadraticWellModel(k=1.7),
+        device="cpu",
+        dtype=torch.float32,
+        cutoff=3.0,
+        e0_dict={1: e0_value},
+    )(state, neighbor_policy="never")
+
+    assert total.energy.dtype == torch.float64
+    expected = residual.energy.to(torch.float64) + 46 * e0_value
+    torch.testing.assert_close(total.energy, expected, rtol=0, atol=1e-12)
+
+
 def test_neighbor_edges_never_cross_graphs():
     batch = AseGraphBatch.from_ase(
         make_systems(), cutoff=3.0, device="cpu", dtype=torch.float64

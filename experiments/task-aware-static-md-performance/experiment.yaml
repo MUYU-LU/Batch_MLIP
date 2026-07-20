@@ -1,0 +1,56 @@
+id: task-aware-static-md-performance
+date: 2026-07-20
+baseline_commit: f7663768a34e052643d4abcbfe32ef5eefab8547
+hypothesis: >-
+  The throughput-optimal resident batch depends on model, task, pool size, and
+  atom/edge distribution; native batching improves measured useful-work
+  throughput over ordinary ASE B1 while remaining within the declared
+  correctness and memory gates.
+models:
+  - AtomBit checkpoint model_epoch_15.pt, float32, cutoff 6.0 A
+  - MACE-OFF-Small, float64, cutoff 4.5 A
+tasks: [force_evaluation, md_nve]
+workloads:
+  distributions: [H46, H276, MIX]
+  pool_sizes: [32, 256]
+  manifest_version: v1
+methods:
+  reference: ordinary ASE calculator, sequential B1
+  batch: native BatchCalculator, ordered contiguous resident batches
+resident_matrix:
+  R32: [8, 16, 32]
+  R256: [32, 64, 128, 256]
+replication:
+  screening_repeats: 1
+  interpretation: differences below 2 percent are inconclusive
+timing:
+  calculator_construction: excluded
+  wall_time_s: synchronized measured region
+  end_to_end_time_s: verified materialization plus warmup plus measured region
+  output_serialization: excluded
+  eval_warmup: one force evaluation
+  md_physical_warmup_steps: 100
+  md_measured_steps: 1000
+metrics:
+  primary: [speedup_vs_ASE_B1, wall_time_s, peak_allocated_GB]
+  throughput: [structures_per_s, replica_steps_per_s, atoms_per_s]
+  supporting:
+    - peak_reserved_GB
+    - model_and_graph_phase_time_s
+    - directed_edges
+    - neighbor_rebuilds
+    - NVE_energy_drift_eV_per_atom
+correctness_gates:
+  static:
+    energy_per_atom_atol_eV: 5.0e-7
+    force_atol_eV_per_A: 1.0e-4
+  nve:
+    - identical manifest seeds and initial velocities across partitions
+    - real-model short-horizon ASE versus batch parity recorded before timing
+    - finite per-replica energy drift reported for the exact measured horizon
+execution_gates:
+  - run the complete EVAL matrix first
+  - run exact R32 NVE and use measured cost and memory to select R256 points
+  - do not substitute an extrapolated ASE time for a measured result without labeling it derived
+  - stop any point before OOM using 85 percent memory headroom
+performance_claim: screening only until a selected point receives confirmation timing

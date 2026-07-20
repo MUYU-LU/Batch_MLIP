@@ -96,6 +96,7 @@ class MDResult:
     steps: int
     kinetic_energy: torch.Tensor
     temperature: torch.Tensor
+    initial_total_energy: torch.Tensor | None = None
 
     @property
     def structures(self) -> list[Any]:
