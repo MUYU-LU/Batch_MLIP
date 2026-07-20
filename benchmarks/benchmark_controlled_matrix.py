@@ -517,6 +517,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--distributions", default="H46,H276,MIX")
     parser.add_argument("--batch-sizes", required=True)
     parser.add_argument("--device", default="cuda:0")
+    parser.add_argument("--cpu-threads", type=int, default=1)
+    parser.add_argument("--concurrent-workers", type=int, default=1)
     parser.add_argument("--dataset-dir", type=Path, default=Path("data/T2_test/structures"))
     parser.add_argument("--manifest-dir", type=Path, default=Path("benchmarks/workloads/manifests"))
     parser.add_argument("--code-commit", required=True)
@@ -550,6 +552,9 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> int:
     args = build_parser().parse_args()
+    if args.cpu_threads <= 0 or args.concurrent_workers <= 0:
+        raise ValueError("cpu-threads and concurrent-workers must be positive")
+    torch.set_num_threads(args.cpu_threads)
     distributions = [item.strip() for item in args.distributions.split(",") if item.strip()]
     batch_sizes = [int(item) for item in args.batch_sizes.split(",") if item.strip()]
     if not distributions or any(item not in {"H46", "H276", "MIX"} for item in distributions):
@@ -573,6 +578,10 @@ def main() -> int:
         "batch_sizes": batch_sizes,
         "distributions": distributions,
         "screening_repeats": 1,
+        "execution": {
+            "torch_cpu_threads": torch.get_num_threads(),
+            "concurrent_workers": args.concurrent_workers,
+        },
         "environment": environment_metadata(bundle.device),
         "timing_scope": {
             "calculator_construction": "excluded",
@@ -686,7 +695,12 @@ def main() -> int:
                 point.update({"status": "oom", "error": str(error)})
                 memory_limit_reached = True
             except Exception as error:
-                point.update({"status": "error", "error": f"{type(error).__name__}: {error}"})
+                message = f"{type(error).__name__}: {error}"
+                if "out of memory" in message.lower():
+                    point.update({"status": "oom", "error": message})
+                    memory_limit_reached = True
+                else:
+                    point.update({"status": "error", "error": message})
             finally:
                 write_result(args.output, result)
                 _clean_cuda(bundle.device)
