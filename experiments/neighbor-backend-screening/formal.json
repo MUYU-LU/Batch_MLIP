@@ -1,0 +1,543 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "comparison_scope": "ASE structures to packed graph tensors resident on CUDA",
+  "gpu_algorithm": "dense O(N^2) over 27 periodic images, bucketed by atom count",
+  "screening_repeats": 1,
+  "warmup": "one resident chunk per method and point",
+  "cpu_workers": 8,
+  "neighbor_backend": "matscipy",
+  "environment": {
+    "python": "3.11.14",
+    "torch": "2.9.1+cu128",
+    "cuda": "12.8",
+    "gpu": "NVIDIA H100 80GB HBM3",
+    "omp_num_threads": "1"
+  },
+  "workloads": [
+    {
+      "distribution": "H46",
+      "pool_size": 32,
+      "resident_batch_size": 32
+    },
+    {
+      "distribution": "H46",
+      "pool_size": 256,
+      "resident_batch_size": 128
+    },
+    {
+      "distribution": "H276",
+      "pool_size": 32,
+      "resident_batch_size": 16
+    },
+    {
+      "distribution": "H276",
+      "pool_size": 256,
+      "resident_batch_size": 16
+    },
+    {
+      "distribution": "MIX",
+      "pool_size": 32,
+      "resident_batch_size": 32
+    },
+    {
+      "distribution": "MIX",
+      "pool_size": 256,
+      "resident_batch_size": 32
+    }
+  ],
+  "points": [
+    {
+      "workload_id": "EVAL-H46-R32-v1",
+      "distribution": "H46",
+      "pool_size": 32,
+      "resident_batch_size": 32,
+      "cutoff_A": 6.0,
+      "matscipy_serial_phase_probe": {
+        "search_time_s": 0.03237555595114827,
+        "pack_and_transfer_time_s": 0.0012323479168117046,
+        "search_fraction": 0.963331604325774
+      },
+      "methods": {
+        "matscipy_serial": {
+          "wall_time_s": 0.03706432739272714,
+          "structures_per_s": 863.3638393308366,
+          "directed_edges": 52122,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.035639808,
+          "peak_reserved_GB": 0.056623104,
+          "speedup_vs_matscipy_serial": 1.0
+        },
+        "matscipy_threads_8": {
+          "wall_time_s": 0.061824630945920944,
+          "structures_per_s": 517.5930613801956,
+          "directed_edges": 52122,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.035639808,
+          "peak_reserved_GB": 0.056623104,
+          "speedup_vs_matscipy_serial": 0.5995074588499838
+        },
+        "torch_cuda_dense": {
+          "wall_time_s": 0.004772569052875042,
+          "structures_per_s": 6704.984180527024,
+          "directed_edges": 52122,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.040404992,
+          "peak_reserved_GB": 0.058720256,
+          "speedup_vs_matscipy_serial": 7.766116525940935
+        }
+      }
+    },
+    {
+      "workload_id": "EVAL-H46-R32-v1",
+      "distribution": "H46",
+      "pool_size": 32,
+      "resident_batch_size": 32,
+      "cutoff_A": 6.5,
+      "matscipy_serial_phase_probe": {
+        "search_time_s": 0.03688166011124849,
+        "pack_and_transfer_time_s": 0.0013173362240195274,
+        "search_fraction": 0.9655138524463464
+      },
+      "methods": {
+        "matscipy_serial": {
+          "wall_time_s": 0.037933068349957466,
+          "structures_per_s": 843.5911301658749,
+          "directed_edges": 63094,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.036078592,
+          "peak_reserved_GB": 0.056623104,
+          "speedup_vs_matscipy_serial": 1.0
+        },
+        "matscipy_threads_8": {
+          "wall_time_s": 0.05788124306127429,
+          "structures_per_s": 552.8561293357873,
+          "directed_edges": 63094,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.036078592,
+          "peak_reserved_GB": 0.056623104,
+          "speedup_vs_matscipy_serial": 0.6553602919308545
+        },
+        "torch_cuda_dense": {
+          "wall_time_s": 0.004429135005921125,
+          "structures_per_s": 7224.887016814917,
+          "directed_edges": 63094,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.040601088,
+          "peak_reserved_GB": 0.058720256,
+          "speedup_vs_matscipy_serial": 8.564441657173766
+        }
+      }
+    },
+    {
+      "workload_id": "EVAL-H46-R256-v1",
+      "distribution": "H46",
+      "pool_size": 256,
+      "resident_batch_size": 128,
+      "cutoff_A": 6.0,
+      "matscipy_serial_phase_probe": {
+        "search_time_s": 0.25820311810821295,
+        "pack_and_transfer_time_s": 0.006815734785050154,
+        "search_fraction": 0.9742820757442672
+      },
+      "methods": {
+        "matscipy_serial": {
+          "wall_time_s": 0.2740178988315165,
+          "structures_per_s": 934.245540498086,
+          "directed_edges": 416976,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.050234368,
+          "peak_reserved_GB": 0.054525952,
+          "speedup_vs_matscipy_serial": 1.0
+        },
+        "matscipy_threads_8": {
+          "wall_time_s": 0.4224962261505425,
+          "structures_per_s": 605.9225719776794,
+          "directed_edges": 416976,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.050234368,
+          "peak_reserved_GB": 0.054525952,
+          "speedup_vs_matscipy_serial": 0.6485688672965314
+        },
+        "torch_cuda_dense": {
+          "wall_time_s": 0.009080018848180771,
+          "structures_per_s": 28193.774074741148,
+          "directed_edges": 416976,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.06927104,
+          "peak_reserved_GB": 0.081788928,
+          "speedup_vs_matscipy_serial": 30.178120047230674
+        }
+      }
+    },
+    {
+      "workload_id": "EVAL-H46-R256-v1",
+      "distribution": "H46",
+      "pool_size": 256,
+      "resident_batch_size": 128,
+      "cutoff_A": 6.5,
+      "matscipy_serial_phase_probe": {
+        "search_time_s": 0.29547955794259906,
+        "pack_and_transfer_time_s": 0.007252932991832495,
+        "search_fraction": 0.9760417754650478
+      },
+      "methods": {
+        "matscipy_serial": {
+          "wall_time_s": 0.2984475791454315,
+          "structures_per_s": 857.7720775387925,
+          "directed_edges": 504752,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.054525952,
+          "peak_reserved_GB": 0.054525952,
+          "speedup_vs_matscipy_serial": 1.0
+        },
+        "matscipy_threads_8": {
+          "wall_time_s": 0.4825382502749562,
+          "structures_per_s": 530.5278904918482,
+          "directed_edges": 504752,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.054525952,
+          "peak_reserved_GB": 0.054525952,
+          "speedup_vs_matscipy_serial": 0.6184951741657214
+        },
+        "torch_cuda_dense": {
+          "wall_time_s": 0.00971785793080926,
+          "structures_per_s": 26343.254019837423,
+          "directed_edges": 504752,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.072567808,
+          "peak_reserved_GB": 0.102760448,
+          "speedup_vs_matscipy_serial": 30.711251519662643
+        }
+      }
+    },
+    {
+      "workload_id": "EVAL-H276-R32-v1",
+      "distribution": "H276",
+      "pool_size": 32,
+      "resident_batch_size": 16,
+      "cutoff_A": 6.0,
+      "matscipy_serial_phase_probe": {
+        "search_time_s": 0.09780941903591156,
+        "pack_and_transfer_time_s": 0.003738920670002699,
+        "search_fraction": 0.9631808783793937
+      },
+      "methods": {
+        "matscipy_serial": {
+          "wall_time_s": 0.10146976681426167,
+          "structures_per_s": 315.3648717708728,
+          "directed_edges": 278232,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.0446848,
+          "peak_reserved_GB": 0.054525952,
+          "speedup_vs_matscipy_serial": 1.0
+        },
+        "matscipy_threads_8": {
+          "wall_time_s": 0.1283481800928712,
+          "structures_per_s": 249.3218055514709,
+          "directed_edges": 278232,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.0446848,
+          "peak_reserved_GB": 0.054525952,
+          "speedup_vs_matscipy_serial": 0.7905820459693264
+        },
+        "torch_cuda_dense": {
+          "wall_time_s": 0.010986040811985731,
+          "structures_per_s": 2912.7872859427316,
+          "directed_edges": 278232,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.1433984,
+          "peak_reserved_GB": 0.16777216,
+          "speedup_vs_matscipy_serial": 9.236245208879847
+        }
+      }
+    },
+    {
+      "workload_id": "EVAL-H276-R32-v1",
+      "distribution": "H276",
+      "pool_size": 32,
+      "resident_batch_size": 16,
+      "cutoff_A": 6.5,
+      "matscipy_serial_phase_probe": {
+        "search_time_s": 0.1392987542785704,
+        "pack_and_transfer_time_s": 0.004300388041883707,
+        "search_fraction": 0.9700528291994459
+      },
+      "methods": {
+        "matscipy_serial": {
+          "wall_time_s": 0.14308051485568285,
+          "structures_per_s": 223.65029949938727,
+          "directed_edges": 327480,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.046654976,
+          "peak_reserved_GB": 0.054525952,
+          "speedup_vs_matscipy_serial": 1.0
+        },
+        "matscipy_threads_8": {
+          "wall_time_s": 0.1777958618476987,
+          "structures_per_s": 179.9816917415741,
+          "directed_edges": 327480,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.046654976,
+          "peak_reserved_GB": 0.054525952,
+          "speedup_vs_matscipy_serial": 0.8047460349681632
+        },
+        "torch_cuda_dense": {
+          "wall_time_s": 0.010565130040049553,
+          "structures_per_s": 3028.831626179389,
+          "directed_edges": 327480,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.14483968,
+          "peak_reserved_GB": 0.16777216,
+          "speedup_vs_matscipy_serial": 13.542712140153816
+        }
+      }
+    },
+    {
+      "workload_id": "EVAL-H276-R256-v1",
+      "distribution": "H276",
+      "pool_size": 256,
+      "resident_batch_size": 16,
+      "cutoff_A": 6.0,
+      "matscipy_serial_phase_probe": {
+        "search_time_s": 0.7899868539534509,
+        "pack_and_transfer_time_s": 0.031146008986979723,
+        "search_fraction": 0.962069464769139
+      },
+      "methods": {
+        "matscipy_serial": {
+          "wall_time_s": 0.8059415412135422,
+          "structures_per_s": 317.6409043446617,
+          "directed_edges": 2225856,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.124471296,
+          "peak_reserved_GB": 0.138412032,
+          "speedup_vs_matscipy_serial": 1.0
+        },
+        "matscipy_threads_8": {
+          "wall_time_s": 0.9833851773291826,
+          "structures_per_s": 260.3252579983778,
+          "directed_edges": 2225856,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.124471296,
+          "peak_reserved_GB": 0.138412032,
+          "speedup_vs_matscipy_serial": 0.8195583580001001
+        },
+        "torch_cuda_dense": {
+          "wall_time_s": 0.07545835431665182,
+          "structures_per_s": 3392.5998296454636,
+          "directed_edges": 2225856,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.228945408,
+          "peak_reserved_GB": 0.25165824,
+          "speedup_vs_matscipy_serial": 10.680613810254945
+        }
+      }
+    },
+    {
+      "workload_id": "EVAL-H276-R256-v1",
+      "distribution": "H276",
+      "pool_size": 256,
+      "resident_batch_size": 16,
+      "cutoff_A": 6.5,
+      "matscipy_serial_phase_probe": {
+        "search_time_s": 1.1153598502278328,
+        "pack_and_transfer_time_s": 0.03362058103084564,
+        "search_fraction": 0.9707387696812075
+      },
+      "methods": {
+        "matscipy_serial": {
+          "wall_time_s": 1.143485690932721,
+          "structures_per_s": 223.87687229490854,
+          "directed_edges": 2619840,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.138358784,
+          "peak_reserved_GB": 0.159383552,
+          "speedup_vs_matscipy_serial": 1.0
+        },
+        "matscipy_threads_8": {
+          "wall_time_s": 1.342108948621899,
+          "structures_per_s": 190.7445742485104,
+          "directed_edges": 2619840,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.138358784,
+          "peak_reserved_GB": 0.159383552,
+          "speedup_vs_matscipy_serial": 0.8520066065477562
+        },
+        "torch_cuda_dense": {
+          "wall_time_s": 0.07547502219676971,
+          "structures_per_s": 3391.8506089681764,
+          "directed_edges": 2619840,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.240185856,
+          "peak_reserved_GB": 0.25165824,
+          "speedup_vs_matscipy_serial": 15.15051811381463
+        }
+      }
+    },
+    {
+      "workload_id": "EVAL-MIX-R32-v1",
+      "distribution": "MIX",
+      "pool_size": 32,
+      "resident_batch_size": 32,
+      "cutoff_A": 6.0,
+      "matscipy_serial_phase_probe": {
+        "search_time_s": 0.0826809462159872,
+        "pack_and_transfer_time_s": 0.0023070010356605053,
+        "search_fraction": 0.9728549622591834
+      },
+      "methods": {
+        "matscipy_serial": {
+          "wall_time_s": 0.08494827803224325,
+          "structures_per_s": 376.6998077095097,
+          "directed_edges": 163290,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.040086528,
+          "peak_reserved_GB": 0.054525952,
+          "speedup_vs_matscipy_serial": 1.0
+        },
+        "matscipy_threads_8": {
+          "wall_time_s": 0.10228289710357785,
+          "structures_per_s": 312.8577788287993,
+          "directed_edges": 163290,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.040086528,
+          "peak_reserved_GB": 0.054525952,
+          "speedup_vs_matscipy_serial": 0.830522799390591
+        },
+        "torch_cuda_dense": {
+          "wall_time_s": 0.009595281910151243,
+          "structures_per_s": 3334.9723645061313,
+          "directed_edges": 163290,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.13808128,
+          "peak_reserved_GB": 0.148897792,
+          "speedup_vs_matscipy_serial": 8.853129989059829
+        }
+      }
+    },
+    {
+      "workload_id": "EVAL-MIX-R32-v1",
+      "distribution": "MIX",
+      "pool_size": 32,
+      "resident_batch_size": 32,
+      "cutoff_A": 6.5,
+      "matscipy_serial_phase_probe": {
+        "search_time_s": 0.12285127490758896,
+        "pack_and_transfer_time_s": 0.0026753381825983524,
+        "search_fraction": 0.9786870838243983
+      },
+      "methods": {
+        "matscipy_serial": {
+          "wall_time_s": 0.1249365578405559,
+          "structures_per_s": 256.1299955201136,
+          "directed_edges": 192226,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.04124416,
+          "peak_reserved_GB": 0.054525952,
+          "speedup_vs_matscipy_serial": 1.0
+        },
+        "matscipy_threads_8": {
+          "wall_time_s": 0.1410560910589993,
+          "structures_per_s": 226.860107633462,
+          "directed_edges": 192226,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.04124416,
+          "peak_reserved_GB": 0.054525952,
+          "speedup_vs_matscipy_serial": 0.8857225299707114
+        },
+        "torch_cuda_dense": {
+          "wall_time_s": 0.009727986063808203,
+          "structures_per_s": 3289.478396669598,
+          "directed_edges": 192226,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.138906624,
+          "peak_reserved_GB": 0.148897792,
+          "speedup_vs_matscipy_serial": 12.843003374086573
+        }
+      }
+    },
+    {
+      "workload_id": "EVAL-MIX-R256-v1",
+      "distribution": "MIX",
+      "pool_size": 256,
+      "resident_batch_size": 32,
+      "cutoff_A": 6.0,
+      "matscipy_serial_phase_probe": {
+        "search_time_s": 0.5284632970578969,
+        "pack_and_transfer_time_s": 0.019536812789738178,
+        "search_fraction": 0.9643488889168833
+      },
+      "methods": {
+        "matscipy_serial": {
+          "wall_time_s": 0.5367742860689759,
+          "structures_per_s": 476.9229947186848,
+          "directed_edges": 1321416,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.08641536,
+          "peak_reserved_GB": 0.096468992,
+          "speedup_vs_matscipy_serial": 1.0
+        },
+        "matscipy_threads_8": {
+          "wall_time_s": 0.6797697506844997,
+          "structures_per_s": 376.5981050822263,
+          "directed_edges": 1321416,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.08641536,
+          "peak_reserved_GB": 0.096468992,
+          "speedup_vs_matscipy_serial": 0.7896413241814109
+        },
+        "torch_cuda_dense": {
+          "wall_time_s": 0.06775715621188283,
+          "structures_per_s": 3778.1987071515305,
+          "directed_edges": 1321416,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.187608064,
+          "peak_reserved_GB": 0.211812352,
+          "speedup_vs_matscipy_serial": 7.922030912726526
+        }
+      }
+    },
+    {
+      "workload_id": "EVAL-MIX-R256-v1",
+      "distribution": "MIX",
+      "pool_size": 256,
+      "resident_batch_size": 32,
+      "cutoff_A": 6.5,
+      "matscipy_serial_phase_probe": {
+        "search_time_s": 0.7027667690999806,
+        "pack_and_transfer_time_s": 0.020732647739350796,
+        "search_fraction": 0.9713439330332523
+      },
+      "methods": {
+        "matscipy_serial": {
+          "wall_time_s": 0.7299555912613869,
+          "structures_per_s": 350.70626633275555,
+          "directed_edges": 1562296,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.096784896,
+          "peak_reserved_GB": 0.117440512,
+          "speedup_vs_matscipy_serial": 1.0
+        },
+        "matscipy_threads_8": {
+          "wall_time_s": 0.8802274540066719,
+          "structures_per_s": 290.83391893166237,
+          "directed_edges": 1562296,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.096784896,
+          "peak_reserved_GB": 0.117440512,
+          "speedup_vs_matscipy_serial": 0.8292806455180777
+        },
+        "torch_cuda_dense": {
+          "wall_time_s": 0.06729468703269958,
+          "structures_per_s": 3804.1636165958457,
+          "directed_edges": 1562296,
+          "exact_vs_matscipy_serial": true,
+          "peak_allocated_GB": 0.19562496,
+          "peak_reserved_GB": 0.211812352,
+          "speedup_vs_matscipy_serial": 10.847150398465923
+        }
+      }
+    }
+  ]
+}

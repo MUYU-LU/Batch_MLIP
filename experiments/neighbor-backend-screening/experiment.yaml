@@ -1,0 +1,75 @@
+name: neighbor-backend-screening
+date: 2026-07-20
+hypothesis: >-
+  Matscipy's compiled CPU implementation may outperform GPU neighbor
+  construction for small resident batches, while batched GPU construction may
+  win after launch and allocation overhead are amortized.
+workloads:
+  distributions: [H46, H276, MIX]
+  pool_sizes: [32, 256]
+  fixed_resident_batches:
+    H46-R32: 32
+    H46-R256: 128
+    H276-R32: 16
+    H276-R256: 16
+    MIX-R32: 32
+    MIX-R256: 32
+  crossover:
+    distributions: [H46, H276]
+    pool_size: 32
+    resident_batches: [1, 2, 4, 8, 16, 32]
+cutoffs_A: [6.0, 6.5]
+methods:
+  - matscipy_serial
+  - matscipy_threads_8
+  - torch_cuda_dense
+comparison_scope: ASE structures to packed graph tensors resident on CUDA
+gpu_algorithm: dense O(N^2) screen over 27 periodic images, bucketed by atom count
+environment:
+  gpu: NVIDIA H100 80GB HBM3
+  python: 3.11.14
+  torch: 2.9.1+cu128
+  cuda: '12.8'
+  neighbor_backend: matscipy
+  thread_environment: OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+timing:
+  warmup: one resident chunk per method and point
+  repeats: 1
+  cuda_synchronized: true
+  peak_gpu_memory: true
+correctness_gates:
+  - Identical frozen structures and cutoff are used by every method.
+  - Directed center, neighbor, and integer periodic-shift tuples match exactly.
+  - Comparison includes packing and transfer to resident CUDA tensors.
+commands:
+  fixed_matrix: >-
+    CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+    MKL_NUM_THREADS=1 PYTHONPATH=. python
+    benchmarks/benchmark_neighbor_backend.py --cpu-workers 8 --device cuda:0
+    --cutoffs 6.0,6.5 --output runs/neighbor_backend/formal.json
+  crossover: >-
+    CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+    MKL_NUM_THREADS=1 PYTHONPATH=. python
+    benchmarks/benchmark_neighbor_backend.py --cpu-workers 8 --device cuda:0
+    --cutoffs 6.5 --workloads EVAL-H46-R32-v1,EVAL-H276-R32-v1
+    --resident-batches 1,2,4,8,16,32
+    --output runs/neighbor_backend/crossover.json
+result:
+  status: passed
+  exact_points: 24
+  matscipy_raw_search_fraction_percent: [94.5, 97.9]
+  matscipy_threads_8_speedup_range: [0.57, 0.89]
+  h46_cuda_crossover_batch: 4
+  h276_cuda_crossover_batch: 1
+  fixed_matrix_cuda_speedup_range: [7.77, 30.71]
+limitations:
+  - One timing observation per point does not quantify uncertainty.
+  - The CUDA prototype assumes fully periodic cells and image shifts in [-1, 1].
+  - Dense O(N^2) work is a screening implementation, not a general cell list.
+  - This is a neighbor-only result, not an end-to-end MLIP speedup.
+decision: >-
+  Retain matscipy fallback, prototype an adaptive GPU backend above the measured
+  crossover, then measure end-to-end AtomBit and MACE evaluation and BFGS.
+final_checks:
+  pytest: 99 passed, 6 skipped in 19.96s
+  ruff: All checks passed
