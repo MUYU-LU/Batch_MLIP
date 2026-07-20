@@ -65,7 +65,8 @@ from .planning import (
     SystemProfile,
     fit_memory_coefficients,
 )
-from .profiling import RuntimeProfiler
+from .profiling import RunTelemetry, RuntimeProfiler
+from .workloads import TaskProfile, WorkloadJob, WorkloadManifest
 
 
 def _install_legacy_module_aliases() -> None:
@@ -137,10 +138,14 @@ __all__ = [
     "PlannedBucket",
     "RelaxationResult",
     "RuntimeProfiler",
+    "RunTelemetry",
     "SystemProfile",
     "TorchStateCheckpointReporter",
+    "TaskProfile",
     "WorkerResult",
     "WorkerShard",
+    "WorkloadJob",
+    "WorkloadManifest",
     "available_optimizers",
     "balance_work",
     "batched_bfgs_relax",

@@ -1,0 +1,393 @@
+protocol_version: "1.0-draft"
+date: "2026-07-20"
+stage: controlled-test
+
+manifest_requirements:
+  immutable_fields:
+    - workload_id
+    - workload_version
+    - system_id
+    - group_id
+    - duplicate_group
+    - source_file
+    - source_frame
+    - source_sha256
+    - normalized_structure_sha256
+    - n_atoms
+    - species
+    - pbc
+    - cell
+    - volume
+    - active_edges_at_cutoff
+    - candidate_edges_by_skin
+    - constraints
+    - seed
+    - arrival_time_or_wave
+    - output_order
+  reference_fields:
+    - reference_b1_steps
+    - reference_converged
+    - reference_final_energy
+    - difficulty_stratum
+
+common_optimization:
+  optimizer: ase_compatible_bfgs
+  cell_filter_variable: FrechetCellFilter
+  fmax_eV_per_A: 0.05
+  max_steps: 500
+  max_step_A: 0.2
+  alpha: 70.0
+  optimizer_dtype: float64
+  model_dtype:
+    AtomBit: float32
+    MACE: float64
+  deterministic: true
+
+common_md:
+  timestep_fs: 0.5
+  warmup_steps: 100
+  performance_steps: 10000
+  nve_validation_steps_minimum: 100000
+  initial_temperature_K: 300.0
+  langevin_friction_per_fs: 0.01
+
+workloads:
+  - id: OPT-H46-R256-v1
+    aliases: [OPT-H46-256]
+    family: variable_horizon_closed
+    operation: optimization
+    population:
+      total_jobs: 256
+      unique_structures: 32
+      repetitions_per_unique: 8
+    structure:
+      atom_count: 46
+      size_distribution: homogeneous
+      periodic: true
+      cell_mode: variable
+    arrival:
+      mode: closed
+      all_available_at_t0: true
+    purposes: [cache, batch_size, memory, optimizer]
+    manifest: manifests/OPT-H46-R256-v1.csv
+
+  - id: OPT-H276-R256-v1
+    aliases: [OPT-H276-256]
+    family: variable_horizon_closed
+    operation: optimization
+    population:
+      total_jobs: 256
+      unique_structures: 32
+      repetitions_per_unique: 8
+    structure:
+      atom_count: 276
+      size_distribution: homogeneous
+      periodic: true
+      cell_mode: variable
+    arrival:
+      mode: closed
+      all_available_at_t0: true
+    purposes: [cache, batch_size, memory, refill, optimizer, multi_gpu]
+    manifest: manifests/OPT-H276-R256-v1.csv
+
+  - id: OPT-MIX-R256-v1
+    aliases: [OPT-MIX-256]
+    family: variable_horizon_closed
+    operation: optimization
+    population:
+      total_jobs: 256
+      composition:
+        atom_46_jobs: 128
+        atom_276_jobs: 128
+    structure:
+      size_distribution: bimodal
+      periodic: true
+      cell_mode: variable
+    arrival:
+      mode: closed
+      all_available_at_t0: true
+    purposes: [packing, memory, bucketing, refill, multi_gpu]
+    manifest: manifests/OPT-MIX-R256-v1.csv
+
+  - id: OPT-STEPVAR-R256-v1
+    aliases: [OPT-STEPVAR-256]
+    family: variable_horizon_closed
+    operation: optimization
+    population:
+      total_jobs: 256
+      easy_jobs: 128
+      hard_jobs: 128
+    structure:
+      atom_count: 276
+      size_distribution: homogeneous
+      periodic: true
+      cell_mode: variable
+    difficulty_definition:
+      reference: single_system_B1_BFGS
+      easy: lowest_step_count_quartile
+      hard: highest_step_count_quartile
+      freeze_assignment: true
+    arrival:
+      mode: closed
+      all_available_at_t0: true
+    purposes: [refill, compaction, occupancy, remaining_cost_prediction]
+    manifest: manifests/OPT-STEPVAR-R256-v1.csv
+
+  - id: OPT-H276-FIXED-R256-v1
+    aliases: [OPT-FIXED-256]
+    family: variable_horizon_closed
+    operation: optimization
+    population:
+      source_workload: OPT-H276-R256-v1
+      total_jobs: 256
+    structure:
+      atom_count: 276
+      size_distribution: homogeneous
+      periodic: true
+      cell_mode: fixed
+    purposes: [cell_overhead, fixed_cell_cache, optimizer_state]
+    manifest: manifests/OPT-H276-FIXED-R256-v1.csv
+
+  - id: OPT-MIX-R32-v1
+    aliases: [OPT-SMALL-32]
+    family: small_pool_latency
+    operation: optimization
+    population:
+      total_jobs: 32
+      atom_46_jobs: 16
+      atom_276_jobs: 16
+    structure:
+      size_distribution: bimodal
+      periodic: true
+      cell_mode: variable
+    arrival:
+      mode: closed
+      all_available_at_t0: true
+    purposes: [cold_start, small_pool, gpu_count_selection]
+    manifest: manifests/OPT-MIX-R32-v1.csv
+
+  - id: OPT-MIX-STREAM256-v1
+    aliases: [OPT-STREAM-256]
+    family: dynamic_arrival_service
+    operation: optimization
+    population:
+      source_workload: OPT-MIX-R256-v1
+      total_jobs: 256
+      waves: 8
+      jobs_per_wave: 32
+    arrival:
+      mode: calibrated_waves
+      target_load_fraction: 0.8
+      interval_rule: "delta_t = jobs_per_wave / (target_load_fraction * reference_warm_service_rate)"
+      reference_service: "single_gpu B64 drain on the same hardware"
+    purposes: [persistent_workers, online_refill, queueing]
+    manifest: manifests/OPT-MIX-STREAM256-v1.csv
+
+  - id: OPT-H46-U256-v1
+    family: variable_horizon_closed
+    operation: optimization
+    population:
+      total_jobs: 256
+      unique_structures: 256
+    structure:
+      atom_count: 46
+      size_distribution: homogeneous
+      periodic: true
+      cell_mode: variable
+    status: to_be_constructed
+    purposes: [publication_generalization]
+    manifest: manifests/OPT-H46-U256-v1.csv
+
+  - id: OPT-H276-U256-v1
+    family: variable_horizon_closed
+    operation: optimization
+    population:
+      total_jobs: 256
+      unique_structures: 256
+    structure:
+      atom_count: 276
+      size_distribution: homogeneous
+      periodic: true
+      cell_mode: variable
+    status: to_be_constructed
+    purposes: [publication_generalization]
+    manifest: manifests/OPT-H276-U256-v1.csv
+
+  - id: EVAL-REPLAY50-v1
+    family: static_one_shot
+    operation: force_evaluation
+    definition:
+      frames_per_structure: 50
+      frames_source: frozen_reference_trajectories
+      optimizer_execution: false
+    purposes: [exact_work_kernel, cache, packing, multi_gpu]
+    manifest: manifests/EVAL-REPLAY50-v1.csv
+
+  - id: OPT-FIXED50-v1
+    family: fixed_horizon_persistent
+    operation: optimization
+    definition:
+      steps: 50
+      convergence_stopping: false
+      max_step_A: 0.2
+    purposes: [optimizer_runtime, fixed_horizon_execution]
+    manifest: manifests/OPT-FIXED50-v1.csv
+
+  - id: FD-H46-FULL276-v1
+    family: static_one_shot
+    operation: force_evaluation
+    structure:
+      atom_count: 46
+      periodic: true
+      cell_mode: fixed
+      topology_relation: same_reference_cell
+    displacements:
+      scheme: full_plus_minus_single_atom_cartesian
+      amplitude_A: 0.01
+      sample_count: 276
+    execution:
+      refill: disabled
+      preferred_mode: fixed_microbatch_stream
+    purposes: [phonon_like_static_batching, topology_reuse]
+    manifest: manifests/FD-H46-FULL276-v1.csv
+
+  - id: FD-H276-FULL1656-v1
+    family: static_one_shot
+    operation: force_evaluation
+    structure:
+      atom_count: 276
+      periodic: true
+      cell_mode: fixed
+      topology_relation: same_reference_cell
+    displacements:
+      scheme: full_plus_minus_single_atom_cartesian
+      amplitude_A: 0.01
+      sample_count: 1656
+    execution:
+      refill: disabled
+      preferred_mode: fixed_microbatch_stream
+    purposes: [large_static_pool, phonon_like_batching, multi_gpu]
+    manifest: manifests/FD-H276-FULL1656-v1.csv
+
+  - id: FD-H276-RAND1024-v1
+    family: static_one_shot
+    operation: force_evaluation
+    structure:
+      atom_count: 276
+      periodic: true
+      cell_mode: fixed
+    displacements:
+      scheme: frozen_random_all_atom
+      rms_amplitude_A: 0.01
+      sample_count: 1024
+      seed: 20260720
+    execution:
+      refill: disabled
+      preferred_mode: fixed_microbatch_stream
+    purposes: [regression_IFC_like_data, static_throughput]
+    manifest: manifests/FD-H276-RAND1024-v1.csv
+
+  - id: FD-SYM-v1
+    family: static_one_shot
+    operation: force_evaluation
+    displacements:
+      scheme: phonopy_symmetry_reduced
+      amplitude_A: 0.01
+      configuration_hash_required: true
+    status: application_like_after_static_validation
+    purposes: [phonopy_integration, force_constant_validation]
+    manifest: manifests/FD-SYM-v1.csv
+
+  - id: MD-NVE-H64-v1
+    family: fixed_horizon_persistent
+    operation: md_nve
+    population:
+      replicas: 64
+      structure_count: 1
+      independent_velocity_seeds: 64
+    structure:
+      periodic: true
+      cell_mode: fixed
+      size_distribution: homogeneous
+    settings:
+      timestep_fs: 0.5
+      initial_temperature_K: 300.0
+      performance_steps: 10000
+      validation_steps_minimum: 100000
+    purposes: [integrator_parity, energy_drift, persistent_batch]
+    manifest: manifests/MD-NVE-H64-v1.csv
+
+  - id: MD-NVT-T64-v1
+    family: fixed_horizon_persistent
+    operation: md_langevin_nvt
+    population:
+      replicas: 64
+      temperatures_K: [100, 150, 200, 250, 300, 350, 400, 450]
+      seeds_per_temperature: 8
+    structure:
+      periodic: true
+      cell_mode: fixed
+      size_distribution: homogeneous
+    settings:
+      timestep_fs: 0.5
+      friction_per_fs: 0.01
+      performance_steps: 10000
+    purposes: [per_system_parameters, canonical_statistics]
+    manifest: manifests/MD-NVT-T64-v1.csv
+
+  - id: MD-MIX64-v1
+    family: fixed_horizon_persistent
+    operation: md
+    population:
+      replicas: 64
+      atom_46_jobs: 32
+      atom_276_jobs: 32
+    structure:
+      periodic: true
+      cell_mode: fixed
+      size_distribution: bimodal
+    settings:
+      timestep_fs: 0.5
+      performance_steps: 10000
+    purposes: [heterogeneous_md, packing]
+    manifest: manifests/MD-MIX64-v1.csv
+
+  - id: MD-CACHE64-v1
+    family: fixed_horizon_persistent
+    operation: md_langevin_nvt
+    population:
+      replicas: 64
+      low_temperature_jobs: 32
+      high_temperature_jobs: 32
+    settings:
+      low_temperature_K: 100
+      high_temperature_K: 450
+      timestep_fs: 0.5
+      friction_per_fs: 0.01
+      performance_steps: 10000
+    purposes: [cache_rebuild_rate, skin_selection]
+    manifest: manifests/MD-CACHE64-v1.csv
+
+  - id: MD-MGPU256-v1
+    family: fixed_horizon_persistent
+    operation: md
+    population:
+      replicas: 256
+    resources:
+      gpu_counts: [1, 4, 7]
+      worker_mode: persistent
+    purposes: [multi_gpu_scaling, micro_pool_scheduling]
+    manifest: manifests/MD-MGPU256-v1.csv
+
+  - id: EOS-V21-v1
+    family: small_pool_latency
+    operation: equation_of_state
+    population:
+      configurations: 21
+    strain:
+      mode: isotropic
+      linear_scale_min: 0.94
+      linear_scale_max: 1.06
+      count: 21
+    purposes: [energy_stress_correctness, small_pool_latency]
+    manifest: manifests/EOS-V21-v1.csv

@@ -1,0 +1,207 @@
+planner_version: "1.0-draft"
+objective:
+  ordering:
+    - correctness
+    - no_oom_or_runtime_failure
+    - reproducibility_and_latency_constraints
+    - maximize_goodput_or_minimize_makespan
+  default_metric: accepted_jobs_per_second
+  alternative_metrics:
+    - useful_atom_steps_per_second
+    - useful_active_edge_steps_per_second
+    - gpu_seconds_per_accepted_job
+    - time_to_first_accepted_result
+
+inputs:
+  workload:
+    - operation
+    - pool_size
+    - arrival_mode
+    - atom_count_distribution
+    - active_edge_distribution
+    - candidate_edge_distribution_by_skin
+    - fixed_or_variable_cell
+    - constraint_type
+    - expected_or_pilot_step_distribution
+    - topology_stability
+    - required_equivalence_tier
+  model:
+    - model_name_and_hash
+    - cutoff
+    - dtype
+    - direct_or_autograd_force
+    - stress_support
+    - cache_support
+    - inactive_edge_mask_semantics
+    - compile_support
+  optimizer_or_integrator:
+    - algorithm
+    - state_dimension
+    - state_memory_scaling
+    - fixed_or_variable_horizon
+  resources:
+    - gpu_count
+    - gpu_model
+    - memory_per_gpu
+    - worker_startup_time
+    - host_threads
+    - transfer_bandwidth
+
+constraints:
+  memory_safety_fraction_default: 0.85
+  no_cross_system_edges: true
+  no_missed_active_edges: true
+  correctness_tier_required: K0
+  no_silent_algorithm_change: true
+
+execution_family_rules:
+  - condition: operation in [energy_evaluation, force_evaluation, stress_evaluation, equation_of_state]
+    family: static_one_shot
+    default_mode: static_stream
+    refill: disabled
+  - condition: operation in [md_nve, md_nvt] and fixed_horizon == true
+    family: fixed_horizon_persistent
+    default_mode: persistent_ensemble
+    refill: disabled
+  - condition: operation == optimization and arrival_mode == closed
+    family: variable_horizon_closed
+    default_mode: active_refill
+  - condition: arrival_mode in [streaming, open]
+    family: dynamic_arrival_service
+    default_mode: service_queue
+  - condition: pool_size <= one_measured_resident_batch
+    family: small_pool_latency
+    default_mode: single_gpu
+
+cache_policy:
+  candidate_skins_A: [0.0, 0.25, 0.5, 1.0]
+  required_semantics:
+    - update_distances_each_evaluation
+    - exact_physical_cutoff_filter_or_correct_active_mask
+    - exclude_inactive_edges_from_degree_normalization
+    - validate_variable_cell_invalidation
+  break_even_expression: "(R-1)*T_build > R*delta_T_model + T_filter + T_validation"
+  enable_when:
+    - predicted_or_measured_gain_positive
+    - no_correctness_failure
+    - candidate_edge_inflation_does_not_destroy_batch_goodput
+  report:
+    - cache_hit_rate
+    - mean_rebuild_interval
+    - candidate_to_active_edge_ratio
+    - missed_edge_count
+    - energy_force_parity
+
+refill_policy:
+  disabled_for:
+    - static_one_shot
+    - fixed_horizon_persistent
+  candidate_modes:
+    - drain
+    - immediate_full_rebuild
+    - threshold_full_rebuild
+    - immediate_topology_preserving
+    - cohort_topology_preserving
+    - fixed_slot
+  initial_hysteresis:
+    check_interval_steps: 10
+    refill_below_active_cost_fraction: 0.70
+    fill_target_fraction: 0.90
+    minimum_released_cost_fraction: 0.15
+  break_even_expression: "H*(1-u)*T_step > T_compact + T_admit + T_compile"
+  immediate_refill_allowed_when:
+    - fixed_slot_shape_compatible
+    - or topology_preserving_compaction_is_low_cost
+  report:
+    - active_cost_fraction_time_series
+    - inactive_work_fraction
+    - refill_event_count
+    - insertion_size_distribution
+    - compaction_time
+    - compile_shape_variants
+    - survivor_cache_retention
+
+batch_policy:
+  candidate_graph_counts: [1, 2, 4, 8, 16, 32, 64, 128]
+  primary_capacity_variables:
+    - total_atoms
+    - total_active_edges
+    - total_candidate_edges
+    - sum_optimizer_dimension_squared
+    - force_or_stress_mode
+  memory_model: "M0 + a*N_total + b*E_total + c*sum(d_i^2)"
+  time_model: "t0 + alpha*N_total + beta*E_total + gamma*T_optimizer"
+  selection_rule: maximize_measured_or_predicted_goodput_under_memory_safety
+  never_assume:
+    - largest_batch_is_fastest
+    - highest_memory_fill_is_fastest
+
+multi_gpu_policy:
+  worker_model: one_persistent_process_and_model_replica_per_gpu
+  scheduling_unit: invariant_micro_pool
+  internal_schedule_invariant_across_gpu_count: true
+  assignment: dynamic_whole_micro_pool_to_idle_worker
+  cost_estimate: "sum_i(predicted_steps_i * predicted_step_time_i) + cache_refill_overhead"
+  candidate_gpu_counts: [1, 2, 4, 7]
+  selection_rule: use_additional_gpu_only_when_predicted_makespan_reduction_exceeds_startup_and_underfill_cost
+  report:
+    - cold_start_speedup
+    - persistent_speedup
+    - parallel_efficiency
+    - gpu_seconds_per_job
+    - load_imbalance
+    - worker_idle_time
+
+optimizer_policy:
+  user_algorithm_authoritative: true
+  recommendations:
+    bfgs:
+      use_when: small_or_medium_state_and_curvature_benefit
+      concern: dense_state_O_d_squared
+    lbfgs:
+      use_when: large_structures_or_memory_constrained_batch
+      status: to_be_implemented_and_validated
+    fire:
+      use_when: robust_screening_or_low_state_memory_needed
+      correctness_gate: classic_ASE_update_order
+    fire2:
+      use_when: explicitly_requested_and_separately_validated
+      never_alias_to_fire: true
+
+planner_evaluation:
+  calibration_split:
+    requirement: no_overlap_with_held_out_structures_or_pool_variants
+  baselines:
+    - ASE_B1
+    - static_B64_no_cache_no_refill
+    - largest_memory_fitting_batch
+    - current_hand_tuned_default
+    - simple_atom_count_bucketing
+    - task_aware_planner
+    - empirical_oracle
+  regret: "(T_planner - T_oracle) / T_oracle"
+  targets:
+    zero_ooms: true
+    median_regret_max: 0.10
+    p90_regret_max: 0.20
+    correctness_pass_rate: 1.0
+
+output_plan_fields:
+  - task_family
+  - selected_algorithm
+  - selected_batch_policy
+  - resident_capacity
+  - memory_safety_fraction
+  - skin_A
+  - cache_enabled
+  - refill_mode
+  - refill_thresholds
+  - compaction_interval
+  - bucket_boundaries
+  - micro_pool_definition
+  - gpu_count
+  - worker_mode
+  - expected_memory
+  - expected_goodput
+  - expected_equivalence_tier
+  - selection_explanation

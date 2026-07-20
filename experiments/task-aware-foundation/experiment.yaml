@@ -1,0 +1,40 @@
+id: task-aware-foundation
+date: 2026-07-20
+baseline_commit: 41694f704703a8d9a3b6de4e07b184c46be61595
+hypothesis: >-
+  Immutable workload manifests and a common run-telemetry schema can make the
+  existing cache, refill, packing, and multi-GPU experiments reproducible and
+  provide sufficient task descriptors for later plan selection without changing
+  calculator, optimizer, or integrator numerical behavior.
+scope:
+  code_baseline: active-v0.2.0-repository
+  protocol_source: atombit_task_aware_batching_complete_packet-v1.0.0
+  packet_policy: immutable-reference
+deliverables:
+  - TaskProfile schema
+  - WorkloadManifest schema
+  - RunTelemetry schema
+  - deterministic T2 manifest generator
+  - frozen replicated optimization manifests
+  - fixed-work replay definitions
+initial_workloads:
+  - OPT-H46-R256-v1
+  - OPT-H276-R256-v1
+  - OPT-H276-FIXED-R256-v1
+  - OPT-MIX-R256-v1
+  - OPT-MIX-R32-v1
+  - OPT-FIXED50-v1
+  - OPT-STEPVAR-ATOMBIT-R256-v1
+  - OPT-STEPVAR-MACE-OFF-SMALL-R256-v1
+deferred_workloads:
+  EVAL-REPLAY50-v1: requires frozen reference trajectory frames
+correctness_gates:
+  - stable system IDs and original order
+  - every source structure hash recorded
+  - normalized structure hash recorded
+  - duplicate groups explicit
+  - atom and edge counts validated
+  - manifest content hash validated on load
+  - schemas round-trip through JSON
+  - no numerical calculator or optimizer changes
+performance_claim: none

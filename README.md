@@ -30,6 +30,7 @@ atombit_batch/          Thin compatibility namespace for the former package name
   interfaces/           Python API, CLI/configuration, reporting
   profiling/            Opt-in phase timing and runtime event collection
   planning/             Memory calibration and heterogeneous workload bucketing
+  workloads/            Signed workload identities and task descriptors
 src/                    Uploaded AtomBit code in checkpoint-compatible namespace
 original_uploads/       Immutable source snapshots
 configs/                Runnable YAML configurations
@@ -37,6 +38,7 @@ examples/               Python API and checkpoint-loader examples
 data/                   Small demo extxyz batch
 benchmarks/              Scaling and profiling scripts
 experiments/             Reproducible experiment specifications
+research/                Imported research protocols and active-baseline notes
 runs/                    Generated outputs; ignored by Git
 tests/                   Correctness and regression tests
 docs/                    Architecture, validation, and roadmap
@@ -230,6 +232,48 @@ with RuntimeProfiler(device=calculator.device) as profiler:
 profile = profiler.summary()
 print(profile["phases"])
 ```
+
+Controlled experiments use signed workload manifests rather than ad hoc filename
+lists. Load and verify a manifest, derive model-specific task costs, and project
+runtime profiling into the common registry schema as follows:
+
+```python
+from batch_mlip import TaskProfile
+from batch_mlip.profiling import RunTelemetry, runtime_profile_registry_fields
+from batch_mlip.workloads import read_workload_manifest, topology_key
+
+manifest = read_workload_manifest(
+    "benchmarks/workloads/manifests/OPT-H276-R256-v1.json"
+)
+task = TaskProfile.from_manifest(
+    manifest,
+    active_edge_key=topology_key(6.0, 0.0),
+    candidate_edge_key=topology_key(6.0, 0.5),
+)
+timings = runtime_profile_registry_fields(profile)
+telemetry = RunTelemetry.create(
+    run_id="example-001",
+    study_id="skin-calibration",
+    workload_id=manifest.workload_id,
+    workload_manifest_sha256=manifest.manifest_sha256,
+    model_name="AtomBit",
+    code_commit="<git-commit>",
+    algorithm="bfgs",
+    cell_mode=manifest.cell_mode,
+    gpu_count=1,
+    worker_mode="single-process",
+    cold_or_warm="warm",
+    repeat_index=0,
+    equivalence_tier="K2",
+    validation_pass=True,
+    **timings,
+)
+```
+
+The frozen suite and its model-specific profiles are indexed by
+`benchmarks/workloads/index.json`. Regenerate and validate it with
+`PYTHONPATH=. python tools/generate_controlled_workloads.py` and
+`PYTHONPATH=. python tools/validate_controlled_workloads.py`.
 
 CUDA events are resolved once when the context exits. The variable-cell
 benchmark scripts accept `--profile-runtime` and store the full phase samples
