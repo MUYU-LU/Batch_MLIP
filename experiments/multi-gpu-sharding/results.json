@@ -1,0 +1,1556 @@
+{
+  "correctness": {
+    "all_convergence_flags_match_w1": true,
+    "all_points_converged": true,
+    "all_sources_match_w1": true
+  },
+  "main_matrix": {
+    "atombit": {
+      "homogeneous-276": {
+        "1": {
+          "all_converged": true,
+          "atoms_per_second": 250.2665338877084,
+          "comparison_to_w1": {
+            "absolute_energy_difference_eV": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "absolute_max_force_difference_eV_per_A": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "absolute_max_stress_difference_eV_per_A3": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "absolute_step_difference": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "convergence_flags_match": true,
+            "max_abs_cell_difference_A": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "max_abs_position_difference_A": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "sources_match": true,
+            "step_mismatch_count": 0
+          },
+          "end_to_end_speedup_vs_w1": 1.0,
+          "end_to_end_wall_seconds": 315.41179643478245,
+          "model_evaluations": 514,
+          "neighbor_rebuilds": 368,
+          "optimization_speedup_vs_w1": 1.0,
+          "optimization_wall_seconds": 282.3230054071173,
+          "optimizer_steps_total": 19878,
+          "parallel_efficiency": 1.0,
+          "peak_memory_bytes_max_per_worker": 27349302272,
+          "phase_device_seconds_sum": {
+            "calculator.graph_view": 0.4008248009979722,
+            "calculator.neighbor_update": 24.94798145127301,
+            "graph.geometry_to_host": 0.15144163203239447,
+            "graph.neighbor_search": 10.616428856849675,
+            "graph.to_device": 0.4976953912973401,
+            "model.autograd": 52.21341662406925,
+            "model.forward": 23.873609827995278,
+            "optimizer.bfgs_update": 171.06540656185135,
+            "scheduler.refill_repack": 3.7174866249561327
+          },
+          "raw_file": "runs/multi_gpu_sharding/atombit_homogeneous276_w1.json",
+          "raw_sha256": "14ba99f0325cc1463feca9cfd1296bbfd67f15472f75b4ea43b732745b869f2e",
+          "startup_wall_seconds": 24.784896976780146,
+          "systems_per_second": 0.9067628039409724,
+          "worker_imbalance_ratio": 1.0,
+          "worker_run_seconds_max": 282.18124281521887,
+          "worker_run_seconds_min": 282.18124281521887
+        },
+        "4": {
+          "all_converged": true,
+          "atoms_per_second": 845.5764046473154,
+          "comparison_to_w1": {
+            "absolute_energy_difference_eV": {
+              "count_above_1e-1": 5,
+              "count_above_1e-2": 13,
+              "count_above_1e-3": 19,
+              "maximum": 4.588481903076172,
+              "median": 0.0,
+              "nonzero_count": 36,
+              "percentile_90": 2.47955322265625e-05,
+              "percentile_95": 0.008706092834472656
+            },
+            "absolute_max_force_difference_eV_per_A": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 2,
+              "count_above_1e-3": 23,
+              "maximum": 0.012353409081697464,
+              "median": 0.0,
+              "nonzero_count": 33,
+              "percentile_90": 0.0003892090171575546,
+              "percentile_95": 0.0028775669634342194
+            },
+            "absolute_max_stress_difference_eV_per_A3": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.00026673093088902533,
+              "median": 0.0,
+              "nonzero_count": 33,
+              "percentile_90": 2.941633283626288e-07,
+              "percentile_95": 2.7329122531227767e-05
+            },
+            "absolute_step_difference": {
+              "count_above_1e-1": 18,
+              "count_above_1e-2": 18,
+              "count_above_1e-3": 18,
+              "maximum": 176.0,
+              "median": 0.0,
+              "nonzero_count": 18,
+              "percentile_90": 0.0,
+              "percentile_95": 2.0
+            },
+            "convergence_flags_match": true,
+            "max_abs_cell_difference_A": {
+              "count_above_1e-1": 1,
+              "count_above_1e-2": 5,
+              "count_above_1e-3": 9,
+              "maximum": 0.4996013641357422,
+              "median": 0.0,
+              "nonzero_count": 32,
+              "percentile_90": 1.1866912245750427e-05,
+              "percentile_95": 0.0003330318140797317
+            },
+            "max_abs_position_difference_A": {
+              "count_above_1e-1": 5,
+              "count_above_1e-2": 11,
+              "count_above_1e-3": 23,
+              "maximum": 2.1648669242858887,
+              "median": 0.0,
+              "nonzero_count": 33,
+              "percentile_90": 0.0003552436828613281,
+              "percentile_95": 0.007771313190460205
+            },
+            "sources_match": true,
+            "step_mismatch_count": 18
+          },
+          "end_to_end_speedup_vs_w1": 2.636630196989578,
+          "end_to_end_wall_seconds": 119.62686189170927,
+          "model_evaluations": 816,
+          "neighbor_rebuilds": 253,
+          "optimization_speedup_vs_w1": 3.3787034627119397,
+          "optimization_wall_seconds": 83.55956908408552,
+          "optimizer_steps_total": 20105,
+          "parallel_efficiency": 0.8446758656779849,
+          "peak_memory_bytes_max_per_worker": 26918725632,
+          "phase_device_seconds_sum": {
+            "calculator.graph_view": 0.5007167358398437,
+            "calculator.neighbor_update": 25.218111548185348,
+            "graph.geometry_to_host": 0.15161804807186127,
+            "graph.neighbor_search": 10.791988646030424,
+            "graph.to_device": 0.3989536305069924,
+            "model.autograd": 54.35990217781066,
+            "model.forward": 24.618935205459607,
+            "optimizer.bfgs_update": 174.03227545928954,
+            "scheduler.refill_repack": 0.721444226026535
+          },
+          "raw_file": "runs/multi_gpu_sharding/atombit_homogeneous276_w4.json",
+          "raw_sha256": "1bda9378695cb03468192010b7ff26988377ac5bf2b4488b8ef93f612ed7c447",
+          "startup_wall_seconds": 27.60126790869981,
+          "systems_per_second": 3.063682625533751,
+          "worker_imbalance_ratio": 1.409778414829249,
+          "worker_run_seconds_max": 83.54344943724573,
+          "worker_run_seconds_min": 59.25998622085899
+        },
+        "7": {
+          "all_converged": true,
+          "atoms_per_second": 1303.6027582489733,
+          "comparison_to_w1": {
+            "absolute_energy_difference_eV": {
+              "count_above_1e-1": 7,
+              "count_above_1e-2": 12,
+              "count_above_1e-3": 22,
+              "maximum": 4.587089538574219,
+              "median": 0.0,
+              "nonzero_count": 55,
+              "percentile_90": 0.0002880096435546875,
+              "percentile_95": 0.00632476806640625
+            },
+            "absolute_max_force_difference_eV_per_A": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 2,
+              "count_above_1e-3": 26,
+              "maximum": 0.01213829219341278,
+              "median": 0.0,
+              "nonzero_count": 51,
+              "percentile_90": 0.0009253807365894318,
+              "percentile_95": 0.0033976640552282333
+            },
+            "absolute_max_stress_difference_eV_per_A3": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.000443478231318295,
+              "median": 0.0,
+              "nonzero_count": 51,
+              "percentile_90": 4.851124685956165e-06,
+              "percentile_95": 3.0053208320168778e-05
+            },
+            "absolute_step_difference": {
+              "count_above_1e-1": 19,
+              "count_above_1e-2": 19,
+              "count_above_1e-3": 19,
+              "maximum": 175.0,
+              "median": 0.0,
+              "nonzero_count": 19,
+              "percentile_90": 0.0,
+              "percentile_95": 2.0
+            },
+            "convergence_flags_match": true,
+            "max_abs_cell_difference_A": {
+              "count_above_1e-1": 2,
+              "count_above_1e-2": 7,
+              "count_above_1e-3": 10,
+              "maximum": 0.49907684326171875,
+              "median": 0.0,
+              "nonzero_count": 51,
+              "percentile_90": 4.482269287109375e-05,
+              "percentile_95": 0.0005879402160644531
+            },
+            "max_abs_position_difference_A": {
+              "count_above_1e-1": 7,
+              "count_above_1e-2": 12,
+              "count_above_1e-3": 29,
+              "maximum": 2.1626057624816895,
+              "median": 0.0,
+              "nonzero_count": 51,
+              "percentile_90": 0.001531839370727539,
+              "percentile_95": 0.007399648427963257
+            },
+            "sources_match": true,
+            "step_mismatch_count": 19
+          },
+          "end_to_end_speedup_vs_w1": 3.4077201106245805,
+          "end_to_end_wall_seconds": 92.55801127897575,
+          "model_evaluations": 1703,
+          "neighbor_rebuilds": 709,
+          "optimization_speedup_vs_w1": 5.208857684639067,
+          "optimization_wall_seconds": 54.2005603723228,
+          "optimizer_steps_total": 20203,
+          "parallel_efficiency": 0.7441225263770096,
+          "peak_memory_bytes_max_per_worker": 15006082048,
+          "phase_device_seconds_sum": {
+            "calculator.graph_view": 0.8273823367655276,
+            "calculator.neighbor_update": 26.805758692502973,
+            "graph.geometry_to_host": 0.27603472089767456,
+            "graph.neighbor_search": 10.939378798007967,
+            "graph.to_device": 0.663424318611622,
+            "model.autograd": 62.85195141887664,
+            "model.forward": 30.544444868087762,
+            "optimizer.bfgs_update": 177.73454205799106,
+            "scheduler.refill_repack": 1.7362217984199524
+          },
+          "raw_file": "runs/multi_gpu_sharding/atombit_homogeneous276_w7.json",
+          "raw_sha256": "18d006a64e00d30e177b2adad164be544960e2861562a5d4c632b487a704fd4c",
+          "startup_wall_seconds": 29.761845795903355,
+          "systems_per_second": 4.7231983994528015,
+          "worker_imbalance_ratio": 1.5141037505626977,
+          "worker_run_seconds_max": 54.187726652249694,
+          "worker_run_seconds_min": 35.78864832222462
+        }
+      },
+      "mixed-46-276": {
+        "1": {
+          "all_converged": true,
+          "atoms_per_second": 206.6329864364424,
+          "comparison_to_w1": {
+            "absolute_energy_difference_eV": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "absolute_max_force_difference_eV_per_A": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "absolute_max_stress_difference_eV_per_A3": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "absolute_step_difference": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "convergence_flags_match": true,
+            "max_abs_cell_difference_A": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "max_abs_position_difference_A": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "sources_match": true,
+            "step_mismatch_count": 0
+          },
+          "end_to_end_speedup_vs_w1": 1.0,
+          "end_to_end_wall_seconds": 233.05851728376,
+          "model_evaluations": 555,
+          "neighbor_rebuilds": 441,
+          "optimization_speedup_vs_w1": 1.0,
+          "optimization_wall_seconds": 199.46476460900158,
+          "optimizer_steps_total": 24106,
+          "parallel_efficiency": 1.0,
+          "peak_memory_bytes_max_per_worker": 15081293312,
+          "phase_device_seconds_sum": {
+            "calculator.graph_view": 0.3231731520295142,
+            "calculator.neighbor_update": 24.926806141972534,
+            "graph.geometry_to_host": 0.15558713588118558,
+            "graph.neighbor_search": 7.506649239778516,
+            "graph.to_device": 0.5737415035963056,
+            "model.autograd": 34.546269221305856,
+            "model.forward": 15.799709609985356,
+            "optimizer.bfgs_update": 113.41714804124837,
+            "scheduler.refill_repack": 4.125349961757661
+          },
+          "raw_file": "runs/multi_gpu_sharding/atombit_mixed46_276_w1.json",
+          "raw_sha256": "2eedd9e87bff11e3db70c07139854de513f48cbbe087ace74f9b2537050ff511",
+          "startup_wall_seconds": 25.175691256765276,
+          "systems_per_second": 1.2834346983629963,
+          "worker_imbalance_ratio": 1.0,
+          "worker_run_seconds_max": 199.3487735693343,
+          "worker_run_seconds_min": 199.3487735693343
+        },
+        "4": {
+          "all_converged": true,
+          "atoms_per_second": 681.0262930123193,
+          "comparison_to_w1": {
+            "absolute_energy_difference_eV": {
+              "count_above_1e-1": 2,
+              "count_above_1e-2": 6,
+              "count_above_1e-3": 14,
+              "maximum": 0.9370079040527344,
+              "median": 0.0,
+              "nonzero_count": 76,
+              "percentile_90": 0.0001239776611328125,
+              "percentile_95": 0.001110076904296875
+            },
+            "absolute_max_force_difference_eV_per_A": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 4,
+              "count_above_1e-3": 24,
+              "maximum": 0.013436231762170792,
+              "median": 0.0,
+              "nonzero_count": 66,
+              "percentile_90": 0.0008244309574365616,
+              "percentile_95": 0.002640228718519211
+            },
+            "absolute_max_stress_difference_eV_per_A3": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.00040485127829015255,
+              "median": 0.0,
+              "nonzero_count": 66,
+              "percentile_90": 7.922382792457938e-06,
+              "percentile_95": 3.6253040889278054e-05
+            },
+            "absolute_step_difference": {
+              "count_above_1e-1": 19,
+              "count_above_1e-2": 19,
+              "count_above_1e-3": 19,
+              "maximum": 60.0,
+              "median": 0.0,
+              "nonzero_count": 19,
+              "percentile_90": 0.0,
+              "percentile_95": 1.0
+            },
+            "convergence_flags_match": true,
+            "max_abs_cell_difference_A": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 2,
+              "count_above_1e-3": 10,
+              "maximum": 0.059322357177734375,
+              "median": 0.0,
+              "nonzero_count": 64,
+              "percentile_90": 9.40561294555664e-05,
+              "percentile_95": 0.0006551742553710938
+            },
+            "max_abs_position_difference_A": {
+              "count_above_1e-1": 2,
+              "count_above_1e-2": 9,
+              "count_above_1e-3": 30,
+              "maximum": 0.9402629137039185,
+              "median": 0.0,
+              "nonzero_count": 65,
+              "percentile_90": 0.0014963150024414062,
+              "percentile_95": 0.007117867469787598
+            },
+            "sources_match": true,
+            "step_mismatch_count": 19
+          },
+          "end_to_end_speedup_vs_w1": 2.4201083517144735,
+          "end_to_end_wall_seconds": 96.30086071090773,
+          "model_evaluations": 966,
+          "neighbor_rebuilds": 460,
+          "optimization_speedup_vs_w1": 3.29582563150823,
+          "optimization_wall_seconds": 60.52042398788035,
+          "optimizer_steps_total": 23999,
+          "parallel_efficiency": 0.8239564078770575,
+          "peak_memory_bytes_max_per_worker": 15778067968,
+          "phase_device_seconds_sum": {
+            "calculator.graph_view": 0.4739980798661707,
+            "calculator.neighbor_update": 25.57115974712371,
+            "graph.geometry_to_host": 0.17613440012931822,
+            "graph.neighbor_search": 7.528758711695669,
+            "graph.to_device": 0.556489695906639,
+            "model.autograd": 37.67985293006896,
+            "model.forward": 18.34511314201356,
+            "optimizer.bfgs_update": 113.6836223220825,
+            "scheduler.refill_repack": 1.41899036860466
+          },
+          "raw_file": "runs/multi_gpu_sharding/atombit_mixed46_276_w4.json",
+          "raw_sha256": "63aa0bbc0539ed09f7aa4777270342b75d4de5c21fc2970881bc79f872b8f076",
+          "startup_wall_seconds": 27.251524783670902,
+          "systems_per_second": 4.229976975231797,
+          "worker_imbalance_ratio": 1.3051624937124224,
+          "worker_run_seconds_max": 60.40138768590987,
+          "worker_run_seconds_min": 46.27882579900324
+        },
+        "7": {
+          "all_converged": true,
+          "atoms_per_second": 994.5991043042039,
+          "comparison_to_w1": {
+            "absolute_energy_difference_eV": {
+              "count_above_1e-1": 6,
+              "count_above_1e-2": 10,
+              "count_above_1e-3": 19,
+              "maximum": 1.8932685852050781,
+              "median": 0.0,
+              "nonzero_count": 107,
+              "percentile_90": 0.00030541419982910156,
+              "percentile_95": 0.0046443939208984375
+            },
+            "absolute_max_force_difference_eV_per_A": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 4,
+              "count_above_1e-3": 30,
+              "maximum": 0.013436231762170792,
+              "median": 0.0,
+              "nonzero_count": 96,
+              "percentile_90": 0.002145100384950638,
+              "percentile_95": 0.0038848472759127617
+            },
+            "absolute_max_stress_difference_eV_per_A3": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.00044468604028224945,
+              "median": 0.0,
+              "nonzero_count": 96,
+              "percentile_90": 1.4485412975773215e-05,
+              "percentile_95": 4.0835489926394075e-05
+            },
+            "absolute_step_difference": {
+              "count_above_1e-1": 23,
+              "count_above_1e-2": 23,
+              "count_above_1e-3": 23,
+              "maximum": 90.0,
+              "median": 0.0,
+              "nonzero_count": 23,
+              "percentile_90": 0.0,
+              "percentile_95": 2.0
+            },
+            "convergence_flags_match": true,
+            "max_abs_cell_difference_A": {
+              "count_above_1e-1": 1,
+              "count_above_1e-2": 9,
+              "count_above_1e-3": 15,
+              "maximum": 0.1473846435546875,
+              "median": 0.0,
+              "nonzero_count": 94,
+              "percentile_90": 0.00043463706970214844,
+              "percentile_95": 0.0018469654023647308
+            },
+            "max_abs_position_difference_A": {
+              "count_above_1e-1": 6,
+              "count_above_1e-2": 13,
+              "count_above_1e-3": 36,
+              "maximum": 1.2330169677734375,
+              "median": 0.0,
+              "nonzero_count": 96,
+              "percentile_90": 0.0033186674118041992,
+              "percentile_95": 0.009921431541442871
+            },
+            "sources_match": true,
+            "step_mismatch_count": 23
+          },
+          "end_to_end_speedup_vs_w1": 2.8836360304033466,
+          "end_to_end_wall_seconds": 80.8210588390939,
+          "model_evaluations": 1647,
+          "neighbor_rebuilds": 826,
+          "optimization_speedup_vs_w1": 4.813360739042164,
+          "optimization_wall_seconds": 41.439812102820724,
+          "optimizer_steps_total": 23971,
+          "parallel_efficiency": 0.6876229627203091,
+          "peak_memory_bytes_max_per_worker": 9477159424,
+          "phase_device_seconds_sum": {
+            "calculator.graph_view": 0.7147515834867956,
+            "calculator.neighbor_update": 26.449000340104103,
+            "graph.geometry_to_host": 0.30047974377870557,
+            "graph.neighbor_search": 7.543520511150359,
+            "graph.to_device": 0.7230507207214834,
+            "model.autograd": 43.40412598896028,
+            "model.forward": 22.26729180240631,
+            "optimizer.bfgs_update": 115.14992434215542,
+            "scheduler.refill_repack": 1.8596625230312351
+          },
+          "raw_file": "runs/multi_gpu_sharding/atombit_mixed46_276_w7.json",
+          "raw_sha256": "2dcc1a7f3ba66863f3ddc8e5ead617322416df398117f9d39beaea16ac4a1047",
+          "startup_wall_seconds": 30.780188284814358,
+          "systems_per_second": 6.177634188224869,
+          "worker_imbalance_ratio": 2.0378169161635205,
+          "worker_run_seconds_max": 41.42897763196379,
+          "worker_run_seconds_min": 20.330078381113708
+        }
+      }
+    },
+    "mace": {
+      "homogeneous-276": {
+        "1": {
+          "all_converged": true,
+          "atoms_per_second": 242.16112952521593,
+          "comparison_to_w1": {
+            "absolute_energy_difference_eV": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "absolute_max_force_difference_eV_per_A": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "absolute_max_stress_difference_eV_per_A3": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "absolute_step_difference": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "convergence_flags_match": true,
+            "max_abs_cell_difference_A": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "max_abs_position_difference_A": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "sources_match": true,
+            "step_mismatch_count": 0
+          },
+          "end_to_end_speedup_vs_w1": 1.0,
+          "end_to_end_wall_seconds": 333.4537007990293,
+          "model_evaluations": 493,
+          "neighbor_rebuilds": 396,
+          "optimization_speedup_vs_w1": 1.0,
+          "optimization_wall_seconds": 291.772672759369,
+          "optimizer_steps_total": 22066,
+          "parallel_efficiency": 1.0,
+          "peak_memory_bytes_max_per_worker": 27467161600,
+          "phase_device_seconds_sum": {
+            "calculator.neighbor_update": 21.31838060778378,
+            "graph.geometry_to_host": 0.1403613438904285,
+            "graph.mace_tensor_state": 0.22341180828213683,
+            "graph.neighbor_search": 5.933897717595102,
+            "graph.to_device": 0.48022639876604106,
+            "model.forward": 71.87787365531929,
+            "optimizer.bfgs_update": 189.83040772342676,
+            "scheduler.refill_repack": 3.3980018808841708
+          },
+          "raw_file": "runs/multi_gpu_sharding/mace_homogeneous276_w1.json",
+          "raw_sha256": "100491c7cc71fe9fc6a96a39a338298dfa3662f2ebd27db98ae09826ad41859f",
+          "startup_wall_seconds": 30.147161582950503,
+          "systems_per_second": 0.8773953968304925,
+          "worker_imbalance_ratio": 1.0,
+          "worker_run_seconds_max": 291.6498970380053,
+          "worker_run_seconds_min": 291.6498970380053
+        },
+        "4": {
+          "all_converged": true,
+          "atoms_per_second": 697.7201194951062,
+          "comparison_to_w1": {
+            "absolute_energy_difference_eV": {
+              "count_above_1e-1": 18,
+              "count_above_1e-2": 42,
+              "count_above_1e-3": 74,
+              "maximum": 2.736541409860365,
+              "median": 0.0,
+              "nonzero_count": 125,
+              "percentile_90": 0.02160220537916757,
+              "percentile_95": 0.20703686025808565
+            },
+            "absolute_max_force_difference_eV_per_A": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 3,
+              "count_above_1e-3": 86,
+              "maximum": 0.01918257640929987,
+              "median": 9.797064236261033e-10,
+              "nonzero_count": 213,
+              "percentile_90": 0.004989021389474945,
+              "percentile_95": 0.00756757247328655
+            },
+            "absolute_max_stress_difference_eV_per_A3": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.00034585126949194665,
+              "median": 4.5090705258141184e-13,
+              "nonzero_count": 213,
+              "percentile_90": 5.578546176116656e-05,
+              "percentile_95": 0.00014076302689799248
+            },
+            "absolute_step_difference": {
+              "count_above_1e-1": 70,
+              "count_above_1e-2": 70,
+              "count_above_1e-3": 70,
+              "maximum": 156.0,
+              "median": 0.0,
+              "nonzero_count": 70,
+              "percentile_90": 5.5,
+              "percentile_95": 39.0
+            },
+            "convergence_flags_match": true,
+            "max_abs_cell_difference_A": {
+              "count_above_1e-1": 7,
+              "count_above_1e-2": 18,
+              "count_above_1e-3": 37,
+              "maximum": 0.27021880580682733,
+              "median": 1.2047252084812499e-11,
+              "nonzero_count": 213,
+              "percentile_90": 0.0039878695133133135,
+              "percentile_95": 0.020381381960440592
+            },
+            "max_abs_position_difference_A": {
+              "count_above_1e-1": 18,
+              "count_above_1e-2": 53,
+              "count_above_1e-3": 92,
+              "maximum": 1.4800265849457972,
+              "median": 5.522409196601075e-10,
+              "nonzero_count": 213,
+              "percentile_90": 0.04447927870415902,
+              "percentile_95": 0.39447432721938824
+            },
+            "sources_match": true,
+            "step_mismatch_count": 70
+          },
+          "end_to_end_speedup_vs_w1": 2.294356475722106,
+          "end_to_end_wall_seconds": 145.33648294303566,
+          "model_evaluations": 862,
+          "neighbor_rebuilds": 244,
+          "optimization_speedup_vs_w1": 2.8812226010964883,
+          "optimization_wall_seconds": 101.26696654688567,
+          "optimizer_steps_total": 22156,
+          "parallel_efficiency": 0.7203056502741221,
+          "peak_memory_bytes_max_per_worker": 27359032832,
+          "phase_device_seconds_sum": {
+            "calculator.neighbor_update": 21.44899021720886,
+            "graph.geometry_to_host": 0.1947793923020363,
+            "graph.mace_tensor_state": 0.31218428778648377,
+            "graph.neighbor_search": 6.04092761516571,
+            "graph.to_device": 0.35325481534004216,
+            "model.forward": 82.53690489578247,
+            "optimizer.bfgs_update": 191.01739366531382,
+            "scheduler.refill_repack": 0.6232594826221466
+          },
+          "raw_file": "runs/multi_gpu_sharding/mace_homogeneous276_w4.json",
+          "raw_sha256": "892dc330a66bad31ff0e3825ee0fba13ea6016267ef01baa305376d0f5b70ea4",
+          "startup_wall_seconds": 34.916206595953554,
+          "systems_per_second": 2.527971447446037,
+          "worker_imbalance_ratio": 2.259625679281763,
+          "worker_run_seconds_max": 101.25329602463171,
+          "worker_run_seconds_min": 44.809765154030174
+        },
+        "7": {
+          "all_converged": true,
+          "atoms_per_second": 1319.2143975014758,
+          "comparison_to_w1": {
+            "absolute_energy_difference_eV": {
+              "count_above_1e-1": 18,
+              "count_above_1e-2": 42,
+              "count_above_1e-3": 71,
+              "maximum": 2.7365414099476766,
+              "median": 1.0186340659856796e-09,
+              "nonzero_count": 140,
+              "percentile_90": 0.02160220535006374,
+              "percentile_95": 0.20703699788282393
+            },
+            "absolute_max_force_difference_eV_per_A": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 3,
+              "count_above_1e-3": 85,
+              "maximum": 0.01918865316937829,
+              "median": 5.637738966293715e-08,
+              "nonzero_count": 232,
+              "percentile_90": 0.004991055101479836,
+              "percentile_95": 0.007517571863782003
+            },
+            "absolute_max_stress_difference_eV_per_A3": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.00034585126898723184,
+              "median": 6.68606006029701e-11,
+              "nonzero_count": 232,
+              "percentile_90": 5.578546176141752e-05,
+              "percentile_95": 0.0001407626600623069
+            },
+            "absolute_step_difference": {
+              "count_above_1e-1": 68,
+              "count_above_1e-2": 68,
+              "count_above_1e-3": 68,
+              "maximum": 156.0,
+              "median": 0.0,
+              "nonzero_count": 68,
+              "percentile_90": 5.5,
+              "percentile_95": 39.0
+            },
+            "convergence_flags_match": true,
+            "max_abs_cell_difference_A": {
+              "count_above_1e-1": 7,
+              "count_above_1e-2": 18,
+              "count_above_1e-3": 37,
+              "maximum": 0.27021880646120877,
+              "median": 9.182095084270259e-10,
+              "nonzero_count": 232,
+              "percentile_90": 0.003988601384895318,
+              "percentile_95": 0.020381381953529676
+            },
+            "max_abs_position_difference_A": {
+              "count_above_1e-1": 18,
+              "count_above_1e-2": 54,
+              "count_above_1e-3": 92,
+              "maximum": 1.4800265856939419,
+              "median": 2.754677241867398e-08,
+              "nonzero_count": 232,
+              "percentile_90": 0.044479115949306314,
+              "percentile_95": 0.3944743216056752
+            },
+            "sources_match": true,
+            "step_mismatch_count": 68
+          },
+          "end_to_end_speedup_vs_w1": 3.3524252438102633,
+          "end_to_end_wall_seconds": 99.4664091062732,
+          "model_evaluations": 1791,
+          "neighbor_rebuilds": 779,
+          "optimization_speedup_vs_w1": 5.447671969848933,
+          "optimization_wall_seconds": 53.55914863711223,
+          "optimizer_steps_total": 22160,
+          "parallel_efficiency": 0.7782388528355619,
+          "peak_memory_bytes_max_per_worker": 15816085504,
+          "phase_device_seconds_sum": {
+            "calculator.neighbor_update": 23.22353495877981,
+            "graph.geometry_to_host": 0.2883871683478355,
+            "graph.mace_tensor_state": 0.6030472961068153,
+            "graph.neighbor_search": 6.145023976445196,
+            "graph.to_device": 0.645840095281601,
+            "model.forward": 100.41306271362305,
+            "optimizer.bfgs_update": 195.16958472156517,
+            "scheduler.refill_repack": 1.5314531848430635
+          },
+          "raw_file": "runs/multi_gpu_sharding/mace_homogeneous276_w7.json",
+          "raw_sha256": "1f620db9094a88ed6c0c8a43f761889e6289003ff31b00e53b6c1ad79aa6ec04",
+          "startup_wall_seconds": 36.31369552295655,
+          "systems_per_second": 4.779762309787956,
+          "worker_imbalance_ratio": 1.2323027070142987,
+          "worker_run_seconds_max": 53.546211305074394,
+          "worker_run_seconds_min": 43.452157493680716
+        }
+      },
+      "mixed-46-276": {
+        "1": {
+          "all_converged": true,
+          "atoms_per_second": 197.14111183484567,
+          "comparison_to_w1": {
+            "absolute_energy_difference_eV": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "absolute_max_force_difference_eV_per_A": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "absolute_max_stress_difference_eV_per_A3": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "absolute_step_difference": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "convergence_flags_match": true,
+            "max_abs_cell_difference_A": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "max_abs_position_difference_A": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0,
+              "median": 0.0,
+              "nonzero_count": 0,
+              "percentile_90": 0.0,
+              "percentile_95": 0.0
+            },
+            "sources_match": true,
+            "step_mismatch_count": 0
+          },
+          "end_to_end_speedup_vs_w1": 1.0,
+          "end_to_end_wall_seconds": 251.4183248798363,
+          "model_evaluations": 632,
+          "neighbor_rebuilds": 499,
+          "optimization_speedup_vs_w1": 1.0,
+          "optimization_wall_seconds": 209.06851755268872,
+          "optimizer_steps_total": 27579,
+          "parallel_efficiency": 1.0,
+          "peak_memory_bytes_max_per_worker": 15887621120,
+          "phase_device_seconds_sum": {
+            "calculator.neighbor_update": 24.77721812093259,
+            "graph.geometry_to_host": 0.17604409590363504,
+            "graph.mace_tensor_state": 0.22931532818079,
+            "graph.neighbor_search": 4.355267270863063,
+            "graph.to_device": 0.6140494714081282,
+            "model.forward": 48.74464763069146,
+            "optimizer.bfgs_update": 124.72093273544317,
+            "scheduler.refill_repack": 4.20408648276329
+          },
+          "raw_file": "runs/multi_gpu_sharding/mace_mixed46_276_w1.json",
+          "raw_sha256": "dc5a97c52750c7318adc0c2c84aa9ec02d9efe4a0587ac496029d34f54b4b5bb",
+          "startup_wall_seconds": 33.65652883518487,
+          "systems_per_second": 1.2244789554959359,
+          "worker_imbalance_ratio": 1.0,
+          "worker_run_seconds_max": 208.96112872706726,
+          "worker_run_seconds_min": 208.96112872706726
+        },
+        "4": {
+          "all_converged": true,
+          "atoms_per_second": 590.7886116250133,
+          "comparison_to_w1": {
+            "absolute_energy_difference_eV": {
+              "count_above_1e-1": 8,
+              "count_above_1e-2": 20,
+              "count_above_1e-3": 36,
+              "maximum": 2.736545840278268,
+              "median": 0.0,
+              "nonzero_count": 96,
+              "percentile_90": 0.0038371212722267956,
+              "percentile_95": 0.026720764726633206
+            },
+            "absolute_max_force_difference_eV_per_A": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 2,
+              "count_above_1e-3": 40,
+              "maximum": 0.011902227750370163,
+              "median": 1.2996839715562203e-11,
+              "nonzero_count": 237,
+              "percentile_90": 0.002131781092984786,
+              "percentile_95": 0.005192690813793246
+            },
+            "absolute_max_stress_difference_eV_per_A3": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0001989343671408544,
+              "median": 4.616801190480968e-14,
+              "nonzero_count": 237,
+              "percentile_90": 3.700721052798791e-05,
+              "percentile_95": 8.682663112563278e-05
+            },
+            "absolute_step_difference": {
+              "count_above_1e-1": 37,
+              "count_above_1e-2": 37,
+              "count_above_1e-3": 37,
+              "maximum": 156.0,
+              "median": 0.0,
+              "nonzero_count": 37,
+              "percentile_90": 1.0,
+              "percentile_95": 7.5
+            },
+            "convergence_flags_match": true,
+            "max_abs_cell_difference_A": {
+              "count_above_1e-1": 4,
+              "count_above_1e-2": 8,
+              "count_above_1e-3": 19,
+              "maximum": 0.2864210318393461,
+              "median": 1.3091749906379846e-12,
+              "nonzero_count": 237,
+              "percentile_90": 0.000510793760227557,
+              "percentile_95": 0.003298163449889202
+            },
+            "max_abs_position_difference_A": {
+              "count_above_1e-1": 9,
+              "count_above_1e-2": 27,
+              "count_above_1e-3": 43,
+              "maximum": 1.4801896940004298,
+              "median": 8.36752889199488e-12,
+              "nonzero_count": 237,
+              "percentile_90": 0.010314605244595931,
+              "percentile_95": 0.051116787786411266
+            },
+            "sources_match": true,
+            "step_mismatch_count": 37
+          },
+          "end_to_end_speedup_vs_w1": 2.180649785283622,
+          "end_to_end_wall_seconds": 115.29514118982479,
+          "model_evaluations": 1088,
+          "neighbor_rebuilds": 529,
+          "optimization_speedup_vs_w1": 2.9967803576148264,
+          "optimization_wall_seconds": 69.76437796698883,
+          "optimizer_steps_total": 27880,
+          "parallel_efficiency": 0.7491950894037066,
+          "peak_memory_bytes_max_per_worker": 15972533760,
+          "phase_device_seconds_sum": {
+            "calculator.neighbor_update": 25.329484693646428,
+            "graph.geometry_to_host": 0.19266790381073953,
+            "graph.mace_tensor_state": 0.3622682234346867,
+            "graph.neighbor_search": 4.372399329185487,
+            "graph.to_device": 0.584539520084858,
+            "model.forward": 62.56849460983276,
+            "optimizer.bfgs_update": 128.33694011783604,
+            "scheduler.refill_repack": 1.3558977954387665
+          },
+          "raw_file": "runs/multi_gpu_sharding/mace_mixed46_276_w4.json",
+          "raw_sha256": "283eb280306b2731ca1e6241b252471cdfabdf67fd9690474884c0435946f0c7",
+          "startup_wall_seconds": 36.208342945668846,
+          "systems_per_second": 3.6694944821429396,
+          "worker_imbalance_ratio": 1.6871681797286255,
+          "worker_run_seconds_max": 69.74851814471185,
+          "worker_run_seconds_min": 41.34058417100459
+        },
+        "7": {
+          "all_converged": true,
+          "atoms_per_second": 909.5246471002233,
+          "comparison_to_w1": {
+            "absolute_energy_difference_eV": {
+              "count_above_1e-1": 12,
+              "count_above_1e-2": 25,
+              "count_above_1e-3": 45,
+              "maximum": 1.1264641203451902,
+              "median": 0.0,
+              "nonzero_count": 121,
+              "percentile_90": 0.008347217881237157,
+              "percentile_95": 0.09234080009628087
+            },
+            "absolute_max_force_difference_eV_per_A": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 4,
+              "count_above_1e-3": 48,
+              "maximum": 0.011775122116332061,
+              "median": 5.122596444251393e-11,
+              "nonzero_count": 256,
+              "percentile_90": 0.003359488225339366,
+              "percentile_95": 0.006329933537706483
+            },
+            "absolute_max_stress_difference_eV_per_A3": {
+              "count_above_1e-1": 0,
+              "count_above_1e-2": 0,
+              "count_above_1e-3": 0,
+              "maximum": 0.0005311692969912369,
+              "median": 1.7098602807068264e-13,
+              "nonzero_count": 256,
+              "percentile_90": 3.828061820982277e-05,
+              "percentile_95": 5.6451346949425467e-05
+            },
+            "absolute_step_difference": {
+              "count_above_1e-1": 44,
+              "count_above_1e-2": 44,
+              "count_above_1e-3": 44,
+              "maximum": 146.0,
+              "median": 0.0,
+              "nonzero_count": 44,
+              "percentile_90": 2.0,
+              "percentile_95": 17.5
+            },
+            "convergence_flags_match": true,
+            "max_abs_cell_difference_A": {
+              "count_above_1e-1": 6,
+              "count_above_1e-2": 10,
+              "count_above_1e-3": 28,
+              "maximum": 0.3111559509137898,
+              "median": 5.100850297701243e-12,
+              "nonzero_count": 256,
+              "percentile_90": 0.0012261527704318098,
+              "percentile_95": 0.0037819826544085444
+            },
+            "max_abs_position_difference_A": {
+              "count_above_1e-1": 15,
+              "count_above_1e-2": 34,
+              "count_above_1e-3": 62,
+              "maximum": 1.1443544196625854,
+              "median": 2.5228263922372207e-11,
+              "nonzero_count": 256,
+              "percentile_90": 0.01916991491820441,
+              "percentile_95": 0.13204485097733143
+            },
+            "sources_match": true,
+            "step_mismatch_count": 44
+          },
+          "end_to_end_speedup_vs_w1": 2.789506281091253,
+          "end_to_end_wall_seconds": 90.1300443680957,
+          "model_evaluations": 2038,
+          "neighbor_rebuilds": 887,
+          "optimization_speedup_vs_w1": 4.61357166262801,
+          "optimization_wall_seconds": 45.31597921112552,
+          "optimizer_steps_total": 27711,
+          "parallel_efficiency": 0.6590816660897156,
+          "peak_memory_bytes_max_per_worker": 9576005120,
+          "phase_device_seconds_sum": {
+            "calculator.neighbor_update": 25.70580673187971,
+            "graph.geometry_to_host": 0.31537987190485006,
+            "graph.mace_tensor_state": 0.6466691526174547,
+            "graph.neighbor_search": 4.375414234757424,
+            "graph.to_device": 0.7348047053217888,
+            "model.forward": 83.5208364982605,
+            "optimizer.bfgs_update": 129.26292034697536,
+            "scheduler.refill_repack": 1.8314671659469601
+          },
+          "raw_file": "runs/multi_gpu_sharding/mace_mixed46_276_w7.json",
+          "raw_sha256": "bb965ce597001c8c360d9ed56b5bae198af7ef385887d64b9da2586759614060",
+          "startup_wall_seconds": 35.30538289807737,
+          "systems_per_second": 5.6492214105603935,
+          "worker_imbalance_ratio": 1.7698892408455764,
+          "worker_run_seconds_max": 45.30421461397782,
+          "worker_run_seconds_min": 25.597203242126852
+        }
+      }
+    }
+  },
+  "schema_version": 1,
+  "small_pool_control": {
+    "atombit": {
+      "1": {
+        "all_converged": true,
+        "atoms_per_second": 172.4885899858046,
+        "comparison_to_w1": {
+          "absolute_energy_difference_eV": {
+            "count_above_1e-1": 0,
+            "count_above_1e-2": 0,
+            "count_above_1e-3": 0,
+            "maximum": 0.0,
+            "median": 0.0,
+            "nonzero_count": 0,
+            "percentile_90": 0.0,
+            "percentile_95": 0.0
+          },
+          "absolute_max_force_difference_eV_per_A": {
+            "count_above_1e-1": 0,
+            "count_above_1e-2": 0,
+            "count_above_1e-3": 0,
+            "maximum": 0.0,
+            "median": 0.0,
+            "nonzero_count": 0,
+            "percentile_90": 0.0,
+            "percentile_95": 0.0
+          },
+          "absolute_max_stress_difference_eV_per_A3": {
+            "count_above_1e-1": 0,
+            "count_above_1e-2": 0,
+            "count_above_1e-3": 0,
+            "maximum": 0.0,
+            "median": 0.0,
+            "nonzero_count": 0,
+            "percentile_90": 0.0,
+            "percentile_95": 0.0
+          },
+          "absolute_step_difference": {
+            "count_above_1e-1": 0,
+            "count_above_1e-2": 0,
+            "count_above_1e-3": 0,
+            "maximum": 0.0,
+            "median": 0.0,
+            "nonzero_count": 0,
+            "percentile_90": 0.0,
+            "percentile_95": 0.0
+          },
+          "convergence_flags_match": true,
+          "max_abs_cell_difference_A": {
+            "count_above_1e-1": 0,
+            "count_above_1e-2": 0,
+            "count_above_1e-3": 0,
+            "maximum": 0.0,
+            "median": 0.0,
+            "nonzero_count": 0,
+            "percentile_90": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_abs_position_difference_A": {
+            "count_above_1e-1": 0,
+            "count_above_1e-2": 0,
+            "count_above_1e-3": 0,
+            "maximum": 0.0,
+            "median": 0.0,
+            "nonzero_count": 0,
+            "percentile_90": 0.0,
+            "percentile_95": 0.0
+          },
+          "sources_match": true,
+          "step_mismatch_count": 0
+        },
+        "end_to_end_speedup_vs_w1": 1.0,
+        "end_to_end_wall_seconds": 54.116711852140725,
+        "model_evaluations": 267,
+        "neighbor_rebuilds": 122,
+        "optimization_speedup_vs_w1": 1.0,
+        "optimization_wall_seconds": 29.868642328307033,
+        "optimizer_steps_total": 3193,
+        "parallel_efficiency": 1.0,
+        "peak_memory_bytes_max_per_worker": 7293510656,
+        "phase_device_seconds_sum": {
+          "calculator.graph_view": 0.11125270417332654,
+          "calculator.neighbor_update": 3.869968834161757,
+          "graph.geometry_to_host": 0.0450843199789524,
+          "graph.neighbor_search": 1.3278156217336647,
+          "graph.to_device": 0.10300681641697886,
+          "model.autograd": 5.656810529708864,
+          "model.forward": 3.142498210906982,
+          "optimizer.bfgs_update": 13.871560784816745,
+          "scheduler.refill_repack": 0.21740336012840267
+        },
+        "raw_file": "runs/multi_gpu_sharding/control32_atombit_mixed_w1.json",
+        "raw_sha256": "fd29c0f497bfb3da95c526694628410cd805163fac27d9123e437615d87eeb52",
+        "startup_wall_seconds": 15.552612454164773,
+        "systems_per_second": 1.0713577017751839,
+        "worker_imbalance_ratio": 1.0,
+        "worker_run_seconds_max": 29.858096193987876,
+        "worker_run_seconds_min": 29.858096193987876
+      },
+      "7": {
+        "all_converged": true,
+        "atoms_per_second": 427.75816245946504,
+        "comparison_to_w1": {
+          "absolute_energy_difference_eV": {
+            "count_above_1e-1": 1,
+            "count_above_1e-2": 3,
+            "count_above_1e-3": 8,
+            "maximum": 0.5597000122070312,
+            "median": 3.814697265625e-06,
+            "nonzero_count": 27,
+            "percentile_90": 0.005393886566162115,
+            "percentile_95": 0.020455765724182118
+          },
+          "absolute_max_force_difference_eV_per_A": {
+            "count_above_1e-1": 0,
+            "count_above_1e-2": 0,
+            "count_above_1e-3": 10,
+            "maximum": 0.007401149719953537,
+            "median": 0.00010260939598083496,
+            "nonzero_count": 25,
+            "percentile_90": 0.003970712423324586,
+            "percentile_95": 0.006678276322782039
+          },
+          "absolute_max_stress_difference_eV_per_A3": {
+            "count_above_1e-1": 0,
+            "count_above_1e-2": 0,
+            "count_above_1e-3": 0,
+            "maximum": 0.00019611133029684424,
+            "median": 3.2396565075032413e-07,
+            "nonzero_count": 25,
+            "percentile_90": 9.620698401704437e-05,
+            "percentile_95": 0.00013835183926858005
+          },
+          "absolute_step_difference": {
+            "count_above_1e-1": 7,
+            "count_above_1e-2": 7,
+            "count_above_1e-3": 7,
+            "maximum": 43.0,
+            "median": 0.0,
+            "nonzero_count": 7,
+            "percentile_90": 4.700000000000006,
+            "percentile_95": 5.899999999999999
+          },
+          "convergence_flags_match": true,
+          "max_abs_cell_difference_A": {
+            "count_above_1e-1": 1,
+            "count_above_1e-2": 2,
+            "count_above_1e-3": 7,
+            "maximum": 0.20548629760742188,
+            "median": 1.811981201171875e-05,
+            "nonzero_count": 24,
+            "percentile_90": 0.008706235885620129,
+            "percentile_95": 0.013189744949340814
+          },
+          "max_abs_position_difference_A": {
+            "count_above_1e-1": 1,
+            "count_above_1e-2": 5,
+            "count_above_1e-3": 11,
+            "maximum": 0.6811943054199219,
+            "median": 0.00016999244689941406,
+            "nonzero_count": 25,
+            "percentile_90": 0.025544643402099637,
+            "percentile_95": 0.042747867107391334
+          },
+          "sources_match": true,
+          "step_mismatch_count": 7
+        },
+        "end_to_end_speedup_vs_w1": 1.0551098626191964,
+        "end_to_end_wall_seconds": 51.29012036509812,
+        "model_evaluations": 1081,
+        "neighbor_rebuilds": 212,
+        "optimization_speedup_vs_w1": 2.4799214979649875,
+        "optimization_wall_seconds": 12.044188637752086,
+        "optimizer_steps_total": 3161,
+        "parallel_efficiency": 0.35427449970928393,
+        "peak_memory_bytes_max_per_worker": 1194531840,
+        "phase_device_seconds_sum": {
+          "calculator.graph_view": 0.43204396781325355,
+          "calculator.neighbor_update": 4.375334497451782,
+          "graph.geometry_to_host": 0.09400668716430663,
+          "graph.neighbor_search": 1.138847977519035,
+          "graph.to_device": 0.1295272323787212,
+          "model.autograd": 14.17716886138916,
+          "model.forward": 10.204599560737611,
+          "optimizer.bfgs_update": 15.643551666021347,
+          "scheduler.refill_repack": 0.08641865563392638
+        },
+        "raw_file": "runs/multi_gpu_sharding/control32_atombit_mixed_w7.json",
+        "raw_sha256": "e248f7b7dfc9f1fae88a879805c7e35ff991e167b39741645437e805f6657e29",
+        "startup_wall_seconds": 29.641521919053048,
+        "systems_per_second": 2.65688299664264,
+        "worker_imbalance_ratio": 2.307375652979744,
+        "worker_run_seconds_max": 12.03716308483854,
+        "worker_run_seconds_min": 5.216819840017706
+      }
+    },
+    "mace": {
+      "1": {
+        "all_converged": true,
+        "atoms_per_second": 133.09382801132574,
+        "comparison_to_w1": {
+          "absolute_energy_difference_eV": {
+            "count_above_1e-1": 0,
+            "count_above_1e-2": 0,
+            "count_above_1e-3": 0,
+            "maximum": 0.0,
+            "median": 0.0,
+            "nonzero_count": 0,
+            "percentile_90": 0.0,
+            "percentile_95": 0.0
+          },
+          "absolute_max_force_difference_eV_per_A": {
+            "count_above_1e-1": 0,
+            "count_above_1e-2": 0,
+            "count_above_1e-3": 0,
+            "maximum": 0.0,
+            "median": 0.0,
+            "nonzero_count": 0,
+            "percentile_90": 0.0,
+            "percentile_95": 0.0
+          },
+          "absolute_max_stress_difference_eV_per_A3": {
+            "count_above_1e-1": 0,
+            "count_above_1e-2": 0,
+            "count_above_1e-3": 0,
+            "maximum": 0.0,
+            "median": 0.0,
+            "nonzero_count": 0,
+            "percentile_90": 0.0,
+            "percentile_95": 0.0
+          },
+          "absolute_step_difference": {
+            "count_above_1e-1": 0,
+            "count_above_1e-2": 0,
+            "count_above_1e-3": 0,
+            "maximum": 0.0,
+            "median": 0.0,
+            "nonzero_count": 0,
+            "percentile_90": 0.0,
+            "percentile_95": 0.0
+          },
+          "convergence_flags_match": true,
+          "max_abs_cell_difference_A": {
+            "count_above_1e-1": 0,
+            "count_above_1e-2": 0,
+            "count_above_1e-3": 0,
+            "maximum": 0.0,
+            "median": 0.0,
+            "nonzero_count": 0,
+            "percentile_90": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_abs_position_difference_A": {
+            "count_above_1e-1": 0,
+            "count_above_1e-2": 0,
+            "count_above_1e-3": 0,
+            "maximum": 0.0,
+            "median": 0.0,
+            "nonzero_count": 0,
+            "percentile_90": 0.0,
+            "percentile_95": 0.0
+          },
+          "sources_match": true,
+          "step_mismatch_count": 0
+        },
+        "end_to_end_speedup_vs_w1": 1.0,
+        "end_to_end_wall_seconds": 80.06198367802426,
+        "model_evaluations": 354,
+        "neighbor_rebuilds": 141,
+        "optimization_speedup_vs_w1": 1.0,
+        "optimization_wall_seconds": 38.709533544722944,
+        "optimizer_steps_total": 3990,
+        "parallel_efficiency": 1.0,
+        "peak_memory_bytes_max_per_worker": 7978769920,
+        "phase_device_seconds_sum": {
+          "calculator.neighbor_update": 4.07032534772158,
+          "graph.geometry_to_host": 0.04854003199934958,
+          "graph.mace_tensor_state": 0.11139964795112606,
+          "graph.neighbor_search": 0.9690248639583587,
+          "graph.to_device": 0.11188876754045489,
+          "model.forward": 12.640559654235831,
+          "optimizer.bfgs_update": 18.65538128566742,
+          "scheduler.refill_repack": 0.22463401532173152
+        },
+        "raw_file": "runs/multi_gpu_sharding/control32_mace_mixed_w1.json",
+        "raw_sha256": "ec7998e38a93715668617f8887314b1e37e32cbf756cd1dfae0441a0784613d8",
+        "startup_wall_seconds": 32.31920116022229,
+        "systems_per_second": 0.826669739200781,
+        "worker_imbalance_ratio": 1.0,
+        "worker_run_seconds_max": 38.69892961718142,
+        "worker_run_seconds_min": 38.69892961718142
+      },
+      "7": {
+        "all_converged": true,
+        "atoms_per_second": 358.8782825254534,
+        "comparison_to_w1": {
+          "absolute_energy_difference_eV": {
+            "count_above_1e-1": 1,
+            "count_above_1e-2": 1,
+            "count_above_1e-3": 5,
+            "maximum": 0.49705817984067835,
+            "median": 1.0913936421275139e-11,
+            "nonzero_count": 18,
+            "percentile_90": 0.0032320969039574296,
+            "percentile_95": 0.004298866011959035
+          },
+          "absolute_max_force_difference_eV_per_A": {
+            "count_above_1e-1": 0,
+            "count_above_1e-2": 0,
+            "count_above_1e-3": 6,
+            "maximum": 0.006380084643737204,
+            "median": 1.1115562220664899e-09,
+            "nonzero_count": 32,
+            "percentile_90": 0.004318421600381427,
+            "percentile_95": 0.004852649828591311
+          },
+          "absolute_max_stress_difference_eV_per_A3": {
+            "count_above_1e-1": 0,
+            "count_above_1e-2": 0,
+            "count_above_1e-3": 0,
+            "maximum": 0.00013943569967784182,
+            "median": 6.843725971128131e-12,
+            "nonzero_count": 32,
+            "percentile_90": 4.630073830693358e-06,
+            "percentile_95": 2.4950127245273658e-05
+          },
+          "absolute_step_difference": {
+            "count_above_1e-1": 5,
+            "count_above_1e-2": 5,
+            "count_above_1e-3": 5,
+            "maximum": 146.0,
+            "median": 0.0,
+            "nonzero_count": 5,
+            "percentile_90": 1.0,
+            "percentile_95": 1.4499999999999993
+          },
+          "convergence_flags_match": true,
+          "max_abs_cell_difference_A": {
+            "count_above_1e-1": 1,
+            "count_above_1e-2": 1,
+            "count_above_1e-3": 1,
+            "maximum": 0.15851937884267997,
+            "median": 5.832401228644812e-11,
+            "nonzero_count": 32,
+            "percentile_90": 0.00037542989132823836,
+            "percentile_95": 0.0006656287516928925
+          },
+          "max_abs_position_difference_A": {
+            "count_above_1e-1": 1,
+            "count_above_1e-2": 2,
+            "count_above_1e-3": 6,
+            "maximum": 0.9505984838062354,
+            "median": 8.513691973632831e-10,
+            "nonzero_count": 32,
+            "percentile_90": 0.007020135105734228,
+            "percentile_95": 0.01113532142784068
+          },
+          "sources_match": true,
+          "step_mismatch_count": 5
+        },
+        "end_to_end_speedup_vs_w1": 1.3386665905136834,
+        "end_to_end_wall_seconds": 59.8072621258907,
+        "model_evaluations": 1373,
+        "neighbor_rebuilds": 255,
+        "optimization_speedup_vs_w1": 2.69643069019635,
+        "optimization_wall_seconds": 14.355842219665647,
+        "optimizer_steps_total": 3845,
+        "parallel_efficiency": 0.3852043843137643,
+        "peak_memory_bytes_max_per_worker": 1343452672,
+        "phase_device_seconds_sum": {
+          "calculator.neighbor_update": 4.539101859629154,
+          "graph.geometry_to_host": 0.09452745583653452,
+          "graph.mace_tensor_state": 0.4300200318396091,
+          "graph.neighbor_search": 0.9818892786502841,
+          "graph.to_device": 0.14208224028348923,
+          "model.forward": 49.76937437248229,
+          "optimizer.bfgs_update": 19.977329626083375,
+          "scheduler.refill_repack": 0.08595654392242431
+        },
+        "raw_file": "runs/multi_gpu_sharding/control32_mace_mixed_w7.json",
+        "raw_sha256": "bf91c7a4571f4d35f75370a2bc619660d8b58c63743acc4c6bd602808d677d8a",
+        "startup_wall_seconds": 35.88350729690865,
+        "systems_per_second": 2.229057655437599,
+        "worker_imbalance_ratio": 1.473448384471883,
+        "worker_run_seconds_max": 14.348854015115649,
+        "worker_run_seconds_min": 9.738280734047294
+      }
+    }
+  }
+}

@@ -19,6 +19,14 @@ from .dynamics.integrators import (
     batched_velocity_verlet,
     initialize_maxwell_boltzmann,
 )
+from .execution import (
+    MultiGPUExecution,
+    ParallelWorkerError,
+    WorkerResult,
+    WorkerShard,
+    balance_work,
+    run_parallel_workers,
+)
 from .interfaces.api import evaluate, molecular_dynamics, relax
 from .interfaces.reporting import (
     CompositeReporter,
@@ -122,14 +130,19 @@ __all__ = [
     "MACEBatchCalculator",
     "MemoryCoefficients",
     "MDResult",
+    "MultiGPUExecution",
     "OptimizerCapabilities",
     "OptimizerFactory",
+    "ParallelWorkerError",
     "PlannedBucket",
     "RelaxationResult",
     "RuntimeProfiler",
     "SystemProfile",
     "TorchStateCheckpointReporter",
+    "WorkerResult",
+    "WorkerShard",
     "available_optimizers",
+    "balance_work",
     "batched_bfgs_relax",
     "batched_fire_relax",
     "batched_gradient_descent",
@@ -145,6 +158,7 @@ __all__ = [
     "molecular_dynamics",
     "register_optimizer",
     "relax",
+    "run_parallel_workers",
 ]
 
 __version__ = "0.2.0"

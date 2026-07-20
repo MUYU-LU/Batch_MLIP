@@ -1,0 +1,79 @@
+id: multi-gpu-sharding
+date: 2026-07-20
+baseline_commit: 645940e0f71f38a8414026a4c6aba44fbd04145f
+hypothesis: >-
+  Independent one-process-per-GPU sharding will reduce fixed-workload BFGS
+  relaxation wall time approximately in proportion to the number of H100 GPUs,
+  while deterministic cost-balanced assignment prevents the mixed workload
+  from being limited by a large-structure straggler shard.
+mechanism: >-
+  Each process owns one model replica and CUDA context, relaxes only its assigned
+  structures with the selected single-GPU B64 active-refill path, and returns
+  CPU records that are reassembled by original input index.
+models:
+  - AtomBit
+  - MACE-OFF-Small
+optimizer: BFGS
+cell_filter: FrechetCellFilter
+workloads:
+  - name: homogeneous-276
+    systems: 256
+    atom_counts: {276: 256}
+  - name: mixed-46-276
+    systems: 256
+    atom_counts: {46: 128, 276: 128}
+worker_counts: [1, 4, 7]
+resident_batch_size: 64
+repeats: 1
+precision:
+  AtomBit: {model: float32, optimizer: float64}
+  MACE-OFF-Small: {model: float64, optimizer: float64}
+selected_paths:
+  AtomBit:
+    neighbor_skin_A: 0.5
+    active_compaction: topology-preserving
+    refill_policy: immediate
+  MACE-OFF-Small:
+    graph_mode: cached
+    neighbor_skin_A: 0.5
+    refill_policy: immediate
+timing:
+  synchronize_cuda: true
+  report_worker_startup_separately: true
+  primary_metric: synchronized_optimization_wall_seconds
+  secondary_metric: end_to_end_wall_seconds
+correctness_gates:
+  - every_input_index_returned_exactly_once
+  - output_records_reassembled_in_original_order
+  - all_jobs_converge
+  - per_record_sources_match_one_gpu_baseline
+  - report_step_energy_position_and_cell_differences_against_one_gpu
+conditional_small_pool_control:
+  enabled_after_main_matrix_passes: true
+  systems: 32
+  workload: mixed-46-276
+  worker_counts: [1, 7]
+raw_results: runs/multi_gpu_sharding/
+result:
+  main_points_complete: 12
+  control_points_complete: 4
+  all_jobs_converged: true
+  all_sources_match_w1: true
+  all_convergence_flags_match_w1: true
+  strict_final_state_invariance: false
+  AtomBit:
+    homogeneous_276_w7_speedup: 5.208858
+    homogeneous_276_w7_efficiency: 0.744123
+    mixed_46_276_w7_speedup: 4.813361
+    mixed_46_276_w7_efficiency: 0.687623
+    control_32_w7_optimization_speedup: 2.479921
+    control_32_w7_end_to_end_speedup: 1.055110
+  MACE_OFF_Small:
+    homogeneous_276_w7_speedup: 5.447672
+    homogeneous_276_w7_efficiency: 0.778239
+    mixed_46_276_w7_speedup: 4.613572
+    mixed_46_276_w7_efficiency: 0.659082
+    control_32_w7_optimization_speedup: 2.696431
+    control_32_w7_end_to_end_speedup: 1.338667
+  retained: true
+  automatic_gpu_count_selection: false
