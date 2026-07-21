@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+from collections import defaultdict
+from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import cast
 
 import torch
 
@@ -120,6 +123,187 @@ def _prepare_bfgs_step(
     return displacement.detach()
 
 
+_LINEAR_ALGEBRA_BACKENDS = frozenset(("auto", "grouped", "serial"))
+_AUTO_GROUPED_MAX_DIMENSION = 256
+
+
+def _use_grouped_linear_algebra(
+    backend: str,
+    *,
+    device_type: str,
+    group_size: int,
+    dimension: int,
+) -> bool:
+    if group_size < 2:
+        return False
+    if backend == "grouped":
+        return True
+    return (
+        backend == "auto"
+        and device_type == "cuda"
+        and dimension <= _AUTO_GROUPED_MAX_DIMENSION
+    )
+
+
+def _prepare_grouped_bfgs_steps(
+    coordinates: Sequence[torch.Tensor],
+    forces: Sequence[torch.Tensor],
+    histories: Sequence[_BFGSHistory],
+    *,
+    alpha: float,
+    max_step: float,
+) -> tuple[torch.Tensor, ...]:
+    """Update equal-sized BFGS histories with one batched eigensolve."""
+
+    position_vectors = torch.stack([value.flatten() for value in coordinates])
+    force_vectors = torch.stack([value.flatten() for value in forces])
+    batch_size, dimension = position_vectors.shape
+    device = position_vectors.device
+
+    identity = torch.eye(
+        dimension,
+        device=device,
+        dtype=position_vectors.dtype,
+    )
+    hessians = identity.expand(batch_size, -1, -1).clone().mul_(alpha)
+    initialized = [
+        index
+        for index, history in enumerate(histories)
+        if history.hessian is not None
+    ]
+    if initialized:
+        initialized_histories = [histories[index] for index in initialized]
+        if any(
+            history.positions is None or history.forces is None
+            for history in initialized_histories
+        ):
+            raise RuntimeError("BFGS history is incomplete")
+        initialized_ids = torch.as_tensor(
+            initialized, device=device, dtype=torch.long
+        )
+        hessians[initialized_ids] = torch.stack(
+            [cast(torch.Tensor, history.hessian) for history in initialized_histories]
+        )
+        previous_positions = torch.stack(
+            [
+                cast(torch.Tensor, history.positions)
+                for history in initialized_histories
+            ]
+        )
+        previous_forces = torch.stack(
+            [cast(torch.Tensor, history.forces) for history in initialized_histories]
+        )
+        delta_position = position_vectors[initialized_ids] - previous_positions
+        update_local = torch.nonzero(
+            delta_position.abs().amax(dim=1) >= 1e-7,
+            as_tuple=False,
+        ).flatten()
+        if update_local.numel():
+            update_ids = initialized_ids[update_local]
+            selected_delta_position = delta_position[update_local]
+            delta_force = (
+                force_vectors[update_ids] - previous_forces[update_local]
+            )
+            selected_hessians = hessians[update_ids]
+            hessian_step = torch.bmm(
+                selected_hessians,
+                selected_delta_position.unsqueeze(-1),
+            ).squeeze(-1)
+            a = torch.sum(selected_delta_position * delta_force, dim=1)
+            b = torch.sum(selected_delta_position * hessian_step, dim=1)
+            hessians[update_ids] = selected_hessians - (
+                torch.bmm(delta_force.unsqueeze(2), delta_force.unsqueeze(1))
+                / a[:, None, None]
+                + torch.bmm(hessian_step.unsqueeze(2), hessian_step.unsqueeze(1))
+                / b[:, None, None]
+            )
+
+    eigenvalues, eigenvectors = torch.linalg.eigh(hessians)
+    projected_forces = torch.bmm(
+        force_vectors.unsqueeze(1), eigenvectors
+    ).squeeze(1)
+    displacements = torch.bmm(
+        eigenvectors,
+        (projected_forces / eigenvalues.abs()).unsqueeze(-1),
+    ).squeeze(-1)
+    displacements = displacements.reshape(batch_size, *coordinates[0].shape)
+    max_row_norm = torch.linalg.vector_norm(displacements, dim=2).amax(dim=1)
+    scale = torch.where(
+        max_row_norm >= max_step,
+        max_step / max_row_norm,
+        torch.ones_like(max_row_norm),
+    )
+    displacements = displacements * scale[:, None, None]
+
+    for index, history in enumerate(histories):
+        history.hessian = hessians[index].detach()
+        history.positions = position_vectors[index].detach().clone()
+        history.forces = force_vectors[index].detach().clone()
+    return tuple(value.detach() for value in displacements.unbind())
+
+
+def _prepare_bfgs_steps(
+    coordinates: Sequence[torch.Tensor],
+    forces: Sequence[torch.Tensor],
+    histories: Sequence[_BFGSHistory],
+    *,
+    alpha: float,
+    max_step: float,
+    linear_algebra_backend: str,
+) -> tuple[torch.Tensor, ...]:
+    if not (len(coordinates) == len(forces) == len(histories)):
+        raise ValueError("BFGS step inputs must have equal lengths")
+    if not coordinates:
+        return ()
+    if linear_algebra_backend == "serial":
+        return tuple(
+            _prepare_bfgs_step(
+                current_coordinates,
+                current_forces,
+                history,
+                alpha=alpha,
+                max_step=max_step,
+            )
+            for current_coordinates, current_forces, history in zip(
+                coordinates, forces, histories, strict=True
+            )
+        )
+
+    grouped_ids: dict[tuple[int, ...], list[int]] = defaultdict(list)
+    for index, value in enumerate(coordinates):
+        grouped_ids[tuple(value.shape)].append(index)
+    output: list[torch.Tensor | None] = [None] * len(coordinates)
+    for indices in grouped_ids.values():
+        dimension = coordinates[indices[0]].numel()
+        if not _use_grouped_linear_algebra(
+            linear_algebra_backend,
+            device_type=coordinates[indices[0]].device.type,
+            group_size=len(indices),
+            dimension=dimension,
+        ):
+            for index in indices:
+                output[index] = _prepare_bfgs_step(
+                    coordinates[index],
+                    forces[index],
+                    histories[index],
+                    alpha=alpha,
+                    max_step=max_step,
+                )
+            continue
+        grouped_output = _prepare_grouped_bfgs_steps(
+            [coordinates[index] for index in indices],
+            [forces[index] for index in indices],
+            [histories[index] for index in indices],
+            alpha=alpha,
+            max_step=max_step,
+        )
+        for index, displacement in zip(indices, grouped_output, strict=True):
+            output[index] = displacement
+    if any(value is None for value in output):
+        raise RuntimeError("BFGS grouped solve did not produce every displacement")
+    return tuple(value for value in output if value is not None)
+
+
 def _validate_options(
     *,
     fmax: float,
@@ -217,6 +401,7 @@ def batched_bfgs_relax(
     refill_policy: str = "immediate",
     refill_low_watermark: float = 0.8,
     refill_min_chunk: int | None = None,
+    linear_algebra_backend: str = "auto",
 ) -> RelaxationResult:
     """Relax systems with independent full BFGS Hessians.
 
@@ -224,7 +409,10 @@ def batched_bfgs_relax(
     BFGS. Optional Frechet cell rows use the same generalized coordinates and
     forces as ASE's ``FrechetCellFilter``. ``optimizer_dtype`` can promote the
     optimizer state independently of the calculator when desired; by default
-    it follows the calculator state dtype.
+    it follows the calculator state dtype. ``linear_algebra_backend="auto"``
+    groups equal-sized systems in the validated small-Hessian regime for
+    batched updates and eigensolves. It retains the serial ASE-compatible path
+    for singleton, CPU, and large-Hessian groups.
     """
 
     _validate_options(
@@ -237,6 +425,9 @@ def batched_bfgs_relax(
     )
 
     optimizer_dtype = _resolve_optimizer_dtype(optimizer_dtype, state.dtype)
+    if linear_algebra_backend not in _LINEAR_ALGEBRA_BACKENDS:
+        choices = ", ".join(sorted(_LINEAR_ALGEBRA_BACKENDS))
+        raise ValueError(f"linear_algebra_backend must be one of: {choices}")
     if refill_policy not in _REFILL_POLICIES:
         choices = ", ".join(sorted(_REFILL_POLICIES))
         raise ValueError(f"refill_policy must be one of: {choices}")
@@ -280,6 +471,7 @@ def batched_bfgs_relax(
             cell_filter=cell_filter,
             smax=smax,
             optimizer_dtype=optimizer_dtype,
+            linear_algebra_backend=linear_algebra_backend,
         )
     n_systems = state.n_systems
     device, dtype = state.device, state.dtype
@@ -516,25 +708,35 @@ def batched_bfgs_relax(
                 )
             )
             local_active = converged_step[active_system_ids] < 0
-            for system_id in torch.nonzero(
+            active_ids = torch.nonzero(
                 local_active, as_tuple=False
-            ).flatten().tolist():
-                coordinates = _system_coordinates(
+            ).flatten().tolist()
+            coordinates = [
+                _system_coordinates(
                     active_state,
                     system_id,
                     active_filter,
                     optimizer_positions,
                 )
-                generalized_forces = _system_forces(
+                for system_id in active_ids
+            ]
+            generalized_forces = [
+                _system_forces(
                     active_state, system_id, atomic_forces, cell_forces
                 )
-                displacement = _prepare_bfgs_step(
-                    coordinates,
-                    generalized_forces,
-                    histories[system_id],
-                    alpha=alpha,
-                    max_step=max_step,
-                )
+                for system_id in active_ids
+            ]
+            displacements = _prepare_bfgs_steps(
+                coordinates,
+                generalized_forces,
+                [histories[system_id] for system_id in active_ids],
+                alpha=alpha,
+                max_step=max_step,
+                linear_algebra_backend=linear_algebra_backend,
+            )
+            for system_id, displacement in zip(
+                active_ids, displacements, strict=True
+            ):
                 atom_slice = active_state.atom_slice(system_id)
                 atom_count = atom_slice.stop - atom_slice.start
                 atomic_displacement[atom_slice] = displacement[:atom_count]
@@ -639,6 +841,7 @@ def _batched_bfgs_refill_relax(
     cell_filter: FrechetCellFilter | None,
     smax: float | None,
     optimizer_dtype: torch.dtype,
+    linear_algebra_backend: str,
 ) -> RelaxationResult:
     """Run BFGS with a bounded resident batch and a pending-system queue."""
 
@@ -990,30 +1193,40 @@ def _batched_bfgs_refill_relax(
                     dtype=optimizer_dtype,
                 )
             )
+            coordinates = []
+            generalized_forces = []
+            active_histories = []
             for local_id in range(ready_count):
                 global_id = int(active_system_ids[local_id])
                 history = histories[global_id]
                 if history is None:
                     raise RuntimeError("active BFGS history was released")
-                coordinates = _system_coordinates(
-                    active_state,
-                    local_id,
-                    active_filter,
-                    optimizer_positions,
+                coordinates.append(
+                    _system_coordinates(
+                        active_state,
+                        local_id,
+                        active_filter,
+                        optimizer_positions,
+                    )
                 )
-                generalized_forces = _system_forces(
-                    active_state,
-                    local_id,
-                    atomic_forces,
-                    cell_forces,
+                generalized_forces.append(
+                    _system_forces(
+                        active_state,
+                        local_id,
+                        atomic_forces,
+                        cell_forces,
+                    )
                 )
-                displacement = _prepare_bfgs_step(
-                    coordinates,
-                    generalized_forces,
-                    history,
-                    alpha=alpha,
-                    max_step=max_step,
-                )
+                active_histories.append(history)
+            displacements = _prepare_bfgs_steps(
+                coordinates,
+                generalized_forces,
+                active_histories,
+                alpha=alpha,
+                max_step=max_step,
+                linear_algebra_backend=linear_algebra_backend,
+            )
+            for local_id, displacement in enumerate(displacements):
                 atom_slice = active_state.atom_slice(local_id)
                 atom_count = atom_slice.stop - atom_slice.start
                 atomic_displacement[atom_slice] = displacement[:atom_count]

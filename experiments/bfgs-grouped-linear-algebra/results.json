@@ -1,0 +1,44 @@
+{
+  "atombit_H46_B256": {
+    "serial_wall_time_s": 86.28896589484066,
+    "grouped_wall_time_s": 68.49155724793673,
+    "throughput_speedup": 1.2598482114003922,
+    "optimizer_time_reduction_percent": 33.260098183559386,
+    "converged_jobs": 256
+  },
+  "mace_H46_B256": {
+    "serial_wall_time_s": 94.99923457810655,
+    "grouped_wall_time_s": 76.02119063027203,
+    "throughput_speedup": 1.2496414985149862,
+    "optimizer_time_reduction_percent": 31.30052919823811,
+    "converged_jobs": 256
+  },
+  "atombit_H276_B64": {
+    "serial_wall_time_s": 269.24289028393105,
+    "grouped_wall_time_s": 256.39037431497127,
+    "throughput_speedup": 1.050128699266887,
+    "optimizer_time_reduction_percent": 7.23368165129743,
+    "converged_jobs": 256
+  },
+  "mace_H276_B64": {
+    "serial_wall_time_s": 277.5995928766206,
+    "grouped_wall_time_s": 264.1353388191201,
+    "throughput_speedup": 1.0509748302430704,
+    "optimizer_time_reduction_percent": 6.86829402980336,
+    "converged_jobs": 256
+  },
+  "automatic_policy": {
+    "backend": "grouped for CUDA groups with D <= 256; serial otherwise",
+    "b1_backend": "serial"
+  },
+  "raw_sha256": {
+    "atombit_h276_b64_grouped.json": "ba0b1d6725900099c74554c1179c37222bad7b4f071c6e43f3a5f32360f0a4ed",
+    "atombit_h276_b64_serial.json": "ca473f9369da0d553326697b2f79dbb31d376ec2e8ffbcc2ef028cbfae065b1d",
+    "atombit_h46_b256_grouped.json": "a5329d60cd605927d692f8d3f0f728a0a122818844f7792caf58978de138f5d8",
+    "atombit_h46_b256_serial.json": "d10643635e9150b642fd748bb7b75080dfe7fdd640e8764cb8c3ce42259266ca",
+    "mace_h276_b64_grouped.json": "e51240f2dbd62c87de233586e072491338c1cf395c1f96ca2f5f673834a2c993",
+    "mace_h276_b64_serial.json": "aa1770337024944b902bff8f72c6636920e4ab34f5abd749904bdcc73c3a9f6b",
+    "mace_h46_b256_grouped.json": "11270f6ab175f83e6e85d129502c3c6481aa87425bf17c947bfb26ecd9a4afd5",
+    "mace_h46_b256_serial.json": "731b32b0d0643625a6ae7046b18b0d18c0738517e2eb783bdbff1b7979c0f16d"
+  }
+}

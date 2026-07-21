@@ -1,0 +1,66 @@
+id: bfgs-grouped-linear-algebra
+date: 2026-07-21
+hypothesis: >-
+  Grouping equal-dimensional full-BFGS histories and evaluating their Hessian
+  updates and eigendecompositions as batched CUDA tensors reduces optimizer
+  time by at least 10% without changing the mathematical BFGS update,
+  convergence flags, or final observables.
+baseline_commit: f1781587052979ea2368701f9844ccf169c21761
+models: [AtomBit, MACE-OFF-Small]
+task: variable-cell full BFGS with FrechetCellFilter
+pool:
+  source: frozen T2 manifest cyclically expanded to 256 jobs
+  distributions: [H46, H276]
+resident_batch_sizes:
+  H46: 256
+  H276: 64
+comparison: [serial, grouped]
+repeats: 1
+settings:
+  active_compaction: true
+  refill_policy: immediate
+  optimizer_dtype: float64
+  fmax_eV_per_A: 0.05
+  max_steps: 500
+  deterministic_algorithms: true
+  neighbor_backend: auto
+metrics:
+  - wall time and systems per second
+  - optimizer, model-kernel, and neighbor time
+  - peak allocated and reserved GPU memory
+  - convergence flags and optimizer steps
+  - final energy, position, and cell differences
+gates:
+  performance: at least 10 percent lower optimizer time
+  memory: below 85 percent of H100 capacity
+  correctness:
+    - B1 retains the serial ASE-compatible path
+    - convergence flags match serial
+    - no additional final-state divergence beyond deterministic batch sensitivity
+decision_rule: >-
+  Select grouped execution only in dimension regimes whose integrated runs
+  pass the 10 percent optimizer-time gate; retain serial elsewhere. Treat the
+  isolated eigensolver microbenchmark as mechanism diagnosis because it does
+  not include vectorized Hessian updates or removed host synchronization.
+result:
+  small_hessian_H46:
+    dimension: 147
+    throughput_speedup:
+      AtomBit: 1.2598
+      MACE-OFF-Small: 1.2496
+    optimizer_time_reduction_percent:
+      AtomBit: 33.26
+      MACE-OFF-Small: 31.30
+    selected: grouped
+  large_hessian_H276:
+    dimension: 837
+    throughput_speedup:
+      AtomBit: 1.0501
+      MACE-OFF-Small: 1.0510
+    optimizer_time_reduction_percent:
+      AtomBit: 7.23
+      MACE-OFF-Small: 6.87
+    selected: serial
+  automatic_policy: grouped CUDA execution only for dimension <= 256
+  convergence: all eight runs converged 256 of 256 jobs
+  conclusion: retain a dimension-gated grouped backend

@@ -22,7 +22,10 @@ from batch_mlip import (
     create_optimizer,
     relax,
 )
-from batch_mlip.optimization.bfgs import _refill_insert_count
+from batch_mlip.optimization.bfgs import (
+    _refill_insert_count,
+    _use_grouped_linear_algebra,
+)
 
 
 class QuadraticCalculator(Calculator):
@@ -244,7 +247,7 @@ def test_variable_cell_active_bfgs_matches_masked_and_ase():
     ]
     references = [_ase_frechet_bfgs(atoms) for atoms in systems]
 
-    def run(*, compact: bool):
+    def run(*, compact: bool, linear_algebra_backend: str = "auto"):
         calculator = ASECalculatorAdapter(
             LennardJones(sigma=3.4, epsilon=0.0103, rc=8.5)
         )
@@ -258,9 +261,11 @@ def test_variable_cell_active_bfgs_matches_masked_and_ase():
             max_steps=200,
             alpha=70.0,
             max_step=0.2,
+            linear_algebra_backend=linear_algebra_backend,
         )
 
-    masked = run(compact=False)
+    masked = run(compact=False, linear_algebra_backend="serial")
+    grouped = run(compact=False, linear_algebra_backend="grouped")
     active = run(compact=True)
 
     assert active.converged_step.tolist() == [0, 6, 8]
@@ -270,6 +275,10 @@ def test_variable_cell_active_bfgs_matches_masked_and_ase():
     torch.testing.assert_close(active.evaluation.energy, masked.evaluation.energy)
     torch.testing.assert_close(active.evaluation.forces, masked.evaluation.forces)
     torch.testing.assert_close(active.evaluation.stress, masked.evaluation.stress)
+    torch.testing.assert_close(grouped.state.positions, masked.state.positions)
+    torch.testing.assert_close(grouped.state.cells, masked.state.cells)
+    torch.testing.assert_close(grouped.evaluation.energy, masked.evaluation.energy)
+    torch.testing.assert_close(grouped.converged_step, masked.converged_step)
     assert masked.graph_evaluations == 27
     assert active.graph_evaluations == 17
     for system_id, (reference, _) in enumerate(references):
@@ -296,6 +305,7 @@ def test_variable_cell_bfgs_refill_policies_preserve_state_and_output_order():
         *,
         refill_batch_size: int | None,
         refill_policy: str = "immediate",
+        linear_algebra_backend: str = "auto",
     ):
         calculator = ASECalculatorAdapter(
             LennardJones(sigma=3.4, epsilon=0.0103, rc=8.5)
@@ -314,6 +324,7 @@ def test_variable_cell_bfgs_refill_policies_preserve_state_and_output_order():
             max_steps=200,
             alpha=70.0,
             max_step=0.2,
+            linear_algebra_backend=linear_algebra_backend,
         )
 
     active = run(refill_batch_size=None)
@@ -321,6 +332,11 @@ def test_variable_cell_bfgs_refill_policies_preserve_state_and_output_order():
         policy: run(refill_batch_size=2, refill_policy=policy)
         for policy in ("drain", "immediate", "threshold")
     }
+    grouped = run(
+        refill_batch_size=2,
+        linear_algebra_backend="grouped",
+    )
+    results["grouped"] = grouped
 
     for refill in results.values():
         assert bool(refill.converged.all())
@@ -357,6 +373,31 @@ def test_refill_policy_insert_count(policy, survivors, pending, expected):
             min_chunk=2,
         )
         == expected
+    )
+
+
+@pytest.mark.parametrize(
+    "backend,device_type,group_size,dimension,expected",
+    [
+        ("auto", "cuda", 64, 147, True),
+        ("auto", "cuda", 64, 837, False),
+        ("auto", "cpu", 64, 147, False),
+        ("auto", "cuda", 1, 147, False),
+        ("grouped", "cuda", 64, 837, True),
+        ("serial", "cuda", 64, 147, False),
+    ],
+)
+def test_bfgs_linear_algebra_policy(
+    backend, device_type, group_size, dimension, expected
+):
+    assert (
+        _use_grouped_linear_algebra(
+            backend,
+            device_type=device_type,
+            group_size=group_size,
+            dimension=dimension,
+        )
+        is expected
     )
 
 
@@ -438,6 +479,10 @@ def test_refill_preserves_survivor_neighbor_cache(monkeypatch):
         ({"max_step": 0.0}, "max_step must be positive"),
         ({"max_steps": -1}, "max_steps must be non-negative"),
         ({"optimizer_dtype": "float16"}, "optimizer_dtype must be"),
+        (
+            {"linear_algebra_backend": "cpu"},
+            "linear_algebra_backend must be",
+        ),
         ({"refill_batch_size": 0}, "refill_batch_size must be"),
         ({"refill_batch_size": 1.5}, "refill_batch_size must be"),
         ({"refill_policy": "sometimes"}, "refill_policy must be"),

@@ -105,6 +105,12 @@ The optional `planning` layer profiles atoms, directed edges, and optimizer
 state, then emits memory-safe queues and resident capacities. It does not enter
 the calculator or optimizer contracts and does not execute work automatically.
 
+Full BFGS retains one independent dense Hessian per system. Equal-dimensional
+small CUDA Hessians can be stacked for vectorized updates and a grouped
+eigendecomposition; large Hessians and singleton groups retain independent
+serial eigensolves. The automatic boundary is a measured execution policy, not
+a change to the BFGS equations or optimizer protocol.
+
 ## Runtime profiling
 
 `RuntimeProfiler` activates instrumentation through a context-local collector,
