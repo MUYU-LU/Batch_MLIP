@@ -1,0 +1,60 @@
+id: direct-backend-frontier
+date: 2026-07-21
+code_base: 6e99f15 plus the benchmark-runner changes in this experiment
+hypothesis: >-
+  Direct common-ASE versus matscipy versus adaptive-auto measurements will
+  quantify task-dependent total acceleration without multiplying ratios from
+  separate experiments.
+hardware:
+  gpu: NVIDIA H100 80GB HBM3
+  available_gpus: 7
+  gpu_per_process: 1
+  cpu_threads_per_process: 1
+models:
+  AtomBit:
+    dtype: float32
+    cutoff_A: 6.0
+  MACE-OFF-Small:
+    dtype: float64
+    cutoff_A: 4.5
+methods: [common_ase_b1, native_matscipy, native_auto]
+tasks:
+  eval:
+    distributions: [H46, H276, MIX]
+    pools: [32, 256]
+  nve:
+    distributions: [H46, H276, MIX]
+    pools: [32]
+    warmup_steps: 100
+    measured_steps: 1000
+    skin_A: 0.5
+  variable_bfgs:
+    models: [AtomBit, MACE-OFF-Small]
+    atom_counts: [46, 276]
+    pool: 32
+    batches: [16, 32]
+  variable_fire:
+    models: [AtomBit]
+    atom_counts: [46, 276]
+    pool: 32
+    batches: [16, 32]
+measurement:
+  repeats: 1
+  synchronized_cuda: true
+  selection: fastest valid point below 85 percent peak memory
+results:
+  rows: 120
+  selected_rows: 24
+  all_execution_statuses_passed: true
+  selected_validation_passed: true
+  selected_memory_safe: true
+  speedup_vs_ase:
+    atombit_eval: [5.99, 18.09]
+    mace_eval: [8.49, 66.80]
+    nve: [3.98, 16.27]
+    variable_bfgs: [6.96, 8.92]
+    atombit_variable_fire: [3.62, 6.37]
+verification:
+  pytest_main: 107 passed, 6 skipped
+  pytest_mace_optional: 6 passed
+  ruff: All checks passed

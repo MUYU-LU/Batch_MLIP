@@ -41,6 +41,7 @@ from batch_mlip import (  # noqa: E402
     execute_workload,
     initialize_maxwell_boltzmann,
 )
+from batch_mlip.core.neighbors import validate_neighbor_backend  # noqa: E402
 from batch_mlip.profiling import runtime_profile_registry_fields  # noqa: E402
 from batch_mlip.profiling.runtime import profile_phase  # noqa: E402
 from batch_mlip.workloads import materialize_workload, read_workload_manifest  # noqa: E402
@@ -108,6 +109,7 @@ def build_model_bundle(args: argparse.Namespace) -> ModelBundle:
             e0_dict=e0,
             cutoff=args.atombit_cutoff,
             skin=skin,
+            neighbor_backend=args.resolved_neighbor_backends[0],
         )
         ase_calculator = AtomBitCalculator(
             model,
@@ -142,6 +144,7 @@ def build_model_bundle(args: argparse.Namespace) -> ModelBundle:
         dtype=torch.float64,
         graph_mode="cached",
         skin=skin,
+        neighbor_backend=args.resolved_neighbor_backends[0],
     )
     from mace.calculators import MACECalculator
 
@@ -490,10 +493,11 @@ def _run_native(
     batch_size: int,
     code_commit: str,
     run_id: str,
+    study_id: str,
 ) -> Any:
     spec = WorkloadRunSpec(
         run_id=run_id,
-        study_id="task-aware-static-md-performance",
+        study_id=study_id,
         model_name=bundle.name,
         model_checkpoint_sha256=bundle.checkpoint_sha256,
         code_commit=code_commit,
@@ -509,6 +513,16 @@ def _run_native(
     return execute_workload(manifest, dataset_dir, bundle.native, spec)
 
 
+def _observed_neighbor_backends(profile: dict[str, Any]) -> list[str]:
+    return sorted(
+        {
+            str(event["backend"])
+            for event in profile.get("events", [])
+            if event.get("name") == "neighbor_rebuild" and event.get("backend") is not None
+        }
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", choices=("atombit", "mace"), required=True)
@@ -516,6 +530,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--pool-size", type=int, choices=(32, 256), required=True)
     parser.add_argument("--distributions", default="H46,H276,MIX")
     parser.add_argument("--batch-sizes", required=True)
+    parser.add_argument(
+        "--neighbor-backends",
+        default="auto",
+        help="comma-separated native backends: matscipy,auto,cuda_dense",
+    )
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--cpu-threads", type=int, default=1)
     parser.add_argument("--concurrent-workers", type=int, default=1)
@@ -557,18 +576,31 @@ def main() -> int:
     torch.set_num_threads(args.cpu_threads)
     distributions = [item.strip() for item in args.distributions.split(",") if item.strip()]
     batch_sizes = [int(item) for item in args.batch_sizes.split(",") if item.strip()]
+    neighbor_backends = [
+        validate_neighbor_backend(item.strip())
+        for item in args.neighbor_backends.split(",")
+        if item.strip()
+    ]
     if not distributions or any(item not in {"H46", "H276", "MIX"} for item in distributions):
         raise ValueError("distributions must contain H46, H276, or MIX")
     if not batch_sizes or any(size <= 0 or args.pool_size % size for size in batch_sizes):
         raise ValueError("each positive batch size must divide the pool size")
+    if not neighbor_backends or len(set(neighbor_backends)) != len(neighbor_backends):
+        raise ValueError("neighbor-backends must be non-empty and unique")
     if args.skip_ase and args.skip_batch:
         raise ValueError("at least one method must be enabled")
 
+    args.resolved_neighbor_backends = neighbor_backends
+    study_id = (
+        "direct-backend-frontier"
+        if len(neighbor_backends) > 1
+        else "task-aware-static-md-performance"
+    )
     bundle = build_model_bundle(args)
     result: dict[str, Any] = {
         "schema_version": 1,
         "status": "running",
-        "experiment": "task-aware-static-md-performance",
+        "experiment": study_id,
         "code_commit": args.code_commit,
         "model": bundle.name,
         "model_checkpoint_sha256": bundle.checkpoint_sha256,
@@ -576,6 +608,7 @@ def main() -> int:
         "task": args.task,
         "pool_size": args.pool_size,
         "batch_sizes": batch_sizes,
+        "neighbor_backends": neighbor_backends,
         "distributions": distributions,
         "screening_repeats": 1,
         "execution": {
@@ -637,78 +670,89 @@ def main() -> int:
             )
             write_result(args.output, result)
 
-        memory_limit_reached = False
-        for batch_size in batch_sizes:
-            if args.skip_batch:
-                break
-            point: dict[str, Any] = {
-                "workload_id": manifest.workload_id,
-                "manifest_sha256": manifest.manifest_sha256,
-                "method": "native_batch",
-                "batch_size": batch_size,
-                "status": "running",
-            }
-            result["points"].append(point)
-            write_result(args.output, result)
-            if memory_limit_reached:
-                point.update({"status": "skipped_memory_gate"})
+        for neighbor_backend in neighbor_backends:
+            bundle.native.neighbor_backend = neighbor_backend
+            memory_limit_reached = False
+            for batch_size in batch_sizes:
+                if args.skip_batch:
+                    break
+                point: dict[str, Any] = {
+                    "workload_id": manifest.workload_id,
+                    "manifest_sha256": manifest.manifest_sha256,
+                    "method": "native_batch",
+                    "neighbor_backend": neighbor_backend,
+                    "batch_size": batch_size,
+                    "status": "running",
+                }
+                result["points"].append(point)
                 write_result(args.output, result)
-                continue
-            try:
-                native_result = _run_native(
-                    manifest,
-                    args.dataset_dir,
-                    bundle,
-                    batch_size=batch_size,
-                    code_commit=args.code_commit,
-                    run_id=f"{args.model}-{args.task}-{distribution}-R{args.pool_size}-B{batch_size}",
-                )
-                point["summary"] = native_result.summary
-                point["telemetry"] = native_result.telemetry.to_dict()
-                point["runtime_profile"] = native_result.runtime_profile
-                if reference_output is not None and reference_summary is not None:
-                    point["validation"] = validate_outputs(
+                if memory_limit_reached:
+                    point.update({"status": "skipped_memory_gate"})
+                    write_result(args.output, result)
+                    continue
+                try:
+                    native_result = _run_native(
                         manifest,
-                        reference_output,
-                        native_result.structures,
-                        task=args.task,
-                        energy_per_atom_atol=args.energy_per_atom_atol,
-                        force_atol=args.force_atol,
+                        args.dataset_dir,
+                        bundle,
+                        batch_size=batch_size,
+                        code_commit=args.code_commit,
+                        run_id=(
+                            f"{args.model}-{args.task}-{distribution}-R{args.pool_size}"
+                            f"-B{batch_size}-{neighbor_backend}"
+                        ),
+                        study_id=study_id,
                     )
-                    point["speedup_vs_ase_b1"] = {
-                        "measured": reference_summary["wall_time_s"]
-                        / native_result.summary["wall_time_s"],
-                        "end_to_end": reference_summary["end_to_end_time_s"]
-                        / native_result.summary["end_to_end_time_s"],
-                    }
-                    point["status"] = (
-                        "passed" if point["validation"]["passed"] else "validation_failed"
+                    point["summary"] = native_result.summary
+                    point["telemetry"] = native_result.telemetry.to_dict()
+                    point["runtime_profile"] = native_result.runtime_profile
+                    point["observed_neighbor_backends"] = _observed_neighbor_backends(
+                        native_result.runtime_profile
                     )
-                else:
-                    point["status"] = "passed_without_reference"
-                allocated_memory = native_result.summary["peak_allocated_GB"]
-                reserved_memory = native_result.summary["peak_reserved_GB"]
-                gpu_memory = native_result.telemetry.values["gpu_memory_GB"]
-                if allocated_memory is not None and gpu_memory is not None:
-                    point["allocated_memory_fraction"] = allocated_memory / gpu_memory
-                    point["reserved_memory_fraction"] = reserved_memory / gpu_memory
-                    point["memory_gate_fraction"] = max(
-                        point["allocated_memory_fraction"], point["reserved_memory_fraction"]
-                    )
-                    memory_limit_reached = point["memory_gate_fraction"] >= 0.85
-            except torch.cuda.OutOfMemoryError as error:
-                point.update({"status": "oom", "error": str(error)})
-                memory_limit_reached = True
-            except Exception as error:
-                message = f"{type(error).__name__}: {error}"
-                if "out of memory" in message.lower():
-                    point.update({"status": "oom", "error": message})
+                    if reference_output is not None and reference_summary is not None:
+                        point["validation"] = validate_outputs(
+                            manifest,
+                            reference_output,
+                            native_result.structures,
+                            task=args.task,
+                            energy_per_atom_atol=args.energy_per_atom_atol,
+                            force_atol=args.force_atol,
+                        )
+                        point["speedup_vs_ase_b1"] = {
+                            "measured": reference_summary["wall_time_s"]
+                            / native_result.summary["wall_time_s"],
+                            "end_to_end": reference_summary["end_to_end_time_s"]
+                            / native_result.summary["end_to_end_time_s"],
+                        }
+                        point["status"] = (
+                            "passed" if point["validation"]["passed"] else "validation_failed"
+                        )
+                    else:
+                        point["status"] = "passed_without_reference"
+                    allocated_memory = native_result.summary["peak_allocated_GB"]
+                    reserved_memory = native_result.summary["peak_reserved_GB"]
+                    gpu_memory = native_result.telemetry.values["gpu_memory_GB"]
+                    if allocated_memory is not None and gpu_memory is not None:
+                        point["allocated_memory_fraction"] = allocated_memory / gpu_memory
+                        point["reserved_memory_fraction"] = reserved_memory / gpu_memory
+                        point["memory_gate_fraction"] = max(
+                            point["allocated_memory_fraction"],
+                            point["reserved_memory_fraction"],
+                        )
+                        memory_limit_reached = point["memory_gate_fraction"] >= 0.85
+                except torch.cuda.OutOfMemoryError as error:
+                    point.update({"status": "oom", "error": str(error)})
                     memory_limit_reached = True
-                else:
-                    point.update({"status": "error", "error": message})
-            finally:
-                write_result(args.output, result)
-                _clean_cuda(bundle.device)
+                except Exception as error:
+                    message = f"{type(error).__name__}: {error}"
+                    if "out of memory" in message.lower():
+                        point.update({"status": "oom", "error": message})
+                        memory_limit_reached = True
+                    else:
+                        point.update({"status": "error", "error": message})
+                finally:
+                    write_result(args.output, result)
+                    _clean_cuda(bundle.device)
 
         if args.output_structures is not None and reference_output is not None:
             output = args.output_structures / f"{manifest.workload_id}-ase.extxyz"

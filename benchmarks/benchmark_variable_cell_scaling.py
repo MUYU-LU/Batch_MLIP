@@ -175,6 +175,7 @@ def run_batch(
     alpha: float,
     optimizer_dtype: str | None,
     model_dtype: torch.dtype,
+    neighbor_backend: str,
     refill: bool = False,
     refill_policy: str = "immediate",
     refill_low_watermark: float = 0.8,
@@ -187,6 +188,7 @@ def run_batch(
         device=device,
         dtype=model_dtype,
         force_mode="autograd",
+        neighbor_backend=neighbor_backend,
     )
     records = []
     model_evaluations = 0
@@ -195,10 +197,11 @@ def run_batch(
     neighbor_rebuilds = 0
     active_batch_sizes = []
 
-    chunks = [systems] if refill else [
-        systems[start : start + batch_size]
-        for start in range(0, len(systems), batch_size)
-    ]
+    chunks = (
+        [systems]
+        if refill
+        else [systems[start : start + batch_size] for start in range(0, len(systems), batch_size)]
+    )
     for chunk in chunks:
         state = calculator.create_state(chunk, build_neighbors=not refill)
         common = {
@@ -264,8 +267,7 @@ def run_batch(
         "model_evaluations": model_evaluations,
         "graph_evaluations": graph_evaluations,
         "uncompacted_graph_evaluations": uncompacted_graph_evaluations,
-        "avoided_graph_evaluations": uncompacted_graph_evaluations
-        - graph_evaluations,
+        "avoided_graph_evaluations": uncompacted_graph_evaluations - graph_evaluations,
         "neighbor_rebuilds": neighbor_rebuilds,
         "optimizer_steps_total": sum(record["steps"] for record in records),
         "active_batch_sizes": active_batch_sizes,
@@ -289,9 +291,7 @@ def timed_repeats(fn, *, repeats: int, device: torch.device):
         if output is None:
             output = current
         if device.type == "cuda":
-            peak_memory = max(
-                peak_memory or 0, torch.cuda.max_memory_allocated(device)
-            )
+            peak_memory = max(peak_memory or 0, torch.cuda.max_memory_allocated(device))
     return output, timing_summary(samples), peak_memory
 
 
@@ -310,6 +310,11 @@ def main() -> None:
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--cutoff", type=float, default=6.0)
     parser.add_argument("--skin", type=float, default=0.0)
+    parser.add_argument(
+        "--neighbor-backend",
+        choices=("auto", "matscipy", "cuda_dense"),
+        default="auto",
+    )
     parser.add_argument("--fmax", type=float, default=0.05)
     parser.add_argument("--max-steps", type=int, default=500)
     parser.add_argument("--dt-start", type=float, default=0.1)
@@ -335,12 +340,8 @@ def main() -> None:
         choices=("state", "float32", "float64"),
         default="state",
     )
-    parser.add_argument(
-        "--dataset-dir", type=Path, default=Path("data/T2_test/structures")
-    )
-    parser.add_argument(
-        "--manifest", type=Path, default=Path("benchmarks/t2_fixed_samples.json")
-    )
+    parser.add_argument("--dataset-dir", type=Path, default=Path("data/T2_test/structures"))
+    parser.add_argument("--manifest", type=Path, default=Path("benchmarks/t2_fixed_samples.json"))
     parser.add_argument(
         "--checkpoint", type=Path, default=Path("../AtomBit-OMC-s/model_epoch_15.pt")
     )
@@ -350,16 +351,12 @@ def main() -> None:
     torch.use_deterministic_algorithms(args.deterministic)
     if args.method == "refill" and args.optimizer != "bfgs":
         raise ValueError("active refill is currently implemented only for BFGS")
-    optimizer_dtype = (
-        None if args.optimizer_dtype == "state" else args.optimizer_dtype
-    )
+    optimizer_dtype = None if args.optimizer_dtype == "state" else args.optimizer_dtype
     model_dtype = getattr(torch, args.model_dtype)
 
     if args.pool_size <= 0 or args.repeats <= 0:
         raise ValueError("pool size and repeats must be positive")
-    if args.method != "ase" and any(
-        args.pool_size % size for size in args.batch_sizes
-    ):
+    if args.method != "ase" and any(args.pool_size % size for size in args.batch_sizes):
         raise ValueError("every batch size must divide the fixed pool")
 
     manifest = load_manifest(args.manifest, min(args.pool_size, 32))
@@ -415,6 +412,7 @@ def main() -> None:
             "batch_sizes": args.batch_sizes,
             "cutoff_A": args.cutoff,
             "skin_A": args.skin,
+            "neighbor_backend": args.neighbor_backend,
             "fmax_eV_per_A": args.fmax,
             "smax": None,
             "convergence": "ASE FrechetCellFilter generalized-force fmax",
@@ -447,9 +445,7 @@ def main() -> None:
         dtype=model_dtype,
         force_mode="autograd",
     )
-    warm_calculator(
-        warm_calculator.create_state([systems[0]]), compute_stress=True
-    )
+    warm_calculator(warm_calculator.create_state([systems[0]]), compute_stress=True)
     warm_ase_calculator = AtomBitCalculator(
         model,
         cutoff=args.cutoff,
@@ -472,20 +468,24 @@ def main() -> None:
         write_result(args.output, result)
         try:
             if args.method == "ase":
+
                 def fn():
                     return run_ase(**common)
             else:
+
                 def fn(batch_size=batch_size):
                     return run_batch(
                         **common,
                         batch_size=batch_size,
                         skin=args.skin,
                         active_compaction=args.method in ("active", "refill"),
+                        neighbor_backend=args.neighbor_backend,
                         refill=args.method == "refill",
                         refill_policy=args.refill_policy,
                         refill_low_watermark=args.refill_low_watermark,
                         refill_min_chunk=args.refill_min_chunk,
                     )
+
             runtime_profiles = []
 
             def measured_fn(benchmark_fn=fn, profiles=runtime_profiles):
@@ -503,11 +503,8 @@ def main() -> None:
                 {
                     "status": "passed",
                     "timing": timing,
-                    "systems_per_second": args.pool_size
-                    / timing["median_seconds"],
-                    "atoms_per_second": args.pool_size
-                    * args.atom_count
-                    / timing["median_seconds"],
+                    "systems_per_second": args.pool_size / timing["median_seconds"],
+                    "atoms_per_second": args.pool_size * args.atom_count / timing["median_seconds"],
                     "peak_memory_bytes": peak_memory,
                     **output,
                 }
@@ -518,9 +515,7 @@ def main() -> None:
             point.update({"status": "oom", "error": str(exc)})
             torch.cuda.empty_cache()
         except Exception as exc:
-            point.update(
-                {"status": "failed", "error": f"{type(exc).__name__}: {exc}"}
-            )
+            point.update({"status": "failed", "error": f"{type(exc).__name__}: {exc}"})
         write_result(args.output, result)
 
     result["status"] = "complete"

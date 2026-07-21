@@ -155,10 +155,11 @@ def run_batch(
     neighbor_rebuilds = 0
     active_batch_sizes = []
 
-    chunks = [systems] if refill else [
-        systems[start : start + batch_size]
-        for start in range(0, len(systems), batch_size)
-    ]
+    chunks = (
+        [systems]
+        if refill
+        else [systems[start : start + batch_size] for start in range(0, len(systems), batch_size)]
+    )
     for chunk in chunks:
         state = calculator.create_state(chunk, build_neighbors=not refill)
         common = {
@@ -210,9 +211,7 @@ def run_batch(
                 serialize_record(
                     source=source.info["benchmark_source"],
                     converged=bool(converged[local_id]),
-                    steps=(
-                        converged_step if converged_step >= 0 else result.steps
-                    ),
+                    steps=(converged_step if converged_step >= 0 else result.steps),
                     energy=float(energies[local_id]),
                     forces=forces[atom_slice],
                     stress=stresses[local_id],
@@ -226,9 +225,7 @@ def run_batch(
         "model_evaluations": model_evaluations,
         "graph_evaluations": graph_evaluations,
         "uncompacted_graph_evaluations": uncompacted_graph_evaluations,
-        "avoided_graph_evaluations": (
-            uncompacted_graph_evaluations - graph_evaluations
-        ),
+        "avoided_graph_evaluations": (uncompacted_graph_evaluations - graph_evaluations),
         "neighbor_rebuilds": neighbor_rebuilds,
         "optimizer_steps_total": sum(record["steps"] for record in records),
         "active_batch_sizes": active_batch_sizes,
@@ -244,17 +241,18 @@ def main() -> None:
     )
     parser.add_argument("--optimizer", choices=("fire", "bfgs"), default="fire")
     parser.add_argument("--atom-count", type=int, required=True)
-    parser.add_argument(
-        "--batch-sizes", type=parse_int_list, default=[1, 2, 4, 8, 16, 32]
-    )
+    parser.add_argument("--batch-sizes", type=parse_int_list, default=[1, 2, 4, 8, 16, 32])
     parser.add_argument("--pool-size", type=int, default=32)
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--model", default="small")
-    parser.add_argument(
-        "--graph-mode", choices=("cached", "rebuild"), default="rebuild"
-    )
+    parser.add_argument("--graph-mode", choices=("cached", "rebuild"), default="rebuild")
     parser.add_argument("--skin", type=float, default=0.0)
+    parser.add_argument(
+        "--neighbor-backend",
+        choices=("auto", "matscipy", "cuda_dense"),
+        default="auto",
+    )
     parser.add_argument("--fmax", type=float, default=0.05)
     parser.add_argument("--max-steps", type=int, default=500)
     parser.add_argument("--dt-start", type=float, default=0.1)
@@ -270,12 +268,8 @@ def main() -> None:
     )
     parser.add_argument("--refill-low-watermark", type=float, default=0.8)
     parser.add_argument("--refill-min-chunk", type=int)
-    parser.add_argument(
-        "--dataset-dir", type=Path, default=Path("data/T2_test/structures")
-    )
-    parser.add_argument(
-        "--manifest", type=Path, default=Path("benchmarks/t2_fixed_samples.json")
-    )
+    parser.add_argument("--dataset-dir", type=Path, default=Path("data/T2_test/structures"))
+    parser.add_argument("--manifest", type=Path, default=Path("benchmarks/t2_fixed_samples.json"))
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
@@ -284,9 +278,7 @@ def main() -> None:
         raise ValueError("active refill is currently implemented only for BFGS")
     if args.pool_size <= 0 or args.repeats <= 0:
         raise ValueError("pool size and repeats must be positive")
-    if args.method != "ase" and any(
-        args.pool_size % size for size in args.batch_sizes
-    ):
+    if args.method != "ase" and any(args.pool_size % size for size in args.batch_sizes):
         raise ValueError("every batch size must divide the fixed pool")
 
     manifest = load_manifest(args.manifest, min(args.pool_size, 32))
@@ -308,6 +300,7 @@ def main() -> None:
         dtype=torch.float64,
         graph_mode=args.graph_mode,
         skin=args.skin,
+        neighbor_backend=args.neighbor_backend,
     )
     ase_calculator = make_counting_ase_calculator(
         calculator.model,
@@ -345,6 +338,7 @@ def main() -> None:
             "cutoff_A": calculator.cutoff,
             "skin_A": calculator.skin,
             "graph_mode": calculator.graph_mode,
+            "neighbor_backend": calculator.neighbor_backend,
             "fmax_eV_per_A": args.fmax,
             "smax": None,
             "convergence": "ASE FrechetCellFilter generalized-force fmax",
@@ -419,12 +413,9 @@ def main() -> None:
                 {
                     "status": "passed",
                     "timing": timing,
-                    "systems_per_second": args.pool_size
-                    / timing["median_seconds"],
+                    "systems_per_second": args.pool_size / timing["median_seconds"],
                     "atoms_per_second": (
-                        args.pool_size
-                        * args.atom_count
-                        / timing["median_seconds"]
+                        args.pool_size * args.atom_count / timing["median_seconds"]
                     ),
                     "peak_memory_bytes": peak_memory,
                     **output,
@@ -436,9 +427,7 @@ def main() -> None:
             point.update({"status": "oom", "error": str(exc)})
             torch.cuda.empty_cache()
         except Exception as exc:
-            point.update(
-                {"status": "failed", "error": f"{type(exc).__name__}: {exc}"}
-            )
+            point.update({"status": "failed", "error": f"{type(exc).__name__}: {exc}"})
         write_result(args.output, result)
 
     result["status"] = "complete"
