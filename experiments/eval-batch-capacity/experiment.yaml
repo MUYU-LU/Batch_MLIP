@@ -1,0 +1,46 @@
+id: eval-resident-batch-capacity
+date: 2026-07-21
+baseline_commit: c9e5454
+hypothesis: >-
+  H46 permits substantially larger resident batches than the previous B256
+  frontier, while H276 reaches the model/autograd memory limit between B128
+  and B256; throughput will saturate before out-of-memory.
+hardware:
+  gpu: NVIDIA H100 80GB HBM3
+  gpu_per_process: 1
+models:
+  AtomBit:
+    dtype: float32
+    cutoff_A: 6.0
+  MACE-OFF-Small:
+    dtype: float64
+    cutoff_A: 4.5
+task: full energy-force evaluation
+neighbor_backend: auto
+workloads:
+  source_manifests: [EVAL-H46-R32-v1, EVAL-H276-R32-v1]
+  expansion: cyclic repetition in frozen manifest order
+matrix:
+  H46: [256, 512, 768, 1024]
+  H276: [32, 64, 96, 128, 160, 192, 224, 256]
+measurement:
+  process_isolation: one fresh process per point
+  repeats: 1
+  warmup: one B1 evaluation followed by two unmeasured same-shape evaluations
+  synchronized_cuda: true
+  outputs:
+    - wall_time_s
+    - structures_per_s
+    - atoms_per_s
+    - neighbor_time_s
+    - kernel_time_s
+    - peak_allocated_GB
+    - peak_reserved_GB
+    - execution_status
+validation:
+  method: compare each unique frozen source once against native B1
+  energy_per_atom_atol: 5.0e-7
+  force_atol: 1.0e-4
+limitations:
+  - One timing per point is a capacity screen, not an uncertainty-qualified result.
+  - The result applies to EVAL; optimization and MD have different persistent state.
