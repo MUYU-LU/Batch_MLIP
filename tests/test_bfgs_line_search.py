@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import atombit_batch
 import numpy as np
 import pytest
 import torch
@@ -10,6 +9,9 @@ from ase.calculators.calculator import Calculator, all_changes
 from ase.calculators.lj import LennardJones
 from ase.filters import FrechetCellFilter as ASEFrechetCellFilter
 from ase.optimize import BFGSLineSearch, QuasiNewton
+from batch_mlip.toy_models import QuadraticWellModel
+
+import atombit_batch
 from batch_mlip import (
     ASECalculatorAdapter,
     AtomBitBatchCalculator,
@@ -21,7 +23,6 @@ from batch_mlip import (
     create_optimizer,
     relax,
 )
-from batch_mlip.toy_models import QuadraticWellModel
 
 
 class QuadraticCalculator(Calculator):
