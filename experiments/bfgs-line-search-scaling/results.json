@@ -1,0 +1,184 @@
+{
+  "schema_version": 1,
+  "status": "complete_with_atombit_line_search_rejected",
+  "baseline_commit": "482f5b9",
+  "runner_commit": "49fb626",
+  "protocol": {
+    "pool_size": 32,
+    "resident_batch_size": 32,
+    "variable_cell": true,
+    "fmax_eV_per_A": 0.05,
+    "max_accepted_steps": 500,
+    "timing_repeats": 1,
+    "deterministic": true,
+    "skin_A": 0.5,
+    "screening_timeout_seconds": 1800
+  },
+  "mace_off_small_float64": {
+    "46": {
+      "ase_bfgslinesearch": {
+        "wall_seconds": 373.1143052629195,
+        "systems_per_second": 0.08576460229111509,
+        "model_evaluations": 11415,
+        "graph_evaluations": 11415,
+        "neighbor_rebuilds": 11415,
+        "optimizer_steps_total": 4334,
+        "converged_count": 32,
+        "peak_memory_bytes": 150843904
+      },
+      "batch_bfgslinesearch_b32": {
+        "wall_seconds": 34.29072705376893,
+        "systems_per_second": 0.9331968945955272,
+        "speedup_vs_ase_bfgslinesearch": 10.880909718766377,
+        "model_evaluations": 440,
+        "graph_evaluations": 8681,
+        "neighbor_rebuilds": 184,
+        "optimizer_steps_total": 4335,
+        "converged_count": 32,
+        "peak_memory_bytes": 2337974272
+      },
+      "batch_bfgs_b32": {
+        "wall_seconds": 22.510568099096417,
+        "systems_per_second": 1.4215545275947297,
+        "speedup_vs_ase_bfgslinesearch": 16.57507281115204,
+        "speedup_vs_batch_bfgslinesearch": 1.5233168218062598,
+        "model_evaluations": 263,
+        "graph_evaluations": 4676,
+        "neighbor_rebuilds": 151,
+        "optimizer_steps_total": 4644,
+        "converged_count": 32,
+        "peak_memory_bytes": 2331441664
+      }
+    },
+    "276": {
+      "ase_bfgslinesearch": {
+        "wall_seconds": 965.231854276266,
+        "systems_per_second": 0.03315265638844224,
+        "model_evaluations": 13739,
+        "graph_evaluations": 13739,
+        "neighbor_rebuilds": 13739,
+        "optimizer_steps_total": 4597,
+        "converged_count": 32,
+        "peak_memory_bytes": 519877120
+      },
+      "batch_bfgslinesearch_b32": {
+        "wall_seconds": 64.98301649605855,
+        "systems_per_second": 0.49243635838205374,
+        "speedup_vs_ase_bfgslinesearch": 14.853601853567548,
+        "model_evaluations": 741,
+        "graph_evaluations": 9806,
+        "neighbor_rebuilds": 187,
+        "optimizer_steps_total": 4787,
+        "converged_count": 32,
+        "peak_memory_bytes": 13659394560
+      },
+      "batch_bfgs_b32": {
+        "wall_seconds": 43.6579549103044,
+        "systems_per_second": 0.7329706594306638,
+        "speedup_vs_ase_bfgslinesearch": 22.10895714788616,
+        "speedup_vs_batch_bfgslinesearch": 1.4884576391534294,
+        "model_evaluations": 255,
+        "graph_evaluations": 2887,
+        "neighbor_rebuilds": 94,
+        "optimizer_steps_total": 2855,
+        "converged_count": 32,
+        "peak_memory_bytes": 13640193024
+      }
+    },
+    "endpoint_comparison_batch_vs_ase_bfgslinesearch": {
+      "46": {
+        "convergence_flags_match": true,
+        "energy_difference_eV_per_atom_max": 0.00008671205875504276,
+        "energy_difference_eV_per_atom_median": 2.087883489287418e-11,
+        "position_rmsd_A_max": 0.01382332594170425,
+        "position_rmsd_A_median": 1.2746221601778817e-08,
+        "cell_rmsd_A_max": 0.022405063391595103,
+        "cell_rmsd_A_median": 8.67532814121748e-09,
+        "step_difference_max": 3,
+        "step_mismatch_count": 2,
+        "count_within_0_1_meV_per_atom": 32
+      },
+      "276": {
+        "convergence_flags_match": true,
+        "energy_difference_eV_per_atom_max": 0.002560497179439298,
+        "energy_difference_eV_per_atom_median": 0.000003688211016697755,
+        "position_rmsd_A_max": 0.6851271012114503,
+        "position_rmsd_A_median": 0.0013879631200478895,
+        "cell_rmsd_A_max": 0.8859166718563736,
+        "cell_rmsd_A_median": 0.0001501448015397885,
+        "step_difference_max": 72,
+        "step_mismatch_count": 18,
+        "count_within_0_1_meV_per_atom": 29,
+        "count_within_1_meV_per_atom": 31
+      }
+    }
+  },
+  "atombit_float32": {
+    "46": {
+      "ase_bfgslinesearch": {
+        "status": "terminated_at_screening_timeout"
+      },
+      "batch_bfgslinesearch_b32": {
+        "status": "failed",
+        "elapsed_lower_bound_seconds": 1400,
+        "error": "BFGSLineSearch exceeded 100 trial evaluations for system 13"
+      },
+      "batch_bfgs_b32": {
+        "status": "complete",
+        "wall_seconds": 22.58572443528101,
+        "systems_per_second": 1.4168241577415606,
+        "model_evaluations": 267,
+        "graph_evaluations": 3925,
+        "neighbor_rebuilds": 147,
+        "optimizer_steps_total": 3893,
+        "converged_count": 32,
+        "peak_memory_bytes": 2368256000
+      }
+    },
+    "276": {
+      "ase_bfgslinesearch": {
+        "status": "terminated_at_screening_timeout"
+      },
+      "batch_bfgslinesearch_b32": {
+        "status": "terminated_at_screening_timeout"
+      },
+      "batch_bfgs_b32": {
+        "status": "complete",
+        "wall_seconds": 39.581285633612424,
+        "systems_per_second": 0.8084628755167468,
+        "model_evaluations": 181,
+        "graph_evaluations": 2437,
+        "neighbor_rebuilds": 76,
+        "optimizer_steps_total": 2405,
+        "converged_count": 32,
+        "peak_memory_bytes": 12376148992
+      }
+    }
+  },
+  "decision": {
+    "default_optimizer": "bfgs",
+    "bfgslinesearch_available_by_explicit_selection": true,
+    "mace_bfgslinesearch_default": false,
+    "atombit_float32_bfgslinesearch_recommended": false,
+    "reason": "MACE BFGSLineSearch batches effectively but requires substantially more model evaluations than standard BFGS; AtomBit float32 energy comparisons make the strong-Wolfe search impractical on this workload."
+  },
+  "limitations": [
+    "Each timing is one observation and concurrent GPU jobs shared host CPU resources.",
+    "The three AtomBit timed-out processes were externally terminated, so their raw JSON files retain running status.",
+    "Converged H276 MACE trajectories are not endpoint-identical for 3 of 32 structures, consistent with different local basins after numerical trajectory divergence."
+  ],
+  "raw_sha256": {
+    "atombit_h46_ase_qn.json": "5708a7402b53b7e3db8a056575f426a6cf8852f59b9e41f6fb4755160ea25d17",
+    "atombit_h46_batch_qn_b32.json": "96b4e1ce55899dae18e23ccd4fbd29dc0be35e52ee6c57dc0511923257cc9332",
+    "atombit_h46_batch_bfgs_b32.json": "76d9f9ec501c79c87b41b675a07fb36553e714d7d8226b1ee2eb82cbfff1052c",
+    "atombit_h276_ase_qn.json": "0ede9c8e0a49f95c9cee7241a571d99f85cdb13d592c8b9dcb7f2d8a49e1ea20",
+    "atombit_h276_batch_qn_b32.json": "1032dda8ab8da2b293768de42c9d0828eaba9f335d33df45c62fc993471c90c1",
+    "atombit_h276_batch_bfgs_b32.json": "b339d613c8d728af5c824e4b807dfa3cf93aa376946f677982a720693be85031",
+    "mace_h46_ase_qn.json": "e35e7eae29e4b11d8abf5bbd1fbde34f28241b60b8ab4ecb6df8c3e813d00a7e",
+    "mace_h46_batch_qn_b32.json": "ec378751c0bfdcbd20525d6c9ec05bdd22f98866bd99f61b55e0412dd37f16d1",
+    "mace_h46_batch_bfgs_b32.json": "f2662a5f40b43870dd927e6818ae2cf6dfbdca41b52c1b2049e30ebe9c5d9c23",
+    "mace_h276_ase_qn.json": "4f0060174c59a79fb31f2fd1574b76dfdd56f8431f914fa23171981cab604748",
+    "mace_h276_batch_qn_b32.json": "6e7b79aea6493999c67eef0a52fe9ae107f3f0ead61ceb56e80bf0e72403fae6",
+    "mace_h276_batch_bfgs_b32.json": "68e268857b4f791c06ef23de50c2791b829f5349c702e67670428d813948b648"
+  }
+}
