@@ -11,7 +11,7 @@ import pytest
 import torch
 from ase.filters import FrechetCellFilter as ASEFrechetCellFilter
 from ase.io import read
-from ase.optimize import BFGS, FIRE
+from ase.optimize import BFGS, BFGSLineSearch, FIRE
 
 from batch_mlip import (
     FrechetCellFilter,
@@ -85,8 +85,10 @@ def _optimizer_options(optimizer: str) -> dict[str, Any]:
     }
     if optimizer == "fire":
         common.update(dt_start=0.1, dt_max=1.0)
-    else:
+    elif optimizer == "bfgs":
         common.update(alpha=70.0, optimizer_dtype="float64")
+    else:
+        common.update(alpha=10.0, optimizer_dtype="float64")
     return common
 
 
@@ -118,12 +120,20 @@ def _run_ase(
                 dtmax=1.0,
                 maxstep=0.2,
             )
-        else:
+        elif optimizer_name == "bfgs":
             optimizer = BFGS(
                 target,
                 logfile=None,
                 trajectory=None,
                 alpha=70.0,
+                maxstep=0.2,
+            )
+        else:
+            optimizer = BFGSLineSearch(
+                target,
+                logfile=None,
+                trajectory=None,
+                alpha=10.0,
                 maxstep=0.2,
             )
         optimizer.run(fmax=1e-30, steps=3)
@@ -204,6 +214,22 @@ def test_mace_cached_b1_bfgs_matches_ase(
         optimizer="bfgs",
         cell_filter=FrechetCellFilter(),
         **_optimizer_options("bfgs"),
+    )
+    _assert_batch_matches_ase(reference, result)
+
+
+def test_mace_cached_b1_bfgs_line_search_matches_ase(
+    mace_systems: list[Any],
+    mace_calculator: MACEBatchCalculator,
+) -> None:
+    systems = mace_systems[:1]
+    reference = _run_ase(systems, mace_calculator, "bfgslinesearch")
+    result = relax(
+        systems,
+        mace_calculator,
+        optimizer="quasinewton",
+        cell_filter=FrechetCellFilter(),
+        **_optimizer_options("bfgslinesearch"),
     )
     _assert_batch_matches_ase(reference, result)
 
