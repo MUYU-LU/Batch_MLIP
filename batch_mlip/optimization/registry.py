@@ -11,6 +11,7 @@ from ..core.calculator import BatchCalculator
 from ..core.state import AseGraphBatch
 from ..core.types import RelaxationResult
 from .bfgs import batched_bfgs_relax
+from .bfgs_line_search import batched_bfgs_line_search_relax
 from .fire import batched_fire_relax, batched_gradient_descent
 
 
@@ -123,6 +124,30 @@ class BatchedBFGS:
         return batched_bfgs_relax(state, calculator, **resolved)
 
 
+class BatchedBFGSLineSearch:
+    """Object interface for ASE-compatible batched BFGSLineSearch."""
+
+    def __init__(self, **options: Any) -> None:
+        self.options = MappingProxyType(dict(options))
+
+    def capabilities(self) -> OptimizerCapabilities:
+        return OptimizerCapabilities(variable_cell=True, active_compaction=True)
+
+    def run(
+        self,
+        state: AseGraphBatch,
+        calculator: BatchCalculator,
+        **options: Any,
+    ) -> RelaxationResult:
+        resolved = _merged_options(self.options, options)
+        _validate_capabilities(self, resolved)
+        return batched_bfgs_line_search_relax(state, calculator, **resolved)
+
+
+# Match ASE: QuasiNewton is another name for BFGSLineSearch.
+BatchedQuasiNewton = BatchedBFGSLineSearch
+
+
 class BatchedGradientDescent:
     """Object interface for the fixed-cell steepest-descent baseline."""
 
@@ -201,5 +226,8 @@ def create_optimizer(name: str, **options: Any) -> BatchOptimizer:
 
 register_optimizer("fire", BatchedFIRE)
 register_optimizer("bfgs", BatchedBFGS)
+register_optimizer("bfgslinesearch", BatchedBFGSLineSearch)
+register_optimizer("bfgs_line_search", BatchedBFGSLineSearch)
+register_optimizer("quasinewton", BatchedBFGSLineSearch)
 register_optimizer("gradient_descent", BatchedGradientDescent)
 register_optimizer("gd", BatchedGradientDescent)

@@ -1,0 +1,15 @@
+id: bfgs-line-search-integration
+hypothesis: >-
+  Independent ASE-compatible line-search state can be advanced for every
+  structure while trial energy and force requests are evaluated as one batch.
+baseline_commit: 6e8f093
+scope:
+  - fixed-cell B1 equivalence against ASE BFGSLineSearch
+  - heterogeneous batch-versus-single equivalence
+  - active compaction
+  - Frechet variable-cell B1 equivalence
+performance_claim: none
+notes: >-
+  This stage establishes optimizer correctness and records model-evaluation
+  counts. Active refill and production MLIP timing are decision-gated follow-up
+  work because nested per-system line searches require a distinct scheduler.

@@ -43,6 +43,7 @@ from .models.potential import (
     load_atombit_batch,
 )
 from .optimization.bfgs import batched_bfgs_relax
+from .optimization.bfgs_line_search import batched_bfgs_line_search_relax
 from .optimization.cell_filters import BatchedFrechetCellFilter, FrechetCellFilter
 from .optimization.fire import (
     FIREConfig,
@@ -52,8 +53,10 @@ from .optimization.fire import (
 )
 from .optimization.registry import (
     BatchedBFGS,
+    BatchedBFGSLineSearch,
     BatchedFIRE,
     BatchedGradientDescent,
+    BatchedQuasiNewton,
     BatchOptimizer,
     OptimizerCapabilities,
     OptimizerFactory,
@@ -89,11 +92,12 @@ def _install_legacy_module_aliases() -> None:
     from .dynamics import integrators
     from .interfaces import api, cli, config, reporting
     from .models import loaders, potential, toy_models
-    from .optimization import bfgs, cell_filters, fire, registry
+    from .optimization import bfgs, bfgs_line_search, cell_filters, fire, registry
 
     aliases: dict[str, _ModuleType] = {
         "api": api,
         "bfgs": bfgs,
+        "bfgs_line_search": bfgs_line_search,
         "calculator": calculator,
         "cli": cli,
         "config": config,
@@ -128,10 +132,12 @@ __all__ = [
     "BatchPlan",
     "BatchPlanner",
     "BatchedBFGS",
+    "BatchedBFGSLineSearch",
     "BatchedFIRE",
     "BatchedFrechetCellFilter",
     "FrechetCellFilter",
     "BatchedGradientDescent",
+    "BatchedQuasiNewton",
     "AtomBitBatchCalculator",
     "BatchedPotential",
     "CompositeReporter",
@@ -165,6 +171,7 @@ __all__ = [
     "available_optimizers",
     "balance_work",
     "batched_bfgs_relax",
+    "batched_bfgs_line_search_relax",
     "batched_fire_relax",
     "batched_gradient_descent",
     "batched_langevin_baoab",

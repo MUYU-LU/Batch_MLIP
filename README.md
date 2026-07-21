@@ -452,6 +452,25 @@ H92 reduce optimizer time by 17-33%; H184 misses the joint two-model gate and
 larger Hessians use the serial path. Singleton groups always use the serial
 path, which preserves B1 agreement with ASE.
 
+ASE's line-search variant is available under either conventional name:
+
+```python
+result = relax(
+    systems,
+    calculator,
+    optimizer="quasinewton",  # alias: bfgslinesearch
+    cell_filter=FrechetCellFilter(),
+    active_compaction=True,
+    fmax=0.05,
+)
+```
+
+`quasinewton` and `bfgslinesearch` construct the same optimizer, matching ASE's
+class alias. Each structure owns an inverse Hessian and independent strong-Wolfe
+state, while simultaneous trial requests share a model batch. One accepted
+optimizer step can require multiple model evaluations. Active refill is not yet
+supported for this optimizer and is rejected by the capability interface.
+
 `refill_policy` accepts `"drain"`, `"immediate"`, or `"threshold"`.
 Immediate is the measured default. Threshold refill also accepts
 `refill_low_watermark` and `refill_min_chunk`, but it is workload-dependent and

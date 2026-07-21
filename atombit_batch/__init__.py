@@ -33,6 +33,7 @@ _CANONICAL_MODULES = (
     "models.toy_models",
     "optimization",
     "optimization.bfgs",
+    "optimization.bfgs_line_search",
     "optimization.cell_filters",
     "optimization.fire",
     "optimization.registry",

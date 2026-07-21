@@ -111,6 +111,13 @@ eigendecomposition; large Hessians and singleton groups retain independent
 serial eigensolves. The automatic boundary is a measured execution policy, not
 a change to the BFGS equations or optimizer protocol.
 
+`BFGSLineSearch` (also registered as `QuasiNewton`) keeps an independent inverse
+Hessian and strong-Wolfe state for each structure. Trial points requested in the
+same line-search round are evaluated together. Structures that finish a line
+search early remain at their accepted coordinates while the remaining searches
+continue. This correctness-first scheduler supports active compaction but not
+pending-queue refill.
+
 ## Runtime profiling
 
 `RuntimeProfiler` activates instrumentation through a context-local collector,
