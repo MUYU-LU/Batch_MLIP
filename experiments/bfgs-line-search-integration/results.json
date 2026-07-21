@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "status": "correctness_complete_per_declared_gates",
+  "accepted_steps": 3,
+  "atombit_h46": {
+    "b1": {
+      "model_evaluations": 7,
+      "fixed_cell_ase": {
+        "passed": true,
+        "max_position_error_A": 1.7667843691393514e-06,
+        "max_energy_error_eV": 1.430511474609375e-06,
+        "max_force_error_eV_per_A": 0.0002815723419189453
+      },
+      "variable_cell_ase": {
+        "passed": true,
+        "max_position_error_A": 3.0532435015828696e-06,
+        "max_cell_error_A": 7.149568244102511e-07,
+        "max_energy_error_eV": 5.245208740234375e-06,
+        "max_force_error_eV_per_A": 0.00015115737915039062,
+        "max_stress_error_eV_per_A3": 7.543712854385376e-08
+      }
+    },
+    "b2": {
+      "model_evaluations": 7,
+      "fixed_cell_ase": {
+        "passed": true,
+        "max_position_error_A": 1.754992769775754e-06,
+        "max_energy_error_eV": 2.86102294921875e-06,
+        "max_force_error_eV_per_A": 0.00017130374908447266
+      },
+      "variable_cell_ase": {
+        "passed": false,
+        "reason": "stress_only_exceeds_existing_direct_gate",
+        "max_position_error_A": 3.0733160780727076e-06,
+        "max_cell_error_A": 1.3221838361943128e-06,
+        "max_energy_error_eV": 6.67572021484375e-06,
+        "max_force_error_eV_per_A": 0.00024145841598510742,
+        "max_stress_error_eV_per_A3": 2.7241185307502747e-07,
+        "stress_tolerance_eV_per_A3": 2e-07
+      },
+      "variable_cell_b1": {
+        "passed": true,
+        "max_stress_error_eV_per_A3": 1.0989606380462646e-07
+      }
+    }
+  },
+  "mace_off_small_b1_variable_cell_ase": {
+    "passed": true,
+    "validation": "tests/test_mace_optimization.py::test_mace_cached_b1_bfgs_line_search_matches_ase"
+  }
+}

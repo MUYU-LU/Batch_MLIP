@@ -562,7 +562,7 @@ Implemented:
 
 - independent fixed-cell and optional Frechet variable-cell systems;
 - heterogeneous sizes and cells;
-- FIRE, full BFGS, and gradient descent;
+- FIRE, full BFGS, BFGSLineSearch/QuasiNewton, and gradient descent;
 - NVE/NVT fixed-cell MD;
 - `FixAtoms` for fixed-cell optimization and MD;
 - per-system time steps, temperatures, friction, and FIRE parameters;
