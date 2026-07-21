@@ -13,7 +13,7 @@ import numpy as np
 import torch
 from ase.filters import FrechetCellFilter as ASEFrechetCellFilter
 from ase.io import read
-from ase.optimize import BFGS
+from ase.optimize import BFGS, BFGSLineSearch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -47,6 +47,8 @@ def run_ase(
     device: torch.device,
     variable_cell: bool,
     steps: int,
+    optimizer_name: str,
+    alpha: float,
 ) -> list[dict[str, Any]]:
     calculator = AtomBitCalculator(
         model,
@@ -60,10 +62,11 @@ def run_ase(
         atoms = source.copy()
         atoms.calc = calculator
         target = ASEFrechetCellFilter(atoms) if variable_cell else atoms
-        optimizer = BFGS(
+        optimizer_class = BFGS if optimizer_name == "bfgs" else BFGSLineSearch
+        optimizer = optimizer_class(
             target,
             logfile=None,
-            alpha=70.0,
+            alpha=alpha,
             maxstep=0.2,
         )
         converged = bool(optimizer.run(fmax=1e-30, steps=steps))
@@ -92,6 +95,8 @@ def run_batch(
     device: torch.device,
     variable_cell: bool,
     steps: int,
+    optimizer_name: str,
+    alpha: float,
 ):
     calculator = AtomBitBatchCalculator(
         model,
@@ -102,11 +107,11 @@ def run_batch(
         force_mode="autograd",
     )
     options: dict[str, Any] = {
-        "optimizer": "bfgs",
+        "optimizer": optimizer_name,
         "active_compaction": True,
         "fmax": 1e-30,
         "max_steps": steps,
-        "alpha": 70.0,
+        "alpha": alpha,
         "max_step": 0.2,
     }
     if variable_cell:
@@ -225,6 +230,12 @@ def main() -> None:
     parser.add_argument("--pool-size", type=int, default=2)
     parser.add_argument("--steps", type=int, default=3)
     parser.add_argument(
+        "--optimizer",
+        choices=("bfgs", "bfgslinesearch"),
+        default="bfgs",
+    )
+    parser.add_argument("--alpha", type=float, default=70.0)
+    parser.add_argument(
         "--dataset-dir", type=Path, default=Path("data/T2_test/structures")
     )
     parser.add_argument(
@@ -252,6 +263,8 @@ def main() -> None:
             device=device,
             variable_cell=variable_cell,
             steps=args.steps,
+            optimizer_name=args.optimizer,
+            alpha=args.alpha,
         )
         candidate = run_batch(
             model,
@@ -259,6 +272,8 @@ def main() -> None:
             device=device,
             variable_cell=variable_cell,
             steps=args.steps,
+            optimizer_name=args.optimizer,
+            alpha=args.alpha,
         )
         size_one_records = []
         for system in systems:
@@ -270,6 +285,8 @@ def main() -> None:
                         device=device,
                         variable_cell=variable_cell,
                         steps=args.steps,
+                        optimizer_name=args.optimizer,
+                        alpha=args.alpha,
                     )
                 )
             )
@@ -291,8 +308,9 @@ def main() -> None:
         },
         "parameters": {
             "steps": args.steps,
+            "optimizer": args.optimizer,
             "fmax_eV_per_A": 1e-30,
-            "alpha_eV_per_A2": 70.0,
+            "alpha_eV_per_A2": args.alpha,
             "max_step_A": 0.2,
             "dtype": "float32",
         },
