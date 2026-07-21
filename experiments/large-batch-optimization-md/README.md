@@ -120,6 +120,6 @@ equivalence evidence; this capacity runner records final energy diagnostics but
 not complete native endpoint structures.
 
 Complete metrics are in `results.csv`; cross-batch BFGS and NVE diagnostics are
-in `validation.json`. Raw JSON and logs, including failed launcher preflights
+in `diagnostics.json`. Raw JSON and logs, including failed launcher preflights
 and the superseded MACE rebuild control, remain on the benchmark server under
 `runs/large_batch_optimization_md/`.

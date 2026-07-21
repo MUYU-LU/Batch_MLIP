@@ -1,0 +1,112 @@
+{
+  "bfgs_cross_batch": {
+    "atombit_H276": {
+      "comparisons": {
+        "B64_vs_B128": {
+          "convergence_flags_match": true,
+          "max_cell_rmsd_A": 0.28947598344020997,
+          "max_energy_error_eV_per_atom": 0.01661252284395522,
+          "max_position_rmsd_A": 0.9581675743156742,
+          "max_step_difference": 174
+        }
+      },
+      "converged_jobs_by_batch": {
+        "128": 256,
+        "64": 256
+      }
+    },
+    "atombit_H46": {
+      "comparisons": {
+        "B64_vs_B128": {
+          "convergence_flags_match": true,
+          "max_cell_rmsd_A": 0.033826250469895965,
+          "max_energy_error_eV_per_atom": 0.0001733925031579059,
+          "max_position_rmsd_A": 0.030412384353419655,
+          "max_step_difference": 12
+        },
+        "B64_vs_B256": {
+          "convergence_flags_match": true,
+          "max_cell_rmsd_A": 0.09743561398193659,
+          "max_energy_error_eV_per_atom": 0.0013698805933413298,
+          "max_position_rmsd_A": 0.13062390090286147,
+          "max_step_difference": 31
+        }
+      },
+      "converged_jobs_by_batch": {
+        "128": 256,
+        "256": 256,
+        "64": 256
+      }
+    },
+    "mace_H276": {
+      "comparisons": {
+        "B64_vs_B128": {
+          "convergence_flags_match": true,
+          "max_cell_rmsd_A": 0.185937361984962,
+          "max_energy_error_eV_per_atom": 0.009891613914658303,
+          "max_position_rmsd_A": 0.5843350233086603,
+          "max_step_difference": 154
+        }
+      },
+      "converged_jobs_by_batch": {
+        "128": 256,
+        "64": 256
+      }
+    },
+    "mace_H46": {
+      "comparisons": {
+        "B64_vs_B128": {
+          "convergence_flags_match": true,
+          "max_cell_rmsd_A": 5.154967155617039e-06,
+          "max_energy_error_eV_per_atom": 1.6593928550086591e-09,
+          "max_position_rmsd_A": 5.04505413549792e-06,
+          "max_step_difference": 0
+        },
+        "B64_vs_B256": {
+          "convergence_flags_match": true,
+          "max_cell_rmsd_A": 8.711933563727703e-06,
+          "max_energy_error_eV_per_atom": 2.6701182714137044e-09,
+          "max_position_rmsd_A": 8.524094480919163e-06,
+          "max_step_difference": 0
+        }
+      },
+      "converged_jobs_by_batch": {
+        "128": 256,
+        "256": 256,
+        "64": 256
+      }
+    }
+  },
+  "nve_energy_drift": {
+    "atombit_H276": {
+      "max_abs_drift_eV_per_atom_by_batch": {
+        "128": 0.005791788515840592,
+        "64": 0.00579053768213162
+      },
+      "spread_eV_per_atom": 1.2508337089711663e-06
+    },
+    "atombit_H46": {
+      "max_abs_drift_eV_per_atom_by_batch": {
+        "128": 0.006939001705339241,
+        "256": 0.0069375245467476225,
+        "64": 0.006935365822001764
+      },
+      "spread_eV_per_atom": 3.6358833374770458e-06
+    },
+    "mace_H276": {
+      "max_abs_drift_eV_per_atom_by_batch": {
+        "128": 7.412234697477433e-05,
+        "64": 7.4122347080223e-05
+      },
+      "spread_eV_per_atom": 1.0544866303925648e-13
+    },
+    "mace_H46": {
+      "max_abs_drift_eV_per_atom_by_batch": {
+        "128": 0.00016547018648175847,
+        "256": 0.00016547018648175847,
+        "64": 0.0001654701858490665
+      },
+      "spread_eV_per_atom": 6.326919782355389e-13
+    }
+  }
+}
