@@ -37,8 +37,8 @@ from batch_mlip import (  # noqa: E402
     FrechetCellFilter,
     MACEBatchCalculator,
     RuntimeProfiler,
-    batched_bfgs_relax,
     batched_bfgs_line_search_relax,
+    batched_bfgs_relax,
     batched_fire_relax,
 )
 
