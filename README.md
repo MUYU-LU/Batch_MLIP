@@ -447,11 +447,10 @@ neighbor graphs for pending structures are built only when those structures
 enter the resident batch.
 
 `linear_algebra_backend` accepts `"auto"`, `"serial"`, or `"grouped"`. The
-automatic policy groups equal-sized CUDA Hessians only when `D <= 256`, where
-the measured H46 workload reduced optimizer time by 31-33%. Larger Hessians use
-the serial path because H276 grouping improved optimizer time by only 7% and
-increased trajectory sensitivity. Singleton groups always use the serial path,
-which preserves B1 agreement with ASE.
+automatic policy groups equal-sized CUDA Hessians only when `D <= 285`. H46 and
+H92 reduce optimizer time by 17-33%; H184 misses the joint two-model gate and
+larger Hessians use the serial path. Singleton groups always use the serial
+path, which preserves B1 agreement with ASE.
 
 `refill_policy` accepts `"drain"`, `"immediate"`, or `"threshold"`.
 Immediate is the measured default. Threshold refill also accepts

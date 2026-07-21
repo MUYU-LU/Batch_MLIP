@@ -380,6 +380,8 @@ def test_refill_policy_insert_count(policy, survivors, pending, expected):
     "backend,device_type,group_size,dimension,expected",
     [
         ("auto", "cuda", 64, 147, True),
+        ("auto", "cuda", 128, 285, True),
+        ("auto", "cuda", 128, 286, False),
         ("auto", "cuda", 64, 837, False),
         ("auto", "cpu", 64, 147, False),
         ("auto", "cuda", 1, 147, False),

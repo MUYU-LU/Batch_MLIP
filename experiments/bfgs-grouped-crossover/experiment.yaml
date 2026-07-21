@@ -1,0 +1,70 @@
+id: bfgs-grouped-crossover
+date: 2026-07-21
+hypothesis: >-
+  Grouped full-BFGS linear algebra remains beneficial above the validated H46
+  dimension but crosses below the 10 percent optimizer-time and 5 percent
+  end-to-end gates before H276, permitting a measured automatic dimension
+  boundary for homogeneous and size-bucketed workloads.
+baseline_commit: 2de96f9dd950b69ebe27233a0bb3b83f54698f7b
+models: [AtomBit, MACE-OFF-Small]
+task: variable-cell full BFGS with FrechetCellFilter
+pool:
+  source: frozen T2 manifest cyclically expanded to 256 jobs
+  distributions: [H92, H184]
+points:
+  H92:
+    generalized_dimension: 285
+    resident_batch: 256
+  H184:
+    generalized_dimension: 561
+    resident_batch: 128
+comparison: [serial, grouped]
+repeats: 1
+settings:
+  active_compaction: true
+  refill_policy: immediate
+  optimizer_dtype: float64
+  fmax_eV_per_A: 0.05
+  max_steps: 500
+  deterministic_algorithms: true
+  neighbor_backend: auto
+  graph_skin_A: 0.0
+metrics:
+  - wall time and systems per second
+  - optimizer, model-kernel, neighbor, and scheduler time
+  - peak allocated GPU memory
+  - model evaluations and optimizer steps
+  - convergence flags and final observables
+gates:
+  performance:
+    optimizer_time_reduction_percent: 10
+    end_to_end_throughput_improvement_percent: 5
+  memory: below 85 percent of H100 capacity
+  correctness:
+    - convergence flags match serial
+    - final-state differences remain within known deterministic BFGS sensitivity
+decision_rule: >-
+  Extend the automatic grouped boundary only through the largest tested
+  generalized dimension that passes both performance gates for both MLIPs.
+  Retain explicit grouped execution for diagnostic use above that boundary.
+result:
+  H92_D285_B256:
+    throughput_speedup:
+      AtomBit: 1.1493
+      MACE-OFF-Small: 1.1183
+    optimizer_time_reduction_percent:
+      AtomBit: 19.97
+      MACE-OFF-Small: 17.21
+    selected: grouped
+  H184_D561_B128:
+    throughput_speedup:
+      AtomBit: 1.0629
+      MACE-OFF-Small: 1.0753
+    optimizer_time_reduction_percent:
+      AtomBit: 9.59
+      MACE-OFF-Small: 10.61
+    selected: serial
+    reason: AtomBit misses the 10 percent optimizer-time gate
+  automatic_boundary: 285
+  convergence: all eight production runs converged 256 of 256 jobs
+  fixed3_validation: serial and grouped H92 agree at numerical-noise scale

@@ -124,7 +124,7 @@ def _prepare_bfgs_step(
 
 
 _LINEAR_ALGEBRA_BACKENDS = frozenset(("auto", "grouped", "serial"))
-_AUTO_GROUPED_MAX_DIMENSION = 256
+_AUTO_GROUPED_MAX_DIMENSION = 285
 
 
 def _use_grouped_linear_algebra(
