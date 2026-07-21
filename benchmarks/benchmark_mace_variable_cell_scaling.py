@@ -14,7 +14,7 @@ import torch
 from ase.calculators.calculator import all_changes
 from ase.filters import FrechetCellFilter as ASEFrechetCellFilter
 from ase.io import read
-from ase.optimize import BFGS, FIRE
+from ase.optimize import BFGS, FIRE, BFGSLineSearch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -38,6 +38,7 @@ from batch_mlip import (  # noqa: E402
     MACEBatchCalculator,
     RuntimeProfiler,
     batched_bfgs_relax,
+    batched_bfgs_line_search_relax,
     batched_fire_relax,
 )
 
@@ -96,8 +97,16 @@ def run_ase(
                 dtmax=dt_max,
                 maxstep=max_step,
             )
-        else:
+        elif optimizer_name == "bfgs":
             optimizer = BFGS(
+                cell_filter,
+                logfile=None,
+                trajectory=None,
+                maxstep=max_step,
+                alpha=alpha,
+            )
+        else:
+            optimizer = BFGSLineSearch(
                 cell_filter,
                 logfile=None,
                 trajectory=None,
@@ -180,7 +189,7 @@ def run_batch(
                 dt_max=dt_max,
                 **common,
             )
-        else:
+        elif optimizer_name == "bfgs":
             result = batched_bfgs_relax(
                 state,
                 calculator,
@@ -191,6 +200,14 @@ def run_batch(
                 refill_low_watermark=refill_low_watermark,
                 refill_min_chunk=refill_min_chunk,
                 linear_algebra_backend=linear_algebra_backend,
+                **common,
+            )
+        else:
+            result = batched_bfgs_line_search_relax(
+                state,
+                calculator,
+                alpha=alpha,
+                optimizer_dtype="float64",
                 **common,
             )
         model_evaluations += result.model_evaluations
@@ -241,7 +258,11 @@ def main() -> None:
         choices=("ase", "masked", "active", "refill"),
         required=True,
     )
-    parser.add_argument("--optimizer", choices=("fire", "bfgs"), default="fire")
+    parser.add_argument(
+        "--optimizer",
+        choices=("fire", "bfgs", "bfgslinesearch"),
+        default="fire",
+    )
     parser.add_argument("--atom-count", type=int, required=True)
     parser.add_argument("--batch-sizes", type=parse_int_list, default=[1, 2, 4, 8, 16, 32])
     parser.add_argument("--pool-size", type=int, default=32)

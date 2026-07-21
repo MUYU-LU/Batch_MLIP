@@ -1,0 +1,34 @@
+id: bfgs-line-search-scaling
+hypothesis: >-
+  Batched BFGSLineSearch can amortize its additional trial evaluations across
+  structures, but standard batched BFGS will retain higher throughput when the
+  line search does not reduce total model evaluations enough.
+baseline_commit: 482f5b9
+hardware: seven NVIDIA H100 80GB GPUs
+workload:
+  manifest: benchmarks/t2_fixed_samples.json
+  pool_size: 32
+  atom_counts: [46, 276]
+  variable_cell: true
+  fmax_eV_per_A: 0.05
+  max_steps: 500
+matrix:
+  models: [AtomBit, MACE-OFF-Small]
+  methods:
+    - ase_bfgslinesearch
+    - batch_bfgslinesearch_b32
+    - batch_bfgs_b32
+timing_repeats: 1
+metrics:
+  - wall_seconds
+  - systems_per_second
+  - speedup_vs_ase_bfgslinesearch
+  - model_evaluations
+  - optimizer_steps_total
+  - peak_gpu_memory
+  - convergence_count
+notes: >-
+  Standard BFGS uses alpha=70 and BFGSLineSearch uses alpha=10, matching ASE
+  defaults used by this project. Timings compare complete optimization tasks,
+  not equal accepted-step counts. One observation per point follows the user's
+  established screening protocol and does not provide uncertainty estimates.
