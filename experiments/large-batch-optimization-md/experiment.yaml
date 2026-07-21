@@ -1,0 +1,80 @@
+id: large-batch-optimization-md
+date: 2026-07-21
+baseline_commit: 84e66dd
+hypothesis: >-
+  Increasing the resident batch beyond B32 improves H46 BFGS and NVE
+  throughput, but H276 reaches a task-specific utilization or memory plateau
+  earlier; the optimal resident size is below the largest executable batch.
+hardware:
+  gpu: NVIDIA H100 80GB HBM3
+  gpu_per_process: 1
+models:
+  AtomBit:
+    model_dtype: float32
+    optimizer_dtype: float64
+    cutoff_A: 6.0
+  MACE-OFF-Small:
+    model_dtype: float64
+    optimizer_dtype: float64
+    cutoff_A: 4.5
+    graph_mode: cached tensor state
+workload:
+  pool_size: 256
+  distributions: [H46, H276]
+  expansion: cyclic repetition of the frozen 32-structure pool
+tasks:
+  variable_cell_bfgs:
+    mode: active compaction with immediate refill
+    cell_filter: full Frechet log deformation
+    fmax_eV_per_A: 0.05
+    max_steps: 500
+    skin_A: 0.0
+    batches:
+      H46: [64, 128, 256]
+      H276: [64, 128]
+  nve:
+    timestep_fs: 0.5
+    warmup_steps: 100
+    measured_steps: 1000
+    skin_A: 0.5
+    batches:
+      H46: [64, 128, 256]
+      H276: [64, 128]
+runtime:
+  neighbor_backend: auto
+  deterministic_optimization: true
+  cublas_workspace_config: ":4096:8"
+  cpu_threads_per_process: 1
+  timing_repeats: 1
+comparison:
+  current_frontier: direct-backend-frontier B32
+  ase_reference: frozen sequential ASE B1 time per structure or replica-step
+  r256_speedup: derived from exact cyclic repetition of the R32 ASE workload
+metrics:
+  - wall_time_s
+  - systems_or_replica_steps_per_s
+  - speedup_vs_current_B32
+  - speedup_vs_ASE_B1
+  - peak_allocated_GB
+  - peak_reserved_GB_when_available
+  - neighbor_time_s
+  - model_or_kernel_time_s
+  - convergence_and_energy_drift_diagnostics
+selection:
+  memory_limit_fraction: 0.85
+  rule: smallest safe batch within 2 percent of maximum validated throughput
+limitations:
+  - One timing per point is a screening result.
+  - R256 ASE speedups are derived from measured identical R32 ASE work, not a new sequential R256 run.
+results:
+  points: 20
+  all_execution_statuses_passed: true
+  selected_batches:
+    bfgs_atombit_H46: 256
+    bfgs_atombit_H276: 64
+    bfgs_mace_H46: 256
+    bfgs_mace_H276: 64
+    nve_atombit_H46: 128
+    nve_atombit_H276: 16
+    nve_mace_H46: 256
+    nve_mace_H276: 64
