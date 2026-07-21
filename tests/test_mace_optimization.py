@@ -11,7 +11,7 @@ import pytest
 import torch
 from ase.filters import FrechetCellFilter as ASEFrechetCellFilter
 from ase.io import read
-from ase.optimize import BFGS, BFGSLineSearch, FIRE
+from ase.optimize import BFGS, FIRE, BFGSLineSearch
 
 from batch_mlip import (
     FrechetCellFilter,
