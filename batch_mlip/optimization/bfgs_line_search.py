@@ -46,6 +46,16 @@ def _max_row_norm(value: np.ndarray) -> float:
     return float(np.linalg.norm(value.reshape(-1, 3), axis=1).max())
 
 
+def _new_line_search() -> LineSearch:
+    """Construct ASE's line search across the supported ASE API versions."""
+
+    try:
+        return LineSearch(get_gradient_norm=_max_row_norm)
+    except TypeError:
+        # ASE <= 3.26 hard-codes the same Cartesian row norm.
+        return LineSearch()
+
+
 def _update_inverse_hessian(
     coordinates: torch.Tensor,
     gradient: torch.Tensor,
@@ -117,7 +127,7 @@ def _start_line_search(
     if bool(direction_norm <= minimum_norm):
         direction = direction * (minimum_norm / direction_norm)
 
-    search = LineSearch(get_gradient_norm=_max_row_norm)
+    search = _new_line_search()
     search.stpmin = 1e-8
     search.pk = direction.detach().cpu().numpy()
     search.stpmax = stpmax
