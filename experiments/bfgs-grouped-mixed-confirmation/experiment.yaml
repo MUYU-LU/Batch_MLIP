@@ -1,0 +1,70 @@
+id: bfgs-grouped-mixed-confirmation
+date: 2026-07-21
+hypothesis: >-
+  The dimension-gated automatic BFGS backend improves a heterogeneous resident
+  workload by grouping H46 and H92 histories while leaving H184 and H276
+  serial, without changing fixed-step equations, convergence flags, or memory
+  safety.
+baseline_commit: 4b998c236a133a0817c40108b0fbdc255c89f4b6
+models: [AtomBit, MACE-OFF-Small]
+task: variable-cell full BFGS with FrechetCellFilter
+pool:
+  source: frozen T2 manifest cyclically expanded and interleaved
+  systems: 256
+  composition:
+    H46: 64
+    H92: 64
+    H184: 64
+    H276: 64
+resident_batch: 128
+comparison: [serial, auto]
+automatic_policy:
+  grouped: [H46, H92]
+  serial: [H184, H276]
+  maximum_grouped_dimension: 285
+repeats: 1
+settings:
+  active_compaction: true
+  refill_policy: immediate
+  optimizer_dtype: float64
+  fmax_eV_per_A: 0.05
+  max_steps: 500
+  deterministic_algorithms: true
+  neighbor_backend: auto
+  graph_skin_A: 0.0
+  mace_graph_mode: cached
+metrics:
+  - wall time and systems per second
+  - optimizer, model-kernel, neighbor, and scheduler time
+  - peak allocated GPU memory
+  - active batch sizes, evaluations, and optimizer steps
+  - convergence flags and final observables
+gates:
+  performance: at least 5 percent end-to-end throughput improvement
+  memory: below 85 percent of H100 capacity
+  correctness:
+    - convergence flags match serial
+    - three-step outputs agree at numerical-noise scale
+decision_rule: >-
+  Keep dimension-only automatic dispatch if the mixed workload has no material
+  regression. Require a composition-aware policy only if auto is slower or
+  violates the correctness or memory gates.
+result:
+  AtomBit:
+    serial_wall_time_s: 193.1617
+    auto_wall_time_s: 186.3705
+    throughput_speedup: 1.0364
+    optimizer_time_reduction_percent: 6.29
+    performance_gate: inconclusive below 5 percent
+  MACE-OFF-Small:
+    serial_wall_time_s: 212.4692
+    auto_wall_time_s: 199.0356
+    throughput_speedup: 1.0675
+    optimizer_time_reduction_percent: 8.64
+    performance_gate: passed
+  peak_allocated_GB:
+    AtomBit_auto: 29.474
+    MACE_auto: 29.549
+  convergence: all four production runs converged 256 of 256 jobs
+  fixed3_validation: serial and auto agree at numerical-noise scale
+  decision: retain dimension-only auto; do not add composition-specific logic

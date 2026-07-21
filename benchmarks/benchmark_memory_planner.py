@@ -54,15 +54,28 @@ def load_count_group(
 
 
 def mixed_workload(
-    *, manifest: dict[str, Any], dataset_dir: Path
+    *,
+    manifest: dict[str, Any],
+    dataset_dir: Path,
+    atom_counts: tuple[int, ...] = (46, 276),
 ) -> list[Any]:
-    small = load_count_group(
-        atom_count=46, count=128, manifest=manifest, dataset_dir=dataset_dir
-    )
-    large = load_count_group(
-        atom_count=276, count=128, manifest=manifest, dataset_dir=dataset_dir
-    )
-    return [item for pair in zip(small, large, strict=True) for item in pair]
+    if 256 % len(atom_counts):
+        raise ValueError("mixed workload groups must divide 256 systems")
+    count_per_group = 256 // len(atom_counts)
+    groups = [
+        load_count_group(
+            atom_count=atom_count,
+            count=count_per_group,
+            manifest=manifest,
+            dataset_dir=dataset_dir,
+        )
+        for atom_count in atom_counts
+    ]
+    return [
+        group[index]
+        for index in range(count_per_group)
+        for group in groups
+    ]
 
 
 def calibration_peaks(path: Path, model: str) -> dict[int, dict[int, int]]:
@@ -204,6 +217,10 @@ def execute_atombit(
     *,
     device: torch.device,
     model: torch.nn.Module,
+    linear_algebra_backend: str,
+    skin: float,
+    fmax: float,
+    max_steps: int,
 ) -> dict[str, Any]:
     outputs = []
     for indices, capacity in buckets:
@@ -215,9 +232,9 @@ def execute_atombit(
             active_compaction=True,
             device=device,
             cutoff=6.0,
-            skin=0.5,
-            fmax=0.05,
-            max_steps=500,
+            skin=skin,
+            fmax=fmax,
+            max_steps=max_steps,
             dt_start=0.1,
             dt_max=1.0,
             max_step=0.2,
@@ -225,8 +242,10 @@ def execute_atombit(
             alpha=70.0,
             optimizer_dtype="float64",
             model_dtype=torch.float32,
+            neighbor_backend="auto",
             refill=True,
             refill_policy="immediate",
+            linear_algebra_backend=linear_algebra_backend,
         )
         outputs.append((indices, output))
     return combine_bucket_outputs(outputs, workload_size=len(systems))
@@ -237,6 +256,9 @@ def execute_mace(
     buckets,
     *,
     calculator: Any,
+    linear_algebra_backend: str,
+    fmax: float,
+    max_steps: int,
 ) -> dict[str, Any]:
     from benchmark_mace_variable_cell_scaling import run_batch as run_mace_batch
 
@@ -248,8 +270,8 @@ def execute_mace(
             selected,
             batch_size=capacity,
             active_compaction=True,
-            fmax=0.05,
-            max_steps=500,
+            fmax=fmax,
+            max_steps=max_steps,
             dt_start=0.1,
             dt_max=1.0,
             max_step=0.2,
@@ -257,6 +279,7 @@ def execute_mace(
             alpha=70.0,
             refill=True,
             refill_policy="immediate",
+            linear_algebra_backend=linear_algebra_backend,
         )
         outputs.append((indices, output))
     return combine_bucket_outputs(outputs, workload_size=len(systems))
@@ -265,13 +288,33 @@ def execute_mace(
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", choices=("atombit", "mace"), required=True)
-    parser.add_argument("--mode", choices=("fixed64", "planned"), required=True)
+    parser.add_argument(
+        "--mode", choices=("fixed64", "fixed128", "planned"), required=True
+    )
+    parser.add_argument(
+        "--workload",
+        choices=("mixed46_276", "mixed4"),
+        default="mixed46_276",
+    )
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--memory-budget-gib", type=float, default=32.0)
     parser.add_argument("--max-batch-size", type=int, default=128)
     parser.add_argument("--max-cost-ratio", type=float, default=2.0)
     parser.add_argument("--deterministic", action="store_true")
     parser.add_argument("--plan-only", action="store_true")
+    parser.add_argument("--skin", type=float)
+    parser.add_argument("--fmax", type=float, default=0.05)
+    parser.add_argument("--max-steps", type=int, default=500)
+    parser.add_argument(
+        "--linear-algebra-backend",
+        choices=("auto", "grouped", "serial"),
+        default="auto",
+    )
+    parser.add_argument(
+        "--mace-graph-mode",
+        choices=("cached", "rebuild"),
+        default="rebuild",
+    )
     parser.add_argument(
         "--dataset-dir", type=Path, default=Path("data/T2_test/structures")
     )
@@ -294,6 +337,9 @@ def main() -> None:
     torch.use_deterministic_algorithms(args.deterministic)
     manifest = load_manifest(args.manifest, 32)
     cutoff = 6.0 if args.model == "atombit" else 5.0
+    skin = args.skin
+    if skin is None:
+        skin = 0.5 if args.model == "atombit" else 0.0
     coefficients, calibration = calibrate(
         model=args.model,
         manifest=manifest,
@@ -301,7 +347,16 @@ def main() -> None:
         calibration_path=args.calibration_results,
         cutoff=cutoff,
     )
-    systems = mixed_workload(manifest=manifest, dataset_dir=args.dataset_dir)
+    atom_counts = (
+        (46, 92, 184, 276)
+        if args.workload == "mixed4"
+        else (46, 276)
+    )
+    systems = mixed_workload(
+        manifest=manifest,
+        dataset_dir=args.dataset_dir,
+        atom_counts=atom_counts,
+    )
     planner = BatchPlanner(
         coefficients,
         memory_budget_bytes=int(args.memory_budget_gib * 1024**3),
@@ -311,7 +366,7 @@ def main() -> None:
     plan = planner.plan(
         systems,
         cutoff=cutoff,
-        skin=0.5 if args.model == "atombit" else 0.0,
+        skin=skin,
     )
     plan_data = serialize_plan(plan)
     result = {
@@ -319,7 +374,14 @@ def main() -> None:
         "status": "planned" if args.plan_only else "running",
         "model": args.model,
         "mode": args.mode,
-        "workload": {"systems": 256, "atoms": {"46": 128, "276": 128}},
+        "workload": {
+            "name": args.workload,
+            "systems": 256,
+            "atoms": {
+                str(atom_count): 256 // len(atom_counts)
+                for atom_count in atom_counts
+            },
+        },
         "calibration": calibration,
         "plan": plan_data,
         "parameters": {
@@ -327,6 +389,11 @@ def main() -> None:
             "max_batch_size": args.max_batch_size,
             "max_cost_ratio": args.max_cost_ratio,
             "deterministic": args.deterministic,
+            "skin_A": skin,
+            "fmax_eV_per_A": args.fmax,
+            "max_steps": args.max_steps,
+            "linear_algebra_backend": args.linear_algebra_backend,
+            "mace_graph_mode": args.mace_graph_mode,
         },
     }
     write_result(args.output, result)
@@ -335,9 +402,10 @@ def main() -> None:
         return
 
     all_indices = tuple(range(len(systems)))
+    fixed_capacity = {"fixed64": 64, "fixed128": 128}.get(args.mode)
     buckets = (
-        [(all_indices, 64)]
-        if args.mode == "fixed64"
+        [(all_indices, fixed_capacity)]
+        if fixed_capacity is not None
         else [
             (bucket.system_indices, bucket.resident_capacity)
             for bucket in plan.buckets
@@ -350,7 +418,7 @@ def main() -> None:
         warm = AtomBitBatchCalculator(
             model,
             cutoff=6.0,
-            skin=0.5,
+            skin=skin,
             device=device,
             dtype=torch.float32,
             force_mode="autograd",
@@ -361,7 +429,11 @@ def main() -> None:
         from batch_mlip import MACEBatchCalculator
 
         calculator = MACEBatchCalculator.from_off(
-            model="small", device=device, dtype=torch.float64
+            model="small",
+            device=device,
+            dtype=torch.float64,
+            graph_mode=args.mace_graph_mode,
+            skin=skin,
         )
         calculator(calculator.create_state([systems[0]]), compute_stress=True)
         model = None
@@ -379,13 +451,25 @@ def main() -> None:
             if model is None:
                 raise RuntimeError("AtomBit model was not initialized")
             output = execute_atombit(
-                systems, buckets, device=device, model=model
+                systems,
+                buckets,
+                device=device,
+                model=model,
+                linear_algebra_backend=args.linear_algebra_backend,
+                skin=skin,
+                fmax=args.fmax,
+                max_steps=args.max_steps,
             )
         else:
             if calculator is None:
                 raise RuntimeError("MACE calculator was not initialized")
             output = execute_mace(
-                systems, buckets, calculator=calculator
+                systems,
+                buckets,
+                calculator=calculator,
+                linear_algebra_backend=args.linear_algebra_backend,
+                fmax=args.fmax,
+                max_steps=args.max_steps,
             )
     synchronize(device)
     elapsed = time.perf_counter() - started

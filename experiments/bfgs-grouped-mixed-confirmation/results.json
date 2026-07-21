@@ -1,0 +1,70 @@
+{
+  "AtomBit": {
+    "serial": {
+      "wall_time_s": 193.16165458085015,
+      "systems_per_s": 1.3253148020268593,
+      "optimizer_time_s": 115.46236802864074,
+      "model_kernel_time_s": 53.54665863800055,
+      "neighbor_time_s": 10.897528751134878,
+      "peak_allocated_GB": 29.478178304
+    },
+    "auto": {
+      "wall_time_s": 186.37052693590522,
+      "systems_per_s": 1.373607749083851,
+      "optimizer_time_s": 108.19511749410626,
+      "model_kernel_time_s": 53.32971664810185,
+      "neighbor_time_s": 10.92617378008365,
+      "peak_allocated_GB": 29.474139648
+    },
+    "throughput_speedup": 1.0364388498363826,
+    "optimizer_time_reduction_percent": 6.294042516720099,
+    "converged_jobs": 256
+  },
+  "MACE-OFF-Small": {
+    "serial": {
+      "wall_time_s": 212.46921987831593,
+      "systems_per_s": 1.204880406425998,
+      "optimizer_time_s": 133.83209590005873,
+      "model_kernel_time_s": 51.644879495620714,
+      "neighbor_time_s": 12.970429742574689,
+      "peak_allocated_GB": 29.556203008
+    },
+    "auto": {
+      "wall_time_s": 199.03562023490667,
+      "systems_per_s": 1.286201935602595,
+      "optimizer_time_s": 122.27208960485463,
+      "model_kernel_time_s": 50.99834440994263,
+      "neighbor_time_s": 12.473706030488021,
+      "peak_allocated_GB": 29.549156352
+    },
+    "throughput_speedup": 1.0674934447791535,
+    "optimizer_time_reduction_percent": 8.637693534917608,
+    "converged_jobs": 256
+  },
+  "fixed3_maximum_errors": {
+    "AtomBit": {
+      "energy_eV_per_atom": 0.0,
+      "fmax_eV_per_A": 0.0,
+      "stress_eV_per_A3": 0.0,
+      "position_A": 0.0,
+      "cell_A": 5.551115123125783e-17
+    },
+    "MACE-OFF-Small": {
+      "energy_eV_per_atom": 0.0,
+      "fmax_eV_per_A": 1.13464793116691e-13,
+      "stress_eV_per_A3": 1.4051260155412137e-16,
+      "position_A": 3.552713678800501e-15,
+      "cell_A": 8.881784197001252e-16
+    }
+  },
+  "raw_sha256": {
+    "raw/atombit_mixed4_b128_auto.json": "c31b15f5e878420a131fc9a0626bdf41b032bf7e1f3eb0b9d2f47866b3e93dac",
+    "raw/atombit_mixed4_b128_serial.json": "db29e91a2815e5ef501cf8f81590549eb59f8701bdc9f3ae3811ac9933403233",
+    "raw/mace_mixed4_b128_auto.json": "ecde077166bcec516bb82adf059e1d1a4439d2ee8d2c41271d92b670879f87c3",
+    "raw/mace_mixed4_b128_serial.json": "ba1c7a2f1897578c3e16276e63b6f07ea0cfcfdca62b7aff21491d395f10aa71",
+    "fixed3/atombit_mixed4_b128_auto.json": "aa6a0820d8680c365352dd5b46c8ffe3a8f74604c48052763d21c7ed993d3b26",
+    "fixed3/atombit_mixed4_b128_serial.json": "891d4ce01157bb129efd9cb3787074f5aa673d65c4a88f581cc13abb03cfc8ae",
+    "fixed3/mace_mixed4_b128_auto.json": "fb7ab35ea9c4dabdcbd1ccb7e61a1a79430a5ad75562ab1c552fcba8d620e3dd",
+    "fixed3/mace_mixed4_b128_serial.json": "ca6e2fa62d991da6ab99920b44a51930f8a1eefff32ff6d0746e3a8cf28b275d"
+  }
+}
