@@ -96,11 +96,78 @@
     "status": "skipped",
     "reason": "The declared float64 B1 convergence gate failed; an R32 timing would benchmark a non-convergent method."
   },
+  "directional_derivative_diagnostic": {
+    "status": "complete",
+    "directions": [
+      "atomic",
+      "cell",
+      "combined"
+    ],
+    "neighbor_modes": [
+      "cached_candidate_edges",
+      "forced_rebuild"
+    ],
+    "best_relative_error_forced_rebuild": {
+      "initial_float32": {
+        "atomic": 0.00008111207223026896,
+        "cell": 0.00001635992569290869,
+        "combined": 0.00010199272994818544
+      },
+      "initial_float64": {
+        "atomic": 8.032136301901071e-11,
+        "cell": 1.0193230167108352e-10,
+        "combined": 6.267072115864931e-11
+      },
+      "stalled_float32": {
+        "atomic": 0.00004937445026085529,
+        "cell": 0.003462844490743257,
+        "combined": 0.00004471920021691643
+      },
+      "stalled_float64": {
+        "atomic": 3.5928950981246375e-11,
+        "cell": 9.829810963733027e-10,
+        "combined": 4.672925981425124e-10
+      }
+    },
+    "maximum_cached_vs_rebuilt_energy_difference_eV": {
+      "float32": 0.00000286102294921875,
+      "float64": 7.993605777301127e-15
+    },
+    "physical_edge_transition_steps": {
+      "initial": [
+        0.1,
+        0.03
+      ],
+      "stalled": [
+        0.1,
+        0.03,
+        0.01
+      ]
+    },
+    "stalled_float64_cell_relative_error_at_transition": {
+      "step_0_1": 0.4511730853654775,
+      "step_0_03": 0.8581127519388472,
+      "step_0_01": 0.4468614377641667
+    },
+    "interpretation": {
+      "energy_gradient_consistent": true,
+      "neighbor_builder_mismatch_detected": false,
+      "float32_small_step_resolution_loss_detected": true,
+      "finite_step_topology_correlated_nonlinearity_detected": true,
+      "note": "The scan uses normalized generalized-force directions, not every later inverse-Hessian direction, so it identifies mechanisms without reproducing each line-search trial."
+    },
+    "raw_sha256": {
+      "derivative_initial_float32.json": "33f0f6f16d1a4f5211d531132372d44e5e724436cda8fdf66cdadef8441a6acb",
+      "derivative_initial_float64.json": "3d78cc0f2132cd242593d60e53d4cd8aa9e1bc7064244ec9617acfccc1ccb3d7",
+      "derivative_stalled_float32.json": "4e760e7de2f52e1fe06d549c4cdc28262439fcff79448f38c2d75298b68c5a96",
+      "derivative_stalled_float64.json": "b9be19f1d0cf8c1979193ef99362a6502a9617538f03c50248a6708d41bee817"
+    }
+  },
   "conclusion": {
     "precision_hypothesis_supported": false,
     "float64_reduces_trial_work": true,
     "float64_restores_convergence": false,
-    "interpretation": "Float32 rounding contributes to trial-search cost, but it is not the root cause of AtomBit BFGSLineSearch failure on this structure. The tested energy landscape and strong-Wolfe search remain incompatible at float64."
+    "interpretation": "Float32 rounding contributes to trial-search cost, but it is not the root cause. Energy gradients and neighbor rebuilding are correct; the evidence points to strong finite-step nonlinearity along topology-changing cell paths and unfavorable strong-Wolfe behavior for this AtomBit landscape."
   },
   "limitations": [
     "Each timing is one observation and the four jobs ran concurrently on separate H100 GPUs.",

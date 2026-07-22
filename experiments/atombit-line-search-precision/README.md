@@ -51,3 +51,31 @@ generalized-force directions. It tests both the initial geometry and the
 stalled active-float64 endpoint, in float32 and float64. Cached candidate edges
 and forced neighbor rebuilding are measured separately, with candidate and
 physical edge counts recorded at every displacement.
+
+The analytic derivatives pass. The best relative errors under normal forced
+neighbor rebuilding are:
+
+| Geometry | Dtype | Atomic | Cell | Combined |
+|---|---|---:|---:|---:|
+| Initial | float32 | 8.11e-5 | 1.64e-5 | 1.02e-4 |
+| Initial | float64 | 8.03e-11 | 1.02e-10 | 6.27e-11 |
+| Stalled | float32 | 4.94e-5 | 3.46e-3 | 4.47e-5 |
+| Stalled | float64 | 3.59e-11 | 9.83e-10 | 4.67e-10 |
+
+Cached and rebuilt float64 energies differ by at most `8.0e-15 eV`, excluding
+a neighbor-builder inconsistency. In float32, their maximum difference is
+`2.86e-6 eV`; dividing this quantization/reduction-order noise by very small
+trial steps makes directional estimates unreliable.
+
+Physical edge transitions occur at normalized steps 0.1 and 0.03 initially,
+and 0.1, 0.03, and 0.01 at the stalled geometry. For the stalled float64 cell
+direction, the corresponding finite-step deviations from the local derivative
+are 45.1%, 85.8%, and 44.7%. Once the physical edge count is stable, the error
+falls to `4.34e-6` at step 0.003 and then converges toward zero.
+
+Therefore, neither an incorrect force/stress gradient nor the neighbor-list
+builder explains the failure. Float32 small-step resolution and strong
+finite-step nonlinearity along topology-changing cell paths both make Wolfe
+searches harder, but float64 removes the former without restoring convergence.
+The result supports retaining standard BFGS rather than altering the potential
+or neighbor semantics to accommodate BFGSLineSearch.
