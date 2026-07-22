@@ -58,3 +58,11 @@ line_profile_diagnostic:
   purpose: >-
     Directly show the one-dimensional AtomBit curves encountered by the real
     BFGSLineSearch trajectory without using MACE as a causal comparison.
+degree_counterfactual:
+  dtype: float64
+  controls:
+    - same_geometry_edge_present_vs_removed
+    - same_geometry_fixed_degree_normalization
+  purpose: >-
+    Prove whether hard neighbor-count degree normalization, rather than an
+    unrelated topology-dependent operation, causes the measured energy jump.
