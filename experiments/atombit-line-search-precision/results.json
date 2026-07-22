@@ -248,6 +248,9 @@
         "normal_crossing_jump_eV": 0.0028752171533019677,
         "same_geometry_topology_effect_eV": 0.0028752260280766606,
         "same_geometry_topology_effect_fixed_degree_eV": 0.0,
+        "maximum_atom_force_topology_effect_eV_per_A": 0.003205463611102164,
+        "force_topology_effect_l2_eV_per_A": 0.005528548291022313,
+        "maximum_atom_force_topology_effect_fixed_degree_eV_per_A": 0.0,
         "hard_degree_normalization_is_causal": true
       },
       "optimizer_step_420": {
@@ -257,12 +260,15 @@
         "normal_crossing_jump_eV": 0.0024467449772300753,
         "same_geometry_topology_effect_eV": 0.0024467450326506324,
         "same_geometry_topology_effect_fixed_degree_eV": 0.0,
+        "maximum_atom_force_topology_effect_eV_per_A": 0.003376971865961691,
+        "force_topology_effect_l2_eV_per_A": 0.006671006438108229,
+        "maximum_atom_force_topology_effect_fixed_degree_eV_per_A": 0.0,
         "hard_degree_normalization_is_causal": true
       },
       "training_interpretation": "The architecture has the discontinuity during training, but parameter-gradient and force-autograd evaluations condition on one fixed graph and do not differentiate the discrete edge-set transition. Ordinary energy/force loss therefore does not guarantee cutoff continuity.",
       "raw_sha256": {
-        "degree_counterfactual_step26.json": "f86e4d7e1280678cdc2a0edfd7d755044892b1f71b50b234b6cc9fd64e08cf32",
-        "degree_counterfactual_step420.json": "a7987ae2004b5e542f5cedd59f3c9c182eb1a73d2a66de7d6de62c4902dd5fc7"
+        "degree_counterfactual_step26.json": "05112c82c2806f8499d7a947f4d65aacf45767ab8659e790a9a56607d360631b",
+        "degree_counterfactual_step420.json": "5840bfd1a63420e1a011fab10a8e461998a11368a3c5ba199ff84a68fa202aca"
       }
     },
     "recommended_resolution": {

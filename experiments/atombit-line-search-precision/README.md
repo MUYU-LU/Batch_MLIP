@@ -121,16 +121,16 @@ crossings above, the model was evaluated at identical coordinates with the
 crossing edge pair first retained and then removed. The comparison was repeated
 while forcing both graphs to use the same inverse-square-root degree.
 
-| Optimizer step | Edge envelope before removal | Topology effect (eV) | Effect with fixed degree (eV) |
-|---:|---:|---:|---:|
-| 26 | 1.22e-15 | 2.875226e-3 | 0.0 |
-| 420 | 1.11e-16 | 2.446745e-3 | 0.0 |
+| Step | Edge envelope | Energy effect (eV) | Max atom force effect (eV/A) | Both effects with fixed degree |
+|---:|---:|---:|---:|---:|
+| 26 | 1.22e-15 | 2.875226e-3 | 3.205464e-3 | 0.0 |
+| 420 | 1.11e-16 | 2.446745e-3 | 3.376972e-3 | 0.0 |
 
 The crossing messages are already numerically zero, yet removing their two
-directed edges changes the energy by several meV. Holding degree fixed removes
-the topology effect exactly in float64 at both independent crossings. This
-establishes hard neighbor-count normalization as the cause of the measured
-discontinuity.
+directed edges changes both energy and atomic forces. Holding degree fixed
+removes both topology effects exactly in float64 at both independent crossings.
+This establishes hard neighbor-count normalization as the cause of the measured
+energy and force discontinuities.
 
 A conventional local finite-difference check does not necessarily cross a
 cutoff, so it can correctly validate the derivative within one fixed topology
