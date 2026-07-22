@@ -113,6 +113,39 @@ as one neighbor. When it is removed, `degree_i` changes discontinuously and
 rescales every other message on atom `i`. This occurs in float64 as well as
 float32, so training or inference precision is not the root cause.
 
+## Degree Counterfactual
+
+We tested the proposed cause directly, rather than relying only on finite
+differences or the correlation with edge count. At each of the two cutoff
+crossings above, the model was evaluated at identical coordinates with the
+crossing edge pair first retained and then removed. The comparison was repeated
+while forcing both graphs to use the same inverse-square-root degree.
+
+| Optimizer step | Edge envelope before removal | Topology effect (eV) | Effect with fixed degree (eV) |
+|---:|---:|---:|---:|
+| 26 | 1.22e-15 | 2.875226e-3 | 0.0 |
+| 420 | 1.11e-16 | 2.446745e-3 | 0.0 |
+
+The crossing messages are already numerically zero, yet removing their two
+directed edges changes the energy by several meV. Holding degree fixed removes
+the topology effect exactly in float64 at both independent crossings. This
+establishes hard neighbor-count normalization as the cause of the measured
+discontinuity.
+
+A conventional local finite-difference check does not necessarily cross a
+cutoff, so it can correctly validate the derivative within one fixed topology
+while missing this discontinuity. Finite differences do expose the problem
+when their two endpoints straddle the cutoff, as the line profiles do.
+
+The issue is also present while training the original architecture, but normal
+parameter optimization does not move coordinates through the cutoff: each
+training forward/backward pass uses one fixed graph. Force autograd likewise
+differentiates the energy conditional on that graph and omits the discrete
+edge-addition/removal event. Unless the data and loss explicitly constrain
+paired geometries on both sides of the cutoff, good energy and force losses do
+not guarantee cutoff continuity. Training in float64 cannot correct the hard
+count; changing the normalization requires retraining or fine-tuning.
+
 For the existing checkpoint, standard BFGS or FIRE is the practical workaround.
 The model-level correction is fixed average-neighbor normalization or a smooth
 envelope-weighted degree, followed by retraining or fine-tuning because changing

@@ -234,6 +234,37 @@
       "introduced_by_batching": false,
       "fixed_by_neighbor_rebuild": false
     },
+    "degree_counterfactual": {
+      "status": "complete_causal_confirmation",
+      "runner_commit": "014f833",
+      "controls": [
+        "same geometry with crossing edge pair retained versus removed",
+        "same topology comparison with inverse-square-root degree held fixed"
+      ],
+      "optimizer_step_26": {
+        "removed_directed_edges": 2,
+        "removed_edge_distance_below_cutoff_A": 5.999999990670443,
+        "removed_edge_envelope_below_cutoff": 1.2212453270876722e-15,
+        "normal_crossing_jump_eV": 0.0028752171533019677,
+        "same_geometry_topology_effect_eV": 0.0028752260280766606,
+        "same_geometry_topology_effect_fixed_degree_eV": 0.0,
+        "hard_degree_normalization_is_causal": true
+      },
+      "optimizer_step_420": {
+        "removed_directed_edges": 2,
+        "removed_edge_distance_below_cutoff_A": 5.999999999415202,
+        "removed_edge_envelope_below_cutoff": 1.1102230246251565e-16,
+        "normal_crossing_jump_eV": 0.0024467449772300753,
+        "same_geometry_topology_effect_eV": 0.0024467450326506324,
+        "same_geometry_topology_effect_fixed_degree_eV": 0.0,
+        "hard_degree_normalization_is_causal": true
+      },
+      "training_interpretation": "The architecture has the discontinuity during training, but parameter-gradient and force-autograd evaluations condition on one fixed graph and do not differentiate the discrete edge-set transition. Ordinary energy/force loss therefore does not guarantee cutoff continuity.",
+      "raw_sha256": {
+        "degree_counterfactual_step26.json": "f86e4d7e1280678cdc2a0edfd7d755044892b1f71b50b234b6cc9fd64e08cf32",
+        "degree_counterfactual_step420.json": "a7987ae2004b5e542f5cedd59f3c9c182eb1a73d2a66de7d6de62c4902dd5fc7"
+      }
+    },
     "recommended_resolution": {
       "current_checkpoint_workaround": "Use standard BFGS or FIRE; do not use energy-based strong-Wolfe line search.",
       "architecture_fix": "Replace hard degree normalization with fixed average-neighbor normalization or a smooth envelope-weighted degree, then retrain or fine-tune and revalidate the potential.",
