@@ -44,3 +44,17 @@ directional_derivative_diagnostic:
   purpose: >-
     Test whether energy derivatives agree with autograd force and stress, and
     whether neighbor rebuilding creates directional discontinuities.
+line_profile_diagnostic:
+  trace_dtype: float64
+  profile_dtypes: [float32, float64]
+  selected_directions: [initial, first_high_trial, stalled]
+  observables:
+    - actual_trial_steps
+    - energy_profile
+    - directional_derivative
+    - armijo_condition
+    - strong_wolfe_curvature_condition
+    - physical_edge_count
+  purpose: >-
+    Directly show the one-dimensional AtomBit curves encountered by the real
+    BFGSLineSearch trajectory without using MACE as a causal comparison.

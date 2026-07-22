@@ -115,6 +115,28 @@ def test_fixed_cell_b1_matches_ase_bfgs_line_search():
     assert result.model_evaluations == optimizer.force_calls + 1
 
 
+def test_line_search_trace_reports_starts_and_trials():
+    initial = Atoms("H", positions=[[0.8, -0.2, 0.1]])
+    events = []
+    result = batched_bfgs_line_search_relax(
+        _quadratic_potential().create_state([initial]),
+        _quadratic_potential(),
+        fmax=1e-30,
+        max_steps=2,
+        trace_callback=events.append,
+    )
+
+    starts = [event for event in events if event["event"] == "search_start"]
+    trials = [event for event in events if event["event"] == "trial"]
+    assert len(starts) == result.steps
+    assert trials
+    assert starts[0]["optimizer_step"] == 0
+    assert starts[0]["system_id"] == 0
+    assert starts[0]["derivative0"] < 0.0
+    assert trials[0]["trial"] == 1
+    assert trials[-1]["task"][:4] in ("CONV", "WARN")
+
+
 def test_heterogeneous_batch_matches_independent_line_searches():
     systems = [
         Atoms("H", positions=[[0.35, -0.1, 0.2]]),

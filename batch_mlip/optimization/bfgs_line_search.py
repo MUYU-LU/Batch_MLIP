@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 
 import numpy as np
@@ -19,6 +20,8 @@ from .bfgs import (
 )
 from .cell_filters import BoundFrechetCellFilter, FrechetCellFilter
 from .fire import max_force_per_system, max_generalized_force_per_system
+
+LineSearchTraceCallback = Callable[[dict[str, object]], None]
 
 
 @dataclass
@@ -39,6 +42,8 @@ class _ActiveLineSearch:
     direction: torch.Tensor
     search: LineSearch
     step_size: float
+    phi0: float
+    derivative0: float
     evaluations: int = 0
 
 
@@ -163,6 +168,8 @@ def _start_line_search(
         direction=direction.detach(),
         search=search,
         step_size=step_size,
+        phi0=phi0,
+        derivative0=derivative0,
     )
 
 
@@ -286,6 +293,7 @@ def batched_bfgs_line_search_relax(
     cell_filter: FrechetCellFilter | None = None,
     smax: float | None = 0.005,
     optimizer_dtype: torch.dtype | str | None = None,
+    trace_callback: LineSearchTraceCallback | None = None,
 ) -> RelaxationResult:
     """Relax independent systems with ASE's BFGSLineSearch equations.
 
@@ -539,6 +547,43 @@ def batched_bfgs_line_search_relax(
                     )
                 )
 
+        if trace_callback is not None:
+            for pending in searches:
+                event: dict[str, object] = {
+                    "event": "search_start",
+                    "optimizer_step": step,
+                    "system_id": int(active_system_ids[pending.system_id].item()),
+                    "base_coordinates": pending.base_coordinates.detach().cpu().clone(),
+                    "direction": pending.direction.detach().cpu().clone(),
+                    "phi0": pending.phi0,
+                    "derivative0": pending.derivative0,
+                    "first_step_size": pending.step_size,
+                    "initial_task": pending.search.task,
+                    "physical_fmax": float(current_fmax[pending.system_id].item()),
+                    "candidate_edges": int(active_state.edge_index.shape[1]),
+                }
+                if current_generalized_fmax is not None:
+                    event["generalized_fmax"] = float(
+                        current_generalized_fmax[pending.system_id].item()
+                    )
+                if active_filter is not None:
+                    event.update(
+                        {
+                            "reference_cell": active_filter.reference_cells[
+                                pending.system_id
+                            ]
+                            .detach()
+                            .cpu()
+                            .clone(),
+                            "cell_factor": float(
+                                active_filter.cell_factor[pending.system_id].item()
+                            ),
+                            "cell_mask": active_filter.mask.detach().cpu().clone(),
+                            "hydrostatic_strain": active_filter.hydrostatic_strain,
+                        }
+                    )
+                trace_callback(event)
+
         unfinished = searches
         while unfinished:
             _apply_trial_coordinates(
@@ -589,8 +634,9 @@ def batched_bfgs_line_search_relax(
                 # ASE records the evaluated point before requesting the next
                 # incremental, max-step-limited trial.
                 pending.search.old_stp = pending.step_size
+                evaluated_step = pending.step_size
                 next_step = pending.search.step(
-                    pending.step_size,
+                    evaluated_step,
                     phi,
                     derivative,
                     c1,
@@ -599,6 +645,24 @@ def batched_bfgs_line_search_relax(
                     pending.search.isave,
                     pending.search.dsave,
                 )
+                if trace_callback is not None:
+                    trace_callback(
+                        {
+                            "event": "trial",
+                            "optimizer_step": step,
+                            "system_id": int(
+                                active_system_ids[pending.system_id].item()
+                            ),
+                            "trial": pending.evaluations,
+                            "step_size": evaluated_step,
+                            "next_step_size": float(next_step),
+                            "phi0": pending.phi0,
+                            "derivative0": pending.derivative0,
+                            "phi": phi,
+                            "derivative": derivative,
+                            "task": pending.search.task,
+                        }
+                    )
                 if pending.search.task[:2] == "FG":
                     pending.step_size = float(next_step)
                     next_unfinished.append(pending)
