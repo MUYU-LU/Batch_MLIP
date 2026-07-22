@@ -1,0 +1,37 @@
+id: atombit-line-search-precision
+hypothesis: >-
+  End-to-end float64 AtomBit evaluation prevents the excessive strong-Wolfe
+  trial loop observed with the float32 H46 workload.
+baseline_commit: 483fb0c
+hardware: NVIDIA H100 80GB GPU
+stage_1:
+  workload: Aven12_1_367_z1.cif
+  atom_count: 46
+  pool_size: 1
+  methods: [ase, active]
+  model_dtypes: [float32, float64]
+stage_2:
+  condition: float64 B1 completes without excessive line-search trials
+  workload: frozen H46 R32 pool
+  pool_size: 32
+  methods: [ase, active_b32]
+  model_dtype: float64
+common:
+  optimizer: bfgslinesearch
+  optimizer_dtype: float64
+  variable_cell: true
+  fmax_eV_per_A: 0.05
+  max_steps: 500
+  alpha: 10.0
+  max_step_A: 0.2
+  skin_A: 0.5
+  deterministic: true
+  repeats: 1
+metrics:
+  - completion_status
+  - wall_seconds
+  - model_evaluations
+  - optimizer_steps_total
+  - convergence_count
+  - endpoint_difference
+  - peak_gpu_memory
