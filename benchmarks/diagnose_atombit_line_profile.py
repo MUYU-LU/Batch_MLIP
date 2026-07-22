@@ -102,8 +102,8 @@ def _profile_point(
 ) -> dict[str, object]:
     dtype = calculator.dtype
     device = calculator.device
-    base = snapshot["base_coordinates"].to(device=device, dtype=dtype)
-    direction = snapshot["direction"].to(device=device, dtype=dtype)
+    base = snapshot["base_coordinates"].to(device=device, dtype=dtype).reshape(-1, 3)
+    direction = snapshot["direction"].to(device=device, dtype=dtype).reshape(-1, 3)
     coordinate = base + parameter * direction
     atom_count = len(atoms)
     generalized_positions = coordinate[:atom_count]
@@ -284,54 +284,93 @@ def main() -> None:
     )
     parser.add_argument("--plot-dir", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--resume-trace", action="store_true")
     args = parser.parse_args()
 
     torch.use_deterministic_algorithms(True)
     device = torch.device(args.device)
     atoms = read(args.structure)
     model, checkpoint_metadata = load_production_model(args.checkpoint)
-    model = model.to(device=device, dtype=torch.float64).eval()
-    calculator = AtomBitBatchCalculator(
-        model,
-        cutoff=args.cutoff,
-        skin=args.skin,
-        device=device,
-        dtype=torch.float64,
-        force_mode="autograd",
-    )
-    raw_events: list[dict[str, object]] = []
-    result = batched_bfgs_line_search_relax(
-        calculator.create_state([atoms]),
-        calculator,
-        cell_filter=FrechetCellFilter(),
-        active_compaction=True,
-        fmax=args.fmax,
-        smax=None,
-        max_steps=args.max_steps,
-        max_step=0.2,
-        alpha=10.0,
-        optimizer_dtype="float64",
-        callback_interval=args.max_steps + 1,
-        trace_callback=raw_events.append,
-    )
+    trace_path = args.output.with_suffix(".trace.pt")
+    if args.resume_trace:
+        if not trace_path.is_file():
+            raise FileNotFoundError(f"trace checkpoint does not exist: {trace_path}")
+        checkpoint = torch.load(trace_path, map_location="cpu", weights_only=False)
+        starts = checkpoint["starts"]
+        trials = checkpoint["trials"]
+        selected = checkpoint["selected"]
+        trace_rows = checkpoint["trace_rows"]
+        optimization = checkpoint["optimization"]
+        del model
+    else:
+        model = model.to(device=device, dtype=torch.float64).eval()
+        calculator = AtomBitBatchCalculator(
+            model,
+            cutoff=args.cutoff,
+            skin=args.skin,
+            device=device,
+            dtype=torch.float64,
+            force_mode="autograd",
+        )
+        raw_events: list[dict[str, object]] = []
+        result = batched_bfgs_line_search_relax(
+            calculator.create_state([atoms]),
+            calculator,
+            cell_filter=FrechetCellFilter(),
+            active_compaction=True,
+            fmax=args.fmax,
+            smax=None,
+            max_steps=args.max_steps,
+            max_step=0.2,
+            alpha=10.0,
+            optimizer_dtype="float64",
+            callback_interval=args.max_steps + 1,
+            trace_callback=raw_events.append,
+        )
+        starts = {
+            int(event["optimizer_step"]): event
+            for event in raw_events
+            if event["event"] == "search_start"
+        }
+        trials: dict[int, list[dict[str, object]]] = defaultdict(list)
+        for event in raw_events:
+            if event["event"] == "trial":
+                trials[int(event["optimizer_step"])].append(event)
+        selected = _select_steps(
+            starts, trials, high_trial_threshold=args.high_trial_threshold
+        )
+        final_fmax = float(result.max_force[0].item())
+        trace_rows = _trace_summary(starts, trials, final_fmax)
+        task_counts = Counter(
+            str(row["final_task"]).split(":", 1)[0] for row in trace_rows
+        )
+        trial_counts = np.asarray([row["trials"] for row in trace_rows], dtype=float)
+        optimization = {
+            "converged": bool(result.converged[0].item()),
+            "steps": result.steps,
+            "model_evaluations": result.model_evaluations,
+            "final_fmax_eV_per_A": final_fmax,
+            "trial_count_min": int(trial_counts.min()),
+            "trial_count_median": float(np.median(trial_counts)),
+            "trial_count_max": int(trial_counts.max()),
+            "non_descent_directions": sum(
+                not bool(row["descent_direction"]) for row in trace_rows
+            ),
+            "final_task_prefix_counts": dict(task_counts),
+        }
+        torch.save(
+            {
+                "starts": starts,
+                "trials": dict(trials),
+                "selected": selected,
+                "trace_rows": trace_rows,
+                "optimization": optimization,
+            },
+            trace_path,
+        )
+        del calculator, model, result, raw_events
 
-    starts = {
-        int(event["optimizer_step"]): event
-        for event in raw_events
-        if event["event"] == "search_start"
-    }
-    trials: dict[int, list[dict[str, object]]] = defaultdict(list)
-    for event in raw_events:
-        if event["event"] == "trial":
-            trials[int(event["optimizer_step"])].append(event)
-    selected = _select_steps(
-        starts, trials, high_trial_threshold=args.high_trial_threshold
-    )
     snapshots = {label: starts[step] for label, step in selected.items()}
-    final_fmax = float(result.max_force[0].item())
-    trace_rows = _trace_summary(starts, trials, final_fmax)
-
-    del calculator, model
     if device.type == "cuda":
         torch.cuda.empty_cache()
     profiles = _scan_profiles(
@@ -345,10 +384,6 @@ def main() -> None:
         skin=args.skin,
     )
     plot_files = _write_plots(profiles, args.plot_dir)
-    task_counts = Counter(
-        str(row["final_task"]).split(":", 1)[0] for row in trace_rows
-    )
-    trial_counts = np.asarray([row["trials"] for row in trace_rows], dtype=float)
     payload = {
         "schema_version": 1,
         "status": "complete",
@@ -372,19 +407,7 @@ def main() -> None:
             "skin_A": args.skin,
             "deterministic_algorithms": True,
         },
-        "optimization": {
-            "converged": bool(result.converged[0].item()),
-            "steps": result.steps,
-            "model_evaluations": result.model_evaluations,
-            "final_fmax_eV_per_A": final_fmax,
-            "trial_count_min": int(trial_counts.min()),
-            "trial_count_median": float(np.median(trial_counts)),
-            "trial_count_max": int(trial_counts.max()),
-            "non_descent_directions": sum(
-                not bool(row["descent_direction"]) for row in trace_rows
-            ),
-            "final_task_prefix_counts": dict(task_counts),
-        },
+        "optimization": optimization,
         "selected_steps": selected,
         "trace": trace_rows,
         "profiles": profiles,
