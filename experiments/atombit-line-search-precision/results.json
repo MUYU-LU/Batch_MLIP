@@ -163,11 +163,96 @@
       "derivative_stalled_float64.json": "b9be19f1d0cf8c1979193ef99362a6502a9617538f03c50248a6708d41bee817"
     }
   },
+  "line_profile_diagnostic": {
+    "status": "complete",
+    "trace_dtype": "float64",
+    "optimization": {
+      "converged": false,
+      "steps": 500,
+      "model_evaluations": 9661,
+      "final_fmax_eV_per_A": 0.8240173968277401,
+      "non_descent_directions": 0,
+      "trial_count_median": 16.0,
+      "trial_count_max": 67,
+      "converged_line_search_steps": 117,
+      "warning_line_search_steps": 383,
+      "warning_rounding_errors": 234,
+      "warning_xtol": 95,
+      "warning_minimum_step": 54,
+      "warning_median_accepted_step": 1.14443178035055e-08,
+      "accepted_steps_increasing_fmax": 240
+    },
+    "selected_directions": {
+      "initial": {
+        "optimizer_step": 0,
+        "trials": 2,
+        "final_task": "CONVERGENCE",
+        "accepted_step": 0.07672859333161663,
+        "sampled_strong_wolfe_points_float64": 42
+      },
+      "first_high_trial": {
+        "optimizer_step": 26,
+        "trials": 49,
+        "final_task": "WARNING: ROUNDING ERRORS PREVENT PROGRESS",
+        "accepted_step": 0.020659657208512986,
+        "sampled_strong_wolfe_points_float64": 0,
+        "edge_boundary": {
+          "parameter_below": 0.020659657208512986,
+          "physical_edges_below": 1722,
+          "energy_change_below_eV": -0.00047461365900058894,
+          "parameter_above": 0.020660059269510745,
+          "physical_edges_above": 1720,
+          "energy_change_above_eV": 0.002400603494302267,
+          "parameter_interval": 4.020609977589684e-07,
+          "energy_jump_eV": 0.002875217153302856
+        }
+      },
+      "stalled": {
+        "optimizer_step": 420,
+        "trials": 56,
+        "final_task": "WARNING: XTOL TEST SATISFIED",
+        "accepted_step": 0.000031345138153792326,
+        "sampled_strong_wolfe_points_float64": 0,
+        "edge_boundary": {
+          "parameter_below": 0.000031345138153792326,
+          "physical_edges_below": 1782,
+          "energy_change_below_eV": -0.00017034453105857494,
+          "parameter_above": 0.0000313451487607044,
+          "physical_edges_above": 1780,
+          "energy_change_above_eV": 0.002276400446175053,
+          "parameter_interval": 1.0606912070399484e-11,
+          "energy_jump_eV": 0.002446744977233628
+        }
+      }
+    },
+    "root_cause": {
+      "component": "original AtomBit model architecture",
+      "location": "src/model.py hard neighbor-count degree normalization",
+      "mechanism": "An edge whose polynomial-envelope message vanishes at the cutoff still contributes one to the integer degree. Removing it changes inverse_sqrt_degree discontinuously and rescales every remaining message on the center atom.",
+      "caused_by_training_precision": false,
+      "present_in_float64": true,
+      "introduced_by_batching": false,
+      "fixed_by_neighbor_rebuild": false
+    },
+    "recommended_resolution": {
+      "current_checkpoint_workaround": "Use standard BFGS or FIRE; do not use energy-based strong-Wolfe line search.",
+      "architecture_fix": "Replace hard degree normalization with fixed average-neighbor normalization or a smooth envelope-weighted degree, then retrain or fine-tune and revalidate the potential.",
+      "md_risk": "The same cutoff energy discontinuity can affect NVE energy conservation and must be validated before AtomBit molecular dynamics."
+    },
+    "raw_sha256": {
+      "line_profile.json": "1b9d14cbbcf882ac2622545222bce55be6e24f4929256c1dc92803c42115c3ea",
+      "figures/initial.png": "60e5ad668a93715651c188ffbfb3eb79d8fe0a2933eb5d5a4630e45e6c10f802",
+      "figures/first_high_trial.png": "fa9925466fbf3cb5adc2aa23845d58564049fcbcdb4dd29460ca9b48a81defb2",
+      "figures/stalled.png": "c99936d238fc114d8e7a1fde92a3d7c7a6892682c9e9fbfefed0e8bcae847c39"
+    }
+  },
   "conclusion": {
     "precision_hypothesis_supported": false,
     "float64_reduces_trial_work": true,
     "float64_restores_convergence": false,
-    "interpretation": "Float32 rounding contributes to trial-search cost, but it is not the root cause. Energy gradients and neighbor rebuilding are correct; the evidence points to strong finite-step nonlinearity along topology-changing cell paths and unfavorable strong-Wolfe behavior for this AtomBit landscape."
+    "hard_degree_cutoff_discontinuity_detected": true,
+    "original_atombit_architecture_issue": true,
+    "interpretation": "Float32 rounding contributes to trial-search cost, but the root cause is AtomBit's hard neighbor-count degree normalization. Edge removal at the cutoff discontinuously rescales other messages, producing meV-scale float64 energy jumps that leave no sampled strong-Wolfe point on difficult search directions."
   },
   "limitations": [
     "Each timing is one observation and the four jobs ran concurrently on separate H100 GPUs.",

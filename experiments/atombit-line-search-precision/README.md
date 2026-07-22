@@ -74,8 +74,48 @@ are 45.1%, 85.8%, and 44.7%. Once the physical edge count is stable, the error
 falls to `4.34e-6` at step 0.003 and then converges toward zero.
 
 Therefore, neither an incorrect force/stress gradient nor the neighbor-list
-builder explains the failure. Float32 small-step resolution and strong
-finite-step nonlinearity along topology-changing cell paths both make Wolfe
-searches harder, but float64 removes the former without restoring convergence.
-The result supports retaining standard BFGS rather than altering the potential
-or neighbor semantics to accommodate BFGSLineSearch.
+builder explains the failure. The line-profile diagnostic below identifies why
+the physical edge transitions are not smooth despite the polynomial envelope.
+
+## Actual Line Profiles
+
+The production float64 BFGSLineSearch trajectory was traced for all 500 steps.
+All directions were descent directions, but only 117 searches converged; 383
+ended with ASE warnings. The median search used 16 model trials, the maximum
+used 67, and the median step accepted after a warning was only `1.14e-8`.
+
+The initial direction is well behaved and converges after two trials:
+
+![Initial line profile](figures/initial.png)
+
+At step 26, the search performs 49 trials and finds no sampled point satisfying
+both strong-Wolfe conditions. Across a parameter interval of only `4.02e-7`,
+two directed physical edges disappear and the float64 energy jumps by
+`2.875 meV`:
+
+![First high-trial line profile](figures/first_high_trial.png)
+
+At stalled step 420, 56 trials collapse around a boundary only `1.06e-11`
+wide. Removing two directed edges jumps the float64 energy by `2.447 meV`; the
+search terminates with `WARNING: XTOL TEST SATISFIED`:
+
+![Stalled line profile](figures/stalled.png)
+
+The original AtomBit model computes
+
+```text
+degree_i = sum_j 1
+messages_i = sum_j message_ij / sqrt(degree_i)
+```
+
+Although `message_ij` approaches zero smoothly at 6 A, that edge still counts
+as one neighbor. When it is removed, `degree_i` changes discontinuously and
+rescales every other message on atom `i`. This occurs in float64 as well as
+float32, so training or inference precision is not the root cause.
+
+For the existing checkpoint, standard BFGS or FIRE is the practical workaround.
+The model-level correction is fixed average-neighbor normalization or a smooth
+envelope-weighted degree, followed by retraining or fine-tuning because changing
+normalization changes the learned potential. The discontinuity must also be
+considered before AtomBit NVE molecular dynamics because it can cause energy
+jumps when pairs cross the cutoff.
