@@ -130,6 +130,34 @@ def _energy(model: torch.nn.Module, data: GraphData) -> float:
     return float(output.reshape(-1)[0].item())
 
 
+def _forces(model: torch.nn.Module, data: GraphData) -> torch.Tensor:
+    position = data.pos.detach().clone().requires_grad_(True)
+    differentiable = GraphData(
+        z=data.z,
+        pos=position,
+        cell=data.cell,
+        edge_index=data.edge_index,
+        shifts_int=data.shifts_int,
+        batch=data.batch,
+        num_graphs=data.num_graphs,
+    )
+    output = model(differentiable)
+    if isinstance(output, dict):
+        output = output["energy"]
+    return -torch.autograd.grad(output.sum(), position)[0].detach()
+
+
+def _force_effect(model: torch.nn.Module, first: GraphData, second: GraphData):
+    difference = _forces(model, second) - _forces(model, first)
+    atom_norms = torch.linalg.vector_norm(difference, dim=1)
+    return {
+        "maximum_atom_force_difference_eV_per_A": float(atom_norms.max().item()),
+        "force_difference_l2_eV_per_A": float(
+            torch.linalg.vector_norm(difference).item()
+        ),
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--structure", type=Path, required=True)
@@ -190,6 +218,9 @@ def main() -> None:
         "above_geometry_below_topology": _energy(model, above_with_below),
         "above_geometry_above_topology": _energy(model, above_with_above),
     }
+    normal_force_effect_above = _force_effect(
+        model, above_with_below, above_with_above
+    )
 
     fixed_results = {}
     for label, topology in (("below", below), ("above", above)):
@@ -224,6 +255,10 @@ def main() -> None:
         fixed_below["above_geometry_above_topology"]
         - fixed_below["above_geometry_below_topology"]
     )
+    with _fixed_degree(model, _inverse_sqrt_degree(below)):
+        fixed_force_effect_above = _force_effect(
+            model, above_with_below, above_with_above
+        )
     payload = {
         "schema_version": 1,
         "status": "complete",
@@ -259,6 +294,10 @@ def main() -> None:
             "topology_effect_at_above_geometry_with_fixed_below_degree": (
                 fixed_topology_effect_above
             ),
+        },
+        "force_effect_at_same_above_geometry": {
+            "normal": normal_force_effect_above,
+            "with_fixed_below_degree": fixed_force_effect_above,
         },
         "hard_degree_normalization_is_causal": (
             abs(topology_effect_above) > 1e-6
