@@ -54,9 +54,11 @@ is convergence equivalence, not trajectory or endpoint identity.
 
 AtomBit float32 is a negative result. Batch QN exceeded 100 trial evaluations
 for one H46 system, while the other QN runs exceeded the 30-minute screening
-limit. Strong-Wolfe energy comparisons are not robust enough at this model's
-precision for this workload. BFGSLineSearch therefore remains an explicit
-option for suitable calculators, while standard BFGS remains the default.
+limit. A subsequent end-to-end float64 B1 diagnostic reduced trial work but
+still failed to converge in 500 steps, so float32 precision is a contributor,
+not the root cause. BFGSLineSearch therefore remains an explicit option for
+suitable calculators, while standard BFGS remains the default. See
+`../atombit-line-search-precision/`.
 
 These are single observations run concurrently on separate H100 GPUs, so they
 are screening results without uncertainty and with possible shared-host CPU

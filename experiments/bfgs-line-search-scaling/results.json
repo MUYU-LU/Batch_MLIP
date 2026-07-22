@@ -160,7 +160,7 @@
     "bfgslinesearch_available_by_explicit_selection": true,
     "mace_bfgslinesearch_default": false,
     "atombit_float32_bfgslinesearch_recommended": false,
-    "reason": "MACE BFGSLineSearch batches effectively but requires substantially more model evaluations than standard BFGS; AtomBit float32 energy comparisons make the strong-Wolfe search impractical on this workload."
+    "reason": "MACE BFGSLineSearch batches effectively but requires substantially more model evaluations than standard BFGS; the strong-Wolfe search is impractical for the tested AtomBit workload, and a subsequent float64 diagnostic showed that precision alone does not restore convergence."
   },
   "limitations": [
     "Each timing is one observation and concurrent GPU jobs shared host CPU resources.",

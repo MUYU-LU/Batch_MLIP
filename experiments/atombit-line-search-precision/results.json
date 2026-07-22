@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "status": "complete_negative_result",
+  "baseline_commit": "483fb0c",
+  "runner_commit": "e4a749c",
+  "target": {
+    "source": "Aven12_1_367_z1.cif",
+    "atom_count": 46,
+    "reason": "reported as system 13 in the failed H46 R32 active BFGSLineSearch run"
+  },
+  "protocol": {
+    "pool_size": 1,
+    "variable_cell": true,
+    "optimizer": "bfgslinesearch",
+    "optimizer_dtype": "float64",
+    "fmax_eV_per_A": 0.05,
+    "max_steps": 500,
+    "alpha": 10.0,
+    "max_step_A": 0.2,
+    "skin_A": 0.5,
+    "deterministic": true,
+    "timing_repeats": 1
+  },
+  "dtype_audit_float64": {
+    "model_parameter_dtypes": [
+      "torch.float64"
+    ],
+    "model_buffer_dtypes": [
+      "torch.float64"
+    ],
+    "position_dtype": "torch.float64",
+    "cell_dtype": "torch.float64",
+    "energy_dtype": "torch.float64",
+    "force_dtype": "torch.float64",
+    "stress_dtype": "torch.float64"
+  },
+  "stage_1": {
+    "ase_float32": {
+      "wall_seconds": 357.79504569387063,
+      "model_evaluations": 19623,
+      "evaluations_per_step": 39.246,
+      "optimizer_steps": 500,
+      "converged": false,
+      "final_energy_eV": -3.6609225273132324,
+      "final_max_force_eV_per_A": 0.48425033688545227,
+      "final_max_abs_stress_eV_per_A3": 0.0006712347967550159,
+      "peak_memory_bytes": 153680896
+    },
+    "ase_float64": {
+      "wall_seconds": 348.998459211085,
+      "model_evaluations": 18903,
+      "evaluations_per_step": 37.806,
+      "optimizer_steps": 500,
+      "converged": false,
+      "final_energy_eV": -3.6729186564440592,
+      "final_max_force_eV_per_A": 0.7031780819492789,
+      "final_max_abs_stress_eV_per_A3": 0.0007012709482727181,
+      "peak_memory_bytes": 245840896
+    },
+    "active_b1_float32": {
+      "wall_seconds": 414.24842575984076,
+      "model_evaluations": 13299,
+      "evaluations_per_step": 26.598,
+      "optimizer_steps": 500,
+      "converged": false,
+      "final_energy_eV": -3.61297607421875,
+      "final_max_force_eV_per_A": 0.9985528588294983,
+      "final_max_abs_stress_eV_per_A3": 0.0012284483527764678,
+      "peak_memory_bytes": 159723520
+    },
+    "active_b1_float64": {
+      "wall_seconds": 307.6909595602192,
+      "model_evaluations": 9661,
+      "evaluations_per_step": 19.322,
+      "optimizer_steps": 500,
+      "converged": false,
+      "final_energy_eV": -3.6361377289781904,
+      "final_max_force_eV_per_A": 0.8240173968277401,
+      "final_max_abs_stress_eV_per_A3": 0.0013815876973433808,
+      "peak_memory_bytes": 246047232
+    }
+  },
+  "comparison": {
+    "active_float64_trial_evaluation_reduction_percent": 27.355440258666064,
+    "active_float64_wall_time_reduction_percent": 25.723082955394965,
+    "ase_float64_trial_evaluation_reduction_percent": 3.669163736431738,
+    "ase_float64_wall_time_reduction_percent": 2.4585545799625184,
+    "standard_batch_bfgs_float32_control": {
+      "source": "experiments/bfgs-line-search-scaling/results.json",
+      "optimizer_steps": 139,
+      "converged": true,
+      "final_max_force_eV_per_A": 0.049056220799684525
+    }
+  },
+  "stage_2": {
+    "status": "skipped",
+    "reason": "The declared float64 B1 convergence gate failed; an R32 timing would benchmark a non-convergent method."
+  },
+  "conclusion": {
+    "precision_hypothesis_supported": false,
+    "float64_reduces_trial_work": true,
+    "float64_restores_convergence": false,
+    "interpretation": "Float32 rounding contributes to trial-search cost, but it is not the root cause of AtomBit BFGSLineSearch failure on this structure. The tested energy landscape and strong-Wolfe search remain incompatible at float64."
+  },
+  "limitations": [
+    "Each timing is one observation and the four jobs ran concurrently on separate H100 GPUs.",
+    "The isolated B1 trajectory differs from the original B32 numerical trajectory, so it diagnoses the reported structure rather than reproducing the exact B32 failure event."
+  ],
+  "raw_sha256": {
+    "target_ase_float32.json": "fbacf4b6bf24e99e6a5891d3f91b390bd826feb4298ce495183e3aae7176a1e9",
+    "target_ase_float64.json": "e49e4034e4dc6f852a261a1661a610199338ce2f9974a0c9695884e21d6d8421",
+    "target_active_float32.json": "ea7dc5b8ad0754d85abad5e2a71c6f6e9472354a2a6a30905f61ba60f713f14e",
+    "target_active_float64.json": "8fcdf5f9a6c7544a0770dda2c69d5e4b19ee2c30424fe5cb88cc19fc80cd40a6"
+  }
+}
