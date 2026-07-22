@@ -146,6 +146,24 @@ paired geometries on both sides of the cutoff, good energy and force losses do
 not guarantee cutoff continuity. Training in float64 cannot correct the hard
 count; changing the normalization requires retraining or fine-tuning.
 
+## Cross-Structure Check
+
+The counterfactual was repeated on three fixed samples at each of H46, H92,
+H184, and H276. For each structure, the nearest physical edge below 6 A was
+placed `1e-8 A` inside the cutoff by uniform cell and coordinate scaling. The
+required absolute length strain was only `0.0049%` to `0.112%`.
+
+All 12 structures reproduce the effect. Although the selected edge envelopes
+are at floating-point zero (`<= 7.8e-16` in magnitude), removing the edge pair
+changes energy by `0.149-4.885 meV` and maximum atomic force by
+`0.000658-0.005945 eV/A`. Holding degree fixed reduces every energy effect to
+zero and every force effect to at most `2e-15 eV/A`.
+
+This confirms that the mechanism is shared by the tested H46-H276 environments,
+not specific to the original H46 trajectory. It does not yet measure how often
+cutoff crossings occur in a natural relaxation or MD trajectory; that requires
+a separate trajectory-level prevalence and energy-drift experiment.
+
 For the existing checkpoint, standard BFGS or FIRE is the practical workaround.
 The model-level correction is fixed average-neighbor normalization or a smooth
 envelope-weighted degree, followed by retraining or fine-tuning because changing

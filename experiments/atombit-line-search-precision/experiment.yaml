@@ -66,3 +66,13 @@ degree_counterfactual:
   purpose: >-
     Prove whether hard neighbor-count degree normalization, rather than an
     unrelated topology-dependent operation, causes the measured energy jump.
+cross_structure_cutoff_probe:
+  atom_counts: [46, 92, 184, 276]
+  samples_per_size: 3
+  sample_count: 12
+  selection: benchmarks/t2_fixed_samples.json
+  dtype: float64
+  construction: >-
+    Apply the minimum uniform strain that places the nearest physical edge
+    immediately inside 6 A, then compare edge-present and edge-removed graphs
+    at identical geometry with and without fixed degree normalization.

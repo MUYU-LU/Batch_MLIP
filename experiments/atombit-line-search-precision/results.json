@@ -271,6 +271,38 @@
         "degree_counterfactual_step420.json": "5840bfd1a63420e1a011fab10a8e461998a11368a3c5ba199ff84a68fa202aca"
       }
     },
+    "cross_structure_cutoff_probe": {
+      "status": "complete_causal_replication",
+      "runner_commit": "b5068a7",
+      "atom_counts": [
+        46,
+        92,
+        184,
+        276
+      ],
+      "samples_per_atom_count": 3,
+      "sample_count": 12,
+      "absolute_uniform_length_strain_range": [
+        0.00004880882997526648,
+        0.0011245398686676733
+      ],
+      "absolute_edge_envelope_maximum": 7.771561172376096e-16,
+      "absolute_energy_effect_range_eV": [
+        0.00014938230042815803,
+        0.004884503342630353
+      ],
+      "maximum_atom_force_effect_range_eV_per_A": [
+        0.0006583464683749857,
+        0.00594498039366637
+      ],
+      "fixed_degree_absolute_energy_effect_maximum_eV": 0.0,
+      "fixed_degree_maximum_atom_force_effect_maximum_eV_per_A": 2.0441844829508383e-15,
+      "all_structures_confirm_hard_degree_causality": true,
+      "scope": "This establishes cross-structure architectural replication, not the natural trajectory frequency of cutoff crossings.",
+      "raw_sha256": {
+        "cutoff_across_12_structures.json": "3d2bc9d52ed201b611390ec81c654220262fcebae27ed42fe176045bc21ae2b6"
+      }
+    },
     "recommended_resolution": {
       "current_checkpoint_workaround": "Use standard BFGS or FIRE; do not use energy-based strong-Wolfe line search.",
       "architecture_fix": "Replace hard degree normalization with fixed average-neighbor normalization or a smooth envelope-weighted degree, then retrain or fine-tune and revalidate the potential.",
