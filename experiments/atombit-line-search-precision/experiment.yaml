@@ -35,3 +35,12 @@ metrics:
   - convergence_count
   - endpoint_difference
   - peak_gpu_memory
+directional_derivative_diagnostic:
+  geometries: [initial, stalled_float64_active_b1]
+  directions: [atomic, cell, combined]
+  model_dtypes: [float32, float64]
+  neighbor_modes: [cached, rebuilt]
+  finite_difference: central
+  purpose: >-
+    Test whether energy derivatives agree with autograd force and stress, and
+    whether neighbor rebuilding creates directional discontinuities.

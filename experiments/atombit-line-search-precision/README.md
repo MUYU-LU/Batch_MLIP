@@ -42,3 +42,12 @@ The precision hypothesis is therefore rejected: float32 rounding contributes
 to excessive trial work, but is not the root cause. Stage 2 R32 timing was
 skipped because its declared B1 convergence gate failed; timing a known
 non-convergent method would not be a valid speed comparison.
+
+## Directional-Derivative Diagnostic
+
+The follow-up diagnostic compares the analytic `gradient . direction` against
+central energy differences for atomic-only, cell-only, and combined
+generalized-force directions. It tests both the initial geometry and the
+stalled active-float64 endpoint, in float32 and float64. Cached candidate edges
+and forced neighbor rebuilding are measured separately, with candidate and
+physical edge counts recorded at every displacement.
