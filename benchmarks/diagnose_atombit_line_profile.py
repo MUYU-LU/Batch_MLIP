@@ -286,6 +286,7 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
+    torch.use_deterministic_algorithms(True)
     device = torch.device(args.device)
     atoms = read(args.structure)
     model, checkpoint_metadata = load_production_model(args.checkpoint)
@@ -369,6 +370,7 @@ def main() -> None:
             "max_step_A": 0.2,
             "cutoff_A": args.cutoff,
             "skin_A": args.skin,
+            "deterministic_algorithms": True,
         },
         "optimization": {
             "converged": bool(result.converged[0].item()),
