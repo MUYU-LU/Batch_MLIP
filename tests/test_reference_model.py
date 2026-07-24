@@ -5,6 +5,7 @@ import torch
 from ase import Atoms
 
 from batch_mlip import AseGraphBatch, AtomBitBatchCalculator
+from benchmarks.benchmark_production import load_production_model
 from src.model import AtomBitModel
 from src.modules import CartesianDensityBlock
 from src.utils import AtomBitConfig
@@ -92,3 +93,36 @@ def test_density_requires_model_supplied_degree_normalization():
             torch.tensor([0]),
             1,
         )
+
+
+def test_production_loader_preserves_checkpoint_dtype(tmp_path):
+    config = AtomBitConfig(
+        hidden_dim=4,
+        num_layers=1,
+        num_atom_types=1,
+        atom_types_map=[1],
+        use_L1=False,
+        use_L2=False,
+        use_gating=False,
+        degree_norm="smooth_rms",
+        active_paths={(0, 0, 0, "prod"): True},
+    )
+    source = AtomBitModel(config).to(torch.float64)
+    checkpoint = tmp_path / "smooth_fp64.pt"
+    torch.save(
+        {
+            "model_config": config,
+            "model_state_dict": source.state_dict(),
+            "precision_dtype": torch.float64,
+        },
+        checkpoint,
+    )
+
+    loaded, metadata = load_production_model(checkpoint)
+
+    assert metadata["state_dtype"] == "torch.float64"
+    floating_state = [
+        value for value in loaded.state_dict().values() if value.is_floating_point()
+    ]
+    assert floating_state
+    assert {value.dtype for value in floating_state} == {torch.float64}

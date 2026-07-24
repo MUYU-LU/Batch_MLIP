@@ -153,6 +153,11 @@ def main() -> None:
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--samples-per-size", type=int, default=3)
     parser.add_argument("--device", default="cuda:0")
+    parser.add_argument(
+        "--dtype",
+        choices=("native", "float32", "float64"),
+        default="native",
+    )
     parser.add_argument("--cutoff", type=float, default=6.0)
     parser.add_argument("--cutoff-offset", type=float, default=1e-8)
     parser.add_argument("--skin", type=float, default=0.5)
@@ -168,8 +173,13 @@ def main() -> None:
         raise ValueError("cutoff-offset must lie between zero and cutoff")
     torch.use_deterministic_algorithms(True)
     device = torch.device(args.device)
-    dtype = torch.float64
     model, checkpoint_metadata = load_production_model(args.checkpoint)
+    native_dtype = next(model.parameters()).dtype
+    dtype = {
+        "native": native_dtype,
+        "float32": torch.float32,
+        "float64": torch.float64,
+    }[args.dtype]
     model = model.to(device=device, dtype=dtype).eval()
     calculator = AtomBitBatchCalculator(
         model,
@@ -206,7 +216,8 @@ def main() -> None:
             "selection_manifest_sha256": sha256_file(args.manifest),
             "cutoff_A": args.cutoff,
             "cutoff_offset_A": args.cutoff_offset,
-            "dtype": "float64",
+            "checkpoint_dtype": str(native_dtype),
+            "evaluation_dtype": str(dtype),
             "control": "same geometry with hard degree held fixed",
         },
         "environment": environment_metadata(device),

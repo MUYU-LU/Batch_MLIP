@@ -124,11 +124,24 @@ def load_production_model(checkpoint: Path) -> tuple[torch.nn.Module, dict[str, 
         (key[7:] if key.startswith("module.") else key): value
         for key, value in payload["model_state_dict"].items()
     }
+    floating_dtypes = {
+        value.dtype
+        for value in state_dict.values()
+        if torch.is_tensor(value) and value.is_floating_point()
+    }
+    if len(floating_dtypes) != 1:
+        raise ValueError(
+            "checkpoint floating state tensors must use one consistent dtype; "
+            f"found {sorted(map(str, floating_dtypes))}"
+        )
+    checkpoint_dtype = next(iter(floating_dtypes))
+    model = model.to(dtype=checkpoint_dtype)
     model.load_state_dict(state_dict, strict=True)
     metadata = {
         "epoch": payload.get("epoch"),
         "label_mode": payload.get("label_mode"),
         "precision_dtype": payload.get("precision_dtype"),
+        "state_dtype": str(checkpoint_dtype),
         "model_config": dict(vars(config)),
         "state_tensor_count": len(state_dict),
     }
