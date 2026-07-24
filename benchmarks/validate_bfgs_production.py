@@ -49,11 +49,13 @@ def run_ase(
     steps: int,
     optimizer_name: str,
     alpha: float,
+    model_dtype: torch.dtype,
 ) -> list[dict[str, Any]]:
     calculator = AtomBitCalculator(
         model,
         cutoff=6.0,
         device=device,
+        dtype=model_dtype,
         enable_stress=variable_cell,
         add_e0=False,
     )
@@ -97,13 +99,14 @@ def run_batch(
     steps: int,
     optimizer_name: str,
     alpha: float,
+    model_dtype: torch.dtype,
 ):
     calculator = AtomBitBatchCalculator(
         model,
         cutoff=6.0,
         skin=0.0,
         device=device,
-        dtype=torch.float32,
+        dtype=model_dtype,
         force_mode="autograd",
     )
     options: dict[str, Any] = {
@@ -236,6 +239,11 @@ def main() -> None:
     )
     parser.add_argument("--alpha", type=float, default=70.0)
     parser.add_argument(
+        "--model-dtype",
+        choices=("float32", "float64"),
+        default="float32",
+    )
+    parser.add_argument(
         "--dataset-dir", type=Path, default=Path("data/T2_test/structures")
     )
     parser.add_argument(
@@ -251,8 +259,9 @@ def main() -> None:
     names = manifest["samples"][str(args.atom_count)][: args.pool_size]
     systems = [read(args.dataset_dir / name) for name in names]
     device = torch.device(args.device)
+    model_dtype = getattr(torch, args.model_dtype)
     model, checkpoint_metadata = load_production_model(args.checkpoint)
-    model = model.to(device=device, dtype=torch.float32).eval()
+    model = model.to(device=device, dtype=model_dtype).eval()
 
     results = {}
     for variable_cell in (False, True):
@@ -265,6 +274,7 @@ def main() -> None:
             steps=args.steps,
             optimizer_name=args.optimizer,
             alpha=args.alpha,
+            model_dtype=model_dtype,
         )
         candidate = run_batch(
             model,
@@ -274,6 +284,7 @@ def main() -> None:
             steps=args.steps,
             optimizer_name=args.optimizer,
             alpha=args.alpha,
+            model_dtype=model_dtype,
         )
         size_one_records = []
         for system in systems:
@@ -287,6 +298,7 @@ def main() -> None:
                         steps=args.steps,
                         optimizer_name=args.optimizer,
                         alpha=args.alpha,
+                        model_dtype=model_dtype,
                     )
                 )
             )
@@ -312,7 +324,7 @@ def main() -> None:
             "fmax_eV_per_A": 1e-30,
             "alpha_eV_per_A2": args.alpha,
             "max_step_A": 0.2,
-            "dtype": "float32",
+            "dtype": args.model_dtype,
         },
         "tolerance_basis": {
             "original_force_tolerance_eV_per_A": 2e-4,
