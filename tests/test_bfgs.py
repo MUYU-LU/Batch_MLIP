@@ -23,6 +23,8 @@ from batch_mlip import (
     relax,
 )
 from batch_mlip.optimization.bfgs import (
+    _BFGSHistory,
+    _prepare_grouped_bfgs_steps,
     _refill_insert_count,
     _use_grouped_linear_algebra,
 )
@@ -266,6 +268,7 @@ def test_variable_cell_active_bfgs_matches_masked_and_ase():
 
     masked = run(compact=False, linear_algebra_backend="serial")
     grouped = run(compact=False, linear_algebra_backend="grouped")
+    cholesky = run(compact=False, linear_algebra_backend="cholesky")
     active = run(compact=True)
 
     assert active.converged_step.tolist() == [0, 6, 8]
@@ -279,6 +282,10 @@ def test_variable_cell_active_bfgs_matches_masked_and_ase():
     torch.testing.assert_close(grouped.state.cells, masked.state.cells)
     torch.testing.assert_close(grouped.evaluation.energy, masked.evaluation.energy)
     torch.testing.assert_close(grouped.converged_step, masked.converged_step)
+    torch.testing.assert_close(cholesky.state.positions, masked.state.positions)
+    torch.testing.assert_close(cholesky.state.cells, masked.state.cells)
+    torch.testing.assert_close(cholesky.evaluation.energy, masked.evaluation.energy)
+    torch.testing.assert_close(cholesky.converged_step, masked.converged_step)
     assert masked.graph_evaluations == 27
     assert active.graph_evaluations == 17
     for system_id, (reference, _) in enumerate(references):
@@ -381,10 +388,12 @@ def test_refill_policy_insert_count(policy, survivors, pending, expected):
     [
         ("auto", "cuda", 64, 147, True),
         ("auto", "cuda", 128, 285, True),
-        ("auto", "cuda", 128, 286, False),
-        ("auto", "cuda", 64, 837, False),
+        ("auto", "cuda", 128, 286, True),
+        ("auto", "cuda", 64, 837, True),
         ("auto", "cpu", 64, 147, False),
-        ("auto", "cuda", 1, 147, False),
+        ("auto", "cuda", 1, 147, True),
+        ("cholesky", "cuda", 1, 837, True),
+        ("cholesky", "cpu", 1, 147, True),
         ("grouped", "cuda", 64, 837, True),
         ("serial", "cuda", 64, 147, False),
     ],
@@ -401,6 +410,37 @@ def test_bfgs_linear_algebra_policy(
         )
         is expected
     )
+
+
+def test_cholesky_backend_falls_back_for_indefinite_hessian():
+    coordinates = [torch.zeros((2, 1), dtype=torch.float64)]
+    forces = [torch.tensor([[1.0], [2.0]], dtype=torch.float64)]
+
+    def history():
+        return _BFGSHistory(
+            hessian=torch.diag(torch.tensor([-2.0, 3.0], dtype=torch.float64)),
+            positions=torch.zeros(2, dtype=torch.float64),
+            forces=torch.zeros(2, dtype=torch.float64),
+        )
+
+    reference = _prepare_grouped_bfgs_steps(
+        coordinates,
+        forces,
+        [history()],
+        alpha=70.0,
+        max_step=10.0,
+        solver="eigh",
+    )
+    result = _prepare_grouped_bfgs_steps(
+        coordinates,
+        forces,
+        [history()],
+        alpha=70.0,
+        max_step=10.0,
+        solver="cholesky",
+    )
+
+    torch.testing.assert_close(result, reference)
 
 
 def test_structure_api_does_not_build_neighbors_for_pending_refill_jobs(

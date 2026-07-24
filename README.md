@@ -446,11 +446,13 @@ enters. Finished Hessians are released, results retain workload order, and
 neighbor graphs for pending structures are built only when those structures
 enter the resident batch.
 
-`linear_algebra_backend` accepts `"auto"`, `"serial"`, or `"grouped"`. The
-automatic policy groups equal-sized CUDA Hessians only when `D <= 285`. H46 and
-H92 reduce optimizer time by 17-33%; H184 misses the joint two-model gate and
-larger Hessians use the serial path. Singleton groups always use the serial
-path, which preserves B1 agreement with ASE.
+`linear_algebra_backend` accepts `"auto"`, `"serial"`, `"grouped"`, or
+`"cholesky"`. On CUDA, the automatic policy groups equal-sized Hessians and
+uses a Cholesky solve while they are positive definite. That solve is
+mathematically equivalent to ASE's eigenbasis expression; any failed
+factorization falls back to ASE's absolute-eigenvalue solve for only the
+affected systems. `"grouped"` keeps the eigen-only batched implementation and
+`"serial"` keeps the per-system ASE-compatible implementation.
 
 ASE's line-search variant is available under either conventional name:
 

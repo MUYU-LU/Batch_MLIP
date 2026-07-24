@@ -360,7 +360,7 @@ def main() -> None:
     parser.add_argument("--refill-min-chunk", type=int)
     parser.add_argument(
         "--linear-algebra-backend",
-        choices=("auto", "grouped", "serial"),
+        choices=("auto", "cholesky", "grouped", "serial"),
         default="auto",
     )
     parser.add_argument(
@@ -389,9 +389,6 @@ def main() -> None:
 
     if args.pool_size <= 0 or args.repeats <= 0:
         raise ValueError("pool size and repeats must be positive")
-    if args.method != "ase" and any(args.pool_size % size for size in args.batch_sizes):
-        raise ValueError("every batch size must divide the fixed pool")
-
     manifest = load_manifest(args.manifest, min(args.pool_size, 32))
     available_names = manifest["samples"][str(args.atom_count)]
     base_names = available_names[: min(args.pool_size, len(available_names))]

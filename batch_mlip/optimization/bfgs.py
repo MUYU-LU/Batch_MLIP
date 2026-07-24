@@ -123,8 +123,7 @@ def _prepare_bfgs_step(
     return displacement.detach()
 
 
-_LINEAR_ALGEBRA_BACKENDS = frozenset(("auto", "grouped", "serial"))
-_AUTO_GROUPED_MAX_DIMENSION = 285
+_LINEAR_ALGEBRA_BACKENDS = frozenset(("auto", "cholesky", "grouped", "serial"))
 
 
 def _use_grouped_linear_algebra(
@@ -134,15 +133,11 @@ def _use_grouped_linear_algebra(
     group_size: int,
     dimension: int,
 ) -> bool:
+    if backend == "cholesky" or (backend == "auto" and device_type == "cuda"):
+        return True
     if group_size < 2:
         return False
-    if backend == "grouped":
-        return True
-    return (
-        backend == "auto"
-        and device_type == "cuda"
-        and dimension <= _AUTO_GROUPED_MAX_DIMENSION
-    )
+    return backend == "grouped"
 
 
 def _prepare_grouped_bfgs_steps(
@@ -152,26 +147,32 @@ def _prepare_grouped_bfgs_steps(
     *,
     alpha: float,
     max_step: float,
+    solver: str = "eigh",
 ) -> tuple[torch.Tensor, ...]:
-    """Update equal-sized BFGS histories with one batched eigensolve."""
+    """Update equal-sized BFGS histories with one batched dense solve."""
 
     position_vectors = torch.stack([value.flatten() for value in coordinates])
     force_vectors = torch.stack([value.flatten() for value in forces])
     batch_size, dimension = position_vectors.shape
     device = position_vectors.device
 
-    identity = torch.eye(
-        dimension,
+    with profile_phase(
+        "optimizer.bfgs_history_pack",
         device=device,
-        dtype=position_vectors.dtype,
-    )
-    hessians = identity.expand(batch_size, -1, -1).clone().mul_(alpha)
-    initialized = [
-        index
-        for index, history in enumerate(histories)
-        if history.hessian is not None
-    ]
-    if initialized:
+        systems=batch_size,
+        dimension=dimension,
+    ):
+        identity = torch.eye(
+            dimension,
+            device=device,
+            dtype=position_vectors.dtype,
+        )
+        hessians = identity.expand(batch_size, -1, -1).clone().mul_(alpha)
+        initialized = [
+            index
+            for index, history in enumerate(histories)
+            if history.hessian is not None
+        ]
         initialized_histories = [histories[index] for index in initialized]
         if any(
             history.positions is None or history.forces is None
@@ -181,64 +182,138 @@ def _prepare_grouped_bfgs_steps(
         initialized_ids = torch.as_tensor(
             initialized, device=device, dtype=torch.long
         )
-        hessians[initialized_ids] = torch.stack(
-            [cast(torch.Tensor, history.hessian) for history in initialized_histories]
-        )
-        previous_positions = torch.stack(
-            [
-                cast(torch.Tensor, history.positions)
-                for history in initialized_histories
-            ]
-        )
-        previous_forces = torch.stack(
-            [cast(torch.Tensor, history.forces) for history in initialized_histories]
-        )
-        delta_position = position_vectors[initialized_ids] - previous_positions
-        update_local = torch.nonzero(
-            delta_position.abs().amax(dim=1) >= 1e-7,
-            as_tuple=False,
-        ).flatten()
-        if update_local.numel():
-            update_ids = initialized_ids[update_local]
-            selected_delta_position = delta_position[update_local]
-            delta_force = (
-                force_vectors[update_ids] - previous_forces[update_local]
+        if initialized:
+            hessians[initialized_ids] = torch.stack(
+                [
+                    cast(torch.Tensor, history.hessian)
+                    for history in initialized_histories
+                ]
             )
-            selected_hessians = hessians[update_ids]
-            hessian_step = torch.bmm(
-                selected_hessians,
-                selected_delta_position.unsqueeze(-1),
+            previous_positions = torch.stack(
+                [
+                    cast(torch.Tensor, history.positions)
+                    for history in initialized_histories
+                ]
+            )
+            previous_forces = torch.stack(
+                [
+                    cast(torch.Tensor, history.forces)
+                    for history in initialized_histories
+                ]
+            )
+
+    with profile_phase(
+        "optimizer.bfgs_hessian_update",
+        device=device,
+        systems=len(initialized),
+        dimension=dimension,
+    ):
+        if initialized:
+            delta_position = position_vectors[initialized_ids] - previous_positions
+            update_local = torch.nonzero(
+                delta_position.abs().amax(dim=1) >= 1e-7,
+                as_tuple=False,
+            ).flatten()
+            if update_local.numel():
+                update_ids = initialized_ids[update_local]
+                selected_delta_position = delta_position[update_local]
+                delta_force = (
+                    force_vectors[update_ids] - previous_forces[update_local]
+                )
+                selected_hessians = hessians[update_ids]
+                hessian_step = torch.bmm(
+                    selected_hessians,
+                    selected_delta_position.unsqueeze(-1),
+                ).squeeze(-1)
+                a = torch.sum(selected_delta_position * delta_force, dim=1)
+                b = torch.sum(selected_delta_position * hessian_step, dim=1)
+                hessians[update_ids] = selected_hessians - (
+                    torch.bmm(
+                        delta_force.unsqueeze(2), delta_force.unsqueeze(1)
+                    )
+                    / a[:, None, None]
+                    + torch.bmm(
+                        hessian_step.unsqueeze(2), hessian_step.unsqueeze(1)
+                    )
+                    / b[:, None, None]
+                )
+
+    if solver == "cholesky":
+        with profile_phase(
+            "optimizer.bfgs_cholesky",
+            device=device,
+            systems=batch_size,
+            dimension=dimension,
+        ):
+            factors, info = torch.linalg.cholesky_ex(hessians)
+            displacements = torch.cholesky_solve(
+                force_vectors.unsqueeze(-1), factors
             ).squeeze(-1)
-            a = torch.sum(selected_delta_position * delta_force, dim=1)
-            b = torch.sum(selected_delta_position * hessian_step, dim=1)
-            hessians[update_ids] = selected_hessians - (
-                torch.bmm(delta_force.unsqueeze(2), delta_force.unsqueeze(1))
-                / a[:, None, None]
-                + torch.bmm(hessian_step.unsqueeze(2), hessian_step.unsqueeze(1))
-                / b[:, None, None]
-            )
+        failed_ids = torch.nonzero(info, as_tuple=False).flatten()
+        if failed_ids.numel():
+            with profile_phase(
+                "optimizer.bfgs_eigh_fallback",
+                device=device,
+                systems=failed_ids.numel(),
+                dimension=dimension,
+            ):
+                failed_hessians = hessians[failed_ids]
+                eigenvalues, eigenvectors = torch.linalg.eigh(failed_hessians)
+                failed_forces = force_vectors[failed_ids]
+                projected_forces = torch.bmm(
+                    failed_forces.unsqueeze(1), eigenvectors
+                ).squeeze(1)
+                displacements[failed_ids] = torch.bmm(
+                    eigenvectors,
+                    (projected_forces / eigenvalues.abs()).unsqueeze(-1),
+                ).squeeze(-1)
+        profile_event(
+            "bfgs_cholesky",
+            systems=batch_size,
+            fallback_systems=failed_ids.numel(),
+            dimension=dimension,
+        )
+    else:
+        with profile_phase(
+            "optimizer.bfgs_eigh",
+            device=device,
+            systems=batch_size,
+            dimension=dimension,
+        ):
+            eigenvalues, eigenvectors = torch.linalg.eigh(hessians)
+        projected_forces = torch.bmm(
+            force_vectors.unsqueeze(1), eigenvectors
+        ).squeeze(1)
+        displacements = torch.bmm(
+            eigenvectors,
+            (projected_forces / eigenvalues.abs()).unsqueeze(-1),
+        ).squeeze(-1)
 
-    eigenvalues, eigenvectors = torch.linalg.eigh(hessians)
-    projected_forces = torch.bmm(
-        force_vectors.unsqueeze(1), eigenvectors
-    ).squeeze(1)
-    displacements = torch.bmm(
-        eigenvectors,
-        (projected_forces / eigenvalues.abs()).unsqueeze(-1),
-    ).squeeze(-1)
-    displacements = displacements.reshape(batch_size, *coordinates[0].shape)
-    max_row_norm = torch.linalg.vector_norm(displacements, dim=2).amax(dim=1)
-    scale = torch.where(
-        max_row_norm >= max_step,
-        max_step / max_row_norm,
-        torch.ones_like(max_row_norm),
-    )
-    displacements = displacements * scale[:, None, None]
+    with profile_phase(
+        "optimizer.bfgs_solve",
+        device=device,
+        systems=batch_size,
+        dimension=dimension,
+    ):
+        displacements = displacements.reshape(batch_size, *coordinates[0].shape)
+        max_row_norm = torch.linalg.vector_norm(displacements, dim=2).amax(dim=1)
+        scale = torch.where(
+            max_row_norm >= max_step,
+            max_step / max_row_norm,
+            torch.ones_like(max_row_norm),
+        )
+        displacements = displacements * scale[:, None, None]
 
-    for index, history in enumerate(histories):
-        history.hessian = hessians[index].detach()
-        history.positions = position_vectors[index].detach().clone()
-        history.forces = force_vectors[index].detach().clone()
+    with profile_phase(
+        "optimizer.bfgs_history_store",
+        device=device,
+        systems=batch_size,
+        dimension=dimension,
+    ):
+        for index, history in enumerate(histories):
+            history.hessian = hessians[index].detach()
+            history.positions = position_vectors[index].detach().clone()
+            history.forces = force_vectors[index].detach().clone()
     return tuple(value.detach() for value in displacements.unbind())
 
 
@@ -296,6 +371,15 @@ def _prepare_bfgs_steps(
             [histories[index] for index in indices],
             alpha=alpha,
             max_step=max_step,
+            solver=(
+                "cholesky"
+                if linear_algebra_backend == "cholesky"
+                or (
+                    linear_algebra_backend == "auto"
+                    and coordinates[indices[0]].device.type == "cuda"
+                )
+                else "eigh"
+            ),
         )
         for index, displacement in zip(indices, grouped_output, strict=True):
             output[index] = displacement
@@ -410,9 +494,9 @@ def batched_bfgs_relax(
     forces as ASE's ``FrechetCellFilter``. ``optimizer_dtype`` can promote the
     optimizer state independently of the calculator when desired; by default
     it follows the calculator state dtype. ``linear_algebra_backend="auto"``
-    groups equal-sized systems in the validated small-Hessian regime for
-    batched updates and eigensolves. It retains the serial ASE-compatible path
-    for singleton, CPU, and large-Hessian groups.
+    groups equal-sized CUDA systems and uses a positive-definite Cholesky solve
+    with per-system eigen fallback. CPU calculations retain the serial
+    ASE-compatible path.
     """
 
     _validate_options(
@@ -726,14 +810,20 @@ def batched_bfgs_relax(
                 )
                 for system_id in active_ids
             ]
-            displacements = _prepare_bfgs_steps(
-                coordinates,
-                generalized_forces,
-                [histories[system_id] for system_id in active_ids],
-                alpha=alpha,
-                max_step=max_step,
-                linear_algebra_backend=linear_algebra_backend,
-            )
+            with profile_phase(
+                "optimizer.bfgs_linear_algebra",
+                device=device,
+                systems=len(active_ids),
+                dimension=0 if not coordinates else coordinates[0].numel(),
+            ):
+                displacements = _prepare_bfgs_steps(
+                    coordinates,
+                    generalized_forces,
+                    [histories[system_id] for system_id in active_ids],
+                    alpha=alpha,
+                    max_step=max_step,
+                    linear_algebra_backend=linear_algebra_backend,
+                )
             for system_id, displacement in zip(
                 active_ids, displacements, strict=True
             ):
@@ -746,21 +836,29 @@ def batched_bfgs_relax(
             atomic_displacement = atomic_displacement.masked_fill(
                 ~active_state.mobile.unsqueeze(-1), 0.0
             )
-            if active_filter is None:
-                if optimizer_positions is None:
-                    raise RuntimeError(
-                        "fixed-cell BFGS optimizer positions are missing"
+            with profile_phase(
+                "optimizer.bfgs_apply_displacement",
+                device=device,
+                systems=active_state.n_systems,
+                atoms=active_state.n_atoms,
+            ):
+                if active_filter is None:
+                    if optimizer_positions is None:
+                        raise RuntimeError(
+                            "fixed-cell BFGS optimizer positions are missing"
+                        )
+                    optimizer_positions = (
+                        optimizer_positions + atomic_displacement
+                    ).detach()
+                    active_state.positions = optimizer_positions.to(
+                        dtype=dtype
+                    ).detach()
+                else:
+                    if cell_displacement is None:
+                        raise RuntimeError("variable-cell displacement is missing")
+                    active_filter.apply_displacement(
+                        active_state, atomic_displacement, cell_displacement
                     )
-                optimizer_positions = (
-                    optimizer_positions + atomic_displacement
-                ).detach()
-                active_state.positions = optimizer_positions.to(dtype=dtype).detach()
-            else:
-                if cell_displacement is None:
-                    raise RuntimeError("variable-cell displacement is missing")
-                active_filter.apply_displacement(
-                    active_state, atomic_displacement, cell_displacement
-                )
 
         rebuilds_before = active_state.neighbor_rebuild_count
         evaluation = potential(
@@ -1218,14 +1316,20 @@ def _batched_bfgs_refill_relax(
                     )
                 )
                 active_histories.append(history)
-            displacements = _prepare_bfgs_steps(
-                coordinates,
-                generalized_forces,
-                active_histories,
-                alpha=alpha,
-                max_step=max_step,
-                linear_algebra_backend=linear_algebra_backend,
-            )
+            with profile_phase(
+                "optimizer.bfgs_linear_algebra",
+                device=device,
+                systems=len(active_histories),
+                dimension=0 if not coordinates else coordinates[0].numel(),
+            ):
+                displacements = _prepare_bfgs_steps(
+                    coordinates,
+                    generalized_forces,
+                    active_histories,
+                    alpha=alpha,
+                    max_step=max_step,
+                    linear_algebra_backend=linear_algebra_backend,
+                )
             for local_id, displacement in enumerate(displacements):
                 atom_slice = active_state.atom_slice(local_id)
                 atom_count = atom_slice.stop - atom_slice.start
@@ -1238,21 +1342,29 @@ def _batched_bfgs_refill_relax(
             atomic_displacement = atomic_displacement.masked_fill(
                 ~active_state.mobile.unsqueeze(-1), 0.0
             )
-            if active_filter is None:
-                if optimizer_positions is None:
-                    raise RuntimeError(
-                        "fixed-cell BFGS optimizer positions are missing"
+            with profile_phase(
+                "optimizer.bfgs_apply_displacement",
+                device=device,
+                systems=active_state.n_systems,
+                atoms=active_state.n_atoms,
+            ):
+                if active_filter is None:
+                    if optimizer_positions is None:
+                        raise RuntimeError(
+                            "fixed-cell BFGS optimizer positions are missing"
+                        )
+                    optimizer_positions = (
+                        optimizer_positions + atomic_displacement
+                    ).detach()
+                    active_state.positions = optimizer_positions.to(
+                        dtype=dtype
+                    ).detach()
+                else:
+                    if cell_displacement is None:
+                        raise RuntimeError("variable-cell displacement is missing")
+                    active_filter.apply_displacement(
+                        active_state, atomic_displacement, cell_displacement
                     )
-                optimizer_positions = (
-                    optimizer_positions + atomic_displacement
-                ).detach()
-                active_state.positions = optimizer_positions.to(dtype=dtype).detach()
-            else:
-                if cell_displacement is None:
-                    raise RuntimeError("variable-cell displacement is missing")
-                active_filter.apply_displacement(
-                    active_state, atomic_displacement, cell_displacement
-                )
 
         evaluation = evaluate_active(scheduler_step + 1)
         active_batch_sizes.append(active_state.n_systems)

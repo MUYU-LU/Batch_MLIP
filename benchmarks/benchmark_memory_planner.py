@@ -307,7 +307,7 @@ def main() -> None:
     parser.add_argument("--max-steps", type=int, default=500)
     parser.add_argument(
         "--linear-algebra-backend",
-        choices=("auto", "grouped", "serial"),
+        choices=("auto", "cholesky", "grouped", "serial"),
         default="auto",
     )
     parser.add_argument(

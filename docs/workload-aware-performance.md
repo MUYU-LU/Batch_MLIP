@@ -299,6 +299,41 @@ For that reason cached mode is explicit rather than the compatibility default.
 The multi-GPU stage should measure both the default rebuild path and the cached
 276-atom operating point.
 
+### MPS comparison and dense-BFGS result
+
+The matched 256-structure MPS32 comparison exposed a size-specific optimizer
+bottleneck. For H184 variable-cell BFGS, runtime profiling assigned 36.60 s of
+a 75.55 s B64 run to Hessian update and linear algebra, including 34.79 s in
+`torch.linalg.eigh`. Neighbor updates cost 6.85 s and cell-filter displacement
+cost 0.86 s. Parallel CPU eigensolves were rejected after an end-to-end run
+increased the 64-system time to 111.72 s.
+
+CUDA `auto` BFGS now uses a batched Cholesky solve for positive-definite
+Hessians and falls back to ASE's absolute-eigenvalue expression per failed
+system. This preserves the BFGS update and displacement while avoiding a full
+eigendecomposition when both expressions are mathematically identical. The
+profiled H184/B64 workload had zero fallbacks in 440 optimizer updates and
+dropped from 75.55 s to 40.27 s.
+
+Expandable CUDA allocator segments expose the usable resident-memory frontier:
+H184 B224 uses 63.15 GiB allocated and 78.30 GiB reserved; B256 is OOM. Active
+refill then avoids a separate B32 tail for the 256-job pool. One complete
+screening run per point gives:
+
+| Workload | Batched policy | Batch s | MPS32 s | Batch speedup | Peak alloc/reserved |
+|---|---|---:|---:|---:|---:|
+| H46 BFGS | active B256 | 55.65 | 71.46 | 1.284x | 17.31/43.55 GiB |
+| H92 BFGS | active B256 | 89.28 | 126.35 | 1.415x | 37.26/77.80 GiB |
+| H184 BFGS | refill B224 | 125.34 | 124.02 | 0.989x | 63.31/78.32 GiB |
+| H276 FIRE | active B128 | 89.55 | 90.86 | 1.015x | 47.31/76.90 GiB |
+
+H46 and H92 pass the performance gate. H184 is parity under the below-2%
+decision rule, not evidence that either scheduler is faster. The result
+supports a workload-aware policy: use tensor batching for model throughput,
+Cholesky with eigen fallback for full BFGS, expandable segments near the memory
+frontier, and refill only when the pool exceeds resident capacity by a modest
+tail. MPS remains a valid fallback for large dense-Hessian jobs.
+
 ## Measurement and decision rules
 
 - Use the fixed T2 manifest and record the exact filename sequence.
