@@ -1,0 +1,32 @@
+id: atombit-smooth-rms-validation
+implementation_commit: 338f047
+precision_loader_commit: ec53748
+hardware: NVIDIA H100 80GB GPU
+checkpoints:
+  fp32:
+    file: AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt
+    sha256: b27c372cb2c2848ae1e54a9ffd7a2aa0b0401d9cc0ed922e3be250ff63e44486
+  fp64:
+    file: AtomBit-OMC-s_smooth_rms_fp64_8gpu_epoch5.pt
+    sha256: 72b6458d88fe3693e249031bf9f0f8c57a425281989acb8533a1bffc634ed6ae
+continuity_gate:
+  atom_counts: [46, 92, 184, 276]
+  samples_per_size: 3
+  sample_count: 12
+  fp32_cutoff_offset_A: 0.001
+  fp64_cutoff_offset_A: 1.0e-8
+  control: same-geometry edge-present versus edge-removed topology
+optimizer_gate:
+  structure: Aven12_1_367_z1.cif
+  atom_count: 46
+  methods: [ase, active_b1]
+  optimizer: bfgslinesearch
+  variable_cell: true
+  fmax_eV_per_A: 0.05
+  max_steps: 500
+  alpha: 10.0
+  max_step_A: 0.2
+  skin_A: 0.5
+  optimizer_dtype: float64
+  deterministic: true
+  repeats: 1

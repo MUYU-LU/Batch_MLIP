@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "status": "complete_pass",
+  "implementation_commit": "338f047",
+  "precision_loader_commit": "ec53748",
+  "checkpoints": {
+    "fp32": {
+      "file": "AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+      "sha256": "b27c372cb2c2848ae1e54a9ffd7a2aa0b0401d9cc0ed922e3be250ff63e44486",
+      "state_dtype": "torch.float32",
+      "degree_norm": "smooth_rms",
+      "epoch": 5
+    },
+    "fp64": {
+      "file": "AtomBit-OMC-s_smooth_rms_fp64_8gpu_epoch5.pt",
+      "sha256": "72b6458d88fe3693e249031bf9f0f8c57a425281989acb8533a1bffc634ed6ae",
+      "state_dtype": "torch.float64",
+      "degree_norm": "smooth_rms",
+      "epoch": 5
+    }
+  },
+  "continuity_gate": {
+    "sample_count": 12,
+    "atom_counts": [
+      46,
+      92,
+      184,
+      276
+    ],
+    "samples_per_atom_count": 3,
+    "fp32": {
+      "cutoff_offset_A": 0.001,
+      "maximum_absolute_energy_effect_eV": 0.000003814697265625,
+      "maximum_atom_force_effect_eV_per_A": 0.0000016689300537109375
+    },
+    "fp64": {
+      "cutoff_offset_A": 1e-8,
+      "maximum_absolute_energy_effect_eV": 0.0,
+      "maximum_atom_force_effect_eV_per_A": 3.722145839155691e-15
+    },
+    "old_hard_degree_fp64_control": {
+      "maximum_absolute_energy_effect_eV": 0.004884503342630353,
+      "maximum_atom_force_effect_eV_per_A": 0.00594498039366637
+    },
+    "passed": true
+  },
+  "optimizer_gate": {
+    "structure": "Aven12_1_367_z1.cif",
+    "variable_cell": true,
+    "fmax_eV_per_A": 0.05,
+    "max_steps": 500,
+    "alpha": 10.0,
+    "max_step_A": 0.2,
+    "skin_A": 0.5,
+    "optimizer_dtype": "float64",
+    "deterministic": true,
+    "repeats": 1,
+    "fp32": {
+      "ase": {
+        "wall_seconds": 8.800056330859661,
+        "steps": 98,
+        "model_evaluations": 449,
+        "peak_memory_bytes": 159874048,
+        "converged": true
+      },
+      "active_b1": {
+        "wall_seconds": 7.069504186976701,
+        "steps": 98,
+        "model_evaluations": 176,
+        "peak_memory_bytes": 160249344,
+        "converged": true
+      },
+      "active_speedup_vs_ase": 1.2447911618852916,
+      "active_model_evaluation_reduction_percent": 60.801781737193764,
+      "endpoint_difference": {
+        "energy_eV": 0.0000057220458984375,
+        "maximum_position_A": 0.0008949957484762905,
+        "maximum_cell_component_A": 0.000098030154023654
+      }
+    },
+    "fp64": {
+      "ase": {
+        "wall_seconds": 8.824104594066739,
+        "steps": 105,
+        "model_evaluations": 466,
+        "peak_memory_bytes": 247880192,
+        "converged": true
+      },
+      "active_b1": {
+        "wall_seconds": 7.040661187842488,
+        "steps": 105,
+        "model_evaluations": 181,
+        "peak_memory_bytes": 248260096,
+        "converged": true
+      },
+      "active_speedup_vs_ase": 1.253306239093542,
+      "active_model_evaluation_reduction_percent": 61.1587982832618,
+      "endpoint_difference": {
+        "energy_eV": 4.5285197813882405e-10,
+        "maximum_position_A": 8.65038440878152e-9,
+        "maximum_cell_component_A": 1.3770803164447898e-8
+      }
+    },
+    "passed": true
+  },
+  "comparison_to_old_hard_degree": {
+    "old_fp32_active": {
+      "converged": false,
+      "steps": 500,
+      "model_evaluations": 13299
+    },
+    "old_float64_execution_active": {
+      "converged": false,
+      "steps": 500,
+      "model_evaluations": 9661
+    }
+  },
+  "raw_sha256": {
+    "cutoff_across_12_fp32.json": "407a4c876d48d99106c52f138658a57101ac88af626661b76ae4653b2b7a75b5",
+    "cutoff_across_12_fp64.json": "567ddd3336520487460aae00bbc1bb658fdc4290c5f9cd862b58f04c24a576de",
+    "target_active_fp32.json": "4740d3712c0a356951825ae6ec4170dfc6354acc81623dbacdb94674c9a3eabf",
+    "target_active_fp64.json": "38595ba9e8545b040cfba20d319a87e6723749cbfd5fc9c7bcde9f659db10c8f",
+    "target_ase_fp32.json": "73adb753abae8c9aaddc7d69c458b14819f8698353381033f5f5f4754475ecc8",
+    "target_ase_fp64.json": "627694b6e3b17f536d9ad36d3765761411ada2289963a7a145eb224c58aeaec1"
+  },
+  "limitations": [
+    "Every timing is one observation.",
+    "Only one optimizer target was tested.",
+    "No held-out DFT accuracy or natural-trajectory NVE drift result is included."
+  ]
+}
