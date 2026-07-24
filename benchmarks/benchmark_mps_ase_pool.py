@@ -59,11 +59,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument("--gpu-index", type=int, default=0)
     parser.add_argument("--cpu-threads-per-worker", type=int, default=1)
+    parser.add_argument("--worker-start-interval", type=float, default=0.0)
     parser.add_argument("--memory-sample-interval", type=float, default=0.2)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.pool_size <= 0 or args.workers <= 0 or args.cpu_threads_per_worker <= 0:
         parser.error("pool size, worker count, and CPU thread count must be positive")
+    if args.worker_start_interval < 0:
+        parser.error("worker start interval must be non-negative")
     if args.pool_size % args.workers:
         parser.error("pool size must be divisible by worker count")
     for variable in ("CUDA_MPS_PIPE_DIRECTORY", "CUDA_MPS_LOG_DIRECTORY"):
@@ -266,6 +269,8 @@ def main() -> None:
     ]
     for process in processes:
         process.start()
+        if args.worker_start_interval:
+            time.sleep(args.worker_start_interval)
 
     try:
         barrier.wait(timeout=600)
@@ -365,6 +370,7 @@ def main() -> None:
             "model_dtype": args.model_dtype,
             "optimizer_dtype": args.optimizer_dtype,
             "cpu_threads_per_worker": args.cpu_threads_per_worker,
+            "worker_start_interval_seconds": args.worker_start_interval,
             "deterministic_algorithms": args.deterministic,
             "cublas_workspace_config": os.environ.get("CUBLAS_WORKSPACE_CONFIG"),
             "cell_filter": "ASE FrechetCellFilter",
