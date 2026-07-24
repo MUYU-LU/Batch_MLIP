@@ -220,6 +220,29 @@ class AtomBitModel(nn.Module):
             )
         return z_idx
 
+    def _compute_inv_sqrt_degree(
+        self,
+        center: torch.Tensor,
+        cutoff_weight: torch.Tensor,
+        num_nodes: int,
+        *,
+        dtype: torch.dtype,
+        device: torch.device,
+    ) -> torch.Tensor:
+        degree_norm = getattr(self.cfg, "degree_norm", "hard")
+        if degree_norm == "hard":
+            ones = torch.ones(center.shape, dtype=dtype, device=device)
+            degree = scatter_add(ones, center, dim_size=num_nodes)
+            return torch.rsqrt(degree.clamp_min(1.0))
+        if degree_norm == "smooth_rms":
+            effective_degree = scatter_add(
+                cutoff_weight.square(),
+                center,
+                dim_size=num_nodes,
+            )
+            return torch.rsqrt(1.0 + effective_degree)
+        raise ValueError("degree_norm must be either 'hard' or 'smooth_rms'")
+
     def forward(self, data, capture_weights: bool = False, capture_descriptors: bool = False):
         if capture_descriptors:
             self.all_layer_descriptors = []
@@ -252,7 +275,7 @@ class AtomBitModel(nn.Module):
                 "node_z": z_raw.detach().cpu(),
             }
 
-        basis_edges, r_hat = self.geom_basis(vec_ji, d_ji)
+        basis_edges, r_hat, cutoff_weight = self.geom_basis(vec_ji, d_ji)
         h0 = self.embedding_norm(self.embedding(z_idx))
         h1 = None
         h2 = None
@@ -260,10 +283,13 @@ class AtomBitModel(nn.Module):
         total_energy = torch.zeros((data.num_graphs, 1), dtype=runtime_dtype, device=runtime_device)
         total_force = torch.zeros((data.z.shape[0], 3), dtype=runtime_dtype, device=runtime_device) if self.cfg.use_direct_force else None
 
-        ones = torch.ones(center.shape, dtype=runtime_dtype, device=runtime_device)
-        deg = scatter_add(ones, center, dim_size=data.z.size(0))
-        deg.clamp_(min=1.0)
-        inv_sqrt_deg = torch.rsqrt(deg)
+        inv_sqrt_deg = self._compute_inv_sqrt_degree(
+            center,
+            cutoff_weight,
+            data.z.size(0),
+            dtype=runtime_dtype,
+            device=runtime_device,
+        )
 
         for block in self.blocks:
             h0, h1, h2, atomic_energy = block(

@@ -58,6 +58,7 @@ class AtomBitConfig:
     use_L2: bool = True
     use_gating: bool = True
     use_direct_force: bool = False
+    degree_norm: str = "hard"
     active_paths: Dict[PathKey, bool] = field(default_factory=default_active_paths)
     block_impls: Dict[str, str] = field(default_factory=dict)
     outer_impl: int = 1
@@ -67,6 +68,9 @@ class AtomBitConfig:
     @classmethod
     def from_dict(cls, payload: Mapping[str, Any]) -> "AtomBitConfig":
         data = dict(payload)
+        degree_norm = data.get("degree_norm", "hard")
+        if degree_norm not in {"hard", "smooth_rms"}:
+            raise ValueError("degree_norm must be either 'hard' or 'smooth_rms'")
         paths = data.get("active_paths")
         if isinstance(paths, list):
             parsed: Dict[PathKey, bool] = {}

@@ -53,7 +53,11 @@ class GeometricBasis(nn.Module):
         eye_scaled = torch.eye(3, dtype=DEFAULT_FLOAT_DTYPE) / 3.0
         self.register_buffer("_eye_scaled", eye_scaled.view(1, 3, 3))
 
-    def forward(self, vec_ij: torch.Tensor, d_ij: torch.Tensor) -> Tuple[Dict[int, torch.Tensor], torch.Tensor]:
+    def forward(
+        self,
+        vec_ij: torch.Tensor,
+        d_ij: torch.Tensor,
+    ) -> Tuple[Dict[int, torch.Tensor], torch.Tensor, torch.Tensor]:
         bessel = self.rbf(d_ij.unsqueeze(-1))
         raw_rbf = self.rbf_mlp(bessel)
         env = self.envelope(d_ij)
@@ -68,7 +72,7 @@ class GeometricBasis(nn.Module):
         if self.cfg.use_L2:
             outer = torch.einsum("ei,ej->eij", r_hat, r_hat)
             basis[2] = torch.einsum("ef,eij->eijf", rbf_feat, outer - safe_eye)
-        return basis, r_hat
+        return basis, r_hat, env
 
 
 class LeibnizCoupling(nn.Module):
@@ -343,10 +347,9 @@ class CartesianDensityBlock(nn.Module):
         densities: Dict[int, Optional[torch.Tensor]] = {0: None, 1: None, 2: None}
 
         if inv_sqrt_deg is None:
-            ones = torch.ones(index.shape, dtype=dtype, device=index.device)
-            deg = scatter_add(ones, index, dim=0, dim_size=num_nodes)
-            deg.clamp_(min=1.0)
-            inv_sqrt_deg = torch.rsqrt(deg)
+            raise ValueError(
+                "CartesianDensityBlock requires inv_sqrt_deg from AtomBitModel"
+            )
 
         for degree in (0, 1, 2):
             if msgs.get(degree) is None:
