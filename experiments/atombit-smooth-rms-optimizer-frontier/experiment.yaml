@@ -1,0 +1,81 @@
+id: atombit-smooth-rms-optimizer-frontier
+baseline_commit: fd29e84
+benchmark_runner: benchmarks/benchmark_variable_cell_scaling.py
+hardware: NVIDIA H100 80GB HBM3
+hypothesis: >-
+  The native-fp32 smooth-RMS AtomBit checkpoint has an optimizer- and
+  structure-size-dependent throughput frontier. Selecting the resident batch
+  separately for FIRE, full BFGS, and BFGSLineSearch will outperform common
+  sequential ASE while preserving convergence and initial calculator parity.
+checkpoint:
+  file: AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt
+  sha256: b27c372cb2c2848ae1e54a9ffd7a2aa0b0401d9cc0ed922e3be250ff63e44486
+  model_dtype: float32
+workload:
+  manifest: benchmarks/t2_fixed_samples.json
+  source_pool: first 32 frozen samples per atom count
+  batch_pool: cyclic repetition of source pool to R256
+  ase_pool: R32
+  ase_scaling: exact eightfold repetition for the R256 reference
+  atom_counts: [46, 92, 184, 276]
+optimizers:
+  fire:
+    ase_class: ase.optimize.FIRE
+    batch_method: active
+    alpha: null
+  bfgs:
+    ase_class: ase.optimize.BFGS
+    batch_method: refill
+    alpha: 70.0
+  bfgslinesearch:
+    ase_class: ase.optimize.BFGSLineSearch
+    batch_method: active
+    alpha: 10.0
+common:
+  variable_cell: true
+  cell_filter: FrechetCellFilter
+  fmax_eV_per_A: 0.05
+  max_steps: 500
+  max_step_A: 0.2
+  fire_dt_start: 0.1
+  fire_dt_max: 1.0
+  skin_A: 0.5
+  neighbor_backend: auto
+  optimizer_dtype: float64
+  deterministic: true
+  timing_repeats: 1
+initial_frontier:
+  H46: [128, 256]
+  H92: [128, 256]
+  H184: [64, 128]
+  H276: [64, 128]
+adaptive_search:
+  rule: >-
+    If the smaller initial batch is more than 2% faster than the larger batch,
+    measure one additional batch at half the smaller size. Continue downward
+    only while each newly smaller point improves throughput by more than 2%.
+  selection: >-
+    Select the smallest successful batch within 2% of maximum measured
+    throughput and below 85% of total GPU memory.
+correctness_gates:
+  - all 256 jobs converge
+  - no NaN or overflow
+  - selected point stays below the memory safety threshold
+  - convergence flags are compared with the matching ASE optimizer
+  - endpoint energy, force, stress, position, and cell differences are reported
+  - endpoint identity is descriptive rather than required on a nonconvex landscape
+metrics:
+  - wall_seconds
+  - systems_per_second
+  - speedup_vs_exact_repeat_ase
+  - peak_gpu_memory
+  - model_evaluations
+  - graph_evaluations
+  - neighbor_rebuilds
+  - optimizer_steps_total
+  - convergence_count
+  - endpoint_diagnostics
+limitations:
+  - one timing observation per screening point
+  - FIRE and BFGSLineSearch use active-drain because refill is not implemented
+  - BFGS uses active refill and therefore its fastest available scheduling mode
