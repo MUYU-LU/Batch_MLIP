@@ -1,5 +1,7 @@
 id: atombit-smooth-rms-optimizer-frontier
+status: complete
 baseline_commit: fd29e84
+benchmark_commit: 2de22a7
 benchmark_runner: benchmarks/benchmark_variable_cell_scaling.py
 hardware: NVIDIA H100 80GB HBM3
 hypothesis: >-
@@ -13,10 +15,10 @@ checkpoint:
   model_dtype: float32
 workload:
   manifest: benchmarks/t2_fixed_samples.json
-  source_pool: first 32 frozen samples per atom count
+  source_pool: first 64 frozen samples per atom count
   batch_pool: cyclic repetition of source pool to R256
-  ase_pool: R32
-  ase_scaling: exact eightfold repetition for the R256 reference
+  ase_pool: R64
+  ase_scaling: exact fourfold repetition for the R256 reference
   atom_counts: [46, 92, 184, 276]
 optimizers:
   fire:
@@ -36,7 +38,11 @@ common:
   cell_filter: FrechetCellFilter
   fmax_eV_per_A: 0.05
   max_steps:
-    fire: 1000
+    fire:
+      H46: 1000
+      H92: 2000
+      H184: 2000
+      H276: 1000
     bfgs: 500
     bfgslinesearch: 1000
   max_step_A: 0.2
@@ -82,4 +88,15 @@ metrics:
 limitations:
   - one timing observation per screening point
   - FIRE and BFGSLineSearch use active-drain because refill is not implemented
-  - BFGS uses active refill and therefore its fastest available scheduling mode
+  - BFGS screens refill first and falls back to active-drain when reserve is unsafe
+outcome:
+  hypothesis: supported_with_optimizer_specific_convergence_and_memory_limits
+  fastest_optimizer:
+    H46: bfgs
+    H92: bfgs
+    H184: bfgs
+    H276: fire
+  fire_H184: no_valid_frontier_at_2000_steps
+artifacts:
+  raw_archive: /tmp/smooth_rms_optimizer_frontier_raw_final.tgz
+  raw_archive_sha256: 42b7806acc21dca0592a3c82979cb0ba988d42b945d434ae20670f1d447693a8
