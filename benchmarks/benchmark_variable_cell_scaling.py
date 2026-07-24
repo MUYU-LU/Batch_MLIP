@@ -297,6 +297,7 @@ def timed_repeats(fn, *, repeats: int, device: torch.device):
     output = None
     samples = []
     peak_memory = 0 if device.type == "cuda" else None
+    peak_reserved_memory = 0 if device.type == "cuda" else None
     for _ in range(repeats):
         gc.collect()
         if device.type == "cuda":
@@ -311,7 +312,11 @@ def timed_repeats(fn, *, repeats: int, device: torch.device):
             output = current
         if device.type == "cuda":
             peak_memory = max(peak_memory or 0, torch.cuda.max_memory_allocated(device))
-    return output, timing_summary(samples), peak_memory
+            peak_reserved_memory = max(
+                peak_reserved_memory or 0,
+                torch.cuda.max_memory_reserved(device),
+            )
+    return output, timing_summary(samples), peak_memory, peak_reserved_memory
 
 
 def main() -> None:
@@ -526,7 +531,7 @@ def main() -> None:
                 profiles.append(profiler.summary())
                 return current
 
-            output, timing, peak_memory = timed_repeats(
+            output, timing, peak_memory, peak_reserved_memory = timed_repeats(
                 measured_fn, repeats=args.repeats, device=device
             )
             point.update(
@@ -536,6 +541,7 @@ def main() -> None:
                     "systems_per_second": args.pool_size / timing["median_seconds"],
                     "atoms_per_second": args.pool_size * args.atom_count / timing["median_seconds"],
                     "peak_memory_bytes": peak_memory,
+                    "peak_reserved_memory_bytes": peak_reserved_memory,
                     **output,
                 }
             )

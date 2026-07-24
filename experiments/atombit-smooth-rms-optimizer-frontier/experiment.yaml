@@ -35,7 +35,10 @@ common:
   variable_cell: true
   cell_filter: FrechetCellFilter
   fmax_eV_per_A: 0.05
-  max_steps: 500
+  max_steps:
+    fire: 1000
+    bfgs: 500
+    bfgslinesearch: 1000
   max_step_A: 0.2
   fire_dt_start: 0.1
   fire_dt_max: 1.0
@@ -69,6 +72,7 @@ metrics:
   - systems_per_second
   - speedup_vs_exact_repeat_ase
   - peak_gpu_memory
+  - peak_gpu_reserved_memory
   - model_evaluations
   - graph_evaluations
   - neighbor_rebuilds
