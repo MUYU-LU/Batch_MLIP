@@ -1,10 +1,13 @@
 id: atombit-smooth-rms-bfgslinesearch-r8
 implementation_commit: ec53748
+benchmark_commit: 8c61b53
 hardware: NVIDIA H100 80GB GPU
 hypothesis: >-
   Native fp32 and fp64 smooth-RMS AtomBit checkpoints converge reliably with
-  variable-cell BFGSLineSearch across independent H46-H276 structures, and
-  Active B8 preserves the ASE/B1 result while improving throughput.
+  variable-cell BFGSLineSearch across independent H46-H276 structures. Active
+  batching preserves initial ASE calculator results and improves throughput;
+  endpoint equivalence is evaluated separately because line-search paths can
+  enter different local minima.
 workload:
   manifest: benchmarks/t2_fixed_samples.json
   selection: first 8 fixed samples per atom count
@@ -41,3 +44,8 @@ metrics:
   - optimizer_steps_total
   - peak_gpu_memory
   - endpoint_difference
+outcome:
+  convergence: supported
+  initial_calculator_parity: supported
+  throughput_improvement: supported
+  endpoint_equivalence: not_supported_for_all_larger_structures
