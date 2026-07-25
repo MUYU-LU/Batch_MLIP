@@ -535,9 +535,42 @@ cost-compatible memory-safe queues, using active refill only when the selected
 optimizer supports it. This policy is opt-in because coefficients are
 model/device/optimizer specific; it does not guess a safe budget.
 
+Supplying an `OptimizationPilot` activates the task-aware layer:
+
+```python
+import json
+
+from batch_mlip import OptimizationPilot, TaskAwarePolicy
+
+pilot = OptimizationPilot.from_dict(
+    json.load(open("optimizer-pilot.json", encoding="utf-8"))
+)
+result = relax(
+    structures,
+    calculator,
+    optimizer="bfgs",
+    scheduling="auto",
+    planner=planner,
+    pilot=pilot,
+    policy=TaskAwarePolicy(),
+    system_profiles=cached_profiles,
+    cell_filter=FrechetCellFilter(),
+)
+```
+
+It compares measured drain/refill capacities and records a tensor-versus-MPS
+recommendation. `relax` executes the tensor fallback; an MPS recommendation
+requires an external worker dispatcher. Refill is not extrapolated to an
+unmatched atom/edge regime by default. Cached `SystemProfile` values avoid
+repeating CPU topology profiling, and completed buckets are offloaded before
+the next bucket. The allocated-memory planner still requires a separate
+reserved-memory safety measurement near device capacity.
+
 The measured task/mechanism policy, direct CUDA MPS comparison, and untested
 acceleration backlog are recorded in
 `experiments/application-mechanism-atlas/README.md`.
+The held-out task-aware policy validation, including negative results, is in
+`experiments/task-aware-policy-validation/README.md`.
 
 For a strict ordinary-ASE reference, pass the MLIP's native ASE calculator
 explicitly. A `BatchCalculator` is not silently converted into an ASE

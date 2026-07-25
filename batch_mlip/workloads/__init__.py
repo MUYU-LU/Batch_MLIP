@@ -5,6 +5,7 @@ from .generator import (
     T2WorkloadInputs,
     build_robustness_workloads,
     build_t2_workloads,
+    build_task_aware_holdout_workloads,
     normalized_structure_sha256,
     topology_key,
 )
@@ -32,6 +33,7 @@ __all__ = [
     "WorkloadExecutionResult",
     "WorkloadRunSpec",
     "build_robustness_workloads",
+    "build_task_aware_holdout_workloads",
     "build_t2_workloads",
     "normalized_structure_sha256",
     "execute_workload",

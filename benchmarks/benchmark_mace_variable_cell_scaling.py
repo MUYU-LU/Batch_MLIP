@@ -296,6 +296,11 @@ def main() -> None:
         choices=("drain", "immediate", "threshold"),
         default="immediate",
     )
+    parser.add_argument(
+        "--refill-storage",
+        choices=("repack", "slots"),
+        default="repack",
+    )
     parser.add_argument("--refill-low-watermark", type=float, default=0.8)
     parser.add_argument("--refill-min-chunk", type=int)
     parser.add_argument(
@@ -386,6 +391,7 @@ def main() -> None:
             "deterministic_algorithms": args.deterministic,
             "profile_runtime": args.profile_runtime,
             "refill_policy": args.refill_policy,
+            "refill_storage": args.refill_storage,
             "refill_low_watermark": args.refill_low_watermark,
             "refill_min_chunk": args.refill_min_chunk,
             "linear_algebra_backend": args.linear_algebra_backend,
@@ -423,6 +429,7 @@ def main() -> None:
                         active_compaction=args.method in ("active", "refill"),
                         refill=args.method == "refill",
                         refill_policy=args.refill_policy,
+                        refill_storage=args.refill_storage,
                         refill_low_watermark=args.refill_low_watermark,
                         refill_min_chunk=args.refill_min_chunk,
                         linear_algebra_backend=args.linear_algebra_backend,
@@ -438,7 +445,7 @@ def main() -> None:
                 profiles.append(profiler.summary())
                 return current
 
-            output, timing, peak_memory = timed_repeats(
+            output, timing, peak_memory, peak_reserved_memory = timed_repeats(
                 measured_fn,
                 repeats=args.repeats,
                 device=device,
@@ -452,6 +459,7 @@ def main() -> None:
                         args.pool_size * args.atom_count / timing["median_seconds"]
                     ),
                     "peak_memory_bytes": peak_memory,
+                    "peak_reserved_memory_bytes": peak_reserved_memory,
                     **output,
                 }
             )

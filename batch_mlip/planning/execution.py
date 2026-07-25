@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Any
 
 from ase import Atoms
 
@@ -17,6 +18,8 @@ class ScheduledRelaxationBatch:
     system_indices: tuple[int, ...]
     resident_capacity: int
     active_refill: bool
+    refill_storage: str = "repack"
+    predicted_seconds: float | None = None
 
 
 @dataclass(frozen=True)
@@ -27,6 +30,7 @@ class RelaxationSchedule:
     plan: BatchPlan
     batches: tuple[ScheduledRelaxationBatch, ...]
     total_predicted_bytes: int
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 def plan_relaxation_execution(

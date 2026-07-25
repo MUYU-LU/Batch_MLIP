@@ -141,7 +141,7 @@ on their owning GPU.
 | Optimization, few large systems | Use if valid long enough | Off | Small batches; shard independent systems if useful |
 | Many homogeneous systems, similar convergence | Use if profitable | Usually off | Large static resident batches |
 | Many homogeneous systems, varied convergence | Use if profitable | Immediate refill; threshold is experimental | Keep each GPU near its memory-safe target |
-| Many mixed systems | Per-structure policy | Immediate refill within compatible buckets | Edge/Hessian-aware packing and work stealing |
+| Many mixed systems | Per-structure policy | Refill only with matched target evidence | Edge/Hessian-aware packing; conservative drain otherwise |
 | Fixed-length MD replicas | High priority | Off | Persistent replica batches across GPUs |
 
 ## Generic runtime design

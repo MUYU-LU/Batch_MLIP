@@ -1,0 +1,42 @@
+id: task-aware-policy-validation
+date: 2026-07-26
+question: >-
+  Can a policy fitted only from H46/H276 step distributions, warmed graph/model
+  timing curves, calibrated memory, and MPS throughput select low-regret
+  execution for held-out H92/H184/MIX4 pools at R32/R64/R256?
+fit_workloads: [OPT-H46-R256-v1, OPT-H276-R256-v1]
+held_out_workloads:
+  homogeneous:
+    - OPT-H92-R32-v1
+    - OPT-H92-R64-v1
+    - OPT-H92-R256-v1
+    - OPT-H184-R32-v1
+    - OPT-H184-R64-v1
+    - OPT-H184-R256-v1
+  heterogeneous:
+    - OPT-MIX4-R32-v1
+    - OPT-MIX4-R64-v1
+    - OPT-MIX4-R256-v1
+models: [atombit_smooth_rms_fp32, mace_off_small_fp64]
+optimizer_validation:
+  bfgs: [H92, MIX4]
+  fire: [H184]
+pool_sizes: [32, 64, 256]
+resident_candidates: [32, 64, 128]
+execution_candidates: [active_drain, active_refill, mps32]
+controls:
+  repeats: 1
+  deterministic_algorithms: true
+  memory_budget_GiB: 68
+  max_cost_ratio: 2.0
+  fmax_eV_per_A: 0.05
+  bfgs_max_steps: 500
+  fire_max_steps: 2000
+metrics:
+  - policy_regret_vs_fastest_measured_candidate
+  - speedup_vs_mps32
+  - wall_time_s
+  - peak_allocated_GiB
+  - peak_reserved_or_device_GiB
+  - convergence
+  - endpoint_energy_distribution

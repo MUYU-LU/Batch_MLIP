@@ -5,11 +5,16 @@ from ase import Atoms
 
 from batch_mlip import (
     BatchPlanner,
+    BatchTimingPoint,
     CalibrationObservation,
     MemoryCoefficients,
+    OptimizationPilot,
+    PilotRegime,
     SystemProfile,
+    TaskAwarePolicy,
     fit_memory_coefficients,
     plan_relaxation_execution,
+    plan_task_aware_relaxation,
 )
 
 
@@ -153,6 +158,201 @@ def test_execution_planner_uses_refill_only_when_optimizer_supports_it():
     assert schedule.batches[0].system_indices == (0, 1)
     assert schedule.batches[0].resident_capacity == 1
     assert schedule.batches[0].active_refill
+
+
+def _task_aware_pilot(
+    sampled_steps: tuple[int, ...],
+    *,
+    mps_systems_per_second: float | None = None,
+) -> OptimizationPilot:
+    return OptimizationPilot(
+        optimizer="fire",
+        source="unit-test",
+        mps_systems_per_second=mps_systems_per_second,
+        regimes=(
+            PilotRegime(
+                label="H1",
+                atom_count=1,
+                edge_count=0,
+                sampled_steps=sampled_steps,
+                timing_points=(
+                    BatchTimingPoint(1, 0.010, 100),
+                    BatchTimingPoint(2, 0.012, 200),
+                ),
+            ),
+        ),
+    )
+
+
+def test_task_aware_policy_selects_refill_for_a_wide_convergence_tail():
+    systems = [
+        Atoms("H", positions=[[float(index), 0.0, 0.0]])
+        for index in range(4)
+    ]
+    planner = BatchPlanner(
+        MemoryCoefficients(10.0, 1.0, 0.0, 0.0),
+        memory_budget_bytes=1_000,
+        max_batch_size=2,
+        max_cost_ratio=100.0,
+    )
+
+    schedule = plan_task_aware_relaxation(
+        planner,
+        systems,
+        cutoff=1.0,
+        pilot=_task_aware_pilot((0, 9), mps_systems_per_second=100.0),
+        policy=TaskAwarePolicy(allow_refill_regime_extrapolation=True),
+        supports_refill=True,
+    )
+
+    assert schedule.decision == "task_aware_pilot_policy"
+    assert len(schedule.batches) == 1
+    assert schedule.batches[0].active_refill
+    assert schedule.batches[0].resident_capacity == 2
+    assert schedule.batches[0].refill_storage == "slots"
+    assert schedule.metadata["predicted_tensor_seconds"] == pytest.approx(0.14)
+    assert schedule.metadata["recommended_worker_mode"] == "mps"
+    decisions = schedule.metadata["bucket_decisions"][0]
+    assert decisions["selected_mode"] == "refill"
+    assert decisions["selected_capacity"] == 2
+
+
+def test_task_aware_policy_rejects_refill_without_predicted_benefit():
+    systems = [
+        Atoms("H", positions=[[float(index), 0.0, 0.0]])
+        for index in range(4)
+    ]
+    planner = BatchPlanner(
+        MemoryCoefficients(10.0, 1.0, 0.0, 0.0),
+        memory_budget_bytes=1_000,
+        max_batch_size=2,
+        max_cost_ratio=100.0,
+    )
+
+    schedule = plan_task_aware_relaxation(
+        planner,
+        systems,
+        cutoff=1.0,
+        pilot=_task_aware_pilot((4, 4)),
+        policy=TaskAwarePolicy(min_refill_speedup=1.01),
+        supports_refill=True,
+    )
+
+    assert len(schedule.batches) == 2
+    assert all(not batch.active_refill for batch in schedule.batches)
+    assert schedule.metadata["recommended_worker_mode"] == "tensor"
+    decisions = schedule.metadata["bucket_decisions"][0]
+    refill = next(
+        candidate
+        for candidate in decisions["candidates"]
+        if candidate["mode"] == "refill" and candidate["capacity"] == 2
+    )
+    assert not refill["eligible"]
+
+
+def test_task_aware_policy_does_not_extrapolate_refill_by_default():
+    systems = [
+        Atoms("H2", positions=[[0.0, 0.0, 0.0], [0.8, 0.0, 0.0]])
+        for _ in range(4)
+    ]
+    profiles = tuple(
+        SystemProfile(index, 2, 2, 225) for index in range(4)
+    )
+    planner = BatchPlanner(
+        MemoryCoefficients(10.0, 1.0, 0.0, 0.0),
+        memory_budget_bytes=1_000,
+        max_batch_size=2,
+    )
+
+    schedule = plan_task_aware_relaxation(
+        planner,
+        systems,
+        cutoff=1.0,
+        pilot=_task_aware_pilot((0, 9)),
+        supports_refill=True,
+        system_profiles=profiles,
+    )
+
+    assert all(not batch.active_refill for batch in schedule.batches)
+    decision = schedule.metadata["bucket_decisions"][0]
+    assert not decision["refill_evidence_matched"]
+    assert all(
+        candidate["mode"] == "drain"
+        for candidate in decision["candidates"]
+    )
+
+
+def test_optimization_pilot_serialization_round_trip():
+    pilot = _task_aware_pilot((1, 3, 5), mps_systems_per_second=2.5)
+
+    restored = OptimizationPilot.from_dict(pilot.to_dict())
+
+    assert restored == pilot
+
+
+def test_task_aware_policy_rejects_an_optimizer_mismatched_pilot():
+    planner = BatchPlanner(
+        MemoryCoefficients(10.0, 1.0, 0.0, 0.0),
+        memory_budget_bytes=1_000,
+    )
+
+    with pytest.raises(ValueError, match="does not match"):
+        plan_task_aware_relaxation(
+            planner,
+            [Atoms("H", positions=[[0.0, 0.0, 0.0]])],
+            cutoff=1.0,
+            pilot=_task_aware_pilot((1,)),
+            optimizer_name="bfgs",
+        )
+
+
+def test_task_aware_policy_accepts_cached_system_profiles():
+    systems = [
+        Atoms("H", positions=[[0.0, 0.0, 0.0]]),
+        Atoms("H", positions=[[1.0, 0.0, 0.0]]),
+    ]
+    profiles = (
+        SystemProfile(0, 1, 0, 144),
+        SystemProfile(1, 1, 0, 144),
+    )
+    planner = BatchPlanner(
+        MemoryCoefficients(10.0, 1.0, 0.0, 0.0),
+        memory_budget_bytes=1_000,
+        max_batch_size=2,
+    )
+
+    schedule = plan_task_aware_relaxation(
+        planner,
+        systems,
+        cutoff=1.0,
+        pilot=_task_aware_pilot((1, 1)),
+        system_profiles=profiles,
+    )
+
+    assert schedule.plan.profiles == profiles
+    assert schedule.plan.profiling_seconds == 0.0
+
+
+def test_task_aware_policy_excludes_a_measured_capacity_over_budget():
+    systems = [
+        Atoms("H", positions=[[0.0, 0.0, 0.0]]),
+        Atoms("H", positions=[[1.0, 0.0, 0.0]]),
+    ]
+    planner = BatchPlanner(
+        MemoryCoefficients(10.0, 1.0, 0.0, 0.0),
+        memory_budget_bytes=150,
+        max_batch_size=2,
+    )
+
+    schedule = plan_task_aware_relaxation(
+        planner,
+        systems,
+        cutoff=1.0,
+        pilot=_task_aware_pilot((1, 1)),
+    )
+
+    assert len(schedule.batches) == 2
+    assert all(batch.resident_capacity == 1 for batch in schedule.batches)
 
 
 @pytest.mark.parametrize(

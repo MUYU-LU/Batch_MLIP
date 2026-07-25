@@ -61,14 +61,22 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--energy-per-atom-atol", type=float, default=5e-7)
     parser.add_argument("--force-atol", type=float, default=1e-4)
+    parser.add_argument("--compute-stress", action="store_true")
+    parser.add_argument("--validation-count", type=int, default=32)
     parser.add_argument("--output", type=Path, required=True)
     return parser
 
 
 def main() -> int:
     args = build_parser().parse_args()
-    if args.batch_size <= 0 or args.cpu_threads <= 0:
-        raise ValueError("batch-size and cpu-threads must be positive")
+    if (
+        args.batch_size <= 0
+        or args.cpu_threads <= 0
+        or args.validation_count < 0
+    ):
+        raise ValueError(
+            "batch-size/cpu-threads must be positive and validation-count non-negative"
+        )
     torch.set_num_threads(args.cpu_threads)
     args.task = "eval"
     args.skin = 0.0
@@ -98,16 +106,28 @@ def main() -> int:
             atoms.info["capacity_batch_index"] = index
 
         # Initialize both generic model state and shape-dependent allocator paths.
-        evaluate([systems[0]], bundle.native)
+        evaluate(
+            [systems[0]],
+            bundle.native,
+            compute_stress=args.compute_stress,
+        )
         for _ in range(2):
-            evaluate(systems, bundle.native)
+            evaluate(
+                systems,
+                bundle.native,
+                compute_stress=args.compute_stress,
+            )
         _synchronize(bundle.device)
         _reset_peak(bundle.device)
 
         with RuntimeProfiler(device=bundle.device) as profiler:
             _synchronize(bundle.device)
             started = time.perf_counter()
-            output = evaluate(systems, bundle.native)
+            output = evaluate(
+                systems,
+                bundle.native,
+                compute_stress=args.compute_stress,
+            )
             _synchronize(bundle.device)
             wall_time = time.perf_counter() - started
         peak_allocated, peak_reserved = _peak_memory(bundle.device)
@@ -116,9 +136,17 @@ def main() -> int:
         # Validate each unique source once; repeated jobs have identical inputs.
         max_energy_error = 0.0
         max_force_error = 0.0
-        validation_count = min(len(base), args.batch_size)
+        validation_count = min(
+            len(base),
+            args.batch_size,
+            args.validation_count,
+        )
         for index in range(validation_count):
-            single = evaluate([base[index]], bundle.native).structures[0]
+            single = evaluate(
+                [base[index]],
+                bundle.native,
+                compute_stress=args.compute_stress,
+            ).structures[0]
             batched = output.structures[index]
             energy_error = abs(
                 float(single.get_potential_energy()) - float(batched.get_potential_energy())
@@ -139,6 +167,7 @@ def main() -> int:
                 "source_manifest_sha256": manifest.manifest_sha256,
                 "pool_expansion": "cyclic repetition of frozen R32 manifest order",
                 "atom_count": len(systems[0]),
+                "compute_stress": args.compute_stress,
                 "total_atoms": sum(len(atoms) for atoms in systems),
                 "wall_time_s": wall_time,
                 "structures_per_s": args.batch_size / wall_time,

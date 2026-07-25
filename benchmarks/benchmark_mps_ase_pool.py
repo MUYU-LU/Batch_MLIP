@@ -544,8 +544,11 @@ def main() -> None:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     context = mp.get_context("spawn")
     barrier = context.Barrier(args.workers + 1)
+    run_id = os.getpid()
     worker_paths = [
-        args.output.with_suffix(f".worker-{worker_id}.json")
+        args.output.with_suffix(
+            f".run-{run_id}.worker-{worker_id}.json"
+        )
         for worker_id in range(args.workers)
     ]
     for worker_path in worker_paths:
@@ -568,6 +571,11 @@ def main() -> None:
     except threading.BrokenBarrierError:
         for process in processes:
             process.join(timeout=1)
+        for process in processes:
+            if process.is_alive():
+                process.terminate()
+        for process in processes:
+            process.join(timeout=10)
         failures = {
             process.name: process.exitcode
             for process in processes

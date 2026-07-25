@@ -79,6 +79,40 @@ class AseGraphBatch:
     _neighbor_reference_cells: torch.Tensor | None = field(default=None, repr=False)
     _neighbor_reference_valid: torch.Tensor | None = field(default=None, repr=False)
 
+    def to(self, device: str | torch.device) -> AseGraphBatch:
+        """Copy tensor state to ``device`` while preserving graph semantics."""
+
+        resolved = torch.device(device)
+
+        def move(value: torch.Tensor | None) -> torch.Tensor | None:
+            return None if value is None else value.to(resolved)
+
+        return AseGraphBatch(
+            templates=[template.copy() for template in self.templates],
+            cutoff=self.cutoff,
+            skin=self.skin,
+            device=resolved,
+            dtype=self.dtype,
+            neighbor_backend=self.neighbor_backend,
+            z=self.z.to(resolved),
+            positions=self.positions.to(resolved),
+            cells=self.cells.to(resolved),
+            pbc=self.pbc.to(resolved),
+            system_idx=self.system_idx.to(resolved),
+            ptr=self.ptr.to(resolved),
+            masses=self.masses.to(resolved),
+            fixed=self.fixed.to(resolved),
+            velocities=self.velocities.to(resolved),
+            edge_index=self.edge_index.to(resolved),
+            shifts_int=self.shifts_int.to(resolved),
+            neighbor_rebuild_count=self.neighbor_rebuild_count,
+            _neighbor_reference_positions=move(
+                self._neighbor_reference_positions
+            ),
+            _neighbor_reference_cells=move(self._neighbor_reference_cells),
+            _neighbor_reference_valid=move(self._neighbor_reference_valid),
+        )
+
     @classmethod
     def from_ase(
         cls,

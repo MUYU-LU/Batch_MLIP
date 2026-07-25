@@ -1,0 +1,924 @@
+{
+  "rows": [
+    {
+      "candidates": [
+        {
+          "converged": 32,
+          "mode": "policy_tensor",
+          "peak_bytes": 9235857408,
+          "schedule": [
+            {
+              "active_refill": false,
+              "predicted_seconds": 10.525558029401248,
+              "refill_storage": "slots",
+              "resident_capacity": 32,
+              "system_count": 32
+            }
+          ],
+          "seconds": 17.615773246157914
+        },
+        {
+          "converged": 32,
+          "mode": "mps32",
+          "peak_bytes": 36701208576,
+          "seconds": 18.19961158093065
+        }
+      ],
+      "distribution": "H92",
+      "fastest_measured_mode": "policy_tensor",
+      "fastest_measured_seconds": 17.615773246157914,
+      "model": "atombit",
+      "mps_seconds": 18.19961158093065,
+      "optimizer": "bfgs",
+      "policy_regret": 1.0331429297263504,
+      "pool_size": 32,
+      "quality_valid": true,
+      "recommendation": "mps",
+      "selected_converged": 32,
+      "selected_mode": "mps32",
+      "selected_peak_GiB": 34.1806640625,
+      "selected_seconds": 18.19961158093065,
+      "speedup_vs_mps32": 1.0
+    },
+    {
+      "candidates": [
+        {
+          "converged": 64,
+          "mode": "policy_tensor",
+          "peak_bytes": 18360565760,
+          "schedule": [
+            {
+              "active_refill": false,
+              "predicted_seconds": 13.836176678954123,
+              "refill_storage": "slots",
+              "resident_capacity": 64,
+              "system_count": 64
+            }
+          ],
+          "seconds": 26.22275229310617
+        },
+        {
+          "converged": 64,
+          "mode": "mps32",
+          "peak_bytes": 36874223616,
+          "seconds": 29.209733059164137
+        },
+        {
+          "converged": 64,
+          "mode": "refill_b32",
+          "peak_bytes": 30528241664,
+          "seconds": 41.05963930301368
+        }
+      ],
+      "distribution": "H92",
+      "fastest_measured_mode": "policy_tensor",
+      "fastest_measured_seconds": 26.22275229310617,
+      "model": "atombit",
+      "mps_seconds": 29.209733059164137,
+      "optimizer": "bfgs",
+      "policy_regret": 1.0,
+      "pool_size": 64,
+      "quality_valid": true,
+      "recommendation": "tensor",
+      "selected_converged": 64,
+      "selected_mode": "policy_tensor",
+      "selected_peak_GiB": 17.099609375,
+      "selected_seconds": 26.22275229310617,
+      "speedup_vs_mps32": 1.1139079808507832
+    },
+    {
+      "candidates": [
+        {
+          "converged": 256,
+          "mode": "policy_tensor",
+          "peak_bytes": 50262441984,
+          "schedule": [
+            {
+              "active_refill": false,
+              "predicted_seconds": 20.518935039198727,
+              "refill_storage": "slots",
+              "resident_capacity": 128,
+              "system_count": 128
+            },
+            {
+              "active_refill": false,
+              "predicted_seconds": 20.518935039198727,
+              "refill_storage": "slots",
+              "resident_capacity": 128,
+              "system_count": 128
+            }
+          ],
+          "seconds": 80.78831434808671
+        },
+        {
+          "converged": 256,
+          "mode": "mps32",
+          "peak_bytes": 39542849536,
+          "seconds": 101.83136440813541
+        },
+        {
+          "converged": 256,
+          "mode": "refill_b64",
+          "peak_bytes": 83900760064,
+          "seconds": 116.92327257012948
+        },
+        {
+          "converged": 256,
+          "mode": "drain_b128",
+          "peak_bytes": 50262441984,
+          "seconds": 84.27710131183267
+        }
+      ],
+      "distribution": "H92",
+      "fastest_measured_mode": "policy_tensor",
+      "fastest_measured_seconds": 80.78831434808671,
+      "model": "atombit",
+      "mps_seconds": 101.83136440813541,
+      "optimizer": "bfgs",
+      "policy_regret": 1.0,
+      "pool_size": 256,
+      "quality_valid": true,
+      "recommendation": "tensor",
+      "selected_converged": 256,
+      "selected_mode": "policy_tensor",
+      "selected_peak_GiB": 46.810546875,
+      "selected_seconds": 80.78831434808671,
+      "speedup_vs_mps32": 1.2604714584015462
+    },
+    {
+      "candidates": [
+        {
+          "converged": 32,
+          "mode": "policy_tensor",
+          "peak_bytes": 5446303744,
+          "schedule": [
+            {
+              "active_refill": false,
+              "predicted_seconds": 10.976576008193657,
+              "refill_storage": "slots",
+              "resident_capacity": 32,
+              "system_count": 32
+            }
+          ],
+          "seconds": 20.54368886211887
+        },
+        {
+          "converged": 32,
+          "mode": "mps32",
+          "peak_bytes": 36430675968,
+          "seconds": 18.993996852077544
+        }
+      ],
+      "distribution": "H92",
+      "fastest_measured_mode": "mps32",
+      "fastest_measured_seconds": 18.993996852077544,
+      "model": "mace",
+      "mps_seconds": 18.993996852077544,
+      "optimizer": "bfgs",
+      "policy_regret": 1.0,
+      "pool_size": 32,
+      "quality_valid": true,
+      "recommendation": "mps",
+      "selected_converged": 32,
+      "selected_mode": "mps32",
+      "selected_peak_GiB": 33.9287109375,
+      "selected_seconds": 18.993996852077544,
+      "speedup_vs_mps32": 1.0
+    },
+    {
+      "candidates": [
+        {
+          "converged": 64,
+          "mode": "policy_tensor",
+          "peak_bytes": 10785652736,
+          "schedule": [
+            {
+              "active_refill": false,
+              "predicted_seconds": 14.012189431224076,
+              "refill_storage": "slots",
+              "resident_capacity": 64,
+              "system_count": 64
+            }
+          ],
+          "seconds": 30.082955699879676
+        },
+        {
+          "converged": 64,
+          "mode": "mps32",
+          "peak_bytes": 36501979136,
+          "seconds": 24.782422591000795
+        },
+        {
+          "converged": 64,
+          "mode": "refill_b32",
+          "peak_bytes": 6280970240,
+          "seconds": 44.42268322780728
+        }
+      ],
+      "distribution": "H92",
+      "fastest_measured_mode": "mps32",
+      "fastest_measured_seconds": 24.782422591000795,
+      "model": "mace",
+      "mps_seconds": 24.782422591000795,
+      "optimizer": "bfgs",
+      "policy_regret": 1.213882766683337,
+      "pool_size": 64,
+      "quality_valid": true,
+      "recommendation": "tensor",
+      "selected_converged": 64,
+      "selected_mode": "policy_tensor",
+      "selected_peak_GiB": 10.044921875,
+      "selected_seconds": 30.082955699879676,
+      "speedup_vs_mps32": 0.8238027818223965
+    },
+    {
+      "candidates": [
+        {
+          "converged": 256,
+          "mode": "policy_tensor",
+          "peak_bytes": 21483225088,
+          "schedule": [
+            {
+              "active_refill": false,
+              "predicted_seconds": 21.325864967623996,
+              "refill_storage": "slots",
+              "resident_capacity": 128,
+              "system_count": 128
+            },
+            {
+              "active_refill": false,
+              "predicted_seconds": 21.325864967623996,
+              "refill_storage": "slots",
+              "resident_capacity": 128,
+              "system_count": 128
+            }
+          ],
+          "seconds": 97.599190864712
+        },
+        {
+          "converged": 256,
+          "mode": "mps32",
+          "peak_bytes": 37359714304,
+          "seconds": 85.70234432816505
+        },
+        {
+          "converged": 256,
+          "mode": "refill_b64",
+          "peak_bytes": 12452888576,
+          "seconds": 116.03854704042897
+        }
+      ],
+      "distribution": "H92",
+      "fastest_measured_mode": "mps32",
+      "fastest_measured_seconds": 85.70234432816505,
+      "model": "mace",
+      "mps_seconds": 85.70234432816505,
+      "optimizer": "bfgs",
+      "policy_regret": 1.138815882223623,
+      "pool_size": 256,
+      "quality_valid": true,
+      "recommendation": "tensor",
+      "selected_converged": 256,
+      "selected_mode": "policy_tensor",
+      "selected_peak_GiB": 20.0078125,
+      "selected_seconds": 97.599190864712,
+      "speedup_vs_mps32": 0.8781050700201207
+    },
+    {
+      "candidates": [
+        {
+          "converged": 31,
+          "mode": "policy_tensor",
+          "peak_bytes": 17324572672,
+          "schedule": [
+            {
+              "active_refill": false,
+              "predicted_seconds": 10.734497093063375,
+              "refill_storage": "slots",
+              "resident_capacity": 32,
+              "system_count": 32
+            }
+          ],
+          "seconds": 85.91393224708736
+        },
+        {
+          "converged": 31,
+          "mode": "mps32",
+          "peak_bytes": 42141220864,
+          "seconds": 78.05566965788603
+        }
+      ],
+      "distribution": "H184",
+      "fastest_measured_mode": null,
+      "fastest_measured_seconds": null,
+      "model": "atombit",
+      "mps_seconds": 78.05566965788603,
+      "optimizer": "fire",
+      "policy_regret": null,
+      "pool_size": 32,
+      "quality_valid": false,
+      "recommendation": "mps",
+      "selected_converged": 31,
+      "selected_mode": "mps32",
+      "selected_peak_GiB": 39.2470703125,
+      "selected_seconds": 78.05566965788603,
+      "speedup_vs_mps32": 1.0
+    },
+    {
+      "candidates": [
+        {
+          "converged": 62,
+          "mode": "policy_tensor",
+          "peak_bytes": 60882419712,
+          "schedule": [
+            {
+              "active_refill": false,
+              "predicted_seconds": 18.96880739431692,
+              "refill_storage": "slots",
+              "resident_capacity": 64,
+              "system_count": 64
+            }
+          ],
+          "seconds": 105.19292551884428
+        },
+        {
+          "converged": 62,
+          "mode": "mps32",
+          "peak_bytes": 43571478528,
+          "seconds": 92.62260376522318
+        },
+        {
+          "converged": 63,
+          "mode": "refill_b32",
+          "peak_bytes": 23949475840,
+          "seconds": 104.26249128114432
+        }
+      ],
+      "distribution": "H184",
+      "fastest_measured_mode": null,
+      "fastest_measured_seconds": null,
+      "model": "atombit",
+      "mps_seconds": 92.62260376522318,
+      "optimizer": "fire",
+      "policy_regret": null,
+      "pool_size": 64,
+      "quality_valid": false,
+      "recommendation": "tensor",
+      "selected_converged": 62,
+      "selected_mode": "policy_tensor",
+      "selected_peak_GiB": 56.701171875,
+      "selected_seconds": 105.19292551884428,
+      "speedup_vs_mps32": 0.8805022135127399
+    },
+    {
+      "candidates": [
+        {
+          "converged": 248,
+          "mode": "policy_tensor",
+          "peak_bytes": 83716210688,
+          "schedule": [
+            {
+              "active_refill": false,
+              "predicted_seconds": 36.23414374294225,
+              "refill_storage": "slots",
+              "resident_capacity": 128,
+              "system_count": 128
+            },
+            {
+              "active_refill": false,
+              "predicted_seconds": 36.23414374294225,
+              "refill_storage": "slots",
+              "resident_capacity": 128,
+              "system_count": 128
+            }
+          ],
+          "seconds": 267.617084458936
+        },
+        {
+          "converged": 248,
+          "mode": "mps32",
+          "peak_bytes": 45800751104,
+          "seconds": 229.48385329917073
+        },
+        {
+          "converged": 252,
+          "mode": "refill_b64",
+          "peak_bytes": 60741910528,
+          "seconds": 173.9944644747302
+        }
+      ],
+      "distribution": "H184",
+      "fastest_measured_mode": null,
+      "fastest_measured_seconds": null,
+      "model": "atombit",
+      "mps_seconds": 229.48385329917073,
+      "optimizer": "fire",
+      "policy_regret": null,
+      "pool_size": 256,
+      "quality_valid": false,
+      "recommendation": "tensor",
+      "selected_converged": 248,
+      "selected_mode": "policy_tensor",
+      "selected_peak_GiB": 77.966796875,
+      "selected_seconds": 267.617084458936,
+      "speedup_vs_mps32": 0.8575082333145418
+    },
+    {
+      "candidates": [
+        {
+          "converged": 31,
+          "mode": "policy_tensor",
+          "peak_bytes": 9556721664,
+          "schedule": [
+            {
+              "active_refill": false,
+              "predicted_seconds": 10.906093308377807,
+              "refill_storage": "slots",
+              "resident_capacity": 32,
+              "system_count": 32
+            }
+          ],
+          "seconds": 89.5785474809818
+        },
+        {
+          "converged": 31,
+          "mode": "mps32",
+          "peak_bytes": 42200989696,
+          "seconds": 83.80943749379367
+        }
+      ],
+      "distribution": "H184",
+      "fastest_measured_mode": null,
+      "fastest_measured_seconds": null,
+      "model": "mace",
+      "mps_seconds": 83.80943749379367,
+      "optimizer": "fire",
+      "policy_regret": null,
+      "pool_size": 32,
+      "quality_valid": false,
+      "recommendation": "mps",
+      "selected_converged": 31,
+      "selected_mode": "mps32",
+      "selected_peak_GiB": 39.302734375,
+      "selected_seconds": 83.80943749379367,
+      "speedup_vs_mps32": 1.0
+    },
+    {
+      "candidates": [
+        {
+          "converged": 62,
+          "mode": "policy_tensor",
+          "peak_bytes": 19048431616,
+          "schedule": [
+            {
+              "active_refill": false,
+              "predicted_seconds": 18.770347820012887,
+              "refill_storage": "slots",
+              "resident_capacity": 64,
+              "system_count": 64
+            }
+          ],
+          "seconds": 106.70725322328508
+        },
+        {
+          "converged": 62,
+          "mode": "mps32",
+          "peak_bytes": 42313187328,
+          "seconds": 88.63012699689716
+        },
+        {
+          "converged": 63,
+          "mode": "refill_b32",
+          "peak_bytes": 9558818816,
+          "seconds": 93.02430517273024
+        }
+      ],
+      "distribution": "H184",
+      "fastest_measured_mode": null,
+      "fastest_measured_seconds": null,
+      "model": "mace",
+      "mps_seconds": 88.63012699689716,
+      "optimizer": "fire",
+      "policy_regret": null,
+      "pool_size": 64,
+      "quality_valid": false,
+      "recommendation": "tensor",
+      "selected_converged": 62,
+      "selected_mode": "policy_tensor",
+      "selected_peak_GiB": 17.740234375,
+      "selected_seconds": 106.70725322328508,
+      "speedup_vs_mps32": 0.830591401424592
+    },
+    {
+      "candidates": [
+        {
+          "converged": 248,
+          "mode": "policy_tensor",
+          "peak_bytes": 37958451200,
+          "schedule": [
+            {
+              "active_refill": false,
+              "predicted_seconds": 35.006538110552285,
+              "refill_storage": "slots",
+              "resident_capacity": 128,
+              "system_count": 128
+            },
+            {
+              "active_refill": false,
+              "predicted_seconds": 35.006538110552285,
+              "refill_storage": "slots",
+              "resident_capacity": 128,
+              "system_count": 128
+            }
+          ],
+          "seconds": 270.27055193902925
+        },
+        {
+          "converged": 248,
+          "mode": "mps32",
+          "peak_bytes": 42527096832,
+          "seconds": 165.2297099120915
+        },
+        {
+          "converged": 252,
+          "mode": "refill_b64",
+          "peak_bytes": 21325938688,
+          "seconds": 194.02252588281408
+        }
+      ],
+      "distribution": "H184",
+      "fastest_measured_mode": null,
+      "fastest_measured_seconds": null,
+      "model": "mace",
+      "mps_seconds": 165.2297099120915,
+      "optimizer": "fire",
+      "policy_regret": null,
+      "pool_size": 256,
+      "quality_valid": false,
+      "recommendation": "tensor",
+      "selected_converged": 248,
+      "selected_mode": "policy_tensor",
+      "selected_peak_GiB": 35.3515625,
+      "selected_seconds": 270.27055193902925,
+      "speedup_vs_mps32": 0.6113492895421545
+    },
+    {
+      "candidates": [
+        {
+          "converged": 32,
+          "mode": "policy_tensor",
+          "peak_bytes": 6530531328,
+          "schedule": [
+            {
+              "active_refill": false,
+              "predicted_seconds": 8.631603424437333,
+              "refill_storage": "repack",
+              "resident_capacity": 16,
+              "system_count": 16
+            },
+            {
+              "active_refill": false,
+              "predicted_seconds": 6.208150105018695,
+              "refill_storage": "slots",
+              "resident_capacity": 8,
+              "system_count": 8
+            },
+            {
+              "active_refill": false,
+              "predicted_seconds": 6.208150105018695,
+              "refill_storage": "slots",
+              "resident_capacity": 8,
+              "system_count": 8
+            }
+          ],
+          "seconds": 36.09527421602979
+        },
+        {
+          "converged": 32,
+          "mode": "mps32",
+          "peak_bytes": 39358300160,
+          "seconds": 33.84881627373397
+        }
+      ],
+      "distribution": "MIX4",
+      "fastest_measured_mode": "mps32",
+      "fastest_measured_seconds": 33.84881627373397,
+      "model": "atombit",
+      "mps_seconds": 33.84881627373397,
+      "optimizer": "bfgs",
+      "policy_regret": 1.0,
+      "pool_size": 32,
+      "quality_valid": true,
+      "recommendation": "mps",
+      "selected_converged": 32,
+      "selected_mode": "mps32",
+      "selected_peak_GiB": 36.6552734375,
+      "selected_seconds": 33.84881627373397,
+      "speedup_vs_mps32": 1.0
+    },
+    {
+      "candidates": [
+        {
+          "converged": 64,
+          "mode": "policy_tensor",
+          "peak_bytes": 19358810112,
+          "schedule": [
+            {
+              "active_refill": false,
+              "predicted_seconds": 12.872664995982126,
+              "refill_storage": "repack",
+              "resident_capacity": 32,
+              "system_count": 32
+            },
+            {
+              "active_refill": false,
+              "predicted_seconds": 8.427083820769827,
+              "refill_storage": "slots",
+              "resident_capacity": 16,
+              "system_count": 16
+            },
+            {
+              "active_refill": false,
+              "predicted_seconds": 8.427083820769827,
+              "refill_storage": "slots",
+              "resident_capacity": 16,
+              "system_count": 16
+            }
+          ],
+          "seconds": 39.01230736076832
+        },
+        {
+          "converged": 64,
+          "mode": "mps32",
+          "peak_bytes": 39730544640,
+          "seconds": 38.46396445296705
+        },
+        {
+          "converged": 64,
+          "mode": "refill_b32",
+          "peak_bytes": 13312720896,
+          "seconds": 35.28707312513143
+        }
+      ],
+      "distribution": "MIX4",
+      "fastest_measured_mode": "refill_b32",
+      "fastest_measured_seconds": 35.28707312513143,
+      "model": "atombit",
+      "mps_seconds": 38.46396445296705,
+      "optimizer": "bfgs",
+      "policy_regret": 1.0900298904522359,
+      "pool_size": 64,
+      "quality_valid": true,
+      "recommendation": "mps",
+      "selected_converged": 64,
+      "selected_mode": "mps32",
+      "selected_peak_GiB": 37.001953125,
+      "selected_seconds": 38.46396445296705,
+      "speedup_vs_mps32": 1.0
+    },
+    {
+      "candidates": [
+        {
+          "converged": 256,
+          "mode": "policy_tensor",
+          "peak_bytes": 82615205888,
+          "schedule": [
+            {
+              "active_refill": false,
+              "predicted_seconds": 39.23812438887699,
+              "refill_storage": "repack",
+              "resident_capacity": 128,
+              "system_count": 128
+            },
+            {
+              "active_refill": false,
+              "predicted_seconds": 13.836176678954123,
+              "refill_storage": "slots",
+              "resident_capacity": 64,
+              "system_count": 64
+            },
+            {
+              "active_refill": false,
+              "predicted_seconds": 13.836176678954123,
+              "refill_storage": "slots",
+              "resident_capacity": 64,
+              "system_count": 64
+            }
+          ],
+          "seconds": 94.1086357566528
+        },
+        {
+          "converged": 256,
+          "mode": "mps32",
+          "peak_bytes": 52874444800,
+          "seconds": 118.02300155209377
+        },
+        {
+          "converged": 256,
+          "mode": "refill_b64",
+          "peak_bytes": 56226742272,
+          "seconds": 110.87389363767579
+        }
+      ],
+      "distribution": "MIX4",
+      "fastest_measured_mode": "policy_tensor",
+      "fastest_measured_seconds": 94.1086357566528,
+      "model": "atombit",
+      "mps_seconds": 118.02300155209377,
+      "optimizer": "bfgs",
+      "policy_regret": 1.0,
+      "pool_size": 256,
+      "quality_valid": true,
+      "recommendation": "tensor",
+      "selected_converged": 256,
+      "selected_mode": "policy_tensor",
+      "selected_peak_GiB": 76.94140625,
+      "selected_seconds": 94.1086357566528,
+      "speedup_vs_mps32": 1.254114466787926
+    },
+    {
+      "candidates": [
+        {
+          "converged": 32,
+          "mode": "policy_tensor",
+          "peak_bytes": 7268728832,
+          "schedule": [
+            {
+              "active_refill": false,
+              "predicted_seconds": 9.478554994965503,
+              "refill_storage": "repack",
+              "resident_capacity": 16,
+              "system_count": 16
+            },
+            {
+              "active_refill": false,
+              "predicted_seconds": 6.131160417837759,
+              "refill_storage": "slots",
+              "resident_capacity": 8,
+              "system_count": 8
+            },
+            {
+              "active_refill": false,
+              "predicted_seconds": 6.131160417837759,
+              "refill_storage": "slots",
+              "resident_capacity": 8,
+              "system_count": 8
+            }
+          ],
+          "seconds": 34.94223010586575
+        },
+        {
+          "converged": 32,
+          "mode": "mps32",
+          "peak_bytes": 39769341952,
+          "seconds": 37.3356275879778
+        }
+      ],
+      "distribution": "MIX4",
+      "fastest_measured_mode": "policy_tensor",
+      "fastest_measured_seconds": 34.94223010586575,
+      "model": "mace",
+      "mps_seconds": 37.3356275879778,
+      "optimizer": "bfgs",
+      "policy_regret": 1.0684958422762567,
+      "pool_size": 32,
+      "quality_valid": true,
+      "recommendation": "mps",
+      "selected_converged": 32,
+      "selected_mode": "mps32",
+      "selected_peak_GiB": 37.0380859375,
+      "selected_seconds": 37.3356275879778,
+      "speedup_vs_mps32": 1.0
+    },
+    {
+      "candidates": [
+        {
+          "converged": 64,
+          "mode": "policy_tensor",
+          "peak_bytes": 14361296896,
+          "schedule": [
+            {
+              "active_refill": false,
+              "predicted_seconds": 15.186070856131023,
+              "refill_storage": "repack",
+              "resident_capacity": 32,
+              "system_count": 32
+            },
+            {
+              "active_refill": false,
+              "predicted_seconds": 8.855360527581073,
+              "refill_storage": "slots",
+              "resident_capacity": 16,
+              "system_count": 16
+            },
+            {
+              "active_refill": false,
+              "predicted_seconds": 8.855360527581073,
+              "refill_storage": "slots",
+              "resident_capacity": 16,
+              "system_count": 16
+            }
+          ],
+          "seconds": 47.14247597986832
+        },
+        {
+          "converged": 64,
+          "mode": "mps32",
+          "peak_bytes": 42390781952,
+          "seconds": 46.57253164378926
+        },
+        {
+          "converged": 64,
+          "mode": "refill_b32",
+          "peak_bytes": 9372172288,
+          "seconds": 41.387954792007804
+        }
+      ],
+      "distribution": "MIX4",
+      "fastest_measured_mode": "refill_b32",
+      "fastest_measured_seconds": 41.387954792007804,
+      "model": "mace",
+      "mps_seconds": 46.57253164378926,
+      "optimizer": "bfgs",
+      "policy_regret": 1.1252677712111212,
+      "pool_size": 64,
+      "quality_valid": true,
+      "recommendation": "mps",
+      "selected_converged": 64,
+      "selected_mode": "mps32",
+      "selected_peak_GiB": 39.4794921875,
+      "selected_seconds": 46.57253164378926,
+      "speedup_vs_mps32": 1.0
+    },
+    {
+      "candidates": [
+        {
+          "converged": 256,
+          "mode": "policy_tensor",
+          "peak_bytes": 57078185984,
+          "schedule": [
+            {
+              "active_refill": false,
+              "predicted_seconds": 45.0791783098664,
+              "refill_storage": "repack",
+              "resident_capacity": 128,
+              "system_count": 128
+            },
+            {
+              "active_refill": false,
+              "predicted_seconds": 14.012189431224076,
+              "refill_storage": "slots",
+              "resident_capacity": 64,
+              "system_count": 64
+            },
+            {
+              "active_refill": false,
+              "predicted_seconds": 14.012189431224076,
+              "refill_storage": "slots",
+              "resident_capacity": 64,
+              "system_count": 64
+            }
+          ],
+          "seconds": 120.48341380013153
+        },
+        {
+          "converged": 256,
+          "mode": "mps32",
+          "peak_bytes": 55424581632,
+          "seconds": 111.23777197021991
+        },
+        {
+          "converged": 256,
+          "mode": "refill_b64",
+          "peak_bytes": 18572378112,
+          "seconds": 126.49967512395233
+        }
+      ],
+      "distribution": "MIX4",
+      "fastest_measured_mode": "mps32",
+      "fastest_measured_seconds": 111.23777197021991,
+      "model": "mace",
+      "mps_seconds": 111.23777197021991,
+      "optimizer": "bfgs",
+      "policy_regret": 1.0831160285409782,
+      "pool_size": 256,
+      "quality_valid": true,
+      "recommendation": "tensor",
+      "selected_converged": 256,
+      "selected_mode": "policy_tensor",
+      "selected_peak_GiB": 53.158203125,
+      "selected_seconds": 120.48341380013153,
+      "speedup_vs_mps32": 0.9232621193382758
+    }
+  ],
+  "schema_version": 1,
+  "scope": "restricted oracle: policy tensor fallback, MPS32, smaller refill; one deterministic timing per candidate",
+  "summary": {
+    "geometric_mean_regret": 1.0606637621994055,
+    "maximum_regret": 1.213882766683337,
+    "quality_valid_rows": 12,
+    "rows": 18,
+    "rows_with_defined_regret": 12,
+    "within_five_percent_of_oracle": 6
+  }
+}

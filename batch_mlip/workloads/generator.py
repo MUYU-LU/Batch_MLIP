@@ -657,3 +657,96 @@ def build_t2_workloads(
         )
 
     return workloads
+
+
+def build_task_aware_holdout_workloads(
+    inputs: T2WorkloadInputs,
+    *,
+    pool_sizes: tuple[int, ...] = (32, 64, 256),
+) -> dict[str, WorkloadManifest]:
+    """Build signed size-interpolation and four-size mixed validation pools."""
+
+    if any(size <= 0 or size % 32 for size in pool_sizes):
+        raise ValueError("holdout pool sizes must be positive multiples of 32")
+    selection = json.loads(
+        inputs.selection_manifest.read_text(encoding="utf-8")
+    )
+    atom_counts = (46, 92, 184, 276)
+    selected_names = {
+        atom_count: selection["samples"][str(atom_count)][:32]
+        for atom_count in atom_counts
+    }
+    records_by_count: dict[int, list[_StructureRecord]] = {}
+    for atom_count, names in selected_names.items():
+        records = []
+        for name in names:
+            path = inputs.dataset_dir / name
+            if not path.is_file():
+                raise FileNotFoundError(path)
+            record = _structure_record(
+                path,
+                relative_path=name,
+                cutoffs=inputs.cutoffs_A,
+                skins=inputs.skins_A,
+            )
+            if len(record.atoms) != atom_count:
+                raise ValueError(
+                    f"selection labels {name} as {atom_count} atoms, "
+                    f"but the structure contains {len(record.atoms)}"
+                )
+            records.append(record)
+        records_by_count[atom_count] = records
+
+    common = {
+        "selection_manifest": str(inputs.selection_manifest),
+        "selection_manifest_sha256": _sha256_file(inputs.selection_manifest),
+        "cutoffs_A": list(inputs.cutoffs_A),
+        "skins_A": list(inputs.skins_A),
+        "claim_role": "task_aware_policy_holdout",
+        "selection": "first 32 pre-frozen T2 samples in each atom-count stratum",
+        "statistics_role": "technical replicates grouped by duplicate_group",
+    }
+    workloads: dict[str, WorkloadManifest] = {}
+    for atom_count in (92, 184):
+        unique = records_by_count[atom_count]
+        for pool_size in pool_sizes:
+            workload_id = f"OPT-H{atom_count}-R{pool_size}-v1"
+            workloads[workload_id] = _manifest(
+                workload_id,
+                _repeat_records(unique, pool_size=pool_size),
+                inputs=inputs,
+                metadata={
+                    **common,
+                    "atom_count": atom_count,
+                    "pool_size": pool_size,
+                    "unique_structures": 32,
+                    "repetitions": pool_size // 32,
+                },
+            )
+
+    for pool_size in pool_sizes:
+        per_stratum = pool_size // len(atom_counts)
+        mixed = [
+            records_by_count[atom_count][index % 32]
+            for index in range(per_stratum)
+            for atom_count in atom_counts
+        ]
+        workload_id = f"OPT-MIX4-R{pool_size}-v1"
+        workloads[workload_id] = _manifest(
+            workload_id,
+            mixed,
+            inputs=inputs,
+            metadata={
+                **common,
+                "pool_size": pool_size,
+                "atom_count_strata": list(atom_counts),
+                "jobs_per_stratum": per_stratum,
+                "unique_structures": len(
+                    {record.normalized_sha256 for record in mixed}
+                ),
+                "selection": (
+                    "round-robin H46/H92/H184/H276 from pre-frozen samples"
+                ),
+            },
+        )
+    return workloads

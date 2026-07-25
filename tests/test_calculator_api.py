@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
 import torch
 from ase import Atoms
 from ase.calculators.calculator import Calculator, all_changes
@@ -10,7 +11,10 @@ from batch_mlip import (
     BatchCalculator,
     BatchEvaluation,
     BatchPlanner,
+    BatchTimingPoint,
     MemoryCoefficients,
+    OptimizationPilot,
+    PilotRegime,
     evaluate,
     molecular_dynamics,
     relax,
@@ -150,6 +154,107 @@ def test_auto_relaxation_chunks_and_restores_heterogeneous_input_order():
             "resident_capacity": 1,
             "active_refill": True,
         }
+    ]
+
+
+def test_task_aware_relaxation_executes_selected_tensor_schedule():
+    systems = [
+        Atoms("H", positions=[[0.8, -0.2, 0.1]]),
+        Atoms("H", positions=[[-0.4, 0.2, 0.1]]),
+    ]
+    calculator = QuadraticBatchCalculator()
+    planner = BatchPlanner(
+        MemoryCoefficients(100.0, 1.0, 1.0, 1.0),
+        memory_budget_bytes=1_000_000,
+        max_batch_size=2,
+        max_cost_ratio=100.0,
+    )
+    pilot = OptimizationPilot(
+        optimizer="fire",
+        regimes=(
+            PilotRegime(
+                label="one-atom",
+                atom_count=1,
+                edge_count=0,
+                sampled_steps=(10, 10),
+                timing_points=(
+                    BatchTimingPoint(1, 0.01),
+                    BatchTimingPoint(2, 0.012),
+                ),
+            ),
+        ),
+    )
+
+    result = relax(
+        systems,
+        calculator,
+        scheduling="auto",
+        planner=planner,
+        pilot=pilot,
+        fmax=1e-5,
+        max_steps=500,
+        dt_start=0.05,
+        dt_max=0.5,
+    )
+
+    assert bool(result.converged.all())
+    scheduling = result.metadata["scheduling"]
+    assert scheduling["decision"] == "task_aware_pilot_policy"
+    assert scheduling["recommended_worker_mode"] == "tensor"
+    assert scheduling["batches"] == [
+        {
+            "system_count": 2,
+            "resident_capacity": 2,
+            "active_refill": False,
+            "refill_storage": "slots",
+            "predicted_seconds": pytest.approx(0.132),
+        }
+    ]
+
+
+def test_scheduled_relaxation_reassembles_results_on_calculator_device():
+    systems = [
+        Atoms("H", positions=[[0.8, 0.0, 0.0]]),
+        Atoms("He2", positions=[[0.3, 0.0, 0.0], [-0.4, 0.0, 0.0]]),
+    ]
+    calculator = QuadraticBatchCalculator()
+    planner = BatchPlanner(
+        MemoryCoefficients(10.0, 1.0, 0.0, 0.0),
+        memory_budget_bytes=1_000,
+        max_batch_size=1,
+        max_cost_ratio=1.0,
+    )
+    pilot = OptimizationPilot(
+        optimizer="fire",
+        regimes=(
+            PilotRegime(
+                label="small",
+                atom_count=1,
+                edge_count=0,
+                sampled_steps=(10,),
+                timing_points=(BatchTimingPoint(1, 0.01),),
+            ),
+        ),
+    )
+
+    result = relax(
+        systems,
+        calculator,
+        scheduling="auto",
+        planner=planner,
+        pilot=pilot,
+        fmax=1e-5,
+        max_steps=500,
+        dt_start=0.05,
+        dt_max=0.5,
+    )
+
+    assert result.state.device == calculator.device
+    assert result.evaluation.energy.device == calculator.device
+    assert result.evaluation.forces.device == calculator.device
+    assert [atoms.get_chemical_formula() for atoms in result.structures] == [
+        "H",
+        "He2",
     ]
 
 
