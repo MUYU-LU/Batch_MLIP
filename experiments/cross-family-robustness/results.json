@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "status": "compatibility_screen_passed",
+  "baseline_commit": "6421f18f34b646c4ef453f35b69751e6d42196e5",
+  "selection_seed": 20260725,
+  "workloads": {
+    "OPT-RB-GUFJOG44-R256-v1": {
+      "manifest_sha256": "14b40b565ae1eac47be6a91ad2bc8bb08accdeecbecbfa61ca9230e7e2a2f123",
+      "jobs": 256,
+      "unique_structures": 32,
+      "atom_count": [44, 44.0, 44],
+      "directed_edges": [660, 1628.75, 2716],
+      "edge_count_cv": 0.27514212978745506
+    },
+    "OPT-RB-SOXLEX48-R256-v1": {
+      "manifest_sha256": "096ef36599d91130410b3b0ad56ff44f422b898b4c0370b5c52fd4a92fe6e947",
+      "jobs": 256,
+      "unique_structures": 32,
+      "atom_count": [48, 48.0, 48],
+      "directed_edges": [656, 1434.125, 2276],
+      "edge_count_cv": 0.2495136326698514
+    },
+    "OPT-RB-XATMOV88-R256-v1": {
+      "manifest_sha256": "31fc0228819e1875c0a3471b968fe0a8229f0184e4102ceee7d5499061d906aa",
+      "jobs": 256,
+      "unique_structures": 32,
+      "atom_count": [88, 88.0, 88],
+      "directed_edges": [1636, 3895.375, 6884],
+      "edge_count_cv": 0.29492251813251824
+    },
+    "OPT-RB-OBEQIX220-R256-v1": {
+      "manifest_sha256": "d172ee679e8040e69d190eb0208dd1e6f591e0cf29a52eebff18ddaf1b36322e",
+      "jobs": 256,
+      "unique_structures": 32,
+      "atom_count": [220, 220.0, 220],
+      "directed_edges": [5304, 7389.0, 11616],
+      "edge_count_cv": 0.1739508089886447
+    },
+    "OPT-RB-ROFA-MIX-R256-v1": {
+      "manifest_sha256": "0ea2158b645eeb6a0facdc4085e304f4d975f32763123d8831414e47308c1006",
+      "jobs": 256,
+      "unique_structures": 32,
+      "atom_count": [74, 185.0, 296],
+      "directed_edges": [1882, 4944.75, 8446],
+      "edge_count_cv": 0.44806049913044843
+    },
+    "OPT-RB-ROFB296-R256-v1": {
+      "manifest_sha256": "f8c80b1fb3ec7eeaf501fe93645238db87beec291dc83aa3514a4de8e0304140",
+      "jobs": 256,
+      "unique_structures": 32,
+      "atom_count": [296, 296.0, 296],
+      "directed_edges": [7872, 9790.0, 14312],
+      "edge_count_cv": 0.12251228440137558
+    },
+    "OPT-RB-CROSS-MIX-R192-v1": {
+      "manifest_sha256": "022528c71e6c8bb604eaf9d1190b8b8e7d578f9be03de2691caa63ee36f39fa0",
+      "jobs": 192,
+      "unique_structures": 192,
+      "atom_count": [44, 146.83333333333334, 296],
+      "directed_edges": [656, 4847.0, 14312],
+      "edge_count_cv": 0.6709829514265521
+    }
+  },
+  "compatibility": {
+    "representatives_per_model": 18,
+    "atombit": {
+      "status": "passed",
+      "supported_atomic_numbers": [1, 5, 6, 7, 8, 9, 15, 16, 17, 35, 53],
+      "max_energy_error_eV": 2.288818359375e-05,
+      "max_force_error_eV_per_A": 3.814697265625e-06,
+      "max_stress_error_eV_per_A3": 1.7695128917694092e-08,
+      "peak_allocated_bytes": 4114255360,
+      "peak_reserved_bytes": 5106565120
+    },
+    "mace_off_small": {
+      "status": "passed",
+      "supported_atomic_numbers": [1, 6, 7, 8, 9, 15, 16, 17, 35, 53],
+      "max_energy_error_eV": 1.7462298274040222e-10,
+      "max_force_error_eV_per_A": 1.176836406102666e-14,
+      "max_stress_error_eV_per_A3": 5.551115123125783e-17,
+      "peak_allocated_bytes": 4026126336,
+      "peak_reserved_bytes": 5326766080
+    },
+    "xifzof": {
+      "status": "excluded",
+      "reason": "Contains Si (Z=14), unsupported by both tested checkpoints."
+    }
+  }
+}

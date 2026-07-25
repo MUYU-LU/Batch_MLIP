@@ -2,13 +2,17 @@ from __future__ import annotations
 
 import json
 
+import numpy as np
 import pytest
 from ase import Atoms
+from ase.io import write
 
 from batch_mlip.workloads import (
+    RobustnessWorkloadInputs,
     TaskProfile,
     WorkloadJob,
     WorkloadManifest,
+    build_robustness_workloads,
     normalized_structure_sha256,
     read_workload_manifest,
     topology_key,
@@ -127,3 +131,77 @@ def test_normalized_structure_hash_tracks_geometry_not_metadata():
     assert normalized_structure_sha256(atoms) == original
     atoms.positions[1, 0] += 0.01
     assert normalized_structure_sha256(atoms) != original
+
+
+def test_cross_family_robustness_workloads_are_deterministic_and_balanced(
+    tmp_path,
+):
+    homogeneous = {
+        "GUFJOG": 44,
+        "SOXLEX": 48,
+        "XATMOV": 88,
+        "OBEQIX": 220,
+        "rof-b": 296,
+    }
+
+    def write_structure(path, atom_count, offset):
+        side = max(20.0, atom_count ** (1.0 / 3.0) * 4.0)
+        rng = np.random.default_rng(atom_count * 100 + offset)
+        atoms = Atoms(
+            "C" * atom_count,
+            scaled_positions=rng.random((atom_count, 3)),
+            cell=np.eye(3) * side,
+            pbc=True,
+        )
+        path.parent.mkdir(parents=True, exist_ok=True)
+        write(path, atoms)
+
+    for family, atom_count in homogeneous.items():
+        for index in range(4):
+            write_structure(
+                tmp_path / family / "structures" / f"{family}_{index}.cif",
+                atom_count,
+                index,
+            )
+    for index, atom_count in enumerate((74, 148, 222, 296)):
+        write_structure(
+            tmp_path
+            / "rof-a"
+            / "structures"
+            / f"rof-a_{index}_{atom_count}.cif",
+            atom_count,
+            index,
+        )
+
+    inputs = RobustnessWorkloadInputs(
+        dataset_dir=tmp_path,
+        seed=7,
+        candidate_count=4,
+        unique_structures=4,
+        pool_size=8,
+    )
+    first = build_robustness_workloads(inputs)
+    second = build_robustness_workloads(inputs)
+
+    assert first.keys() == second.keys()
+    assert {
+        key: value.manifest_sha256 for key, value in first.items()
+    } == {
+        key: value.manifest_sha256 for key, value in second.items()
+    }
+    rof_a = first["OPT-RB-ROFA-MIX-R8-v1"]
+    assert [job.atom_count for job in rof_a.jobs] == [
+        74,
+        148,
+        222,
+        296,
+        74,
+        148,
+        222,
+        296,
+    ]
+    assert len(first["OPT-RB-CROSS-MIX-R24-v1"].jobs) == 24
+    for workload_id, manifest in first.items():
+        manifest.verify()
+        expected_jobs = 24 if "CROSS-MIX" in workload_id else 8
+        assert len(manifest.jobs) == expected_jobs

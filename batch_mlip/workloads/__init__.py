@@ -1,7 +1,9 @@
 """Frozen workload identities and task descriptors."""
 
 from .generator import (
+    RobustnessWorkloadInputs,
     T2WorkloadInputs,
+    build_robustness_workloads,
     build_t2_workloads,
     normalized_structure_sha256,
     topology_key,
@@ -22,12 +24,14 @@ from .schema import (
 )
 
 __all__ = [
+    "RobustnessWorkloadInputs",
     "T2WorkloadInputs",
     "TaskProfile",
     "WorkloadJob",
     "WorkloadManifest",
     "WorkloadExecutionResult",
     "WorkloadRunSpec",
+    "build_robustness_workloads",
     "build_t2_workloads",
     "normalized_structure_sha256",
     "execute_workload",

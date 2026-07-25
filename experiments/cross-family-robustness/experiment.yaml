@@ -1,0 +1,51 @@
+id: cross-family-robustness
+date: 2026-07-25
+baseline_commit: 6421f18f34b646c4ef453f35b69751e6d42196e5
+hypothesis: >-
+  The workload-aware batching policy remains correct and faster than independent
+  execution across molecular crystals that vary in composition, atom count,
+  edge density, cell anisotropy, and porous volume; capacity and refill choices
+  will depend on live edge and dense-BFGS Hessian costs rather than atom count
+  alone.
+dataset:
+  root: /public/home/lmy/Batch_imple_project/test_set
+  selection_seed: 20260725
+  deterministic_candidates_per_family: 256
+  unique_structures_per_positive_pool: 32
+  jobs_per_positive_pool: 256
+positive_families:
+  - GUFJOG
+  - SOXLEX
+  - XATMOV
+  - OBEQIX
+  - rof-a
+  - rof-b
+applicability_control:
+  family: XIFZOF
+  reason: Contains Si, outside the AtomBit checkpoint's declared element map.
+commands:
+  - name: baseline-tests
+    command: [python, -m, pytest, -q]
+  - name: generate-workloads
+    command:
+      - python
+      - tools/generate_robustness_workloads.py
+      - --dataset-dir
+      - /public/home/lmy/Batch_imple_project/test_set
+      - --output-dir
+      - runs/robustness/workloads
+  - name: compatibility-screen
+    status: passed
+    outputs:
+      - runs/robustness/atombit_compatibility.json
+      - runs/robustness/mace_compatibility.json
+  - name: optimization-matrix
+    status: conditional_on_compatibility_and_capacity_screen
+collect_json:
+  - runs/robustness/workloads/index.json
+decision_rules:
+  - Exclude structures containing elements unsupported by the tested MLIP.
+  - Require finite energy, forces, and stress for every selected representative.
+  - Require B1 and batch-versus-single equivalence before optimization timing.
+  - Treat timing differences below 2 percent as inconclusive.
+  - Report peak allocated and reserved GPU memory with throughput.

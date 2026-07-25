@@ -56,6 +56,20 @@ class T2WorkloadInputs:
 
 
 @dataclass(frozen=True)
+class RobustnessWorkloadInputs:
+    """Inputs for deterministic cross-family robustness workloads."""
+
+    dataset_dir: Path
+    dataset_id: str = "cross_family_test_set"
+    seed: int = 20260725
+    candidate_count: int = 256
+    unique_structures: int = 32
+    pool_size: int = 256
+    cutoffs_A: tuple[float, ...] = (6.0,)
+    skins_A: tuple[float, ...] = (0.0, 0.5)
+
+
+@dataclass(frozen=True)
 class _StructureRecord:
     source_path: str
     source_sha256: str
@@ -127,7 +141,7 @@ def _manifest(
     workload_id: str,
     records: list[_StructureRecord],
     *,
-    inputs: T2WorkloadInputs,
+    inputs: T2WorkloadInputs | RobustnessWorkloadInputs,
     family: str = "variable_horizon_closed",
     operation: str = "optimization",
     cell_mode: str = "variable",
@@ -158,6 +172,209 @@ def _manifest(
         jobs=jobs,
         metadata=metadata,
     ).seal()
+
+
+def _deterministic_candidates(
+    paths: list[Path],
+    *,
+    count: int,
+    seed: int,
+    scope: str,
+) -> list[Path]:
+    if count <= 0:
+        raise ValueError("candidate count must be positive")
+    if len(paths) < count:
+        raise ValueError(
+            f"{scope} provides {len(paths)} structures, fewer than requested {count}"
+        )
+
+    def rank(path: Path) -> bytes:
+        payload = f"{seed}:{scope}:{path.as_posix()}".encode()
+        return hashlib.sha256(payload).digest()
+
+    return sorted(paths, key=lambda path: (rank(path), path.as_posix()))[:count]
+
+
+def _density_stratified_records(
+    records: list[_StructureRecord],
+    *,
+    count: int,
+    edge_key: str,
+) -> list[_StructureRecord]:
+    if count <= 0 or len(records) < count:
+        raise ValueError("density stratum count is invalid")
+    ranked = sorted(
+        records,
+        key=lambda record: (
+            record.topology_edge_counts[edge_key] / len(record.atoms),
+            record.source_path,
+        ),
+    )
+    indices = np.linspace(0, len(ranked) - 1, count, dtype=int)
+    return [ranked[int(index)] for index in indices]
+
+
+def _repeat_records(
+    records: list[_StructureRecord],
+    *,
+    pool_size: int,
+) -> list[_StructureRecord]:
+    if not records or pool_size <= 0 or pool_size % len(records):
+        raise ValueError("pool size must be a positive multiple of unique structures")
+    return [records[index % len(records)] for index in range(pool_size)]
+
+
+def _robustness_records(
+    inputs: RobustnessWorkloadInputs,
+    *,
+    family: str,
+    expected_atom_counts: set[int],
+    balanced_atom_counts: bool = False,
+) -> list[_StructureRecord]:
+    family_dir = inputs.dataset_dir / family
+    paths = sorted(
+        path
+        for path in family_dir.rglob("*.cif")
+        if "_exp_" not in path.name.lower()
+    )
+    if not paths:
+        raise FileNotFoundError(f"no CIF structures found under {family_dir}")
+    edge_key = topology_key(inputs.cutoffs_A[0], inputs.skins_A[0])
+
+    def load(selected_paths: list[Path]) -> list[_StructureRecord]:
+        records = [
+            _structure_record(
+                path,
+                relative_path=path.relative_to(inputs.dataset_dir).as_posix(),
+                cutoffs=inputs.cutoffs_A,
+                skins=inputs.skins_A,
+            )
+            for path in selected_paths
+        ]
+        unexpected = sorted(
+            {len(record.atoms) for record in records} - expected_atom_counts
+        )
+        if unexpected:
+            raise ValueError(
+                f"{family} contains unexpected atom counts in selection: {unexpected}"
+            )
+        return records
+
+    if not balanced_atom_counts:
+        candidates = _deterministic_candidates(
+            paths,
+            count=inputs.candidate_count,
+            seed=inputs.seed,
+            scope=family,
+        )
+        return _density_stratified_records(
+            load(candidates),
+            count=inputs.unique_structures,
+            edge_key=edge_key,
+        )
+
+    per_stratum = inputs.unique_structures // len(expected_atom_counts)
+    candidate_per_stratum = inputs.candidate_count // len(expected_atom_counts)
+    if (
+        per_stratum * len(expected_atom_counts) != inputs.unique_structures
+        or candidate_per_stratum * len(expected_atom_counts)
+        != inputs.candidate_count
+    ):
+        raise ValueError(
+            "candidate and unique counts must divide balanced atom-count strata"
+        )
+    selected: list[_StructureRecord] = []
+    for atom_count in sorted(expected_atom_counts):
+        suffix = f"_{atom_count}.cif"
+        stratum_paths = [path for path in paths if path.name.endswith(suffix)]
+        candidates = _deterministic_candidates(
+            stratum_paths,
+            count=candidate_per_stratum,
+            seed=inputs.seed,
+            scope=f"{family}-N{atom_count}",
+        )
+        selected.extend(
+            _density_stratified_records(
+                load(candidates),
+                count=per_stratum,
+                edge_key=edge_key,
+            )
+        )
+    return selected
+
+
+def build_robustness_workloads(
+    inputs: RobustnessWorkloadInputs,
+) -> dict[str, WorkloadManifest]:
+    """Build fixed cross-family pools spanning chemistry, size, and density."""
+
+    if inputs.pool_size % inputs.unique_structures:
+        raise ValueError("pool size must divide evenly by unique structures")
+    specifications = (
+        ("GUFJOG44", "GUFJOG", {44}, False),
+        ("SOXLEX48", "SOXLEX", {48}, False),
+        ("XATMOV88", "XATMOV", {88}, False),
+        ("OBEQIX220", "OBEQIX", {220}, False),
+        ("ROFA-MIX", "rof-a", {74, 148, 222, 296}, True),
+        ("ROFB296", "rof-b", {296}, False),
+    )
+    edge_key = topology_key(inputs.cutoffs_A[0], inputs.skins_A[0])
+    workloads: dict[str, WorkloadManifest] = {}
+    selected_by_name: dict[str, list[_StructureRecord]] = {}
+    for label, family, atom_counts, balanced in specifications:
+        selected = _robustness_records(
+            inputs,
+            family=family,
+            expected_atom_counts=atom_counts,
+            balanced_atom_counts=balanced,
+        )
+        selected_by_name[label] = selected
+        workload_id = f"OPT-RB-{label}-R{inputs.pool_size}-v1"
+        workloads[workload_id] = _manifest(
+            workload_id,
+            _repeat_records(selected, pool_size=inputs.pool_size),
+            inputs=inputs,
+            metadata={
+                "source_family": family,
+                "selection_seed": inputs.seed,
+                "candidate_count": inputs.candidate_count,
+                "unique_structures": inputs.unique_structures,
+                "repetitions": inputs.pool_size // inputs.unique_structures,
+                "selection": (
+                    "balanced by atom count then uniform across 6 A edge-density rank"
+                    if balanced
+                    else "uniform across 6 A edge-density rank"
+                ),
+                "atom_count_strata": sorted(atom_counts),
+                "active_edge_key": edge_key,
+                "cutoffs_A": list(inputs.cutoffs_A),
+                "skins_A": list(inputs.skins_A),
+                "claim_role": "positive_control",
+            },
+        )
+
+    mixed_unique = [
+        records[index]
+        for index in range(inputs.unique_structures)
+        for records in selected_by_name.values()
+        if index < len(records)
+    ]
+    mixed_pool_size = len(mixed_unique)
+    mixed_id = f"OPT-RB-CROSS-MIX-R{mixed_pool_size}-v1"
+    workloads[mixed_id] = _manifest(
+        mixed_id,
+        mixed_unique,
+        inputs=inputs,
+        metadata={
+            "source_families": [item[1] for item in specifications],
+            "selection_seed": inputs.seed,
+            "unique_structures": mixed_pool_size,
+            "selection": "round-robin interleaving of positive-control families",
+            "active_edge_key": edge_key,
+            "claim_role": "heterogeneous_positive_control",
+        },
+    )
+    return workloads
 
 
 def _load_reference(
