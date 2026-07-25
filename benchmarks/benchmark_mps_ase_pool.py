@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Benchmark an ASE optimization pool with concurrent CUDA MPS workers."""
+"""Benchmark ASE optimization, evaluation, or NVE with CUDA MPS workers."""
 
 from __future__ import annotations
 
@@ -20,11 +20,15 @@ from typing import Any
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mlip", choices=("atombit", "mace"), default="atombit")
+    parser.add_argument(
+        "--task",
+        choices=("optimization", "evaluation", "nve"),
+        default="optimization",
+    )
     parser.add_argument("--atom-count", type=int)
     parser.add_argument(
         "--optimizer",
         choices=("fire", "bfgs", "bfgslinesearch"),
-        required=True,
     )
     parser.add_argument("--pool-size", type=int, default=256)
     parser.add_argument("--workers", type=int, default=4)
@@ -36,6 +40,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dt-max", type=float, default=1.0)
     parser.add_argument("--max-step", type=float, default=0.2)
     parser.add_argument("--alpha", type=float, default=70.0)
+    parser.add_argument("--warmup-steps", type=int)
+    parser.add_argument("--measured-steps", type=int)
+    parser.add_argument("--timestep-fs", type=float)
     parser.add_argument("--deterministic", action="store_true")
     parser.add_argument(
         "--model-dtype",
@@ -63,6 +70,7 @@ def parse_args() -> argparse.Namespace:
         help="Signed workload manifest; supersedes --atom-count and --manifest.",
     )
     parser.add_argument("--checkpoint", type=Path)
+    parser.add_argument("--atombit-e0", type=Path)
     parser.add_argument("--mace-model", default="small")
     parser.add_argument("--gpu-index", type=int, default=0)
     parser.add_argument("--cpu-threads-per-worker", type=int, default=1)
@@ -76,6 +84,16 @@ def parse_args() -> argparse.Namespace:
         parser.error("worker start interval must be non-negative")
     if args.pool_size % args.workers:
         parser.error("pool size must be divisible by worker count")
+    if args.task == "optimization" and args.optimizer is None:
+        parser.error("--optimizer is required for optimization")
+    if args.task != "optimization" and args.workload_manifest is None:
+        parser.error("evaluation and NVE require --workload-manifest")
+    if args.task == "nve" and (
+        (args.warmup_steps is not None and args.warmup_steps < 0)
+        or (args.measured_steps is not None and args.measured_steps <= 0)
+        or (args.timestep_fs is not None and args.timestep_fs <= 0.0)
+    ):
+        parser.error("NVE steps must be non-negative/positive and timestep positive")
     if args.workload_manifest is None and args.atom_count is None:
         parser.error("--atom-count is required without --workload-manifest")
     if args.mlip == "atombit" and args.checkpoint is None:
@@ -94,6 +112,43 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def aggregate_throughput(
+    *,
+    task: str,
+    pool_size: int,
+    elapsed_seconds: float,
+    measured_steps: int | None,
+) -> tuple[float, str]:
+    """Return the task-appropriate MPS pool throughput."""
+
+    if task == "nve":
+        if measured_steps is None or measured_steps <= 0:
+            raise ValueError("NVE throughput requires positive measured steps")
+        return (
+            pool_size * measured_steps / elapsed_seconds,
+            "replica_steps_per_second",
+        )
+    return pool_size / elapsed_seconds, "systems_per_second"
+
+
+def consistent_worker_parameters(
+    worker_results: list[dict[str, Any]],
+    keys: tuple[str, ...],
+) -> dict[str, Any]:
+    """Resolve parameters that must be identical across MPS workers."""
+
+    if not worker_results:
+        raise ValueError("worker_results must not be empty")
+    resolved = {key: worker_results[0].get(key) for key in keys}
+    if any(
+        worker_result.get(key) != value
+        for worker_result in worker_results
+        for key, value in resolved.items()
+    ):
+        raise RuntimeError("MPS workers used inconsistent parameters")
+    return resolved
+
+
 def _worker_impl(
     worker_id: int,
     args: argparse.Namespace,
@@ -105,15 +160,19 @@ def _worker_impl(
         message=r"logm result may be inaccurate.*",
         category=RuntimeWarning,
     )
+    import numpy as np
     import torch
+    from ase import units
     from ase.calculators.calculator import all_changes
     from ase.io import read
+    from ase.md.verlet import VelocityVerlet
 
     benchmark_dir = Path(__file__).resolve().parent
     repository_root = benchmark_dir.parent
     sys.path[:0] = [str(repository_root), str(benchmark_dir)]
     from benchmark_production import load_manifest, load_production_model, synchronize
 
+    from batch_mlip import AseGraphBatch, initialize_maxwell_boltzmann
     from batch_mlip.workloads import read_workload_manifest
 
     torch.use_deterministic_algorithms(args.deterministic)
@@ -159,7 +218,7 @@ def _worker_impl(
     if args.mlip == "atombit":
         from benchmark_variable_cell_scaling import (
             AtomBitBatchCalculator,
-            AtomBitCalculator,
+            CountingAtomBitCalculator,
             run_ase,
         )
 
@@ -177,13 +236,14 @@ def _worker_impl(
             force_mode="autograd",
         )
         warm_batch(warm_batch.create_state([systems[0]]), compute_stress=True)
-        warm_ase = AtomBitCalculator(
+        warm_ase = CountingAtomBitCalculator(
             model,
             cutoff=args.cutoff,
             device=device,
             dtype=model_dtype,
             enable_stress=True,
-            add_e0=False,
+            add_e0=args.atombit_e0 is not None,
+            e0_path=args.atombit_e0,
         )
         warm_ase.calculate(
             systems[0],
@@ -191,7 +251,11 @@ def _worker_impl(
             system_changes=all_changes,
         )
 
-        def execute():
+        ase_calculator = warm_ase
+        state_dtype = model_dtype
+        model_cutoff = args.cutoff
+
+        def execute_optimization():
             return run_ase(
                 model,
                 systems,
@@ -202,7 +266,7 @@ def _worker_impl(
                 dt_start=args.dt_start,
                 dt_max=args.dt_max,
                 max_step=args.max_step,
-                optimizer_name=args.optimizer,
+                optimizer_name=str(args.optimizer),
                 alpha=args.alpha,
                 optimizer_dtype=optimizer_dtype,
                 model_dtype=model_dtype,
@@ -233,7 +297,11 @@ def _worker_impl(
             system_changes=all_changes,
         )
 
-        def execute():
+        ase_calculator = calculator
+        state_dtype = torch.float64
+        model_cutoff = warm_batch.cutoff
+
+        def execute_optimization():
             return run_ase(
                 calculator,
                 systems,
@@ -242,9 +310,149 @@ def _worker_impl(
                 dt_start=args.dt_start,
                 dt_max=args.dt_max,
                 max_step=args.max_step,
-                optimizer_name=args.optimizer,
+                optimizer_name=str(args.optimizer),
                 alpha=args.alpha,
             )
+
+    def execute_evaluation():
+        calls_before = ase_calculator.calculate_calls
+        records = []
+        for source in systems:
+            atoms = source.copy()
+            atoms.calc = ase_calculator
+            energy = float(atoms.get_potential_energy())
+            forces = np.asarray(atoms.get_forces(), dtype=np.float64)
+            records.append(
+                {
+                    "source": source.info["benchmark_source"],
+                    "energy_eV": energy,
+                    "max_force_eV_per_A": float(
+                        np.linalg.vector_norm(forces, axis=1).max()
+                    ),
+                    "finite": bool(
+                        np.isfinite(energy) and np.isfinite(forces).all()
+                    ),
+                }
+            )
+        evaluations = ase_calculator.calculate_calls - calls_before
+        return {
+            "records": records,
+            "model_evaluations": evaluations,
+            "graph_evaluations": evaluations,
+            "neighbor_rebuilds": evaluations,
+            "optimizer_steps_total": 0,
+        }
+
+    warmup_steps = None
+    measured_steps = None
+    timestep_fs = None
+    if args.task == "nve":
+        if args.workload_manifest is None:
+            raise RuntimeError("NVE requires a signed workload")
+        warmup_steps = (
+            int(args.warmup_steps)
+            if args.warmup_steps is not None
+            else int(workload.metadata["warmup_steps"])
+        )
+        measured_steps = (
+            int(args.measured_steps)
+            if args.measured_steps is not None
+            else int(workload.metadata["measured_steps"])
+        )
+        timestep_fs = (
+            float(args.timestep_fs)
+            if args.timestep_fs is not None
+            else float(workload.metadata["timestep_fs"])
+        )
+        initial_state = AseGraphBatch.from_ase(
+            systems,
+            cutoff=model_cutoff,
+            device=device,
+            dtype=state_dtype,
+            build_neighbors=False,
+        )
+        initialize_maxwell_boltzmann(
+            initial_state,
+            float(workload.metadata["initial_temperature_K"]),
+            seed=[int(job.random_seed) for job in jobs],
+            remove_com=bool(workload.metadata["remove_initial_com"]),
+            force_exact_temperature=bool(
+                workload.metadata["force_exact_initial_temperature"]
+            ),
+        )
+        systems = initial_state.to_ase(evaluation=None, wrap=False)
+        dynamics = []
+        for atoms, name in zip(systems, names, strict=True):
+            atoms.info["benchmark_source"] = name
+            atoms.calc = ase_calculator
+            dynamics.append(
+                VelocityVerlet(
+                    atoms,
+                    timestep=timestep_fs * units.fs,
+                    logfile=None,
+                    trajectory=None,
+                )
+            )
+        for dynamics_item in dynamics:
+            dynamics_item.run(warmup_steps)
+        synchronize(device)
+        initial_total_energy = [
+            float(atoms.get_total_energy()) for atoms in systems
+        ]
+
+        def execute_nve():
+            calls_before = ase_calculator.calculate_calls
+            for dynamics_item in dynamics:
+                dynamics_item.run(measured_steps)
+            records = []
+            for atoms, name, initial_energy in zip(
+                systems,
+                names,
+                initial_total_energy,
+                strict=True,
+            ):
+                final_energy = float(atoms.get_total_energy())
+                positions = np.asarray(atoms.positions, dtype=np.float64)
+                velocities = np.asarray(
+                    atoms.get_velocities(),
+                    dtype=np.float64,
+                )
+                records.append(
+                    {
+                        "source": name,
+                        "initial_total_energy_eV": initial_energy,
+                        "final_total_energy_eV": final_energy,
+                        "energy_drift_eV_per_atom": (
+                            (final_energy - initial_energy) / len(atoms)
+                        ),
+                        "position_rms_A": float(
+                            np.sqrt(np.mean(np.square(positions)))
+                        ),
+                        "velocity_rms_A_per_fs": float(
+                            np.sqrt(np.mean(np.square(velocities))) * units.fs
+                        ),
+                        "finite": bool(
+                            np.isfinite(final_energy)
+                            and np.isfinite(positions).all()
+                            and np.isfinite(velocities).all()
+                        ),
+                    }
+                )
+            evaluations = ase_calculator.calculate_calls - calls_before
+            return {
+                "records": records,
+                "model_evaluations": evaluations,
+                "graph_evaluations": evaluations,
+                "neighbor_rebuilds": evaluations,
+                "optimizer_steps_total": shard_size * measured_steps,
+            }
+
+    if args.task == "optimization":
+        execute = execute_optimization
+    elif args.task == "evaluation":
+        execute = execute_evaluation
+    else:
+        execute = execute_nve
 
     synchronize(device)
     torch.cuda.reset_peak_memory_stats(device)
@@ -260,6 +468,14 @@ def _worker_impl(
         "sample_files": names,
         "elapsed_seconds": elapsed,
         "systems_per_second": shard_size / elapsed,
+        "throughput_per_second": (
+            shard_size * measured_steps / elapsed
+            if measured_steps is not None
+            else shard_size / elapsed
+        ),
+        "warmup_steps": warmup_steps,
+        "measured_steps": measured_steps,
+        "timestep_fs": timestep_fs,
         "peak_memory_bytes": int(torch.cuda.max_memory_allocated(device)),
         "peak_reserved_memory_bytes": int(torch.cuda.max_memory_reserved(device)),
         **output,
@@ -407,6 +623,17 @@ def main() -> None:
     if failed_results:
         raise RuntimeError(f"MPS workers reported failures: {failed_results}")
 
+    resolved_md_parameters = consistent_worker_parameters(
+        worker_results,
+        ("warmup_steps", "measured_steps", "timestep_fs"),
+    )
+    measured_steps = resolved_md_parameters["measured_steps"]
+    throughput, throughput_unit = aggregate_throughput(
+        task=args.task,
+        pool_size=args.pool_size,
+        elapsed_seconds=elapsed,
+        measured_steps=measured_steps,
+    )
     records = [
         record
         for worker_result in worker_results
@@ -437,6 +664,7 @@ def main() -> None:
         "schema_version": 1,
         "status": "complete",
         "method": "ase_cuda_mps",
+        "task": args.task,
         "mlip": args.mlip,
         "optimizer": args.optimizer,
         "atom_count": args.atom_count,
@@ -466,17 +694,29 @@ def main() -> None:
             "deterministic_algorithms": args.deterministic,
             "cublas_workspace_config": os.environ.get("CUBLAS_WORKSPACE_CONFIG"),
             "cell_filter": "ASE FrechetCellFilter",
+            "warmup_steps": resolved_md_parameters["warmup_steps"],
+            "measured_steps": measured_steps,
+            "timestep_fs": resolved_md_parameters["timestep_fs"],
         },
         "timing": {
             "wall_seconds": elapsed,
             "systems_per_second": args.pool_size / elapsed,
+            "throughput_per_second": throughput,
+            "throughput_unit": throughput_unit,
             "worker_seconds": [
                 worker_result["elapsed_seconds"] for worker_result in worker_results
             ],
         },
         "peak_gpu_memory_bytes_nvidia_smi": max(memory_samples, default=None),
         "gpu_memory_samples": len(memory_samples),
-        "converged": sum(bool(record["converged"]) for record in records),
+        "converged": (
+            sum(bool(record["converged"]) for record in records)
+            if args.task == "optimization"
+            else None
+        ),
+        "finite": sum(bool(record["finite"]) for record in records)
+        if args.task != "optimization"
+        else None,
         "optimizer_steps_total": sum(
             worker_result["optimizer_steps_total"]
             for worker_result in worker_results

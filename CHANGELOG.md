@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-07-25
+
+- Generalize the CUDA MPS ASE pool reference to signed one-shot evaluation and
+  NVE workloads in addition to variable-cell optimization.
+- Compare the tensor engine directly with 32-worker CUDA MPS on equal H46/H276
+  MIX evaluation and NVE pools and model-specific H276 step-variance pools.
+- Record 1.30x/1.87x EVAL and 1.28x/1.09x NVE gains for AtomBit/MACE,
+  respectively; AtomBit active-drain BFGS gains 1.41x while MACE is at parity.
+- Reject active refill as a universal throughput default on STEPVAR: it reduces
+  model calls but is 2.9-3.5% slower and increases reserved memory.
+- Add a reproducible mechanism-atlas summarizer, normalized results, explicit
+  evidence boundaries, and a ranked untested-acceleration backlog.
+
 ## 2026-07-18
 
 - Audited BFGS B1 against common ASE and found the original single-run

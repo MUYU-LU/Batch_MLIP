@@ -1,0 +1,64 @@
+id: application-mechanism-atlas
+date: 2026-07-25
+baseline_commit: 6e41c259a18916ddfd6e01a2dc16bb60d9c92cb8
+hypothesis: >-
+  The useful ASE-to-tensor changes depend on task shape: one-shot evaluation
+  benefits from graph/model batching, fixed-horizon MD benefits from persistent
+  tensor state and neighbor reuse, and variable-horizon optimization benefits
+  from compaction/refill only when tail waste exceeds admission overhead.
+reference:
+  method: ase_cuda_mps
+  workers: 32
+  sequential_ase_new_runs: 0
+  reason: >-
+    CUDA MPS is the relevant independent-job GPU baseline; common sequential
+    ASE has already been measured and is not repeated.
+new_matrix:
+  - task: heterogeneous_static_evaluation
+    workload: EVAL-MIX-R256-v1
+    mlips: [atombit_smooth_rms_fp32, mace_off_small]
+    new_runs_per_mlip: [tensor_B128, mps32]
+    mechanism: graph_and_model_batching
+  - task: heterogeneous_fixed_horizon_nve
+    workload: MD-NVE-MIX-R32-v1
+    mlips: [atombit_smooth_rms_fp32, mace_off_small]
+    new_runs_per_mlip: [tensor_B32, mps32]
+    mechanism: persistent_tensor_state_and_neighbor_cache
+  - task: homogeneous_size_variable_horizon_optimization
+    workloads:
+      atombit: OPT-STEPVAR-ATOMBIT-R256-v1
+      mace: OPT-STEPVAR-MACE-OFF-SMALL-R256-v1
+    mlips: [atombit_smooth_rms_fp32, mace_off_small]
+    new_runs_per_mlip: [active_drain_B64, active_refill_B64, mps32]
+    mechanism: active_compaction_and_refill
+controls:
+  deterministic_algorithms: true
+  cpu_threads_per_process: 1
+  timing_repeats: 1
+  same_signed_jobs: true
+  optimization:
+    optimizer: bfgs
+    variable_cell: true
+    fmax_eV_per_A: 0.05
+    max_steps: 500
+  nve:
+    timestep_fs: 0.5
+    warmup_steps: 100
+    measured_steps: 1000
+metrics:
+  - mps_relative_speed
+  - wall_seconds
+  - systems_or_replica_steps_per_second
+  - peak_device_memory_bytes
+  - model_evaluations
+  - neighbor_rebuilds
+  - active_batch_distribution
+  - convergence_or_energy_drift
+decision_gates:
+  practical_speed_difference_fraction: 0.05
+  memory_safety_fraction: 0.85
+  correctness: all_jobs_returned_and_finite
+  mechanism_claim: >-
+    Attribute acceleration only to a directly isolated change or to a clearly
+    labeled combined tensor-engine path; do not infer component speedups by
+    multiplying independent measurements.

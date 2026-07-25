@@ -474,9 +474,12 @@ optimizer step can require multiple model evaluations. Active refill is not yet
 supported for this optimizer and is rejected by the capability interface.
 
 `refill_policy` accepts `"drain"`, `"immediate"`, or `"threshold"`.
-Immediate is the measured default. Threshold refill also accepts
+Immediate is the implementation default when refill is explicitly requested.
+Threshold refill also accepts
 `refill_low_watermark` and `refill_min_chunk`, but it is workload-dependent and
-did not beat immediate refill by the project performance gate.
+did not beat immediate refill by the project performance gate. The current
+STEPVAR MPS comparison found both refill policies numerically slower than
+active drain, so refill is not a universal throughput default.
 
 For heterogeneous workloads, `BatchPlanner` provides calibrated memory-safe
 queues without coupling planning to a particular MLIP or optimizer:
@@ -520,6 +523,10 @@ within both the byte budget and maximum resident count. Otherwise, it executes
 cost-compatible memory-safe queues, using active refill only when the selected
 optimizer supports it. This policy is opt-in because coefficients are
 model/device/optimizer specific; it does not guess a safe budget.
+
+The measured task/mechanism policy, direct CUDA MPS comparison, and untested
+acceleration backlog are recorded in
+`experiments/application-mechanism-atlas/README.md`.
 
 For a strict ordinary-ASE reference, pass the MLIP's native ASE calculator
 explicitly. A `BatchCalculator` is not silently converted into an ASE
