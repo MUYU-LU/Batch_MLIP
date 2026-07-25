@@ -287,3 +287,36 @@ def test_concatenate_rebuilds_only_cache_cold_appended_system():
         packed._neighbor_reference_positions[packed.atom_slice(0)],
         survivor_reference,
     )
+
+
+def test_replace_system_slot_invalidates_only_replaced_neighbor_cache():
+    resident = AseGraphBatch.from_ase(
+        [
+            Atoms("H2", positions=[[0.0, 0.0, 0.0], [1.0, 0.0, 0.0]]),
+            Atoms("H2", positions=[[0.0, 0.0, 0.0], [1.2, 0.0, 0.0]]),
+        ],
+        cutoff=2.0,
+        skin=0.4,
+        device="cpu",
+        dtype=torch.float64,
+    )
+    pending = AseGraphBatch.from_ase(
+        [Atoms("He2", positions=[[0.0, 0.0, 0.0], [0.8, 0.0, 0.0]])],
+        cutoff=2.0,
+        skin=0.4,
+        device="cpu",
+        dtype=torch.float64,
+        build_neighbors=False,
+    )
+    survivor_positions = resident.positions[resident.atom_slice(0)].clone()
+
+    resident.replace_systems_from_([1], pending, [0])
+
+    assert resident.templates[1].get_chemical_formula() == "He2"
+    assert resident.neighbor_list_invalid_systems().tolist() == [False, True]
+    torch.testing.assert_close(
+        resident.positions[resident.atom_slice(0)],
+        survivor_positions,
+    )
+    assert resident.ensure_neighbor_list()
+    assert resident.neighbor_list_invalid_systems().tolist() == [False, False]

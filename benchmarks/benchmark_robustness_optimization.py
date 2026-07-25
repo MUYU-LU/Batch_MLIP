@@ -85,6 +85,11 @@ def main() -> None:
         default=Path("/public/home/lmy/Batch_imple_project/test_set"),
     )
     parser.add_argument("--batch-size", type=int, default=64)
+    parser.add_argument(
+        "--refill-storage",
+        choices=("repack", "slots"),
+        default="repack",
+    )
     parser.add_argument("--cpu-threads", type=int, default=1)
     parser.add_argument("--deterministic", action="store_true")
     parser.add_argument(
@@ -174,6 +179,7 @@ def main() -> None:
                 neighbor_backend="auto",
                 refill=args.method == "refill",
                 refill_policy="immediate",
+                refill_storage=args.refill_storage,
                 refill_min_chunk=1 if args.method == "refill" else None,
                 linear_algebra_backend=args.linear_algebra_backend,
                 **common,
@@ -206,6 +212,7 @@ def main() -> None:
                 active_compaction=True,
                 refill=args.method == "refill",
                 refill_policy="immediate",
+                refill_storage=args.refill_storage,
                 refill_min_chunk=1 if args.method == "refill" else None,
                 linear_algebra_backend=args.linear_algebra_backend,
                 **common,
@@ -240,6 +247,9 @@ def main() -> None:
         "workload_jobs": len(manifest.jobs),
         "job_limit": args.job_limit,
         "batch_size": None if args.method == "ase" else args.batch_size,
+        "refill_storage": (
+            args.refill_storage if args.method == "refill" else None
+        ),
         "fmax_eV_per_A": args.fmax,
         "max_steps": args.max_steps,
         "linear_algebra_backend": args.linear_algebra_backend,

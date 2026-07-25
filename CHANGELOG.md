@@ -2,6 +2,12 @@
 
 ## 2026-07-25
 
+- Add opt-in fixed-slot BFGS refill inspired by TorchSim in-flight admission,
+  with partial neighbor invalidation and safe repack fallback.
+- Measure fixed-slot refill against active drain, repack refill, and MPS32:
+  AtomBit H46 gains 1.21x/1.06x/1.09x, while MACE H276 rejects refill.
+- Identify PyTorch allocator fragmentation in long AtomBit refill and reduce
+  peak reserved memory from 78.22 to 29.48 GiB with expandable segments.
 - Generalize the CUDA MPS ASE pool reference to signed one-shot evaluation and
   NVE workloads in addition to variable-cell optimization.
 - Compare the tensor engine directly with 32-worker CUDA MPS on equal H46/H276

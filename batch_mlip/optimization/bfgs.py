@@ -438,6 +438,7 @@ def _resolve_optimizer_dtype(
 
 
 _REFILL_POLICIES = frozenset(("drain", "immediate", "threshold"))
+_REFILL_STORAGE_MODES = frozenset(("repack", "slots"))
 
 
 def _refill_insert_count(
@@ -483,6 +484,7 @@ def batched_bfgs_relax(
     optimizer_dtype: torch.dtype | str | None = None,
     refill_batch_size: int | None = None,
     refill_policy: str = "immediate",
+    refill_storage: str = "repack",
     refill_low_watermark: float = 0.8,
     refill_min_chunk: int | None = None,
     linear_algebra_backend: str = "auto",
@@ -496,7 +498,8 @@ def batched_bfgs_relax(
     it follows the calculator state dtype. ``linear_algebra_backend="auto"``
     groups equal-sized CUDA systems and uses a positive-definite Cholesky solve
     with per-system eigen fallback. CPU calculations retain the serial
-    ASE-compatible path.
+    ASE-compatible path. ``refill_storage="slots"`` overwrites completed
+    equal-size resident slots and safely falls back to repacking otherwise.
     """
 
     _validate_options(
@@ -515,6 +518,9 @@ def batched_bfgs_relax(
     if refill_policy not in _REFILL_POLICIES:
         choices = ", ".join(sorted(_REFILL_POLICIES))
         raise ValueError(f"refill_policy must be one of: {choices}")
+    if refill_storage not in _REFILL_STORAGE_MODES:
+        choices = ", ".join(sorted(_REFILL_STORAGE_MODES))
+        raise ValueError(f"refill_storage must be one of: {choices}")
     if not 0.0 <= refill_low_watermark < 1.0:
         raise ValueError("refill_low_watermark must be in [0, 1)")
     if refill_min_chunk is not None and (
@@ -539,6 +545,7 @@ def batched_bfgs_relax(
             potential,
             refill_batch_size=refill_batch_size,
             refill_policy=refill_policy,
+            refill_storage=refill_storage,
             refill_low_watermark=refill_low_watermark,
             refill_min_chunk=(
                 max(8, refill_batch_size // 8)
@@ -927,6 +934,7 @@ def _batched_bfgs_refill_relax(
     *,
     refill_batch_size: int,
     refill_policy: str,
+    refill_storage: str,
     refill_low_watermark: float,
     refill_min_chunk: int,
     fmax: float,
@@ -1158,105 +1166,188 @@ def _batched_bfgs_refill_relax(
             break
 
         ready_count = active_state.n_systems
+        ready_local_ids = torch.arange(
+            ready_count, device=device, dtype=torch.long
+        )
         if bool(finish_now.any()):
             systems_before = active_state.n_systems
+            remaining_local = torch.nonzero(
+                ~finish_now, as_tuple=False
+            ).flatten()
+            remaining_list = remaining_local.tolist()
+            survivor_ids = active_system_ids[remaining_local]
+            finished_local = torch.nonzero(
+                finish_now, as_tuple=False
+            ).flatten()
+            for system_id in active_system_ids[finish_now].tolist():
+                histories[system_id] = None
+
+            pending_before = n_systems - next_pending
+            insert_count = _refill_insert_count(
+                policy=refill_policy,
+                capacity=capacity,
+                survivors=len(remaining_list),
+                pending=pending_before,
+                low_watermark=refill_low_watermark,
+                min_chunk=refill_min_chunk,
+            )
+            refill_stop = next_pending + insert_count
+            refill_ids = torch.arange(
+                next_pending,
+                refill_stop,
+                device=device,
+                dtype=torch.long,
+            )
+            next_pending = refill_stop
+            slot_counts_match = insert_count == finished_local.numel() and all(
+                int(active_state.counts[destination])
+                == int(state.counts[source_id])
+                for destination, source_id in zip(
+                    finished_local.tolist(),
+                    refill_ids.tolist(),
+                    strict=True,
+                )
+            )
+            use_slot_swap = refill_storage == "slots" and slot_counts_match
             with profile_phase(
-                "scheduler.refill_repack",
+                (
+                    "scheduler.refill_slot_swap"
+                    if use_slot_swap
+                    else "scheduler.refill_repack"
+                ),
                 device=device,
                 systems=systems_before,
                 atoms=active_state.n_atoms,
             ):
-                remaining_local = torch.nonzero(
-                    ~finish_now, as_tuple=False
-                ).flatten()
-                remaining_list = remaining_local.tolist()
-                remaining_atom_ids = (
-                    torch.cat(
-                        [
-                            torch.arange(
-                                active_state.ptr[i],
-                                active_state.ptr[i + 1],
-                                device=device,
-                                dtype=torch.long,
+                if use_slot_swap:
+                    destination_list = finished_local.tolist()
+                    source_list = refill_ids.tolist()
+                    active_state.replace_systems_from_(
+                        destination_list,
+                        state,
+                        source_list,
+                    )
+                    active_system_ids = active_system_ids.clone()
+                    active_system_ids[finished_local] = refill_ids
+                    active_atom_ids = _global_atom_ids(state, active_system_ids)
+                    for destination, source_id in zip(
+                        destination_list, source_list, strict=True
+                    ):
+                        destination_atoms = active_state.atom_slice(destination)
+                        source_atoms = state.atom_slice(source_id)
+                        atomic_forces[destination_atoms] = 0.0
+                        if optimizer_positions is not None:
+                            if full_optimizer_positions is None:
+                                raise RuntimeError(
+                                    "full optimizer positions are missing"
+                                )
+                            optimizer_positions[destination_atoms] = (
+                                full_optimizer_positions[source_atoms]
                             )
-                            for i in remaining_list
-                        ]
-                    )
-                    if remaining_list
-                    else torch.empty(0, device=device, dtype=torch.long)
-                )
-                survivor_forces = atomic_forces[remaining_atom_ids].clone()
-                survivor_cell_forces = (
-                    None
-                    if cell_forces is None
-                    else cell_forces[remaining_local].clone()
-                )
-                survivor_ids = active_system_ids[remaining_local]
-                for system_id in active_system_ids[finish_now].tolist():
-                    histories[system_id] = None
-
-                pending_before = n_systems - next_pending
-                insert_count = _refill_insert_count(
-                    policy=refill_policy,
-                    capacity=capacity,
-                    survivors=len(remaining_list),
-                    pending=pending_before,
-                    low_watermark=refill_low_watermark,
-                    min_chunk=refill_min_chunk,
-                )
-                refill_stop = next_pending + insert_count
-                refill_ids = torch.arange(
-                    next_pending,
-                    refill_stop,
-                    device=device,
-                    dtype=torch.long,
-                )
-                next_pending = refill_stop
-                active_system_ids = torch.cat((survivor_ids, refill_ids))
-                active_atom_ids = _global_atom_ids(state, active_system_ids)
-                state_parts = []
-                if remaining_list:
-                    state_parts.append(
-                        active_state.select_systems(
-                            remaining_list, rebuild_neighbors=False
-                        )
-                    )
-                if refill_ids.numel():
-                    state_parts.append(
-                        state.select_systems(
-                            refill_ids.tolist(), rebuild_neighbors=False
-                        )
-                    )
-                active_state = AseGraphBatch.concatenate(state_parts)
-                active_filter = (
-                    None
-                    if full_filter is None
-                    else full_filter.select_systems(
-                        state, active_system_ids.tolist()
-                    )
-                )
-                optimizer_positions = (
-                    None
-                    if full_optimizer_positions is None
-                    else full_optimizer_positions[active_atom_ids].clone()
-                )
-                atomic_forces = torch.zeros(
-                    active_state.positions.shape,
-                    device=device,
-                    dtype=optimizer_dtype,
-                )
-                atomic_forces[: survivor_forces.shape[0]] = survivor_forces
-                if active_filter is None:
-                    cell_forces = None
+                        if active_filter is not None:
+                            if full_filter is None or cell_forces is None:
+                                raise RuntimeError(
+                                    "full variable-cell state is missing"
+                                )
+                            active_filter.reference_cells[destination] = (
+                                full_filter.reference_cells[source_id]
+                            )
+                            active_filter.generalized_positions[
+                                destination_atoms
+                            ] = full_filter.generalized_positions[source_atoms]
+                            active_filter.log_deformation[destination] = (
+                                full_filter.log_deformation[source_id]
+                            )
+                            active_filter.cell_factor[destination] = (
+                                full_filter.cell_factor[source_id]
+                            )
+                            active_filter.pressure[destination] = (
+                                full_filter.pressure[source_id]
+                            )
+                            cell_forces[destination] = 0.0
+                    ready_local_ids = remaining_local
+                    ready_count = remaining_local.numel()
                 else:
-                    cell_forces = torch.zeros(
-                        (active_state.n_systems, 3, 3),
+                    remaining_atom_ids = (
+                        torch.cat(
+                            [
+                                torch.arange(
+                                    active_state.ptr[i],
+                                    active_state.ptr[i + 1],
+                                    device=device,
+                                    dtype=torch.long,
+                                )
+                                for i in remaining_list
+                            ]
+                        )
+                        if remaining_list
+                        else torch.empty(0, device=device, dtype=torch.long)
+                    )
+                    survivor_forces = atomic_forces[
+                        remaining_atom_ids
+                    ].clone()
+                    survivor_cell_forces = (
+                        None
+                        if cell_forces is None
+                        else cell_forces[remaining_local].clone()
+                    )
+                    active_system_ids = torch.cat((survivor_ids, refill_ids))
+                    active_atom_ids = _global_atom_ids(
+                        state, active_system_ids
+                    )
+                    state_parts = []
+                    if remaining_list:
+                        state_parts.append(
+                            active_state.select_systems(
+                                remaining_list, rebuild_neighbors=False
+                            )
+                        )
+                    if refill_ids.numel():
+                        state_parts.append(
+                            state.select_systems(
+                                refill_ids.tolist(),
+                                rebuild_neighbors=False,
+                            )
+                        )
+                    active_state = AseGraphBatch.concatenate(state_parts)
+                    active_filter = (
+                        None
+                        if full_filter is None
+                        else full_filter.select_systems(
+                            state, active_system_ids.tolist()
+                        )
+                    )
+                    optimizer_positions = (
+                        None
+                        if full_optimizer_positions is None
+                        else full_optimizer_positions[
+                            active_atom_ids
+                        ].clone()
+                    )
+                    atomic_forces = torch.zeros(
+                        active_state.positions.shape,
                         device=device,
                         dtype=optimizer_dtype,
                     )
-                    if survivor_cell_forces is not None:
-                        cell_forces[: len(remaining_list)] = survivor_cell_forces
-                ready_count = len(remaining_list)
+                    atomic_forces[: survivor_forces.shape[0]] = (
+                        survivor_forces
+                    )
+                    if active_filter is None:
+                        cell_forces = None
+                    else:
+                        cell_forces = torch.zeros(
+                            (active_state.n_systems, 3, 3),
+                            device=device,
+                            dtype=optimizer_dtype,
+                        )
+                        if survivor_cell_forces is not None:
+                            cell_forces[: len(remaining_list)] = (
+                                survivor_cell_forces
+                            )
+                    ready_count = len(remaining_list)
+                    ready_local_ids = torch.arange(
+                        ready_count, device=device, dtype=torch.long
+                    )
             profile_event(
                 "refill",
                 policy=refill_policy,
@@ -1267,6 +1358,9 @@ def _batched_bfgs_refill_relax(
                 survivors=ready_count,
                 inserted=refill_ids.numel(),
                 triggered=bool(refill_ids.numel()),
+                storage=(
+                    "slots" if use_slot_swap else "repack"
+                ),
                 systems_after=active_state.n_systems,
                 pending_after=n_systems - next_pending,
             )
@@ -1294,7 +1388,7 @@ def _batched_bfgs_refill_relax(
             coordinates = []
             generalized_forces = []
             active_histories = []
-            for local_id in range(ready_count):
+            for local_id in ready_local_ids.tolist():
                 global_id = int(active_system_ids[local_id])
                 history = histories[global_id]
                 if history is None:
@@ -1330,14 +1424,16 @@ def _batched_bfgs_refill_relax(
                     max_step=max_step,
                     linear_algebra_backend=linear_algebra_backend,
                 )
-            for local_id, displacement in enumerate(displacements):
+            for local_id, displacement in zip(
+                ready_local_ids.tolist(), displacements, strict=True
+            ):
                 atom_slice = active_state.atom_slice(local_id)
                 atom_count = atom_slice.stop - atom_slice.start
                 atomic_displacement[atom_slice] = displacement[:atom_count]
                 if cell_displacement is not None:
                     cell_displacement[local_id] = displacement[atom_count:]
 
-            stepped_ids = active_system_ids[:ready_count]
+            stepped_ids = active_system_ids[ready_local_ids]
             local_steps[stepped_ids] += 1
             atomic_displacement = atomic_displacement.masked_fill(
                 ~active_state.mobile.unsqueeze(-1), 0.0

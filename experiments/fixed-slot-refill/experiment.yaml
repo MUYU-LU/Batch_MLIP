@@ -1,0 +1,55 @@
+id: fixed-slot-refill
+date: 2026-07-25
+baseline_commit: b351a2da97e6f8153389fa7523754442e8691367
+hypothesis: >-
+  In-flight refill can beat active drain when completed homogeneous BFGS slots
+  are overwritten in place, because survivor tensors and optimizer state no
+  longer pass through select-plus-concatenate repacking and allocator churn.
+inspiration:
+  project: TorchSim/torch-sim
+  component: InFlightAutoBatcher
+  adopted:
+    - convergence-driven hot swapping
+    - bounded memory-scaler admission
+    - original-order completion tracking
+  additional_mechanism: >-
+    TorchSim still pops and concatenates SimState objects. This experiment adds
+    fixed resident tensor slots and partial neighbor invalidation specifically
+    to isolate our measured repacking hotspot.
+stage_1_matrix:
+  workloads:
+    atombit: OPT-STEPVAR-ATOMBIT-R256-v1
+    mace: OPT-STEPVAR-MACE-OFF-SMALL-R256-v1
+  atom_count: 276
+  pool_size: 256
+  resident_batch_size: 64
+  methods:
+    - active_drain
+    - active_refill_repack
+    - active_refill_slots
+    - mps32_reuse_application_mechanism_atlas
+  repeats: 1
+stage_2_matrix:
+  purpose: determine the step-variance crossover rather than generalize stage 1
+  regimes: [low, medium, high]
+  construction: signed subsets from each model's frozen B1 step references
+  methods: [active_drain, active_refill_repack, active_refill_slots, mps32]
+controls:
+  deterministic_algorithms: true
+  optimizer: bfgs
+  cell_filter: FrechetCellFilter
+  fmax_eV_per_A: 0.05
+  max_steps: 500
+  skin_A: 0.5
+  memory_gate_fraction: 0.85
+correctness_gates:
+  - all 256 jobs returned in signed input order
+  - convergence flags and converged steps match repack refill
+  - endpoint tensors match declared deterministic tolerances
+  - only replaced slots become neighbor-cache invalid
+  - unequal-size or unfillable-tail swaps fall back to repacking
+decision_gate:
+  practical_speed_difference_fraction: 0.05
+  select_slots: >-
+    More than 5 percent faster than both active drain and repack refill while
+    passing correctness and the 85 percent memory gate.

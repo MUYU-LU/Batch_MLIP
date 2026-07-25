@@ -436,6 +436,7 @@ result = relax(
     cell_filter=FrechetCellFilter(),
     refill_batch_size=64,
     refill_policy="immediate",
+    refill_storage="slots",
     fmax=0.05,
     smax=None,
 )
@@ -445,6 +446,14 @@ The step limit applies independently from the time each queued structure
 enters. Finished Hessians are released, results retain workload order, and
 neighbor graphs for pending structures are built only when those structures
 enter the resident batch.
+
+`refill_storage="slots"` overwrites completed equal-atom-count resident slots
+and falls back to repacking for unequal sizes or an unfillable tail. It is most
+useful after size/edge bucketing. On supported CUDA/PyTorch builds, long refill
+runs should be launched with
+`PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` to avoid measured allocator
+fragmentation. The default remains `"repack"` pending broader application
+validation.
 
 `linear_algebra_backend` accepts `"auto"`, `"serial"`, `"grouped"`, or
 `"cholesky"`. On CUDA, the automatic policy groups equal-sized Hessians and

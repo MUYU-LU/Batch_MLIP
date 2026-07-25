@@ -312,6 +312,7 @@ def test_variable_cell_bfgs_refill_policies_preserve_state_and_output_order():
         *,
         refill_batch_size: int | None,
         refill_policy: str = "immediate",
+        refill_storage: str = "repack",
         linear_algebra_backend: str = "auto",
     ):
         calculator = ASECalculatorAdapter(
@@ -324,6 +325,7 @@ def test_variable_cell_bfgs_refill_policies_preserve_state_and_output_order():
             active_compaction=True,
             refill_batch_size=refill_batch_size,
             refill_policy=refill_policy,
+            refill_storage=refill_storage,
             refill_low_watermark=0.5,
             refill_min_chunk=(1 if refill_batch_size is not None else None),
             fmax=2e-5,
@@ -344,6 +346,10 @@ def test_variable_cell_bfgs_refill_policies_preserve_state_and_output_order():
         linear_algebra_backend="grouped",
     )
     results["grouped"] = grouped
+    results["slots"] = run(
+        refill_batch_size=2,
+        refill_storage="slots",
+    )
 
     for refill in results.values():
         assert bool(refill.converged.all())
@@ -474,6 +480,26 @@ def test_structure_api_does_not_build_neighbors_for_pending_refill_jobs(
     assert rebuilt_sizes == [1, 1, 1]
 
 
+def test_slot_refill_falls_back_for_unequal_atom_counts():
+    systems = [
+        Atoms("H", positions=[[0.1, 0.0, 0.0]]),
+        Atoms("He2", positions=[[0.2, 0.0, 0.0], [0.4, 0.0, 0.0]]),
+    ]
+
+    result = relax(
+        systems,
+        _quadratic_potential(),
+        optimizer="bfgs",
+        refill_batch_size=1,
+        refill_storage="slots",
+        fmax=1e-30,
+        max_steps=0,
+    )
+
+    assert result.state.counts.tolist() == [1, 2]
+    assert result.converged.tolist() == [False, False]
+
+
 def test_refill_preserves_survivor_neighbor_cache(monkeypatch):
     systems = [
         Atoms("H", positions=[[0.0, 0.0, 0.0]]),
@@ -528,6 +554,7 @@ def test_refill_preserves_survivor_neighbor_cache(monkeypatch):
         ({"refill_batch_size": 0}, "refill_batch_size must be"),
         ({"refill_batch_size": 1.5}, "refill_batch_size must be"),
         ({"refill_policy": "sometimes"}, "refill_policy must be"),
+        ({"refill_storage": "sometimes"}, "refill_storage must be"),
         ({"refill_policy": "drain"}, "require refill_batch_size"),
         (
             {"refill_batch_size": 1, "refill_low_watermark": 1.0},

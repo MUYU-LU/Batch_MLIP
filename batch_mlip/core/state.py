@@ -664,6 +664,74 @@ class AseGraphBatch:
             selected.assert_graph_integrity()
         return selected
 
+    def replace_systems_from_(
+        self,
+        destination_ids: Sequence[int],
+        source: AseGraphBatch,
+        source_ids: Sequence[int],
+    ) -> None:
+        """Overwrite equal-size system slots without repacking resident tensors.
+
+        Existing edge blocks remain allocated until the next automatic neighbor
+        update, while invalid reference bits force rebuilding only replaced
+        slots before they can be evaluated.
+        """
+
+        destinations = [int(value) for value in destination_ids]
+        sources = [int(value) for value in source_ids]
+        if len(destinations) != len(sources):
+            raise ValueError("destination_ids and source_ids must have equal length")
+        if len(set(destinations)) != len(destinations):
+            raise ValueError("destination_ids must be unique")
+        if len(set(sources)) != len(sources):
+            raise ValueError("source_ids must be unique")
+        if any(value < 0 or value >= self.n_systems for value in destinations):
+            raise IndexError("destination system id outside the batch")
+        if any(value < 0 or value >= source.n_systems for value in sources):
+            raise IndexError("source system id outside the batch")
+        if (
+            self.cutoff != source.cutoff
+            or self.skin != source.skin
+            or self.device != source.device
+            or self.dtype != source.dtype
+            or self.neighbor_backend != source.neighbor_backend
+        ):
+            raise ValueError("source and destination graph settings must match")
+
+        if self._neighbor_reference_positions is None:
+            self._neighbor_reference_positions = self.positions.detach().clone()
+        if self._neighbor_reference_cells is None:
+            self._neighbor_reference_cells = self.cells.detach().clone()
+        if self._neighbor_reference_valid is None:
+            self._neighbor_reference_valid = torch.ones(
+                self.n_systems, device=self.device, dtype=torch.bool
+            )
+
+        for destination_id, source_id in zip(destinations, sources, strict=True):
+            destination_atoms = self.atom_slice(destination_id)
+            source_atoms = source.atom_slice(source_id)
+            destination_count = destination_atoms.stop - destination_atoms.start
+            source_count = source_atoms.stop - source_atoms.start
+            if destination_count != source_count:
+                raise ValueError(
+                    "fixed-slot replacement requires equal atom counts"
+                )
+            self.templates[destination_id] = source.templates[source_id].copy()
+            self.z[destination_atoms] = source.z[source_atoms]
+            self.positions[destination_atoms] = source.positions[source_atoms]
+            self.cells[destination_id] = source.cells[source_id]
+            self.pbc[destination_id] = source.pbc[source_id]
+            self.masses[destination_atoms] = source.masses[source_atoms]
+            self.fixed[destination_atoms] = source.fixed[source_atoms]
+            self.velocities[destination_atoms] = source.velocities[source_atoms]
+            self._neighbor_reference_positions[destination_atoms] = (
+                source.positions[source_atoms]
+            )
+            self._neighbor_reference_cells[destination_id] = source.cells[source_id]
+            self._neighbor_reference_valid[destination_id] = False
+
+        self.assert_graph_integrity()
+
     @classmethod
     def concatenate(cls, batches: Sequence[AseGraphBatch]) -> AseGraphBatch:
         """Pack batches while retaining valid per-system neighbor caches."""
