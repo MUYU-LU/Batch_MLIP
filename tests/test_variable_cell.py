@@ -27,18 +27,14 @@ def test_graph_model_stress_matches_finite_difference_strain():
         [[0.4, 0.5, 0.6], [2.0, 1.1, 0.8], [1.2, 2.5, 2.1]],
         dtype=torch.float64,
     )
-    atoms = Atoms(
-        "H3", positions=positions.numpy(), cell=cell.numpy(), pbc=True
-    )
+    atoms = Atoms("H3", positions=positions.numpy(), cell=cell.numpy(), pbc=True)
     calculator = AtomBitBatchCalculator(
         PairHarmonicModel(k=2.0, r0=1.4, cutoff=3.5),
         cutoff=3.5,
         device="cpu",
         dtype=torch.float64,
     )
-    evaluation = calculator(
-        calculator.create_state([atoms]), compute_stress=True
-    )
+    evaluation = calculator(calculator.create_state([atoms]), compute_stress=True)
 
     delta = 1e-6
     volume = torch.linalg.det(cell).abs()
@@ -47,32 +43,17 @@ def test_graph_model_stress_matches_finite_difference_strain():
         for column in range(3):
             strain_parameter = torch.zeros((3, 3), dtype=torch.float64)
             strain_parameter[row, column] = delta
-            symmetric_strain = 0.5 * (
-                strain_parameter + strain_parameter.T
-            )
+            symmetric_strain = 0.5 * (strain_parameter + strain_parameter.T)
             energies = []
             for sign in (1.0, -1.0):
-                deformation = (
-                    torch.eye(3, dtype=torch.float64)
-                    + sign * symmetric_strain
-                )
+                deformation = torch.eye(3, dtype=torch.float64) + sign * symmetric_strain
                 displaced = atoms.copy()
-                displaced.set_cell(
-                    (cell @ deformation).numpy(), scale_atoms=False
-                )
+                displaced.set_cell((cell @ deformation).numpy(), scale_atoms=False)
                 displaced.positions[:] = (positions @ deformation).numpy()
-                energies.append(
-                    calculator(
-                        calculator.create_state([displaced])
-                    ).energy[0]
-                )
-            finite_difference[row, column] = (
-                (energies[0] - energies[1]) / (2.0 * delta * volume)
-            )
+                energies.append(calculator(calculator.create_state([displaced])).energy[0])
+            finite_difference[row, column] = (energies[0] - energies[1]) / (2.0 * delta * volume)
 
-    torch.testing.assert_close(
-        evaluation.stress[0], finite_difference, atol=1e-9, rtol=1e-7
-    )
+    torch.testing.assert_close(evaluation.stress[0], finite_difference, atol=1e-9, rtol=1e-7)
 
 
 def _lj_calculator() -> LennardJones:
@@ -132,13 +113,9 @@ def test_batched_hydrostatic_frechet_fire_matches_individual_ase():
 
 def test_batched_anisotropic_frechet_fire_matches_ase():
     atoms = bulk("Ar", "fcc", a=5.5, cubic=True)
-    deformation = np.array(
-        [[1.05, 0.08, 0.0], [0.0, 0.95, 0.04], [0.0, 0.0, 1.02]]
-    )
+    deformation = np.array([[1.05, 0.08, 0.0], [0.0, 0.95, 0.04], [0.0, 0.0, 1.02]])
     atoms.set_cell(atoms.cell.array @ deformation, scale_atoms=True)
-    reference, reference_steps = _ase_frechet_fire(
-        atoms, hydrostatic=False
-    )
+    reference, reference_steps = _ase_frechet_fire(atoms, hydrostatic=False)
     calculator = ASECalculatorAdapter(_lj_calculator())
 
     result = batched_fire_relax(
@@ -154,12 +131,8 @@ def test_batched_anisotropic_frechet_fire_matches_ase():
     )
 
     assert result.steps == reference_steps
-    np.testing.assert_allclose(
-        result.state.cells[0].cpu(), reference.cell.array, atol=2e-12
-    )
-    np.testing.assert_allclose(
-        result.state.positions.cpu(), reference.positions, atol=2e-12
-    )
+    np.testing.assert_allclose(result.state.cells[0].cpu(), reference.cell.array, atol=2e-12)
+    np.testing.assert_allclose(result.state.positions.cpu(), reference.positions, atol=2e-12)
     np.testing.assert_allclose(
         result.evaluation.stress[0].cpu(),
         reference.get_stress(voigt=False),
@@ -169,17 +142,13 @@ def test_batched_anisotropic_frechet_fire_matches_ase():
 
 def test_external_compressive_pressure_matches_ase_enthalpy_force():
     atoms = bulk("Ar", "fcc", a=5.5, cubic=True)
-    reference, reference_steps = _ase_frechet_fire(
-        atoms, hydrostatic=True, pressure_GPa=1.0
-    )
+    reference, reference_steps = _ase_frechet_fire(atoms, hydrostatic=True, pressure_GPa=1.0)
     calculator = ASECalculatorAdapter(_lj_calculator())
 
     result = batched_fire_relax(
         calculator.create_state([atoms]),
         calculator,
-        cell_filter=FrechetCellFilter(
-            pressure_GPa=1.0, hydrostatic_strain=True
-        ),
+        cell_filter=FrechetCellFilter(pressure_GPa=1.0, hydrostatic_strain=True),
         fmax=2e-5,
         smax=None,
         max_steps=500,
@@ -189,9 +158,7 @@ def test_external_compressive_pressure_matches_ase_enthalpy_force():
     )
 
     assert result.steps == reference_steps
-    np.testing.assert_allclose(
-        result.state.cells[0].cpu(), reference.cell.array, atol=2e-12
-    )
+    np.testing.assert_allclose(result.state.cells[0].cpu(), reference.cell.array, atol=2e-12)
     np.testing.assert_allclose(
         result.evaluation.stress[0].cpu(),
         reference.get_stress(voigt=False),
@@ -200,10 +167,7 @@ def test_external_compressive_pressure_matches_ase_enthalpy_force():
 
 
 def test_variable_cell_active_compaction_matches_masked_trajectory_and_reduces_work():
-    systems = [
-        bulk("Ar", "fcc", a=a, cubic=True)
-        for a in (5.2686752, 5.0, 6.2)
-    ]
+    systems = [bulk("Ar", "fcc", a=a, cubic=True) for a in (5.2686752, 5.0, 6.2)]
 
     def run(*, compact: bool):
         calculator = ASECalculatorAdapter(_lj_calculator())
@@ -247,9 +211,7 @@ def test_variable_cell_active_compaction_matches_masked_trajectory_and_reduces_w
     assert masked.converged_step.tolist() == [0, 54, 81]
     assert active.converged_step.tolist() == masked.converged_step.tolist()
     assert len(active_snapshots) == len(masked_snapshots)
-    for masked_snapshot, active_snapshot in zip(
-        masked_snapshots, active_snapshots, strict=True
-    ):
+    for masked_snapshot, active_snapshot in zip(masked_snapshots, active_snapshots, strict=True):
         assert active_snapshot[0] == masked_snapshot[0]
         for masked_value, active_value in zip(
             masked_snapshot[1:], active_snapshot[1:], strict=True
@@ -267,3 +229,42 @@ def test_variable_cell_active_compaction_matches_masked_trajectory_and_reduces_w
     assert active.active_batch_sizes[0] == 3
     assert active.active_batch_sizes[1] == 2
     assert active.active_batch_sizes[-1] == 1
+
+
+def test_variable_cell_fire_refill_preserves_frechet_state():
+    systems = [bulk("Ar", "fcc", a=a, cubic=True) for a in (5.2686752, 5.0, 6.2, 5.7)]
+
+    def run(*, refill: bool):
+        calculator = ASECalculatorAdapter(_lj_calculator())
+        options = (
+            {
+                "refill_batch_size": 2,
+                "refill_storage": "slots",
+                "refill_min_chunk": 1,
+            }
+            if refill
+            else {"active_compaction": True}
+        )
+        return batched_fire_relax(
+            calculator.create_state(systems),
+            calculator,
+            cell_filter=FrechetCellFilter(hydrostatic_strain=True),
+            fmax=2e-5,
+            smax=5e-7,
+            max_steps=200,
+            dt_start=0.05,
+            dt_max=0.5,
+            **options,
+        )
+
+    active = run(refill=False)
+    refill = run(refill=True)
+
+    assert bool(refill.converged.all())
+    torch.testing.assert_close(refill.converged_step, active.converged_step)
+    torch.testing.assert_close(refill.state.positions, active.state.positions)
+    torch.testing.assert_close(refill.state.cells, active.state.cells)
+    torch.testing.assert_close(refill.evaluation.energy, active.evaluation.energy)
+    torch.testing.assert_close(refill.evaluation.forces, active.evaluation.forces)
+    torch.testing.assert_close(refill.evaluation.stress, active.evaluation.stress)
+    assert max(refill.active_batch_sizes) == 2

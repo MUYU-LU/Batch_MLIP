@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-07-26
+
+- Separate refill behavior from atom count with a signed BFGS factorial over
+  H46/H276, B32/B64/B128, AtomBit/MACE, drain/repack/slots, and MPS32.
+- Show that BFGS refill is strong at B32, weakens at B64, and is neutral or
+  harmful at B128; the best memory-safe B128 tensor modes beat MPS32 in all
+  four BFGS workloads.
+- Add optimizer-safe fixed- and variable-cell FIRE active refill, preserving
+  velocity, time step, mixing, positive-power count, Frechet state, and local
+  step count across pending-job admission.
+- Validate FIRE refill against active drain and MPS32. Wide-tail H46 gains
+  2.44x-2.55x at B32 and 1.24x-1.27x at B128, while narrow-tail H276 rejects
+  refill at B128.
+- Benchmark BFGSLineSearch B128 against MPS32. Tensor trial batching wins three
+  of four cases; MACE H276 remains an MPS regime.
+- Replace atom-count-only refill reasoning with a measured policy over
+  optimizer, convergence spread, resident batch, graph/model scaling, memory,
+  pending-pool size, and MPS parity.
+
 ## 2026-07-25
 
 - Add opt-in fixed-slot BFGS refill inspired by TorchSim in-flight admission,

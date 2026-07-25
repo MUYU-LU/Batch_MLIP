@@ -53,9 +53,7 @@ class OptimizerFactory(Protocol):
         """Create an optimizer configured with default run options."""
 
 
-def _merged_options(
-    defaults: Mapping[str, Any], overrides: Mapping[str, Any]
-) -> dict[str, Any]:
+def _merged_options(defaults: Mapping[str, Any], overrides: Mapping[str, Any]) -> dict[str, Any]:
     return {**defaults, **overrides}
 
 
@@ -67,17 +65,11 @@ def _validate_capabilities(
     if not isinstance(capabilities, OptimizerCapabilities):
         raise TypeError("optimizer.capabilities() must return OptimizerCapabilities")
     if options.get("cell_filter") is not None and not capabilities.variable_cell:
-        raise ValueError(
-            f"{type(optimizer).__name__} does not support variable-cell relaxation"
-        )
+        raise ValueError(f"{type(optimizer).__name__} does not support variable-cell relaxation")
     if options.get("active_compaction", False) and not capabilities.active_compaction:
-        raise ValueError(
-            f"{type(optimizer).__name__} does not support active-batch compaction"
-        )
+        raise ValueError(f"{type(optimizer).__name__} does not support active-batch compaction")
     if options.get("refill_batch_size") is not None and not capabilities.active_refill:
-        raise ValueError(
-            f"{type(optimizer).__name__} does not support active-batch refill"
-        )
+        raise ValueError(f"{type(optimizer).__name__} does not support active-batch refill")
 
 
 class BatchedFIRE:
@@ -87,7 +79,11 @@ class BatchedFIRE:
         self.options = MappingProxyType(dict(options))
 
     def capabilities(self) -> OptimizerCapabilities:
-        return OptimizerCapabilities(variable_cell=True, active_compaction=True)
+        return OptimizerCapabilities(
+            variable_cell=True,
+            active_compaction=True,
+            active_refill=True,
+        )
 
     def run(
         self,
@@ -213,14 +209,10 @@ def create_optimizer(name: str, **options: Any) -> BatchOptimizer:
         ) from exc
     optimizer = factory(**options)
     if not isinstance(optimizer, BatchOptimizer):
-        raise TypeError(
-            f"optimizer factory {normalized!r} did not return a BatchOptimizer"
-        )
+        raise TypeError(f"optimizer factory {normalized!r} did not return a BatchOptimizer")
     capabilities = optimizer.capabilities()
     if not isinstance(capabilities, OptimizerCapabilities):
-        raise TypeError(
-            f"optimizer factory {normalized!r} returned invalid capabilities"
-        )
+        raise TypeError(f"optimizer factory {normalized!r} returned invalid capabilities")
     return optimizer
 
 

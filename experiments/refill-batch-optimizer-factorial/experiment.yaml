@@ -1,0 +1,73 @@
+id: refill-batch-optimizer-factorial
+date: 2026-07-26
+baseline_commit: 5ad633dc5c6c33dacba1caa15ac575bc5a8204eb
+hypothesis: >-
+  Refill benefit is an interaction among resident batch size, per-graph cost,
+  optimizer state, model launch scaling, convergence spread, and allocator
+  behavior; atom count alone is not a valid policy variable.
+stage_1_bfgs:
+  workloads:
+    H46: OPT-H46-R256-v1
+    H276: OPT-H276-R256-v1
+  models: [atombit_smooth_rms_fp32, mace_off_small]
+  resident_batch_sizes: [32, 64, 128]
+  methods: [active_drain, active_refill_repack, active_refill_slots]
+  mps_reference:
+    workers: 32
+    one_per_model_and_workload: true
+  tensor_runs: 36
+  new_mps_runs: 2
+  reused_mps_runs: 2
+stage_2_fire:
+  implementation_status: completed_and_unit_validated
+  state_to_preserve:
+    - velocity
+    - dt
+    - alpha
+    - positive_power_counter
+    - Frechet generalized positions and log deformation
+    - local step count
+  selected_matrix:
+    workloads: [OPT-H46-R256-v1, OPT-H276-R256-v1]
+    models: [atombit_smooth_rms_fp32, mace_off_small]
+    resident_batch_sizes: [32, 128]
+    methods: [active_drain, active_refill_slots]
+    mps_reference_workers: 32
+    max_steps: 2000
+    convergence_requirement: matched_and_complete_before_timing_comparison
+    tensor_runs: 16
+    mps_runs: 4
+stage_3_bfgslinesearch:
+  refill: unsupported_until_independent_line_search_admission_is_validated
+  comparison: [active_tensor_batching, mps32]
+  selected_matrix:
+    workloads: [OPT-H46-R256-v1, OPT-H276-R256-v1]
+    models: [atombit_smooth_rms_fp32, mace_off_small]
+    resident_batch_size: 128
+    methods: [active_drain, mps32]
+    tensor_runs: 4
+    mps_runs: 4
+controls:
+  pool_size: 256
+  deterministic_algorithms: true
+  cublas_workspace_config: ":4096:8"
+  allocator: expandable_segments
+  fmax_eV_per_A: 0.05
+  max_steps: 500
+  timing_repeats: 1
+  memory_gate_fraction: 0.85
+metrics:
+  - wall_time_s
+  - speedup_vs_mps32
+  - speedup_slots_vs_drain
+  - speedup_slots_vs_repack
+  - peak_allocated_GiB
+  - peak_reserved_or_device_GiB
+  - model_evaluations
+  - graph_evaluations
+  - neighbor_rebuilds
+  - convergence_and_endpoint_distribution
+decision_rule: >-
+  Fit and validate a policy using batch size, atoms, candidate edges, measured
+  model scaling, optimizer, and predicted convergence spread. Do not use atom
+  count as the sole refill switch.

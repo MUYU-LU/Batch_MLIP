@@ -406,9 +406,10 @@ register_optimizer("lbfgs", BatchedLBFGS)
 result = relax(systems, calculator, optimizer="lbfgs", fmax=0.03)
 ```
 
-The built-in `BatchedFIRE` and `BatchedBFGS` support variable cells and active
-compaction. Full BFGS stores an independent dense Hessian for every active
-structure and follows ASE's update, eigensolve, and row-wise step clipping:
+The built-in `BatchedFIRE` and `BatchedBFGS` support variable cells, active
+compaction, and bounded active refill. Full BFGS stores an independent dense
+Hessian for every active structure and follows ASE's update, eigensolve, and
+row-wise step clipping:
 
 ```python
 from batch_mlip import BatchedBFGS
@@ -424,15 +425,16 @@ result = relax(
 )
 ```
 
-For workloads larger than the desired GPU-resident batch, BFGS can refill
-converged slots from a pending queue while preserving each survivor's Hessian
-and Frechet state:
+For workloads larger than the desired GPU-resident batch, FIRE or BFGS can
+refill converged slots from a pending queue. FIRE preserves velocity, time
+step, mixing, positive-power counter, and Frechet state; BFGS preserves each
+survivor's Hessian and Frechet state:
 
 ```python
 result = relax(
     workload,
     calculator,
-    optimizer="bfgs",
+    optimizer="fire",  # "bfgs" uses the same scheduler controls
     cell_filter=FrechetCellFilter(),
     refill_batch_size=64,
     refill_policy="immediate",
@@ -443,9 +445,9 @@ result = relax(
 ```
 
 The step limit applies independently from the time each queued structure
-enters. Finished Hessians are released, results retain workload order, and
-neighbor graphs for pending structures are built only when those structures
-enter the resident batch.
+enters. Finished optimizer state is released, results retain workload order,
+and neighbor graphs for pending structures are built only when those
+structures enter the resident batch.
 
 `refill_storage="slots"` overwrites completed equal-atom-count resident slots
 and falls back to repacking for unequal sizes or an unfillable tail. It is most

@@ -35,9 +35,7 @@ class QuadraticBatchCalculator(BatchCalculator):
             raise NotImplementedError
         self.calls += 1
         atom_energy = 0.5 * (state.positions * state.positions).sum(dim=-1)
-        energy = torch.zeros(
-            state.n_systems, device=state.device, dtype=state.dtype
-        )
+        energy = torch.zeros(state.n_systems, device=state.device, dtype=state.dtype)
         energy.index_add_(0, state.system_idx, atom_energy)
         return BatchEvaluation(energy=energy, forces=-state.positions.clone())
 
@@ -66,9 +64,7 @@ def test_one_generic_batch_calculator_drives_evaluation_fire_and_md():
     prediction = evaluate(systems, calculator)
     assert prediction.evaluation.energy.shape == (2,)
     assert len(prediction.structures) == 2
-    np.testing.assert_allclose(
-        prediction.structures[0].get_potential_energy(), 0.345, atol=1e-15
-    )
+    np.testing.assert_allclose(prediction.structures[0].get_potential_energy(), 0.345, atol=1e-15)
 
     relaxed = relax(
         systems,
@@ -148,7 +144,13 @@ def test_auto_relaxation_chunks_and_restores_heterogeneous_input_order():
     ]
     scheduling = result.metadata["scheduling"]
     assert scheduling["decision"] == "memory_safe_planned_queues"
-    assert [batch["system_count"] for batch in scheduling["batches"]] == [1, 1]
+    assert scheduling["batches"] == [
+        {
+            "system_count": 2,
+            "resident_capacity": 1,
+            "active_refill": True,
+        }
+    ]
 
 
 def test_relax_ase_runs_an_explicit_native_ase_reference():

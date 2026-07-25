@@ -75,8 +75,11 @@ def _timed(fn, *, device: torch.device) -> tuple[Any, float]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mlip", choices=("atombit", "mace"), required=True)
+    parser.add_argument("--method", choices=("ase", "active", "refill"), required=True)
     parser.add_argument(
-        "--method", choices=("ase", "active", "refill"), required=True
+        "--optimizer",
+        choices=("fire", "bfgs", "bfgslinesearch"),
+        default="bfgs",
     )
     parser.add_argument("--workload-manifest", type=Path, required=True)
     parser.add_argument(
@@ -124,6 +127,8 @@ def main() -> None:
         parser.error("CPU thread count must be positive")
     if args.job_limit is not None and args.job_limit <= 0:
         parser.error("job limit must be positive")
+    if args.method == "refill" and args.optimizer == "bfgslinesearch":
+        parser.error("BFGSLineSearch does not support active refill")
 
     manifest, systems = _systems(
         args.workload_manifest,
@@ -141,7 +146,7 @@ def main() -> None:
         "dt_start": 0.1,
         "dt_max": 1.0,
         "max_step": 0.2,
-        "optimizer_name": "bfgs",
+        "optimizer_name": args.optimizer,
         "alpha": 70.0,
     }
     if args.mlip == "atombit":
@@ -199,9 +204,7 @@ def main() -> None:
             skin=args.skin,
             neighbor_backend="auto",
         )
-        ase_calculator = make_mace_ase_calculator(
-            batch_calculator.model, device=device
-        )
+        ase_calculator = make_mace_ase_calculator(batch_calculator.model, device=device)
 
         def execute():
             if args.method == "ase":
@@ -239,7 +242,7 @@ def main() -> None:
         "error": error,
         "mlip": args.mlip,
         "method": args.method,
-        "optimizer": "bfgs",
+        "optimizer": args.optimizer,
         "workload_id": manifest.workload_id,
         "workload_manifest": str(args.workload_manifest),
         "workload_manifest_sha256": manifest.manifest_sha256,
@@ -247,27 +250,20 @@ def main() -> None:
         "workload_jobs": len(manifest.jobs),
         "job_limit": args.job_limit,
         "batch_size": None if args.method == "ase" else args.batch_size,
-        "refill_storage": (
-            args.refill_storage if args.method == "refill" else None
-        ),
+        "refill_storage": (args.refill_storage if args.method == "refill" else None),
         "fmax_eV_per_A": args.fmax,
         "max_steps": args.max_steps,
         "linear_algebra_backend": args.linear_algebra_backend,
         "deterministic_algorithms": args.deterministic,
         "cpu_threads": args.cpu_threads,
         "timing_seconds": elapsed,
-        "systems_per_second": (
-            None if elapsed is None else len(systems) / elapsed
-        ),
+        "systems_per_second": (None if elapsed is None else len(systems) / elapsed),
         "peak_allocated_bytes": torch.cuda.max_memory_allocated(device),
         "peak_reserved_bytes": torch.cuda.max_memory_reserved(device),
         "environment": environment_metadata(device),
         **model_info,
         **output,
-        "converged": sum(
-            bool(record["converged"])
-            for record in output.get("records", ())
-        ),
+        "converged": sum(bool(record["converged"]) for record in output.get("records", ())),
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(

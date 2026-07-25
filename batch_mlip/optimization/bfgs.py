@@ -15,6 +15,18 @@ from ..core.types import BatchEvaluation, RelaxationResult, StepCallback
 from ..profiling.runtime import profile_event, profile_phase
 from .cell_filters import BoundFrechetCellFilter, FrechetCellFilter
 from .fire import max_force_per_system, max_generalized_force_per_system
+from .refill import (
+    REFILL_POLICIES as _REFILL_POLICIES,
+)
+from .refill import (
+    REFILL_STORAGE_MODES as _REFILL_STORAGE_MODES,
+)
+from .refill import (
+    global_atom_ids as _global_atom_ids,
+)
+from .refill import (
+    refill_insert_count as _refill_insert_count,
+)
 
 
 @dataclass
@@ -52,10 +64,7 @@ def _system_coordinates(
         if optimizer_positions is None:
             raise RuntimeError("fixed-cell BFGS optimizer positions are missing")
         return optimizer_positions[atom_slice]
-    cell_coordinates = (
-        cell_filter.log_deformation[system_id]
-        * cell_filter.cell_factor[system_id]
-    )
+    cell_coordinates = cell_filter.log_deformation[system_id] * cell_filter.cell_factor[system_id]
     return torch.cat(
         (cell_filter.generalized_positions[atom_slice], cell_coordinates),
         dim=0,
@@ -90,11 +99,14 @@ def _prepare_bfgs_step(
     position_vector = coordinates.flatten()
     force_vector = forces.flatten()
     if history.hessian is None:
-        history.hessian = torch.eye(
-            position_vector.numel(),
-            device=coordinates.device,
-            dtype=coordinates.dtype,
-        ) * alpha
+        history.hessian = (
+            torch.eye(
+                position_vector.numel(),
+                device=coordinates.device,
+                dtype=coordinates.dtype,
+            )
+            * alpha
+        )
     else:
         if history.positions is None or history.forces is None:
             raise RuntimeError("BFGS history is incomplete")
@@ -110,9 +122,7 @@ def _prepare_bfgs_step(
             )
 
     eigenvalues, eigenvectors = torch.linalg.eigh(history.hessian)
-    displacement = eigenvectors @ (
-        (force_vector @ eigenvectors) / eigenvalues.abs()
-    )
+    displacement = eigenvectors @ ((force_vector @ eigenvectors) / eigenvalues.abs())
     displacement = displacement.reshape_as(coordinates)
     max_row_norm = torch.linalg.vector_norm(displacement, dim=1).max()
     if bool(max_row_norm >= max_step):
@@ -169,37 +179,23 @@ def _prepare_grouped_bfgs_steps(
         )
         hessians = identity.expand(batch_size, -1, -1).clone().mul_(alpha)
         initialized = [
-            index
-            for index, history in enumerate(histories)
-            if history.hessian is not None
+            index for index, history in enumerate(histories) if history.hessian is not None
         ]
         initialized_histories = [histories[index] for index in initialized]
         if any(
-            history.positions is None or history.forces is None
-            for history in initialized_histories
+            history.positions is None or history.forces is None for history in initialized_histories
         ):
             raise RuntimeError("BFGS history is incomplete")
-        initialized_ids = torch.as_tensor(
-            initialized, device=device, dtype=torch.long
-        )
+        initialized_ids = torch.as_tensor(initialized, device=device, dtype=torch.long)
         if initialized:
             hessians[initialized_ids] = torch.stack(
-                [
-                    cast(torch.Tensor, history.hessian)
-                    for history in initialized_histories
-                ]
+                [cast(torch.Tensor, history.hessian) for history in initialized_histories]
             )
             previous_positions = torch.stack(
-                [
-                    cast(torch.Tensor, history.positions)
-                    for history in initialized_histories
-                ]
+                [cast(torch.Tensor, history.positions) for history in initialized_histories]
             )
             previous_forces = torch.stack(
-                [
-                    cast(torch.Tensor, history.forces)
-                    for history in initialized_histories
-                ]
+                [cast(torch.Tensor, history.forces) for history in initialized_histories]
             )
 
     with profile_phase(
@@ -217,9 +213,7 @@ def _prepare_grouped_bfgs_steps(
             if update_local.numel():
                 update_ids = initialized_ids[update_local]
                 selected_delta_position = delta_position[update_local]
-                delta_force = (
-                    force_vectors[update_ids] - previous_forces[update_local]
-                )
+                delta_force = force_vectors[update_ids] - previous_forces[update_local]
                 selected_hessians = hessians[update_ids]
                 hessian_step = torch.bmm(
                     selected_hessians,
@@ -228,13 +222,8 @@ def _prepare_grouped_bfgs_steps(
                 a = torch.sum(selected_delta_position * delta_force, dim=1)
                 b = torch.sum(selected_delta_position * hessian_step, dim=1)
                 hessians[update_ids] = selected_hessians - (
-                    torch.bmm(
-                        delta_force.unsqueeze(2), delta_force.unsqueeze(1)
-                    )
-                    / a[:, None, None]
-                    + torch.bmm(
-                        hessian_step.unsqueeze(2), hessian_step.unsqueeze(1)
-                    )
+                    torch.bmm(delta_force.unsqueeze(2), delta_force.unsqueeze(1)) / a[:, None, None]
+                    + torch.bmm(hessian_step.unsqueeze(2), hessian_step.unsqueeze(1))
                     / b[:, None, None]
                 )
 
@@ -246,9 +235,7 @@ def _prepare_grouped_bfgs_steps(
             dimension=dimension,
         ):
             factors, info = torch.linalg.cholesky_ex(hessians)
-            displacements = torch.cholesky_solve(
-                force_vectors.unsqueeze(-1), factors
-            ).squeeze(-1)
+            displacements = torch.cholesky_solve(force_vectors.unsqueeze(-1), factors).squeeze(-1)
         failed_ids = torch.nonzero(info, as_tuple=False).flatten()
         if failed_ids.numel():
             with profile_phase(
@@ -260,9 +247,7 @@ def _prepare_grouped_bfgs_steps(
                 failed_hessians = hessians[failed_ids]
                 eigenvalues, eigenvectors = torch.linalg.eigh(failed_hessians)
                 failed_forces = force_vectors[failed_ids]
-                projected_forces = torch.bmm(
-                    failed_forces.unsqueeze(1), eigenvectors
-                ).squeeze(1)
+                projected_forces = torch.bmm(failed_forces.unsqueeze(1), eigenvectors).squeeze(1)
                 displacements[failed_ids] = torch.bmm(
                     eigenvectors,
                     (projected_forces / eigenvalues.abs()).unsqueeze(-1),
@@ -281,9 +266,7 @@ def _prepare_grouped_bfgs_steps(
             dimension=dimension,
         ):
             eigenvalues, eigenvectors = torch.linalg.eigh(hessians)
-        projected_forces = torch.bmm(
-            force_vectors.unsqueeze(1), eigenvectors
-        ).squeeze(1)
+        projected_forces = torch.bmm(force_vectors.unsqueeze(1), eigenvectors).squeeze(1)
         displacements = torch.bmm(
             eigenvectors,
             (projected_forces / eigenvalues.abs()).unsqueeze(-1),
@@ -427,44 +410,12 @@ def _resolve_optimizer_dtype(
         try:
             resolved = aliases[value.lower()]
         except KeyError as exc:
-            raise ValueError(
-                "optimizer_dtype must be float32, float64, or None"
-            ) from exc
+            raise ValueError("optimizer_dtype must be float32, float64, or None") from exc
     else:
         resolved = value
     if resolved not in (torch.float32, torch.float64):
         raise ValueError("optimizer_dtype must be float32, float64, or None")
     return resolved
-
-
-_REFILL_POLICIES = frozenset(("drain", "immediate", "threshold"))
-_REFILL_STORAGE_MODES = frozenset(("repack", "slots"))
-
-
-def _refill_insert_count(
-    *,
-    policy: str,
-    capacity: int,
-    survivors: int,
-    pending: int,
-    low_watermark: float,
-    min_chunk: int,
-) -> int:
-    """Return how many pending systems to insert after active compaction."""
-
-    slots = capacity - survivors
-    if slots <= 0 or pending <= 0:
-        return 0
-    if policy == "immediate":
-        return min(slots, pending)
-    if survivors == 0:
-        return min(slots, pending)
-    if policy == "drain":
-        return 0
-    low_water_count = int(capacity * low_watermark)
-    if survivors > low_water_count or slots < min_chunk:
-        return 0
-    return min(slots, pending)
 
 
 def batched_bfgs_relax(
@@ -529,9 +480,7 @@ def batched_bfgs_relax(
         or refill_min_chunk <= 0
     ):
         raise ValueError("refill_min_chunk must be a positive integer or None")
-    if refill_batch_size is None and (
-        refill_policy != "immediate" or refill_min_chunk is not None
-    ):
+    if refill_batch_size is None and (refill_policy != "immediate" or refill_min_chunk is not None):
         raise ValueError("refill policy options require refill_batch_size")
     if refill_batch_size is not None:
         if (
@@ -548,9 +497,7 @@ def batched_bfgs_relax(
             refill_storage=refill_storage,
             refill_low_watermark=refill_low_watermark,
             refill_min_chunk=(
-                max(8, refill_batch_size // 8)
-                if refill_min_chunk is None
-                else refill_min_chunk
+                max(8, refill_batch_size // 8) if refill_min_chunk is None else refill_min_chunk
             ),
             fmax=fmax,
             max_steps=max_steps,
@@ -570,23 +517,17 @@ def batched_bfgs_relax(
     active_system_ids = torch.arange(n_systems, device=device, dtype=torch.long)
     active_atom_ids = torch.arange(state.n_atoms, device=device, dtype=torch.long)
     active_filter = (
-        None
-        if cell_filter is None
-        else cell_filter.bind(active_state, dtype=optimizer_dtype)
+        None if cell_filter is None else cell_filter.bind(active_state, dtype=optimizer_dtype)
     )
     optimizer_positions = (
         active_state.positions.detach().to(optimizer_dtype).clone()
         if active_filter is None
         else None
     )
-    full_pressure = (
-        None if active_filter is None else active_filter.pressure.detach().clone()
-    )
+    full_pressure = None if active_filter is None else active_filter.pressure.detach().clone()
     histories = [_BFGSHistory() for _ in range(n_systems)]
 
-    converged_step = torch.full(
-        (n_systems,), -1, device=device, dtype=torch.int64
-    )
+    converged_step = torch.full((n_systems,), -1, device=device, dtype=torch.int64)
     full_energy = torch.empty((n_systems,), device=device, dtype=dtype)
     full_forces = torch.empty_like(state.positions)
     full_stress = (
@@ -613,9 +554,7 @@ def batched_bfgs_relax(
     )
     if full_energy.dtype != evaluation.energy.dtype:
         full_energy = full_energy.to(evaluation.energy.dtype)
-    _profile_optimizer_evaluation(
-        active_state, scheduler_step=0, pending_systems=0
-    )
+    _profile_optimizer_evaluation(active_state, scheduler_step=0, pending_systems=0)
     neighbor_rebuilds = active_state.neighbor_rebuild_count
     active_batch_sizes = [n_systems]
     completed_steps = 0
@@ -637,18 +576,13 @@ def batched_bfgs_relax(
             full_stress[active_system_ids] = evaluation.stress
         if full_smax is not None and current_smax is not None:
             full_smax[active_system_ids] = current_smax.to(full_smax.dtype)
-        if (
-            full_generalized_fmax is not None
-            and current_generalized_fmax is not None
-        ):
+        if full_generalized_fmax is not None and current_generalized_fmax is not None:
             full_generalized_fmax[active_system_ids] = current_generalized_fmax.to(
                 full_generalized_fmax.dtype
             )
 
     for step in range(max_steps + 1):
-        physical_forces = evaluation.forces.masked_fill(
-            active_state.fixed.unsqueeze(-1), 0.0
-        )
+        physical_forces = evaluation.forces.masked_fill(active_state.fixed.unsqueeze(-1), 0.0)
         current_fmax = max_force_per_system(active_state, physical_forces)
         if active_filter is None:
             atomic_forces = physical_forces
@@ -657,15 +591,11 @@ def batched_bfgs_relax(
             current_generalized_fmax = None
             convergence_now = current_fmax < fmax
         else:
-            if evaluation.stress is None or not bool(
-                torch.isfinite(evaluation.stress).all()
-            ):
+            if evaluation.stress is None or not bool(torch.isfinite(evaluation.stress).all()):
                 raise FloatingPointError(
                     "calculator returned missing or non-finite stress for cell optimization"
                 )
-            atomic_forces, cell_forces = active_filter.generalized_forces(
-                active_state, evaluation
-            )
+            atomic_forces, cell_forces = active_filter.generalized_forces(active_state, evaluation)
             current_smax = active_filter.max_stress(evaluation)
             current_generalized_fmax = max_generalized_force_per_system(
                 active_state, atomic_forces, cell_forces
@@ -676,9 +606,7 @@ def batched_bfgs_relax(
                 else (current_fmax <= fmax) & (current_smax <= smax)
             )
 
-        sync_full_outputs(
-            current_fmax, current_smax, current_generalized_fmax
-        )
+        sync_full_outputs(current_fmax, current_smax, current_generalized_fmax)
         local_not_converged = converged_step[active_system_ids] < 0
         newly_converged = convergence_now & local_not_converged
         converged_step[active_system_ids[newly_converged]] = step
@@ -732,9 +660,7 @@ def batched_bfgs_relax(
                 systems=systems_before,
                 atoms=active_state.n_atoms,
             ):
-                remaining_local = torch.nonzero(
-                    ~newly_converged, as_tuple=False
-                ).flatten().tolist()
+                remaining_local = torch.nonzero(~newly_converged, as_tuple=False).flatten().tolist()
                 atom_blocks = [
                     torch.arange(
                         active_state.ptr[i],
@@ -745,19 +671,13 @@ def batched_bfgs_relax(
                     for i in remaining_local
                 ]
                 remaining_atoms = torch.cat(atom_blocks)
-                selector = torch.as_tensor(
-                    remaining_local, device=device, dtype=torch.long
-                )
+                selector = torch.as_tensor(remaining_local, device=device, dtype=torch.long)
                 next_filter = (
                     None
                     if active_filter is None
-                    else active_filter.select_systems(
-                        active_state, remaining_local
-                    )
+                    else active_filter.select_systems(active_state, remaining_local)
                 )
-                next_state = active_state.select_systems(
-                    remaining_local, rebuild_neighbors=False
-                )
+                next_state = active_state.select_systems(remaining_local, rebuild_neighbors=False)
                 atomic_forces = atomic_forces[remaining_atoms].clone()
                 if cell_forces is not None:
                     cell_forces = cell_forces[selector].clone()
@@ -765,9 +685,7 @@ def batched_bfgs_relax(
                 active_system_ids = active_system_ids[selector].clone()
                 histories = [histories[i] for i in remaining_local]
                 if optimizer_positions is not None:
-                    optimizer_positions = optimizer_positions[
-                        remaining_atoms
-                    ].clone()
+                    optimizer_positions = optimizer_positions[remaining_atoms].clone()
                 active_state = next_state
                 active_filter = next_filter
             profile_event(
@@ -799,9 +717,7 @@ def batched_bfgs_relax(
                 )
             )
             local_active = converged_step[active_system_ids] < 0
-            active_ids = torch.nonzero(
-                local_active, as_tuple=False
-            ).flatten().tolist()
+            active_ids = torch.nonzero(local_active, as_tuple=False).flatten().tolist()
             coordinates = [
                 _system_coordinates(
                     active_state,
@@ -812,9 +728,7 @@ def batched_bfgs_relax(
                 for system_id in active_ids
             ]
             generalized_forces = [
-                _system_forces(
-                    active_state, system_id, atomic_forces, cell_forces
-                )
+                _system_forces(active_state, system_id, atomic_forces, cell_forces)
                 for system_id in active_ids
             ]
             with profile_phase(
@@ -831,9 +745,7 @@ def batched_bfgs_relax(
                     max_step=max_step,
                     linear_algebra_backend=linear_algebra_backend,
                 )
-            for system_id, displacement in zip(
-                active_ids, displacements, strict=True
-            ):
+            for system_id, displacement in zip(active_ids, displacements, strict=True):
                 atom_slice = active_state.atom_slice(system_id)
                 atom_count = atom_slice.stop - atom_slice.start
                 atomic_displacement[atom_slice] = displacement[:atom_count]
@@ -851,15 +763,9 @@ def batched_bfgs_relax(
             ):
                 if active_filter is None:
                     if optimizer_positions is None:
-                        raise RuntimeError(
-                            "fixed-cell BFGS optimizer positions are missing"
-                        )
-                    optimizer_positions = (
-                        optimizer_positions + atomic_displacement
-                    ).detach()
-                    active_state.positions = optimizer_positions.to(
-                        dtype=dtype
-                    ).detach()
+                        raise RuntimeError("fixed-cell BFGS optimizer positions are missing")
+                    optimizer_positions = (optimizer_positions + atomic_displacement).detach()
+                    active_state.positions = optimizer_positions.to(dtype=dtype).detach()
                 else:
                     if cell_displacement is None:
                         raise RuntimeError("variable-cell displacement is missing")
@@ -873,12 +779,8 @@ def batched_bfgs_relax(
             neighbor_policy="auto",
             compute_stress=active_filter is not None,
         )
-        _profile_optimizer_evaluation(
-            active_state, scheduler_step=step + 1, pending_systems=0
-        )
-        neighbor_rebuilds += (
-            active_state.neighbor_rebuild_count - rebuilds_before
-        )
+        _profile_optimizer_evaluation(active_state, scheduler_step=step + 1, pending_systems=0)
+        neighbor_rebuilds += active_state.neighbor_rebuild_count - rebuilds_before
         active_batch_sizes.append(active_state.n_systems)
         completed_steps = step + 1
 
@@ -910,22 +812,6 @@ def batched_bfgs_relax(
         graph_evaluations=sum(active_batch_sizes),
         active_batch_sizes=tuple(active_batch_sizes),
     )
-
-
-def _global_atom_ids(
-    state: AseGraphBatch,
-    system_ids: torch.Tensor,
-) -> torch.Tensor:
-    blocks = [
-        torch.arange(
-            state.ptr[system_id],
-            state.ptr[system_id + 1],
-            device=state.device,
-            dtype=torch.long,
-        )
-        for system_id in system_ids.tolist()
-    ]
-    return torch.cat(blocks)
 
 
 def _batched_bfgs_refill_relax(
@@ -960,16 +846,10 @@ def _batched_bfgs_refill_relax(
     active_state = (
         state
         if capacity == n_systems
-        else state.select_systems(
-            active_system_ids.tolist(), rebuild_neighbors=False
-        )
+        else state.select_systems(active_system_ids.tolist(), rebuild_neighbors=False)
     )
 
-    full_filter = (
-        None
-        if cell_filter is None
-        else cell_filter.bind(state, dtype=optimizer_dtype)
-    )
+    full_filter = None if cell_filter is None else cell_filter.bind(state, dtype=optimizer_dtype)
     active_filter = (
         None
         if full_filter is None
@@ -980,37 +860,25 @@ def _batched_bfgs_refill_relax(
         )
     )
     full_optimizer_positions = (
-        state.positions.detach().to(optimizer_dtype).clone()
-        if full_filter is None
-        else None
+        state.positions.detach().to(optimizer_dtype).clone() if full_filter is None else None
     )
     optimizer_positions = (
         None
         if full_optimizer_positions is None
         else full_optimizer_positions[active_atom_ids].clone()
     )
-    full_pressure = (
-        None if full_filter is None else full_filter.pressure.detach().clone()
-    )
-    histories: list[_BFGSHistory | None] = [
-        _BFGSHistory() for _ in range(n_systems)
-    ]
+    full_pressure = None if full_filter is None else full_filter.pressure.detach().clone()
+    histories: list[_BFGSHistory | None] = [_BFGSHistory() for _ in range(n_systems)]
     local_steps = torch.zeros((n_systems,), device=device, dtype=torch.int64)
     finished = torch.zeros((n_systems,), device=device, dtype=torch.bool)
-    converged_step = torch.full(
-        (n_systems,), -1, device=device, dtype=torch.int64
-    )
+    converged_step = torch.full((n_systems,), -1, device=device, dtype=torch.int64)
 
-    full_energy = torch.full(
-        (n_systems,), torch.nan, device=device, dtype=dtype
-    )
+    full_energy = torch.full((n_systems,), torch.nan, device=device, dtype=dtype)
     full_forces = torch.full_like(state.positions, torch.nan)
     full_stress = (
         None
         if full_filter is None
-        else torch.full(
-            (n_systems, 3, 3), torch.nan, device=device, dtype=dtype
-        )
+        else torch.full((n_systems, 3, 3), torch.nan, device=device, dtype=dtype)
     )
     full_fmax = torch.full((n_systems,), torch.inf, device=device, dtype=dtype)
     full_smax = (
@@ -1034,9 +902,7 @@ def _batched_bfgs_refill_relax(
             neighbor_policy="auto",
             compute_stress=active_filter is not None,
         )
-        neighbor_rebuilds += (
-            active_state.neighbor_rebuild_count - rebuilds_before
-        )
+        neighbor_rebuilds += active_state.neighbor_rebuild_count - rebuilds_before
         _profile_optimizer_evaluation(
             active_state,
             scheduler_step=current_scheduler_step,
@@ -1067,15 +933,13 @@ def _batched_bfgs_refill_relax(
                 full_filter.generalized_positions[active_atom_ids] = (
                     active_filter.generalized_positions
                 )
-                full_filter.log_deformation[active_system_ids] = (
-                    active_filter.log_deformation
-                )
+                full_filter.log_deformation[active_system_ids] = active_filter.log_deformation
             full_stress[active_system_ids] = evaluation.stress
             if current_smax is not None:
                 full_smax[active_system_ids] = current_smax.to(full_smax.dtype)
             if current_generalized_fmax is not None:
-                full_generalized_fmax[active_system_ids] = (
-                    current_generalized_fmax.to(full_generalized_fmax.dtype)
+                full_generalized_fmax[active_system_ids] = current_generalized_fmax.to(
+                    full_generalized_fmax.dtype
                 )
 
     evaluation = evaluate_active(0)
@@ -1085,9 +949,7 @@ def _batched_bfgs_refill_relax(
     scheduler_step = 0
 
     while True:
-        physical_forces = evaluation.forces.masked_fill(
-            active_state.fixed.unsqueeze(-1), 0.0
-        )
+        physical_forces = evaluation.forces.masked_fill(active_state.fixed.unsqueeze(-1), 0.0)
         current_fmax = max_force_per_system(active_state, physical_forces)
         if active_filter is None:
             atomic_forces = physical_forces
@@ -1096,15 +958,11 @@ def _batched_bfgs_refill_relax(
             current_generalized_fmax = None
             convergence_now = current_fmax < fmax
         else:
-            if evaluation.stress is None or not bool(
-                torch.isfinite(evaluation.stress).all()
-            ):
+            if evaluation.stress is None or not bool(torch.isfinite(evaluation.stress).all()):
                 raise FloatingPointError(
                     "calculator returned missing or non-finite stress for cell optimization"
                 )
-            atomic_forces, cell_forces = active_filter.generalized_forces(
-                active_state, evaluation
-            )
+            atomic_forces, cell_forces = active_filter.generalized_forces(active_state, evaluation)
             current_smax = active_filter.max_stress(evaluation)
             current_generalized_fmax = max_generalized_force_per_system(
                 active_state, atomic_forces, cell_forces
@@ -1115,9 +973,7 @@ def _batched_bfgs_refill_relax(
                 else (current_fmax <= fmax) & (current_smax <= smax)
             )
 
-        sync_active_state(
-            evaluation, current_fmax, current_smax, current_generalized_fmax
-        )
+        sync_active_state(evaluation, current_fmax, current_smax, current_generalized_fmax)
         exhausted_now = local_steps[active_system_ids] >= max_steps
         finish_now = convergence_now | exhausted_now
         newly_converged_ids = active_system_ids[convergence_now]
@@ -1166,19 +1022,13 @@ def _batched_bfgs_refill_relax(
             break
 
         ready_count = active_state.n_systems
-        ready_local_ids = torch.arange(
-            ready_count, device=device, dtype=torch.long
-        )
+        ready_local_ids = torch.arange(ready_count, device=device, dtype=torch.long)
         if bool(finish_now.any()):
             systems_before = active_state.n_systems
-            remaining_local = torch.nonzero(
-                ~finish_now, as_tuple=False
-            ).flatten()
+            remaining_local = torch.nonzero(~finish_now, as_tuple=False).flatten()
             remaining_list = remaining_local.tolist()
             survivor_ids = active_system_ids[remaining_local]
-            finished_local = torch.nonzero(
-                finish_now, as_tuple=False
-            ).flatten()
+            finished_local = torch.nonzero(finish_now, as_tuple=False).flatten()
             for system_id in active_system_ids[finish_now].tolist():
                 histories[system_id] = None
 
@@ -1200,8 +1050,7 @@ def _batched_bfgs_refill_relax(
             )
             next_pending = refill_stop
             slot_counts_match = insert_count == finished_local.numel() and all(
-                int(active_state.counts[destination])
-                == int(state.counts[source_id])
+                int(active_state.counts[destination]) == int(state.counts[source_id])
                 for destination, source_id in zip(
                     finished_local.tolist(),
                     refill_ids.tolist(),
@@ -1210,11 +1059,7 @@ def _batched_bfgs_refill_relax(
             )
             use_slot_swap = refill_storage == "slots" and slot_counts_match
             with profile_phase(
-                (
-                    "scheduler.refill_slot_swap"
-                    if use_slot_swap
-                    else "scheduler.refill_repack"
-                ),
+                ("scheduler.refill_slot_swap" if use_slot_swap else "scheduler.refill_repack"),
                 device=device,
                 systems=systems_before,
                 atoms=active_state.n_atoms,
@@ -1230,40 +1075,32 @@ def _batched_bfgs_refill_relax(
                     active_system_ids = active_system_ids.clone()
                     active_system_ids[finished_local] = refill_ids
                     active_atom_ids = _global_atom_ids(state, active_system_ids)
-                    for destination, source_id in zip(
-                        destination_list, source_list, strict=True
-                    ):
+                    for destination, source_id in zip(destination_list, source_list, strict=True):
                         destination_atoms = active_state.atom_slice(destination)
                         source_atoms = state.atom_slice(source_id)
                         atomic_forces[destination_atoms] = 0.0
                         if optimizer_positions is not None:
                             if full_optimizer_positions is None:
-                                raise RuntimeError(
-                                    "full optimizer positions are missing"
-                                )
-                            optimizer_positions[destination_atoms] = (
-                                full_optimizer_positions[source_atoms]
-                            )
+                                raise RuntimeError("full optimizer positions are missing")
+                            optimizer_positions[destination_atoms] = full_optimizer_positions[
+                                source_atoms
+                            ]
                         if active_filter is not None:
                             if full_filter is None or cell_forces is None:
-                                raise RuntimeError(
-                                    "full variable-cell state is missing"
-                                )
+                                raise RuntimeError("full variable-cell state is missing")
                             active_filter.reference_cells[destination] = (
                                 full_filter.reference_cells[source_id]
                             )
-                            active_filter.generalized_positions[
-                                destination_atoms
-                            ] = full_filter.generalized_positions[source_atoms]
+                            active_filter.generalized_positions[destination_atoms] = (
+                                full_filter.generalized_positions[source_atoms]
+                            )
                             active_filter.log_deformation[destination] = (
                                 full_filter.log_deformation[source_id]
                             )
-                            active_filter.cell_factor[destination] = (
-                                full_filter.cell_factor[source_id]
-                            )
-                            active_filter.pressure[destination] = (
-                                full_filter.pressure[source_id]
-                            )
+                            active_filter.cell_factor[destination] = full_filter.cell_factor[
+                                source_id
+                            ]
+                            active_filter.pressure[destination] = full_filter.pressure[source_id]
                             cell_forces[destination] = 0.0
                     ready_local_ids = remaining_local
                     ready_count = remaining_local.numel()
@@ -1283,24 +1120,16 @@ def _batched_bfgs_refill_relax(
                         if remaining_list
                         else torch.empty(0, device=device, dtype=torch.long)
                     )
-                    survivor_forces = atomic_forces[
-                        remaining_atom_ids
-                    ].clone()
+                    survivor_forces = atomic_forces[remaining_atom_ids].clone()
                     survivor_cell_forces = (
-                        None
-                        if cell_forces is None
-                        else cell_forces[remaining_local].clone()
+                        None if cell_forces is None else cell_forces[remaining_local].clone()
                     )
                     active_system_ids = torch.cat((survivor_ids, refill_ids))
-                    active_atom_ids = _global_atom_ids(
-                        state, active_system_ids
-                    )
+                    active_atom_ids = _global_atom_ids(state, active_system_ids)
                     state_parts = []
                     if remaining_list:
                         state_parts.append(
-                            active_state.select_systems(
-                                remaining_list, rebuild_neighbors=False
-                            )
+                            active_state.select_systems(remaining_list, rebuild_neighbors=False)
                         )
                     if refill_ids.numel():
                         state_parts.append(
@@ -1313,25 +1142,19 @@ def _batched_bfgs_refill_relax(
                     active_filter = (
                         None
                         if full_filter is None
-                        else full_filter.select_systems(
-                            state, active_system_ids.tolist()
-                        )
+                        else full_filter.select_systems(state, active_system_ids.tolist())
                     )
                     optimizer_positions = (
                         None
                         if full_optimizer_positions is None
-                        else full_optimizer_positions[
-                            active_atom_ids
-                        ].clone()
+                        else full_optimizer_positions[active_atom_ids].clone()
                     )
                     atomic_forces = torch.zeros(
                         active_state.positions.shape,
                         device=device,
                         dtype=optimizer_dtype,
                     )
-                    atomic_forces[: survivor_forces.shape[0]] = (
-                        survivor_forces
-                    )
+                    atomic_forces[: survivor_forces.shape[0]] = survivor_forces
                     if active_filter is None:
                         cell_forces = None
                     else:
@@ -1341,13 +1164,9 @@ def _batched_bfgs_refill_relax(
                             dtype=optimizer_dtype,
                         )
                         if survivor_cell_forces is not None:
-                            cell_forces[: len(remaining_list)] = (
-                                survivor_cell_forces
-                            )
+                            cell_forces[: len(remaining_list)] = survivor_cell_forces
                     ready_count = len(remaining_list)
-                    ready_local_ids = torch.arange(
-                        ready_count, device=device, dtype=torch.long
-                    )
+                    ready_local_ids = torch.arange(ready_count, device=device, dtype=torch.long)
             profile_event(
                 "refill",
                 policy=refill_policy,
@@ -1358,9 +1177,7 @@ def _batched_bfgs_refill_relax(
                 survivors=ready_count,
                 inserted=refill_ids.numel(),
                 triggered=bool(refill_ids.numel()),
-                storage=(
-                    "slots" if use_slot_swap else "repack"
-                ),
+                storage=("slots" if use_slot_swap else "repack"),
                 systems_after=active_state.n_systems,
                 pending_after=n_systems - next_pending,
             )
@@ -1424,9 +1241,7 @@ def _batched_bfgs_refill_relax(
                     max_step=max_step,
                     linear_algebra_backend=linear_algebra_backend,
                 )
-            for local_id, displacement in zip(
-                ready_local_ids.tolist(), displacements, strict=True
-            ):
+            for local_id, displacement in zip(ready_local_ids.tolist(), displacements, strict=True):
                 atom_slice = active_state.atom_slice(local_id)
                 atom_count = atom_slice.stop - atom_slice.start
                 atomic_displacement[atom_slice] = displacement[:atom_count]
@@ -1446,15 +1261,9 @@ def _batched_bfgs_refill_relax(
             ):
                 if active_filter is None:
                     if optimizer_positions is None:
-                        raise RuntimeError(
-                            "fixed-cell BFGS optimizer positions are missing"
-                        )
-                    optimizer_positions = (
-                        optimizer_positions + atomic_displacement
-                    ).detach()
-                    active_state.positions = optimizer_positions.to(
-                        dtype=dtype
-                    ).detach()
+                        raise RuntimeError("fixed-cell BFGS optimizer positions are missing")
+                    optimizer_positions = (optimizer_positions + atomic_displacement).detach()
+                    active_state.positions = optimizer_positions.to(dtype=dtype).detach()
                 else:
                     if cell_displacement is None:
                         raise RuntimeError("variable-cell displacement is missing")

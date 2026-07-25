@@ -188,6 +188,11 @@ def run_batch(
                 calculator,
                 dt_start=dt_start,
                 dt_max=dt_max,
+                refill_batch_size=batch_size if refill else None,
+                refill_policy=refill_policy,
+                refill_storage=refill_storage,
+                refill_low_watermark=refill_low_watermark,
+                refill_min_chunk=refill_min_chunk,
                 **common,
             )
         elif optimizer_name == "bfgs":
@@ -304,8 +309,8 @@ def main() -> None:
     args = parser.parse_args()
 
     torch.use_deterministic_algorithms(args.deterministic)
-    if args.method == "refill" and args.optimizer != "bfgs":
-        raise ValueError("active refill is currently implemented only for BFGS")
+    if args.method == "refill" and args.optimizer not in ("fire", "bfgs"):
+        raise ValueError("active refill is currently implemented only for FIRE and BFGS")
     if args.pool_size <= 0 or args.repeats <= 0:
         raise ValueError("pool size and repeats must be positive")
     manifest = load_manifest(args.manifest, min(args.pool_size, 32))
