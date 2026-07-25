@@ -334,6 +334,32 @@ Cholesky with eigen fallback for full BFGS, expandable segments near the memory
 frontier, and refill only when the pool exceeds resident capacity by a modest
 tail. MPS remains a valid fallback for large dense-Hessian jobs.
 
+### Cross-family robustness result
+
+The same comparison now covers four signed 256-job pools selected from the
+independent CSP test set: GUFJOG44, XATMOV88, OBEQIX220, and heterogeneous
+ROFA-MIX. Both smooth-rms AtomBit and MACE-OFF-Small converge all jobs with
+variable-cell BFGS.
+
+With one CPU thread per ASE process or MPS worker, selected tensor policies are
+12.79-24.22x faster than serial ASE. Tensor batching is 1.29-1.86x faster than
+MPS32 on seven of eight model/workload pairs. MACE OBEQIX220 is parity at
+0.99x, inside the 2% inconclusive band. B256 wins for the small, medium, and
+heterogeneous pools. Dense OBEQIX220 B128/B192/refill points are within 2%, so
+B128 is selected for its lower live memory. Refill helps only when a resident
+tail would otherwise require another drain cycle.
+
+Short deterministic ASE/eigen/Cholesky trajectory gates pass, but full
+GUFJOG44 and OBEQIX220 relaxations can reach different local minima after tiny
+numerical perturbations. The effect also appears in tensor B1 and, less often,
+MACE under MPS. The result therefore supports a converged-throughput claim, not
+identical minimum identity. Application validation must compare low-energy hit
+rates, energy/ranking distributions, duplicate minima, and target observables.
+
+The frozen matrix, failed job IDs, endpoint distributions, memory, artifact
+hashes, and B1 diagnostic are in
+`experiments/cross-family-robustness/results/optimization_summary.json`.
+
 ## Measurement and decision rules
 
 - Use the fixed T2 manifest and record the exact filename sequence.

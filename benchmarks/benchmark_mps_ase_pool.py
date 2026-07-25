@@ -19,7 +19,8 @@ from typing import Any
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--atom-count", type=int, required=True)
+    parser.add_argument("--mlip", choices=("atombit", "mace"), default="atombit")
+    parser.add_argument("--atom-count", type=int)
     parser.add_argument(
         "--optimizer",
         choices=("fire", "bfgs", "bfgslinesearch"),
@@ -56,7 +57,13 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=Path("benchmarks/t2_fixed_samples.json"),
     )
-    parser.add_argument("--checkpoint", type=Path, required=True)
+    parser.add_argument(
+        "--workload-manifest",
+        type=Path,
+        help="Signed workload manifest; supersedes --atom-count and --manifest.",
+    )
+    parser.add_argument("--checkpoint", type=Path)
+    parser.add_argument("--mace-model", default="small")
     parser.add_argument("--gpu-index", type=int, default=0)
     parser.add_argument("--cpu-threads-per-worker", type=int, default=1)
     parser.add_argument("--worker-start-interval", type=float, default=0.0)
@@ -69,6 +76,10 @@ def parse_args() -> argparse.Namespace:
         parser.error("worker start interval must be non-negative")
     if args.pool_size % args.workers:
         parser.error("pool size must be divisible by worker count")
+    if args.workload_manifest is None and args.atom_count is None:
+        parser.error("--atom-count is required without --workload-manifest")
+    if args.mlip == "atombit" and args.checkpoint is None:
+        parser.error("--checkpoint is required for AtomBit")
     for variable in ("CUDA_MPS_PIPE_DIRECTORY", "CUDA_MPS_LOG_DIRECTORY"):
         if not os.environ.get(variable):
             parser.error(f"{variable} must identify the active MPS daemon")
@@ -102,81 +113,145 @@ def _worker_impl(
     repository_root = benchmark_dir.parent
     sys.path[:0] = [str(repository_root), str(benchmark_dir)]
     from benchmark_production import load_manifest, load_production_model, synchronize
-    from benchmark_variable_cell_scaling import (
-        AtomBitBatchCalculator,
-        AtomBitCalculator,
-        run_ase,
-    )
+
+    from batch_mlip.workloads import read_workload_manifest
 
     torch.use_deterministic_algorithms(args.deterministic)
     torch.set_num_threads(args.cpu_threads_per_worker)
     torch.set_num_interop_threads(1)
     shard_size = args.pool_size // args.workers
-    manifest = load_manifest(args.manifest, min(args.pool_size, 32))
-    available = manifest["samples"][str(args.atom_count)]
-    base_names = available[: min(args.pool_size, len(available))]
-    global_names = [base_names[index % len(base_names)] for index in range(args.pool_size)]
     start = worker_id * shard_size
-    names = global_names[start : start + shard_size]
-
     systems = []
-    for name in names:
-        atoms = read(args.dataset_dir / name)
-        if len(atoms) != args.atom_count:
-            raise ValueError(f"{name} has {len(atoms)} atoms")
-        atoms.info["benchmark_source"] = name
-        systems.append(atoms)
+    if args.workload_manifest is not None:
+        workload = read_workload_manifest(args.workload_manifest)
+        if args.pool_size > len(workload.jobs):
+            raise ValueError(
+                f"pool size {args.pool_size} exceeds signed workload "
+                f"size {len(workload.jobs)}"
+            )
+        jobs = workload.jobs[start : start + shard_size]
+        names = [job.system_id for job in jobs]
+        for job in jobs:
+            atoms = read(
+                args.dataset_dir / job.source_path,
+                index=job.frame_index,
+            )
+            atoms.info["benchmark_source"] = job.system_id
+            atoms.info["benchmark_source_path"] = job.source_path
+            systems.append(atoms)
+    else:
+        manifest = load_manifest(args.manifest, min(args.pool_size, 32))
+        available = manifest["samples"][str(args.atom_count)]
+        base_names = available[: min(args.pool_size, len(available))]
+        global_names = [
+            base_names[index % len(base_names)]
+            for index in range(args.pool_size)
+        ]
+        names = global_names[start : start + shard_size]
+        for name in names:
+            atoms = read(args.dataset_dir / name)
+            if len(atoms) != args.atom_count:
+                raise ValueError(f"{name} has {len(atoms)} atoms")
+            atoms.info["benchmark_source"] = name
+            systems.append(atoms)
 
     device = torch.device(args.device)
-    model_dtype = getattr(torch, args.model_dtype)
-    optimizer_dtype = (
-        None if args.optimizer_dtype == "state" else args.optimizer_dtype
-    )
-    model, _ = load_production_model(args.checkpoint)
-    model = model.to(device=device, dtype=model_dtype).eval()
+    if args.mlip == "atombit":
+        from benchmark_variable_cell_scaling import (
+            AtomBitBatchCalculator,
+            AtomBitCalculator,
+            run_ase,
+        )
 
-    # Exercise the same model, force, stress, and autograd paths before the barrier.
-    warm_batch = AtomBitBatchCalculator(
-        model,
-        cutoff=args.cutoff,
-        device=device,
-        dtype=model_dtype,
-        force_mode="autograd",
-    )
-    warm_batch(warm_batch.create_state([systems[0]]), compute_stress=True)
-    warm_ase = AtomBitCalculator(
-        model,
-        cutoff=args.cutoff,
-        device=device,
-        dtype=model_dtype,
-        enable_stress=True,
-        add_e0=False,
-    )
-    warm_ase.calculate(
-        systems[0],
-        properties=("energy", "forces", "stress"),
-        system_changes=all_changes,
-    )
+        model_dtype = getattr(torch, args.model_dtype)
+        optimizer_dtype = (
+            None if args.optimizer_dtype == "state" else args.optimizer_dtype
+        )
+        model, _ = load_production_model(args.checkpoint)
+        model = model.to(device=device, dtype=model_dtype).eval()
+        warm_batch = AtomBitBatchCalculator(
+            model,
+            cutoff=args.cutoff,
+            device=device,
+            dtype=model_dtype,
+            force_mode="autograd",
+        )
+        warm_batch(warm_batch.create_state([systems[0]]), compute_stress=True)
+        warm_ase = AtomBitCalculator(
+            model,
+            cutoff=args.cutoff,
+            device=device,
+            dtype=model_dtype,
+            enable_stress=True,
+            add_e0=False,
+        )
+        warm_ase.calculate(
+            systems[0],
+            properties=("energy", "forces", "stress"),
+            system_changes=all_changes,
+        )
+
+        def execute():
+            return run_ase(
+                model,
+                systems,
+                device=device,
+                cutoff=args.cutoff,
+                fmax=args.fmax,
+                max_steps=args.max_steps,
+                dt_start=args.dt_start,
+                dt_max=args.dt_max,
+                max_step=args.max_step,
+                optimizer_name=args.optimizer,
+                alpha=args.alpha,
+                optimizer_dtype=optimizer_dtype,
+                model_dtype=model_dtype,
+            )
+
+    else:
+        from benchmark_mace_variable_cell_scaling import (
+            make_counting_ase_calculator,
+            run_ase,
+        )
+
+        from batch_mlip import MACEBatchCalculator
+
+        warm_batch = MACEBatchCalculator.from_off(
+            model=args.mace_model,
+            device=device,
+            dtype=torch.float64,
+            graph_mode="rebuild",
+        )
+        calculator = make_counting_ase_calculator(
+            warm_batch.model,
+            device=device,
+        )
+        warm_batch(warm_batch.create_state([systems[0]]), compute_stress=True)
+        calculator.calculate(
+            systems[0],
+            properties=("energy", "forces", "stress"),
+            system_changes=all_changes,
+        )
+
+        def execute():
+            return run_ase(
+                calculator,
+                systems,
+                fmax=args.fmax,
+                max_steps=args.max_steps,
+                dt_start=args.dt_start,
+                dt_max=args.dt_max,
+                max_step=args.max_step,
+                optimizer_name=args.optimizer,
+                alpha=args.alpha,
+            )
+
     synchronize(device)
     torch.cuda.reset_peak_memory_stats(device)
 
     barrier.wait(timeout=600)
     started = time.perf_counter()
-    output = run_ase(
-        model,
-        systems,
-        device=device,
-        cutoff=args.cutoff,
-        fmax=args.fmax,
-        max_steps=args.max_steps,
-        dt_start=args.dt_start,
-        dt_max=args.dt_max,
-        max_step=args.max_step,
-        optimizer_name=args.optimizer,
-        alpha=args.alpha,
-        optimizer_dtype=optimizer_dtype,
-        model_dtype=model_dtype,
-    )
+    output = execute()
     synchronize(device)
     elapsed = time.perf_counter() - started
     result = {
@@ -337,10 +412,32 @@ def main() -> None:
         for worker_result in worker_results
         for record in worker_result["records"]
     ]
+    if args.workload_manifest is not None:
+        manifest_metadata = {
+            "path": str(args.workload_manifest.resolve()),
+            "sha256": sha256_file(args.workload_manifest),
+            "kind": "signed_workload",
+        }
+    else:
+        manifest_metadata = {
+            "path": str(args.manifest.resolve()),
+            "sha256": sha256_file(args.manifest),
+            "kind": "legacy_fixed_samples",
+        }
+    model_metadata = (
+        {
+            "kind": "checkpoint",
+            "path": str(args.checkpoint.resolve()),
+            "sha256": sha256_file(args.checkpoint),
+        }
+        if args.mlip == "atombit"
+        else {"kind": "mace_off", "model": args.mace_model}
+    )
     result = {
         "schema_version": 1,
         "status": "complete",
         "method": "ase_cuda_mps",
+        "mlip": args.mlip,
         "optimizer": args.optimizer,
         "atom_count": args.atom_count,
         "pool_size": args.pool_size,
@@ -351,14 +448,9 @@ def main() -> None:
             "pipe_directory": os.environ["CUDA_MPS_PIPE_DIRECTORY"],
             "log_directory": os.environ["CUDA_MPS_LOG_DIRECTORY"],
         },
-        "checkpoint": {
-            "path": str(args.checkpoint.resolve()),
-            "sha256": sha256_file(args.checkpoint),
-        },
-        "manifest": {
-            "path": str(args.manifest.resolve()),
-            "sha256": sha256_file(args.manifest),
-        },
+        "model": model_metadata,
+        "checkpoint": model_metadata if args.mlip == "atombit" else None,
+        "manifest": manifest_metadata,
         "parameters": {
             "cutoff_A": args.cutoff,
             "fmax_eV_per_A": args.fmax,

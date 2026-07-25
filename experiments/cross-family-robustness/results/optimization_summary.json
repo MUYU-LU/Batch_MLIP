@@ -1,0 +1,2487 @@
+{
+  "b1_diagnostics": [
+    {
+      "b1_vs_ase1": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 1.3613523690407265,
+            "median": 0.0032217118259124863,
+            "percentile_95": 0.773028459737379
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 0.06568361412395131,
+            "median": 5.1644715395840734e-05,
+            "percentile_95": 0.02353978536345742
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 0.013971105217933655,
+            "median": 0.002626270055770874,
+            "percentile_95": 0.010549484007060527
+          },
+          "max_position_rmsd_A": {
+            "maximum": 1.6514731349231577,
+            "median": 0.009739304475993329,
+            "percentile_95": 0.9852475787987799
+          },
+          "max_step_difference": {
+            "maximum": 158.0,
+            "median": 2.0,
+            "percentile_95": 146.29999999999998
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 0.005588613683357835,
+            "median": 0.0005818327772431076,
+            "percentile_95": 0.004966972197871655
+          }
+        },
+        "failed_checks": [
+          "max_energy_error_eV_per_atom",
+          "max_position_rmsd_A",
+          "max_cell_rmsd_A",
+          "max_step_difference"
+        ],
+        "failed_job_count": 14,
+        "failed_job_ids": [
+          "OPT-RB-GUFJOG44-R256-v1:0004",
+          "OPT-RB-GUFJOG44-R256-v1:0007",
+          "OPT-RB-GUFJOG44-R256-v1:0010",
+          "OPT-RB-GUFJOG44-R256-v1:0013",
+          "OPT-RB-GUFJOG44-R256-v1:0015",
+          "OPT-RB-GUFJOG44-R256-v1:0017",
+          "OPT-RB-GUFJOG44-R256-v1:0019",
+          "OPT-RB-GUFJOG44-R256-v1:0020",
+          "OPT-RB-GUFJOG44-R256-v1:0021",
+          "OPT-RB-GUFJOG44-R256-v1:0022",
+          "OPT-RB-GUFJOG44-R256-v1:0025",
+          "OPT-RB-GUFJOG44-R256-v1:0026",
+          "OPT-RB-GUFJOG44-R256-v1:0027",
+          "OPT-RB-GUFJOG44-R256-v1:0031"
+        ],
+        "max_cell_rmsd_A": 1.3613523690407265,
+        "max_energy_error_eV_per_atom": 0.06568361412395131,
+        "max_final_fmax_error_eV_per_A": 0.013971105217933655,
+        "max_position_rmsd_A": 1.6514731349231577,
+        "max_step_difference": 158,
+        "max_stress_tensor_error_eV_per_A3": 0.005588613683357835,
+        "passed": false,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "jobs": 32,
+      "mlip": "atombit",
+      "raw_files": {
+        "ase1": {
+          "path": "runs/robustness/production/confirm_ase1_atombit_GUFJOG44.json",
+          "sha256": "220321159001286411ae64747c8144761efb9ad627de962c95419a82d2a87309"
+        },
+        "b1": {
+          "path": "runs/robustness/diagnostics/b1_atombit_GUFJOG44_J32.json",
+          "sha256": "fcb0e7e5ea7b49c6f89a2d851872bedf10a5359797cf5504707aed3fb6067408"
+        },
+        "selected_tensor": {
+          "path": "runs/robustness/production/confirm_tensor_atombit_GUFJOG44_active_B256.json",
+          "sha256": "a5f3702804dccab1d9eb707dc140bc6852615ce2db40dcc0e28d7ade13b4bb80"
+        }
+      },
+      "selected_batch_vs_b1": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 1.330920343048654,
+            "median": 0.002774946251751838,
+            "percentile_95": 0.7687843356200431
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 0.024242184378884056,
+            "median": 3.4278089349920095e-05,
+            "percentile_95": 0.02117741974917325
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 0.01096624881029129,
+            "median": 0.004757456481456757,
+            "percentile_95": 0.01021472904831171
+          },
+          "max_position_rmsd_A": {
+            "maximum": 1.5869807270942151,
+            "median": 0.007498708978798934,
+            "percentile_95": 0.9718237367654488
+          },
+          "max_step_difference": {
+            "maximum": 160.0,
+            "median": 2.5,
+            "percentile_95": 147.39999999999998
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 0.00449946045409888,
+            "median": 0.00040441719465889037,
+            "percentile_95": 0.0027572616345423735
+          }
+        },
+        "failed_checks": [
+          "max_energy_error_eV_per_atom",
+          "max_position_rmsd_A",
+          "max_cell_rmsd_A",
+          "max_step_difference"
+        ],
+        "failed_job_count": 9,
+        "failed_job_ids": [
+          "OPT-RB-GUFJOG44-R256-v1:0004",
+          "OPT-RB-GUFJOG44-R256-v1:0007",
+          "OPT-RB-GUFJOG44-R256-v1:0012",
+          "OPT-RB-GUFJOG44-R256-v1:0015",
+          "OPT-RB-GUFJOG44-R256-v1:0021",
+          "OPT-RB-GUFJOG44-R256-v1:0022",
+          "OPT-RB-GUFJOG44-R256-v1:0025",
+          "OPT-RB-GUFJOG44-R256-v1:0026",
+          "OPT-RB-GUFJOG44-R256-v1:0027"
+        ],
+        "max_cell_rmsd_A": 1.330920343048654,
+        "max_energy_error_eV_per_atom": 0.024242184378884056,
+        "max_final_fmax_error_eV_per_A": 0.01096624881029129,
+        "max_position_rmsd_A": 1.5869807270942151,
+        "max_step_difference": 160,
+        "max_stress_tensor_error_eV_per_A3": 0.00449946045409888,
+        "passed": false,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "workload": "GUFJOG44"
+    },
+    {
+      "b1_vs_ase1": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 0.01340118878086199,
+            "median": 0.00018320527810875334,
+            "percentile_95": 0.008290440346839241
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 0.0007198593833229759,
+            "median": 1.6290491277521307e-05,
+            "percentile_95": 0.00036828431216153216
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 0.015518713742494583,
+            "median": 0.0014304686337709427,
+            "percentile_95": 0.008583098277449606
+          },
+          "max_position_rmsd_A": {
+            "maximum": 0.1030607270311416,
+            "median": 0.002274234955770893,
+            "percentile_95": 0.04132325045136718
+          },
+          "max_step_difference": {
+            "maximum": 27.0,
+            "median": 1.0,
+            "percentile_95": 17.249999999999996
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 0.0008544108713977039,
+            "median": 4.433988215168938e-05,
+            "percentile_95": 0.00051544609159464
+          }
+        },
+        "failed_checks": [
+          "max_energy_error_eV_per_atom",
+          "max_position_rmsd_A",
+          "max_step_difference"
+        ],
+        "failed_job_count": 9,
+        "failed_job_ids": [
+          "OPT-RB-OBEQIX220-R256-v1:0004",
+          "OPT-RB-OBEQIX220-R256-v1:0006",
+          "OPT-RB-OBEQIX220-R256-v1:0010",
+          "OPT-RB-OBEQIX220-R256-v1:0015",
+          "OPT-RB-OBEQIX220-R256-v1:0022",
+          "OPT-RB-OBEQIX220-R256-v1:0023",
+          "OPT-RB-OBEQIX220-R256-v1:0025",
+          "OPT-RB-OBEQIX220-R256-v1:0029",
+          "OPT-RB-OBEQIX220-R256-v1:0031"
+        ],
+        "max_cell_rmsd_A": 0.01340118878086199,
+        "max_energy_error_eV_per_atom": 0.0007198593833229759,
+        "max_final_fmax_error_eV_per_A": 0.015518713742494583,
+        "max_position_rmsd_A": 0.1030607270311416,
+        "max_step_difference": 27,
+        "max_stress_tensor_error_eV_per_A3": 0.0008544108713977039,
+        "passed": false,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "jobs": 32,
+      "mlip": "atombit",
+      "raw_files": {
+        "ase1": {
+          "path": "runs/robustness/production/confirm_ase1_atombit_OBEQIX220.json",
+          "sha256": "a7b06f15b33e24bf7e38693d4f94798b3ec8f6105abfb23e62e7b801ac797710"
+        },
+        "b1": {
+          "path": "runs/robustness/diagnostics/b1_atombit_OBEQIX220_J32.json",
+          "sha256": "efc601fad8e7dfc50da268140897e98b93230d346b4d94fdace5f8709c061ce1"
+        },
+        "selected_tensor": {
+          "path": "runs/robustness/production/confirm_tensor_atombit_OBEQIX220_active_B128.json",
+          "sha256": "7dcd091fdfe974990146827394bdea09617c0bf004cefa2b93e27c1d6a5a5573"
+        }
+      },
+      "selected_batch_vs_b1": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 0.03258802198653532,
+            "median": 0.0004475343609724017,
+            "percentile_95": 0.003822984693212
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 0.001257887753573331,
+            "median": 1.716180281205611e-05,
+            "percentile_95": 0.00015658465298739346
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 0.012079034000635147,
+            "median": 0.0006705410778522491,
+            "percentile_95": 0.008535409532487392
+          },
+          "max_position_rmsd_A": {
+            "maximum": 0.17778384963399388,
+            "median": 0.00284024111879635,
+            "percentile_95": 0.019554906347519996
+          },
+          "max_step_difference": {
+            "maximum": 55.0,
+            "median": 1.0,
+            "percentile_95": 8.45
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 0.00046273728366941214,
+            "median": 8.647976210340858e-05,
+            "percentile_95": 0.0003831557522062211
+          }
+        },
+        "failed_checks": [
+          "max_energy_error_eV_per_atom",
+          "max_position_rmsd_A",
+          "max_cell_rmsd_A",
+          "max_step_difference"
+        ],
+        "failed_job_count": 4,
+        "failed_job_ids": [
+          "OPT-RB-OBEQIX220-R256-v1:0003",
+          "OPT-RB-OBEQIX220-R256-v1:0004",
+          "OPT-RB-OBEQIX220-R256-v1:0017",
+          "OPT-RB-OBEQIX220-R256-v1:0022"
+        ],
+        "max_cell_rmsd_A": 0.03258802198653532,
+        "max_energy_error_eV_per_atom": 0.001257887753573331,
+        "max_final_fmax_error_eV_per_A": 0.012079034000635147,
+        "max_position_rmsd_A": 0.17778384963399388,
+        "max_step_difference": 55,
+        "max_stress_tensor_error_eV_per_A3": 0.00046273728366941214,
+        "passed": false,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "workload": "OBEQIX220"
+    },
+    {
+      "b1_vs_ase1": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 0.17060519878817043,
+            "median": 0.0014967136940362681,
+            "percentile_95": 0.12316675374289027
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 0.008613393992907897,
+            "median": 2.9709704904234968e-05,
+            "percentile_95": 0.0022493234916592802
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 0.026220971027410854,
+            "median": 0.0037139823523777496,
+            "percentile_95": 0.012776166093307612
+          },
+          "max_position_rmsd_A": {
+            "maximum": 0.3231010943886911,
+            "median": 0.005450447617126157,
+            "percentile_95": 0.22604413728315303
+          },
+          "max_step_difference": {
+            "maximum": 44.0,
+            "median": 1.0,
+            "percentile_95": 34.699999999999996
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 0.0012390421761185677,
+            "median": 0.0002517228325198239,
+            "percentile_95": 0.0010481783849456516
+          }
+        },
+        "failed_checks": [
+          "max_energy_error_eV_per_atom",
+          "max_position_rmsd_A",
+          "max_cell_rmsd_A",
+          "max_step_difference"
+        ],
+        "failed_job_count": 9,
+        "failed_job_ids": [
+          "OPT-RB-GUFJOG44-R256-v1:0002",
+          "OPT-RB-GUFJOG44-R256-v1:0004",
+          "OPT-RB-GUFJOG44-R256-v1:0006",
+          "OPT-RB-GUFJOG44-R256-v1:0009",
+          "OPT-RB-GUFJOG44-R256-v1:0016",
+          "OPT-RB-GUFJOG44-R256-v1:0017",
+          "OPT-RB-GUFJOG44-R256-v1:0018",
+          "OPT-RB-GUFJOG44-R256-v1:0021",
+          "OPT-RB-GUFJOG44-R256-v1:0029"
+        ],
+        "max_cell_rmsd_A": 0.17060519878817043,
+        "max_energy_error_eV_per_atom": 0.008613393992907897,
+        "max_final_fmax_error_eV_per_A": 0.026220971027410854,
+        "max_position_rmsd_A": 0.3231010943886911,
+        "max_step_difference": 44,
+        "max_stress_tensor_error_eV_per_A3": 0.0012390421761185677,
+        "passed": false,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "jobs": 32,
+      "mlip": "mace",
+      "raw_files": {
+        "ase1": {
+          "path": "runs/robustness/production/confirm_ase1_mace_GUFJOG44.json",
+          "sha256": "79f0db8928ce70f77d98750a03fe57d1e81c09bc0dd0e6089837eaefd5e66c60"
+        },
+        "b1": {
+          "path": "runs/robustness/diagnostics/b1_mace_GUFJOG44_J32.json",
+          "sha256": "66ca723a23b79434f3056ff700b30d822f50684be09de0cfe62e515374960b99"
+        },
+        "selected_tensor": {
+          "path": "runs/robustness/production/confirm_tensor_mace_GUFJOG44_active_B256.json",
+          "sha256": "ad934f3f7438e07d8e7dccada30faf37a2134e11d069ddec6e3514fde7f74777"
+        }
+      },
+      "selected_batch_vs_b1": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 0.3130735332963993,
+            "median": 0.0021739406088665553,
+            "percentile_95": 0.15544298212448404
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 0.025356559160916895,
+            "median": 4.072441003121308e-05,
+            "percentile_95": 0.005738907354696655
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 0.019891061446095665,
+            "median": 0.004929450559794012,
+            "percentile_95": 0.013356456637913232
+          },
+          "max_position_rmsd_A": {
+            "maximum": 0.5158107936933302,
+            "median": 0.005977350103469447,
+            "percentile_95": 0.2891575533775531
+          },
+          "max_step_difference": {
+            "maximum": 50.0,
+            "median": 2.5,
+            "percentile_95": 40.699999999999996
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 0.002650156447155913,
+            "median": 0.00026115781941104724,
+            "percentile_95": 0.0017356236362370836
+          }
+        },
+        "failed_checks": [
+          "max_energy_error_eV_per_atom",
+          "max_position_rmsd_A",
+          "max_cell_rmsd_A",
+          "max_step_difference"
+        ],
+        "failed_job_count": 8,
+        "failed_job_ids": [
+          "OPT-RB-GUFJOG44-R256-v1:0006",
+          "OPT-RB-GUFJOG44-R256-v1:0008",
+          "OPT-RB-GUFJOG44-R256-v1:0009",
+          "OPT-RB-GUFJOG44-R256-v1:0015",
+          "OPT-RB-GUFJOG44-R256-v1:0016",
+          "OPT-RB-GUFJOG44-R256-v1:0018",
+          "OPT-RB-GUFJOG44-R256-v1:0019",
+          "OPT-RB-GUFJOG44-R256-v1:0021"
+        ],
+        "max_cell_rmsd_A": 0.3130735332963993,
+        "max_energy_error_eV_per_atom": 0.025356559160916895,
+        "max_final_fmax_error_eV_per_A": 0.019891061446095665,
+        "max_position_rmsd_A": 0.5158107936933302,
+        "max_step_difference": 50,
+        "max_stress_tensor_error_eV_per_A3": 0.002650156447155913,
+        "passed": false,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "workload": "GUFJOG44"
+    },
+    {
+      "b1_vs_ase1": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 0.0388008462313909,
+            "median": 0.00038409891990488255,
+            "percentile_95": 0.02783343024857312
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 0.00263326624130555,
+            "median": 1.976793031314049e-05,
+            "percentile_95": 0.0014310594904765655
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 0.009667410273520152,
+            "median": 0.0024180560803501866,
+            "percentile_95": 0.0076628951807471615
+          },
+          "max_position_rmsd_A": {
+            "maximum": 0.21953050682030698,
+            "median": 0.0037501660968108637,
+            "percentile_95": 0.17592261213066313
+          },
+          "max_step_difference": {
+            "maximum": 54.0,
+            "median": 1.5,
+            "percentile_95": 44.94999999999999
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 0.0004921928045334087,
+            "median": 8.946077754791832e-05,
+            "percentile_95": 0.0004384660020811122
+          }
+        },
+        "failed_checks": [
+          "max_energy_error_eV_per_atom",
+          "max_position_rmsd_A",
+          "max_cell_rmsd_A",
+          "max_step_difference"
+        ],
+        "failed_job_count": 10,
+        "failed_job_ids": [
+          "OPT-RB-OBEQIX220-R256-v1:0002",
+          "OPT-RB-OBEQIX220-R256-v1:0004",
+          "OPT-RB-OBEQIX220-R256-v1:0007",
+          "OPT-RB-OBEQIX220-R256-v1:0016",
+          "OPT-RB-OBEQIX220-R256-v1:0020",
+          "OPT-RB-OBEQIX220-R256-v1:0021",
+          "OPT-RB-OBEQIX220-R256-v1:0023",
+          "OPT-RB-OBEQIX220-R256-v1:0024",
+          "OPT-RB-OBEQIX220-R256-v1:0025",
+          "OPT-RB-OBEQIX220-R256-v1:0030"
+        ],
+        "max_cell_rmsd_A": 0.0388008462313909,
+        "max_energy_error_eV_per_atom": 0.00263326624130555,
+        "max_final_fmax_error_eV_per_A": 0.009667410273520152,
+        "max_position_rmsd_A": 0.21953050682030698,
+        "max_step_difference": 54,
+        "max_stress_tensor_error_eV_per_A3": 0.0004921928045334087,
+        "passed": false,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "jobs": 32,
+      "mlip": "mace",
+      "raw_files": {
+        "ase1": {
+          "path": "runs/robustness/production/confirm_ase1_mace_OBEQIX220.json",
+          "sha256": "919bd59c19e9b8a0f05e8a3837c8aee94806f061a47d3662a79d3c33e2ca5d81"
+        },
+        "b1": {
+          "path": "runs/robustness/diagnostics/b1_mace_OBEQIX220_J32.json",
+          "sha256": "040253208adab6fbc5234d549a6bd82c29d2d9c00533aa6c34aba00b07339f92"
+        },
+        "selected_tensor": {
+          "path": "runs/robustness/production/confirm_tensor_mace_OBEQIX220_active_B128.json",
+          "sha256": "835ac02729cadcf60ef92d2b63e1f76339e034b49f66580da2bde398922c1d8c"
+        }
+      },
+      "selected_batch_vs_b1": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 0.017847753030244683,
+            "median": 0.0005470486121546382,
+            "percentile_95": 0.015206417213502438
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 0.0013419106854020025,
+            "median": 2.5617252818351102e-05,
+            "percentile_95": 0.0008995542996523327
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 0.008645161185234417,
+            "median": 0.0014963497043136015,
+            "percentile_95": 0.00655533754947616
+          },
+          "max_position_rmsd_A": {
+            "maximum": 0.15969129487593456,
+            "median": 0.004869245218228896,
+            "percentile_95": 0.11726527232457397
+          },
+          "max_step_difference": {
+            "maximum": 37.0,
+            "median": 2.0,
+            "percentile_95": 30.149999999999995
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 0.0005102335446078123,
+            "median": 0.00010242794490129101,
+            "percentile_95": 0.0004485960477559704
+          }
+        },
+        "failed_checks": [
+          "max_energy_error_eV_per_atom",
+          "max_position_rmsd_A",
+          "max_step_difference"
+        ],
+        "failed_job_count": 8,
+        "failed_job_ids": [
+          "OPT-RB-OBEQIX220-R256-v1:0000",
+          "OPT-RB-OBEQIX220-R256-v1:0004",
+          "OPT-RB-OBEQIX220-R256-v1:0008",
+          "OPT-RB-OBEQIX220-R256-v1:0010",
+          "OPT-RB-OBEQIX220-R256-v1:0020",
+          "OPT-RB-OBEQIX220-R256-v1:0023",
+          "OPT-RB-OBEQIX220-R256-v1:0029",
+          "OPT-RB-OBEQIX220-R256-v1:0030"
+        ],
+        "max_cell_rmsd_A": 0.017847753030244683,
+        "max_energy_error_eV_per_atom": 0.0013419106854020025,
+        "max_final_fmax_error_eV_per_A": 0.008645161185234417,
+        "max_position_rmsd_A": 0.15969129487593456,
+        "max_step_difference": 37,
+        "max_stress_tensor_error_eV_per_A3": 0.0005102335446078123,
+        "passed": false,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "workload": "OBEQIX220"
+    }
+  ],
+  "rows": [
+    {
+      "ase1_converged": 256,
+      "ase1_peak_allocated_bytes": 206604288,
+      "ase1_peak_reserved_bytes": 266338304,
+      "ase1_seconds": 1031.074583185371,
+      "fastest_screen_batch_size": 256,
+      "fastest_screen_method": "active",
+      "jobs": 256,
+      "mlip": "atombit",
+      "mps32_converged": 256,
+      "mps32_peak_nvidia_smi_bytes": 35181821952,
+      "mps32_seconds": 89.74504904076457,
+      "mps32_vs_ase1_validation": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_position_rmsd_A": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_step_difference": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          }
+        },
+        "failed_checks": [],
+        "failed_job_count": 0,
+        "failed_job_ids": [],
+        "max_cell_rmsd_A": 0.0,
+        "max_energy_error_eV_per_atom": 0.0,
+        "max_final_fmax_error_eV_per_A": 0.0,
+        "max_position_rmsd_A": 0.0,
+        "max_step_difference": 0,
+        "max_stress_tensor_error_eV_per_A3": 0.0,
+        "passed": true,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "raw_files": {
+        "ase1": {
+          "path": "runs/robustness/production/confirm_ase1_atombit_GUFJOG44.json",
+          "sha256": "220321159001286411ae64747c8144761efb9ad627de962c95419a82d2a87309"
+        },
+        "mps32": {
+          "path": "runs/robustness/production/mps32_atombit_GUFJOG44.json",
+          "sha256": "a7209a3b1913c00ef296b481bb52f578af5359b39ec2b4a255e3e827fc725116"
+        },
+        "selected_tensor": {
+          "path": "runs/robustness/production/confirm_tensor_atombit_GUFJOG44_active_B256.json",
+          "sha256": "a5f3702804dccab1d9eb707dc140bc6852615ce2db40dcc0e28d7ade13b4bb80"
+        }
+      },
+      "selected_batch_size": 256,
+      "selected_screen_gap_fraction": 0.0,
+      "selected_tensor_method": "active",
+      "tensor_candidates": [
+        {
+          "batch_size": 128,
+          "converged": 256,
+          "method": "active",
+          "model_evaluations": 772,
+          "optimizer_steps_total": 29268,
+          "path": "runs/robustness/production/tensor_atombit_GUFJOG44_active_B128.json",
+          "peak_allocated_bytes": 9608428544,
+          "peak_reserved_bytes": 74803314688,
+          "seconds": 71.3311731419526,
+          "sha256": "842bdf4746a5f8c527ea11fe195c2ea097a3d66fd64234131396f7c4d863b72e",
+          "systems_per_second": 3.5888937294014105
+        },
+        {
+          "batch_size": 256,
+          "converged": 256,
+          "method": "active",
+          "model_evaluations": 343,
+          "optimizer_steps_total": 29708,
+          "path": "runs/robustness/production/tensor_atombit_GUFJOG44_active_B256.json",
+          "peak_allocated_bytes": 19107114496,
+          "peak_reserved_bytes": 83913342976,
+          "seconds": 59.208947747945786,
+          "sha256": "8cf6da06a90d4ee5c4f447cacc900ae866c0c824ec0674813619c110dac41d1a",
+          "systems_per_second": 4.323670825730588
+        }
+      ],
+      "tensor_converged": 256,
+      "tensor_peak_allocated_bytes": 19107114496,
+      "tensor_peak_reserved_bytes": 83913342976,
+      "tensor_seconds": 58.80562085378915,
+      "tensor_speedup_vs_ase1": 17.53360594132616,
+      "tensor_speedup_vs_mps32": 1.5261304572211116,
+      "tensor_vs_ase1_validation": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 1.3696192408320425,
+            "median": 0.0036965734548189714,
+            "percentile_95": 0.31338253576190195
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 0.06567405570637096,
+            "median": 5.328655242919922e-05,
+            "percentile_95": 0.004219792105934836
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 0.019272007048130035,
+            "median": 0.004858940839767456,
+            "percentile_95": 0.014823365956544876
+          },
+          "max_position_rmsd_A": {
+            "maximum": 1.6617918086536598,
+            "median": 0.00866160992415857,
+            "percentile_95": 0.3564589838071058
+          },
+          "max_step_difference": {
+            "maximum": 164.0,
+            "median": 3.0,
+            "percentile_95": 40.0
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 0.005151027115061879,
+            "median": 0.0003546130028553307,
+            "percentile_95": 0.003016075861523859
+          }
+        },
+        "failed_checks": [
+          "max_energy_error_eV_per_atom",
+          "max_position_rmsd_A",
+          "max_cell_rmsd_A",
+          "max_step_difference"
+        ],
+        "failed_job_count": 110,
+        "failed_job_ids": [
+          "OPT-RB-GUFJOG44-R256-v1:0004",
+          "OPT-RB-GUFJOG44-R256-v1:0010",
+          "OPT-RB-GUFJOG44-R256-v1:0012",
+          "OPT-RB-GUFJOG44-R256-v1:0013",
+          "OPT-RB-GUFJOG44-R256-v1:0017",
+          "OPT-RB-GUFJOG44-R256-v1:0019",
+          "OPT-RB-GUFJOG44-R256-v1:0020",
+          "OPT-RB-GUFJOG44-R256-v1:0021",
+          "OPT-RB-GUFJOG44-R256-v1:0022",
+          "OPT-RB-GUFJOG44-R256-v1:0025",
+          "OPT-RB-GUFJOG44-R256-v1:0026",
+          "OPT-RB-GUFJOG44-R256-v1:0027",
+          "OPT-RB-GUFJOG44-R256-v1:0028",
+          "OPT-RB-GUFJOG44-R256-v1:0031",
+          "OPT-RB-GUFJOG44-R256-v1:0036",
+          "OPT-RB-GUFJOG44-R256-v1:0042",
+          "OPT-RB-GUFJOG44-R256-v1:0044",
+          "OPT-RB-GUFJOG44-R256-v1:0045",
+          "OPT-RB-GUFJOG44-R256-v1:0051",
+          "OPT-RB-GUFJOG44-R256-v1:0052",
+          "OPT-RB-GUFJOG44-R256-v1:0053",
+          "OPT-RB-GUFJOG44-R256-v1:0054",
+          "OPT-RB-GUFJOG44-R256-v1:0057",
+          "OPT-RB-GUFJOG44-R256-v1:0058",
+          "OPT-RB-GUFJOG44-R256-v1:0059",
+          "OPT-RB-GUFJOG44-R256-v1:0060",
+          "OPT-RB-GUFJOG44-R256-v1:0063",
+          "OPT-RB-GUFJOG44-R256-v1:0068",
+          "OPT-RB-GUFJOG44-R256-v1:0074",
+          "OPT-RB-GUFJOG44-R256-v1:0076",
+          "OPT-RB-GUFJOG44-R256-v1:0077",
+          "OPT-RB-GUFJOG44-R256-v1:0081",
+          "OPT-RB-GUFJOG44-R256-v1:0083",
+          "OPT-RB-GUFJOG44-R256-v1:0084",
+          "OPT-RB-GUFJOG44-R256-v1:0085",
+          "OPT-RB-GUFJOG44-R256-v1:0086",
+          "OPT-RB-GUFJOG44-R256-v1:0089",
+          "OPT-RB-GUFJOG44-R256-v1:0090",
+          "OPT-RB-GUFJOG44-R256-v1:0091",
+          "OPT-RB-GUFJOG44-R256-v1:0092",
+          "OPT-RB-GUFJOG44-R256-v1:0095",
+          "OPT-RB-GUFJOG44-R256-v1:0100",
+          "OPT-RB-GUFJOG44-R256-v1:0106",
+          "OPT-RB-GUFJOG44-R256-v1:0108",
+          "OPT-RB-GUFJOG44-R256-v1:0109",
+          "OPT-RB-GUFJOG44-R256-v1:0113",
+          "OPT-RB-GUFJOG44-R256-v1:0115",
+          "OPT-RB-GUFJOG44-R256-v1:0116",
+          "OPT-RB-GUFJOG44-R256-v1:0117",
+          "OPT-RB-GUFJOG44-R256-v1:0118",
+          "OPT-RB-GUFJOG44-R256-v1:0121",
+          "OPT-RB-GUFJOG44-R256-v1:0122",
+          "OPT-RB-GUFJOG44-R256-v1:0123",
+          "OPT-RB-GUFJOG44-R256-v1:0124",
+          "OPT-RB-GUFJOG44-R256-v1:0127",
+          "OPT-RB-GUFJOG44-R256-v1:0132",
+          "OPT-RB-GUFJOG44-R256-v1:0138",
+          "OPT-RB-GUFJOG44-R256-v1:0140",
+          "OPT-RB-GUFJOG44-R256-v1:0141",
+          "OPT-RB-GUFJOG44-R256-v1:0145",
+          "OPT-RB-GUFJOG44-R256-v1:0147",
+          "OPT-RB-GUFJOG44-R256-v1:0148",
+          "OPT-RB-GUFJOG44-R256-v1:0149",
+          "OPT-RB-GUFJOG44-R256-v1:0150",
+          "OPT-RB-GUFJOG44-R256-v1:0153",
+          "OPT-RB-GUFJOG44-R256-v1:0154",
+          "OPT-RB-GUFJOG44-R256-v1:0155",
+          "OPT-RB-GUFJOG44-R256-v1:0156",
+          "OPT-RB-GUFJOG44-R256-v1:0159",
+          "OPT-RB-GUFJOG44-R256-v1:0164",
+          "OPT-RB-GUFJOG44-R256-v1:0170",
+          "OPT-RB-GUFJOG44-R256-v1:0172",
+          "OPT-RB-GUFJOG44-R256-v1:0173",
+          "OPT-RB-GUFJOG44-R256-v1:0179",
+          "OPT-RB-GUFJOG44-R256-v1:0180",
+          "OPT-RB-GUFJOG44-R256-v1:0181",
+          "OPT-RB-GUFJOG44-R256-v1:0182",
+          "OPT-RB-GUFJOG44-R256-v1:0185",
+          "OPT-RB-GUFJOG44-R256-v1:0186",
+          "OPT-RB-GUFJOG44-R256-v1:0187",
+          "OPT-RB-GUFJOG44-R256-v1:0188",
+          "OPT-RB-GUFJOG44-R256-v1:0191",
+          "OPT-RB-GUFJOG44-R256-v1:0196",
+          "OPT-RB-GUFJOG44-R256-v1:0202",
+          "OPT-RB-GUFJOG44-R256-v1:0204",
+          "OPT-RB-GUFJOG44-R256-v1:0205",
+          "OPT-RB-GUFJOG44-R256-v1:0209",
+          "OPT-RB-GUFJOG44-R256-v1:0211",
+          "OPT-RB-GUFJOG44-R256-v1:0212",
+          "OPT-RB-GUFJOG44-R256-v1:0213",
+          "OPT-RB-GUFJOG44-R256-v1:0214",
+          "OPT-RB-GUFJOG44-R256-v1:0217",
+          "OPT-RB-GUFJOG44-R256-v1:0218",
+          "OPT-RB-GUFJOG44-R256-v1:0219",
+          "OPT-RB-GUFJOG44-R256-v1:0220",
+          "OPT-RB-GUFJOG44-R256-v1:0223",
+          "OPT-RB-GUFJOG44-R256-v1:0228",
+          "OPT-RB-GUFJOG44-R256-v1:0234",
+          "OPT-RB-GUFJOG44-R256-v1:0236",
+          "OPT-RB-GUFJOG44-R256-v1:0237",
+          "OPT-RB-GUFJOG44-R256-v1:0241",
+          "OPT-RB-GUFJOG44-R256-v1:0243",
+          "OPT-RB-GUFJOG44-R256-v1:0244",
+          "OPT-RB-GUFJOG44-R256-v1:0245",
+          "OPT-RB-GUFJOG44-R256-v1:0246",
+          "OPT-RB-GUFJOG44-R256-v1:0249",
+          "OPT-RB-GUFJOG44-R256-v1:0250",
+          "OPT-RB-GUFJOG44-R256-v1:0251",
+          "OPT-RB-GUFJOG44-R256-v1:0252",
+          "OPT-RB-GUFJOG44-R256-v1:0255"
+        ],
+        "max_cell_rmsd_A": 1.3696192408320425,
+        "max_energy_error_eV_per_atom": 0.06567405570637096,
+        "max_final_fmax_error_eV_per_A": 0.019272007048130035,
+        "max_position_rmsd_A": 1.6617918086536598,
+        "max_step_difference": 164,
+        "max_stress_tensor_error_eV_per_A3": 0.005151027115061879,
+        "passed": false,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "workload": "GUFJOG44"
+    },
+    {
+      "ase1_converged": 256,
+      "ase1_peak_allocated_bytes": 372042752,
+      "ase1_peak_reserved_bytes": 501219328,
+      "ase1_seconds": 288.3218870619312,
+      "fastest_screen_batch_size": 256,
+      "fastest_screen_method": "active",
+      "jobs": 256,
+      "mlip": "atombit",
+      "mps32_converged": 256,
+      "mps32_peak_nvidia_smi_bytes": 37327208448,
+      "mps32_seconds": 29.593450671061873,
+      "mps32_vs_ase1_validation": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_position_rmsd_A": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_step_difference": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          }
+        },
+        "failed_checks": [],
+        "failed_job_count": 0,
+        "failed_job_ids": [],
+        "max_cell_rmsd_A": 0.0,
+        "max_energy_error_eV_per_atom": 0.0,
+        "max_final_fmax_error_eV_per_A": 0.0,
+        "max_position_rmsd_A": 0.0,
+        "max_step_difference": 0,
+        "max_stress_tensor_error_eV_per_A3": 0.0,
+        "passed": true,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "raw_files": {
+        "ase1": {
+          "path": "runs/robustness/production/confirm_ase1_atombit_XATMOV88.json",
+          "sha256": "afa3c84fe73da657fc350cf86640eec402186a3487c98a2e6c18841900deb66a"
+        },
+        "mps32": {
+          "path": "runs/robustness/production/mps32_atombit_XATMOV88.json",
+          "sha256": "09795ac605a348664bcd52284c5d3a988fefce3625b5256ea2cd1faf790aaee0"
+        },
+        "selected_tensor": {
+          "path": "runs/robustness/production/confirm_tensor_atombit_XATMOV88_active_B256.json",
+          "sha256": "adf13298dec5c2523b9d41358a4be430bc53e679acb2f6c77e76c7177b36f17c"
+        }
+      },
+      "selected_batch_size": 256,
+      "selected_screen_gap_fraction": 0.0,
+      "selected_tensor_method": "active",
+      "tensor_candidates": [
+        {
+          "batch_size": 128,
+          "converged": 256,
+          "method": "active",
+          "model_evaluations": 122,
+          "optimizer_steps_total": 7534,
+          "path": "runs/robustness/production/tensor_atombit_XATMOV88_active_B128.json",
+          "peak_allocated_bytes": 21866157056,
+          "peak_reserved_bytes": 40080769024,
+          "seconds": 22.248349061235785,
+          "sha256": "19f259102ad51715ef3f7aa9897d4a6bbae8695eac4ecdc1280e0c0a3e9aa8e4",
+          "systems_per_second": 11.506471751921554
+        },
+        {
+          "batch_size": 256,
+          "converged": 256,
+          "method": "active",
+          "model_evaluations": 61,
+          "optimizer_steps_total": 7536,
+          "path": "runs/robustness/production/tensor_atombit_XATMOV88_active_B256.json",
+          "peak_allocated_bytes": 43599393792,
+          "peak_reserved_bytes": 80081846272,
+          "seconds": 20.70361302094534,
+          "sha256": "d7f6bd6fe29f6ab32fe2a8b943fcea5de94cbe8b7808c136fe8e3e0e257d8c90",
+          "systems_per_second": 12.364991547176382
+        }
+      ],
+      "tensor_converged": 256,
+      "tensor_peak_allocated_bytes": 43599393792,
+      "tensor_peak_reserved_bytes": 80081846272,
+      "tensor_seconds": 21.332686296198517,
+      "tensor_speedup_vs_ase1": 13.515498379278663,
+      "tensor_speedup_vs_mps32": 1.3872350748595326,
+      "tensor_vs_ase1_validation": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 0.0005720903270806712,
+            "median": 3.504537210982066e-07,
+            "percentile_95": 1.374236881579275e-05
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 1.710111444646662e-05,
+            "median": 4.3348832563920456e-08,
+            "percentile_95": 6.068836558948864e-07
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 0.006637565791606903,
+            "median": 1.5364959836006165e-05,
+            "percentile_95": 0.002016596496105194
+          },
+          "max_position_rmsd_A": {
+            "maximum": 0.0022497379225960294,
+            "median": 1.9783955239440012e-06,
+            "percentile_95": 0.00011050925747031022
+          },
+          "max_step_difference": {
+            "maximum": 1.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 0.00015587452799081802,
+            "median": 1.728767529129982e-07,
+            "percentile_95": 1.945922849699855e-05
+          }
+        },
+        "failed_checks": [],
+        "failed_job_count": 0,
+        "failed_job_ids": [],
+        "max_cell_rmsd_A": 0.0005720903270806712,
+        "max_energy_error_eV_per_atom": 1.710111444646662e-05,
+        "max_final_fmax_error_eV_per_A": 0.006637565791606903,
+        "max_position_rmsd_A": 0.0022497379225960294,
+        "max_step_difference": 1,
+        "max_stress_tensor_error_eV_per_A3": 0.00015587452799081802,
+        "passed": true,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "workload": "XATMOV88"
+    },
+    {
+      "ase1_converged": 256,
+      "ase1_peak_allocated_bytes": 594339840,
+      "ase1_peak_reserved_bytes": 2434793472,
+      "ase1_seconds": 1876.2581258323044,
+      "fastest_screen_batch_size": 128,
+      "fastest_screen_method": "active",
+      "jobs": 256,
+      "mlip": "atombit",
+      "mps32_converged": 256,
+      "mps32_peak_nvidia_smi_bytes": 56772001792,
+      "mps32_seconds": 127.10203870898113,
+      "mps32_vs_ase1_validation": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_position_rmsd_A": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_step_difference": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          }
+        },
+        "failed_checks": [],
+        "failed_job_count": 0,
+        "failed_job_ids": [],
+        "max_cell_rmsd_A": 0.0,
+        "max_energy_error_eV_per_atom": 0.0,
+        "max_final_fmax_error_eV_per_A": 0.0,
+        "max_position_rmsd_A": 0.0,
+        "max_step_difference": 0,
+        "max_stress_tensor_error_eV_per_A3": 0.0,
+        "passed": true,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "raw_files": {
+        "ase1": {
+          "path": "runs/robustness/production/confirm_ase1_atombit_OBEQIX220.json",
+          "sha256": "a7b06f15b33e24bf7e38693d4f94798b3ec8f6105abfb23e62e7b801ac797710"
+        },
+        "mps32": {
+          "path": "runs/robustness/production/mps32_atombit_OBEQIX220.json",
+          "sha256": "cac62cd7c7cd5ba357a813f5be42ba0f26678bb70c09cc1362adce7b58bd8f76"
+        },
+        "selected_tensor": {
+          "path": "runs/robustness/production/confirm_tensor_atombit_OBEQIX220_active_B128.json",
+          "sha256": "7dcd091fdfe974990146827394bdea09617c0bf004cefa2b93e27c1d6a5a5573"
+        }
+      },
+      "selected_batch_size": 128,
+      "selected_screen_gap_fraction": 0.0,
+      "selected_tensor_method": "active",
+      "tensor_candidates": [
+        {
+          "batch_size": 128,
+          "converged": 256,
+          "method": "active",
+          "model_evaluations": 406,
+          "optimizer_steps_total": 22264,
+          "path": "runs/robustness/production/tensor_atombit_OBEQIX220_active_B128.json",
+          "peak_allocated_bytes": 42001727488,
+          "peak_reserved_bytes": 82701189120,
+          "seconds": 97.29186076996848,
+          "sha256": "365e1a8ed86ad726b1ef31d1d4fbf835c5fd9050a411fbadb0a5115e6c1b4218",
+          "systems_per_second": 2.631258133763854
+        },
+        {
+          "batch_size": 192,
+          "converged": 256,
+          "method": "active",
+          "model_evaluations": 406,
+          "optimizer_steps_total": 22270,
+          "path": "runs/robustness/production/tensor_atombit_OBEQIX220_active_B192.json",
+          "peak_allocated_bytes": 62896076288,
+          "peak_reserved_bytes": 83657490432,
+          "seconds": 98.72391354339197,
+          "sha256": "3b8f5aba482a644141a9ada32e94942b9ff27f937d83e92780aa903a768731d8",
+          "systems_per_second": 2.593090071206311
+        },
+        {
+          "batch_size": 192,
+          "converged": 256,
+          "method": "refill",
+          "model_evaluations": 254,
+          "optimizer_steps_total": 22261,
+          "path": "runs/robustness/production/tensor_atombit_OBEQIX220_refill_B192.json",
+          "peak_allocated_bytes": 64105542656,
+          "peak_reserved_bytes": 83680559104,
+          "seconds": 97.997673955746,
+          "sha256": "33edded17599da5e11ef8f0009a7c93f9b1b58497f048e956d62a2651d6c2ade",
+          "systems_per_second": 2.612306901443447
+        }
+      ],
+      "tensor_converged": 256,
+      "tensor_peak_allocated_bytes": 42001727488,
+      "tensor_peak_reserved_bytes": 82701189120,
+      "tensor_seconds": 98.58484748518094,
+      "tensor_speedup_vs_ase1": 19.031911837306836,
+      "tensor_speedup_vs_mps32": 1.2892654596649533,
+      "tensor_vs_ase1_validation": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 0.032630328814189626,
+            "median": 0.0004581172366326762,
+            "percentile_95": 0.013328757472645893
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 0.0012583039023659447,
+            "median": 1.7721002752130682e-05,
+            "percentile_95": 0.0007194345647638494
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 0.009698472917079926,
+            "median": 0.001479296013712883,
+            "percentile_95": 0.008364953100681305
+          },
+          "max_position_rmsd_A": {
+            "maximum": 0.1779828154871156,
+            "median": 0.002797117385162407,
+            "percentile_95": 0.10253085899936955
+          },
+          "max_step_difference": {
+            "maximum": 55.0,
+            "median": 1.0,
+            "percentile_95": 27.0
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 0.0006796433008275926,
+            "median": 7.543782703578472e-05,
+            "percentile_95": 0.0006099689926486462
+          }
+        },
+        "failed_checks": [
+          "max_energy_error_eV_per_atom",
+          "max_position_rmsd_A",
+          "max_cell_rmsd_A",
+          "max_step_difference"
+        ],
+        "failed_job_count": 64,
+        "failed_job_ids": [
+          "OPT-RB-OBEQIX220-R256-v1:0003",
+          "OPT-RB-OBEQIX220-R256-v1:0006",
+          "OPT-RB-OBEQIX220-R256-v1:0010",
+          "OPT-RB-OBEQIX220-R256-v1:0015",
+          "OPT-RB-OBEQIX220-R256-v1:0017",
+          "OPT-RB-OBEQIX220-R256-v1:0023",
+          "OPT-RB-OBEQIX220-R256-v1:0025",
+          "OPT-RB-OBEQIX220-R256-v1:0029",
+          "OPT-RB-OBEQIX220-R256-v1:0035",
+          "OPT-RB-OBEQIX220-R256-v1:0038",
+          "OPT-RB-OBEQIX220-R256-v1:0042",
+          "OPT-RB-OBEQIX220-R256-v1:0047",
+          "OPT-RB-OBEQIX220-R256-v1:0049",
+          "OPT-RB-OBEQIX220-R256-v1:0055",
+          "OPT-RB-OBEQIX220-R256-v1:0057",
+          "OPT-RB-OBEQIX220-R256-v1:0061",
+          "OPT-RB-OBEQIX220-R256-v1:0067",
+          "OPT-RB-OBEQIX220-R256-v1:0070",
+          "OPT-RB-OBEQIX220-R256-v1:0074",
+          "OPT-RB-OBEQIX220-R256-v1:0079",
+          "OPT-RB-OBEQIX220-R256-v1:0081",
+          "OPT-RB-OBEQIX220-R256-v1:0087",
+          "OPT-RB-OBEQIX220-R256-v1:0089",
+          "OPT-RB-OBEQIX220-R256-v1:0093",
+          "OPT-RB-OBEQIX220-R256-v1:0099",
+          "OPT-RB-OBEQIX220-R256-v1:0102",
+          "OPT-RB-OBEQIX220-R256-v1:0106",
+          "OPT-RB-OBEQIX220-R256-v1:0111",
+          "OPT-RB-OBEQIX220-R256-v1:0113",
+          "OPT-RB-OBEQIX220-R256-v1:0119",
+          "OPT-RB-OBEQIX220-R256-v1:0121",
+          "OPT-RB-OBEQIX220-R256-v1:0125",
+          "OPT-RB-OBEQIX220-R256-v1:0131",
+          "OPT-RB-OBEQIX220-R256-v1:0134",
+          "OPT-RB-OBEQIX220-R256-v1:0138",
+          "OPT-RB-OBEQIX220-R256-v1:0143",
+          "OPT-RB-OBEQIX220-R256-v1:0145",
+          "OPT-RB-OBEQIX220-R256-v1:0151",
+          "OPT-RB-OBEQIX220-R256-v1:0153",
+          "OPT-RB-OBEQIX220-R256-v1:0157",
+          "OPT-RB-OBEQIX220-R256-v1:0163",
+          "OPT-RB-OBEQIX220-R256-v1:0166",
+          "OPT-RB-OBEQIX220-R256-v1:0170",
+          "OPT-RB-OBEQIX220-R256-v1:0175",
+          "OPT-RB-OBEQIX220-R256-v1:0177",
+          "OPT-RB-OBEQIX220-R256-v1:0183",
+          "OPT-RB-OBEQIX220-R256-v1:0185",
+          "OPT-RB-OBEQIX220-R256-v1:0189",
+          "OPT-RB-OBEQIX220-R256-v1:0195",
+          "OPT-RB-OBEQIX220-R256-v1:0198",
+          "OPT-RB-OBEQIX220-R256-v1:0202",
+          "OPT-RB-OBEQIX220-R256-v1:0207",
+          "OPT-RB-OBEQIX220-R256-v1:0209",
+          "OPT-RB-OBEQIX220-R256-v1:0215",
+          "OPT-RB-OBEQIX220-R256-v1:0217",
+          "OPT-RB-OBEQIX220-R256-v1:0221",
+          "OPT-RB-OBEQIX220-R256-v1:0227",
+          "OPT-RB-OBEQIX220-R256-v1:0230",
+          "OPT-RB-OBEQIX220-R256-v1:0234",
+          "OPT-RB-OBEQIX220-R256-v1:0239",
+          "OPT-RB-OBEQIX220-R256-v1:0241",
+          "OPT-RB-OBEQIX220-R256-v1:0247",
+          "OPT-RB-OBEQIX220-R256-v1:0249",
+          "OPT-RB-OBEQIX220-R256-v1:0253"
+        ],
+        "max_cell_rmsd_A": 0.032630328814189626,
+        "max_energy_error_eV_per_atom": 0.0012583039023659447,
+        "max_final_fmax_error_eV_per_A": 0.009698472917079926,
+        "max_position_rmsd_A": 0.1779828154871156,
+        "max_step_difference": 55,
+        "max_stress_tensor_error_eV_per_A3": 0.0006796433008275926,
+        "passed": false,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "workload": "OBEQIX220"
+    },
+    {
+      "ase1_converged": 256,
+      "ase1_peak_allocated_bytes": 439106560,
+      "ase1_peak_reserved_bytes": 622854144,
+      "ase1_seconds": 1134.1369854086079,
+      "fastest_screen_batch_size": 256,
+      "fastest_screen_method": "active",
+      "jobs": 256,
+      "mlip": "atombit",
+      "mps32_converged": 256,
+      "mps32_peak_nvidia_smi_bytes": 38770049024,
+      "mps32_seconds": 86.87726802378893,
+      "mps32_vs_ase1_validation": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_position_rmsd_A": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_step_difference": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          }
+        },
+        "failed_checks": [],
+        "failed_job_count": 0,
+        "failed_job_ids": [],
+        "max_cell_rmsd_A": 0.0,
+        "max_energy_error_eV_per_atom": 0.0,
+        "max_final_fmax_error_eV_per_A": 0.0,
+        "max_position_rmsd_A": 0.0,
+        "max_step_difference": 0,
+        "max_stress_tensor_error_eV_per_A3": 0.0,
+        "passed": true,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "raw_files": {
+        "ase1": {
+          "path": "runs/robustness/production/confirm_ase1_atombit_ROFA-MIX.json",
+          "sha256": "1d202f5d147b3285cbb5a56cdbf0c24c9987ed2e021f91b3bafda3a2d8d876e0"
+        },
+        "mps32": {
+          "path": "runs/robustness/production/mps32_atombit_ROFA-MIX.json",
+          "sha256": "d341f9da8dec6d0969d48faa31d06b63633991c93064ca7c41cd0d821508e45b"
+        },
+        "selected_tensor": {
+          "path": "runs/robustness/production/confirm_tensor_atombit_ROFA-MIX_active_B256.json",
+          "sha256": "b61bf0925118151aee926a087d5afde2be67bfd96746a39e583d8c645be01225"
+        }
+      },
+      "selected_batch_size": 256,
+      "selected_screen_gap_fraction": 0.0,
+      "selected_tensor_method": "active",
+      "tensor_candidates": [
+        {
+          "batch_size": 128,
+          "converged": 256,
+          "method": "active",
+          "model_evaluations": 378,
+          "optimizer_steps_total": 14184,
+          "path": "runs/robustness/production/tensor_atombit_ROFA-MIX_active_B128.json",
+          "peak_allocated_bytes": 28234978304,
+          "peak_reserved_bytes": 68612521984,
+          "seconds": 52.1880388003774,
+          "sha256": "fc34b3be55c2be69c22657a7805fb21f78013292d91999c7a71feedd6174356f",
+          "systems_per_second": 4.90533857727853
+        },
+        {
+          "batch_size": 192,
+          "converged": 256,
+          "method": "active",
+          "model_evaluations": 378,
+          "optimizer_steps_total": 14184,
+          "path": "runs/robustness/production/tensor_atombit_ROFA-MIX_active_B192.json",
+          "peak_allocated_bytes": 42281120768,
+          "peak_reserved_bytes": 83286294528,
+          "seconds": 51.94198873685673,
+          "sha256": "bc2f5d5361b1395a5ca317be239b1df1faa9311f52478ed78fe9f3a0527c4c5b",
+          "systems_per_second": 4.928575247607892
+        },
+        {
+          "batch_size": 256,
+          "converged": 256,
+          "method": "active",
+          "model_evaluations": 189,
+          "optimizer_steps_total": 14187,
+          "path": "runs/robustness/production/tensor_atombit_ROFA-MIX_active_B256.json",
+          "peak_allocated_bytes": 56335944192,
+          "peak_reserved_bytes": 83470843904,
+          "seconds": 45.56069821212441,
+          "sha256": "5a408a5652c0a3a016b325886e166ecfa7d03a5d1e824a7263c13b750b51df93",
+          "systems_per_second": 5.618877893576144
+        },
+        {
+          "batch_size": 192,
+          "converged": 256,
+          "method": "refill",
+          "model_evaluations": 239,
+          "optimizer_steps_total": 14187,
+          "path": "runs/robustness/production/tensor_atombit_ROFA-MIX_refill_B192.json",
+          "peak_allocated_bytes": 46843986432,
+          "peak_reserved_bytes": 83288391680,
+          "seconds": 48.34578377241269,
+          "sha256": "14cf9b021a5de01692948f20691731f3567c3fda31e91005ac666b84d2c973c0",
+          "systems_per_second": 5.295187708717632
+        }
+      ],
+      "tensor_converged": 256,
+      "tensor_peak_allocated_bytes": 56335944192,
+      "tensor_peak_reserved_bytes": 83470843904,
+      "tensor_seconds": 46.83345928275958,
+      "tensor_speedup_vs_ase1": 24.216382961617114,
+      "tensor_speedup_vs_mps32": 1.8550256452179341,
+      "tensor_vs_ase1_validation": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 0.005108318679383318,
+            "median": 2.4181179038365677e-05,
+            "percentile_95": 0.002097924852774187
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 8.615287574561867e-05,
+            "median": 5.992683204444678e-07,
+            "percentile_95": 6.104804374076225e-05
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 0.010630935430526733,
+            "median": 0.0005043409764766693,
+            "percentile_95": 0.003766685724258423
+          },
+          "max_position_rmsd_A": {
+            "maximum": 0.009459215400520757,
+            "median": 0.0001316071914598283,
+            "percentile_95": 0.008178005748987959
+          },
+          "max_step_difference": {
+            "maximum": 6.0,
+            "median": 0.0,
+            "percentile_95": 5.0
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 0.00013166313874535263,
+            "median": 3.1887357181403786e-06,
+            "percentile_95": 9.587685053702444e-05
+          }
+        },
+        "failed_checks": [],
+        "failed_job_count": 0,
+        "failed_job_ids": [],
+        "max_cell_rmsd_A": 0.005108318679383318,
+        "max_energy_error_eV_per_atom": 8.615287574561867e-05,
+        "max_final_fmax_error_eV_per_A": 0.010630935430526733,
+        "max_position_rmsd_A": 0.009459215400520757,
+        "max_step_difference": 6,
+        "max_stress_tensor_error_eV_per_A3": 0.00013166313874535263,
+        "passed": true,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "workload": "ROFA-MIX"
+    },
+    {
+      "ase1_converged": 256,
+      "ase1_peak_allocated_bytes": 149672448,
+      "ase1_peak_reserved_bytes": 182452224,
+      "ase1_seconds": 936.8782908520661,
+      "fastest_screen_batch_size": 256,
+      "fastest_screen_method": "active",
+      "jobs": 256,
+      "mlip": "mace",
+      "mps32_converged": 256,
+      "mps32_peak_nvidia_smi_bytes": 34040971264,
+      "mps32_seconds": 71.25189931876957,
+      "mps32_vs_ase1_validation": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 0.00345238669586669,
+            "median": 0.0,
+            "percentile_95": 0.0021061372338285543
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 0.00024817179060350594,
+            "median": 0.0,
+            "percentile_95": 9.425893453722396e-05
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 0.004129122064640896,
+            "median": 0.0,
+            "percentile_95": 0.002718434532058764
+          },
+          "max_position_rmsd_A": {
+            "maximum": 0.019610144595927977,
+            "median": 0.0,
+            "percentile_95": 0.00568610617447249
+          },
+          "max_step_difference": {
+            "maximum": 8.0,
+            "median": 0.0,
+            "percentile_95": 5.0
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 0.0007588005726240082,
+            "median": 0.0,
+            "percentile_95": 0.0006378628154738879
+          }
+        },
+        "failed_checks": [
+          "max_energy_error_eV_per_atom"
+        ],
+        "failed_job_count": 8,
+        "failed_job_ids": [
+          "OPT-RB-GUFJOG44-R256-v1:0017",
+          "OPT-RB-GUFJOG44-R256-v1:0049",
+          "OPT-RB-GUFJOG44-R256-v1:0081",
+          "OPT-RB-GUFJOG44-R256-v1:0113",
+          "OPT-RB-GUFJOG44-R256-v1:0145",
+          "OPT-RB-GUFJOG44-R256-v1:0177",
+          "OPT-RB-GUFJOG44-R256-v1:0209",
+          "OPT-RB-GUFJOG44-R256-v1:0241"
+        ],
+        "max_cell_rmsd_A": 0.00345238669586669,
+        "max_energy_error_eV_per_atom": 0.00024817179060350594,
+        "max_final_fmax_error_eV_per_A": 0.004129122064640896,
+        "max_position_rmsd_A": 0.019610144595927977,
+        "max_step_difference": 8,
+        "max_stress_tensor_error_eV_per_A3": 0.0007588005726240082,
+        "passed": false,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "raw_files": {
+        "ase1": {
+          "path": "runs/robustness/production/confirm_ase1_mace_GUFJOG44.json",
+          "sha256": "79f0db8928ce70f77d98750a03fe57d1e81c09bc0dd0e6089837eaefd5e66c60"
+        },
+        "mps32": {
+          "path": "runs/robustness/production/mps32_mace_GUFJOG44.json",
+          "sha256": "f551fb6c7726cb2bcee80c9dd625264551a1ee0b7bc8330ac5d5eb6dafa2f4f8"
+        },
+        "selected_tensor": {
+          "path": "runs/robustness/production/confirm_tensor_mace_GUFJOG44_active_B256.json",
+          "sha256": "ad934f3f7438e07d8e7dccada30faf37a2134e11d069ddec6e3514fde7f74777"
+        }
+      },
+      "selected_batch_size": 256,
+      "selected_screen_gap_fraction": 0.0,
+      "selected_tensor_method": "active",
+      "tensor_candidates": [
+        {
+          "batch_size": 128,
+          "converged": 256,
+          "method": "active",
+          "model_evaluations": 438,
+          "optimizer_steps_total": 25738,
+          "path": "runs/robustness/production/tensor_mace_GUFJOG44_active_B128.json",
+          "peak_allocated_bytes": 8510109184,
+          "peak_reserved_bytes": 10559160320,
+          "seconds": 55.032454137224704,
+          "sha256": "410df8d3c489f534dbd1098ca8a424bc09045b733dd478c88a41ac3e48650432",
+          "systems_per_second": 4.65180054230651
+        },
+        {
+          "batch_size": 256,
+          "converged": 256,
+          "method": "active",
+          "model_evaluations": 272,
+          "optimizer_steps_total": 26681,
+          "path": "runs/robustness/production/tensor_mace_GUFJOG44_active_B256.json",
+          "peak_allocated_bytes": 16939340800,
+          "peak_reserved_bytes": 21011365888,
+          "seconds": 51.787299452349544,
+          "sha256": "320c50e8c8704464432a7b2aea8a5c3e7e3ad7990b18e145363323ef5907f5d8",
+          "systems_per_second": 4.943296960976896
+        }
+      ],
+      "tensor_converged": 256,
+      "tensor_peak_allocated_bytes": 16939340800,
+      "tensor_peak_reserved_bytes": 21011365888,
+      "tensor_seconds": 52.114081548992544,
+      "tensor_speedup_vs_ase1": 17.977449913826174,
+      "tensor_speedup_vs_mps32": 1.3672293015811001,
+      "tensor_vs_ase1_validation": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 0.3133636756725106,
+            "median": 0.001988378469768499,
+            "percentile_95": 0.1847807469010685
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 0.02539514934952339,
+            "median": 5.862705273267983e-05,
+            "percentile_95": 0.0034108797610150014
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 0.029467148080626643,
+            "median": 0.00501885966781674,
+            "percentile_95": 0.016878627708931983
+          },
+          "max_position_rmsd_A": {
+            "maximum": 0.5166149532089711,
+            "median": 0.006559093376441545,
+            "percentile_95": 0.26080139277472714
+          },
+          "max_step_difference": {
+            "maximum": 52.0,
+            "median": 2.0,
+            "percentile_95": 49.0
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 0.0027868846975904363,
+            "median": 0.00030090180146962836,
+            "percentile_95": 0.0021057211364388546
+          }
+        },
+        "failed_checks": [
+          "max_energy_error_eV_per_atom",
+          "max_position_rmsd_A",
+          "max_cell_rmsd_A",
+          "max_step_difference"
+        ],
+        "failed_job_count": 89,
+        "failed_job_ids": [
+          "OPT-RB-GUFJOG44-R256-v1:0002",
+          "OPT-RB-GUFJOG44-R256-v1:0004",
+          "OPT-RB-GUFJOG44-R256-v1:0006",
+          "OPT-RB-GUFJOG44-R256-v1:0008",
+          "OPT-RB-GUFJOG44-R256-v1:0009",
+          "OPT-RB-GUFJOG44-R256-v1:0014",
+          "OPT-RB-GUFJOG44-R256-v1:0015",
+          "OPT-RB-GUFJOG44-R256-v1:0017",
+          "OPT-RB-GUFJOG44-R256-v1:0019",
+          "OPT-RB-GUFJOG44-R256-v1:0021",
+          "OPT-RB-GUFJOG44-R256-v1:0029",
+          "OPT-RB-GUFJOG44-R256-v1:0034",
+          "OPT-RB-GUFJOG44-R256-v1:0036",
+          "OPT-RB-GUFJOG44-R256-v1:0038",
+          "OPT-RB-GUFJOG44-R256-v1:0040",
+          "OPT-RB-GUFJOG44-R256-v1:0041",
+          "OPT-RB-GUFJOG44-R256-v1:0046",
+          "OPT-RB-GUFJOG44-R256-v1:0047",
+          "OPT-RB-GUFJOG44-R256-v1:0049",
+          "OPT-RB-GUFJOG44-R256-v1:0051",
+          "OPT-RB-GUFJOG44-R256-v1:0053",
+          "OPT-RB-GUFJOG44-R256-v1:0061",
+          "OPT-RB-GUFJOG44-R256-v1:0066",
+          "OPT-RB-GUFJOG44-R256-v1:0068",
+          "OPT-RB-GUFJOG44-R256-v1:0070",
+          "OPT-RB-GUFJOG44-R256-v1:0072",
+          "OPT-RB-GUFJOG44-R256-v1:0073",
+          "OPT-RB-GUFJOG44-R256-v1:0078",
+          "OPT-RB-GUFJOG44-R256-v1:0079",
+          "OPT-RB-GUFJOG44-R256-v1:0081",
+          "OPT-RB-GUFJOG44-R256-v1:0083",
+          "OPT-RB-GUFJOG44-R256-v1:0085",
+          "OPT-RB-GUFJOG44-R256-v1:0093",
+          "OPT-RB-GUFJOG44-R256-v1:0098",
+          "OPT-RB-GUFJOG44-R256-v1:0100",
+          "OPT-RB-GUFJOG44-R256-v1:0102",
+          "OPT-RB-GUFJOG44-R256-v1:0104",
+          "OPT-RB-GUFJOG44-R256-v1:0105",
+          "OPT-RB-GUFJOG44-R256-v1:0110",
+          "OPT-RB-GUFJOG44-R256-v1:0111",
+          "OPT-RB-GUFJOG44-R256-v1:0113",
+          "OPT-RB-GUFJOG44-R256-v1:0115",
+          "OPT-RB-GUFJOG44-R256-v1:0117",
+          "OPT-RB-GUFJOG44-R256-v1:0125",
+          "OPT-RB-GUFJOG44-R256-v1:0130",
+          "OPT-RB-GUFJOG44-R256-v1:0132",
+          "OPT-RB-GUFJOG44-R256-v1:0134",
+          "OPT-RB-GUFJOG44-R256-v1:0136",
+          "OPT-RB-GUFJOG44-R256-v1:0137",
+          "OPT-RB-GUFJOG44-R256-v1:0142",
+          "OPT-RB-GUFJOG44-R256-v1:0143",
+          "OPT-RB-GUFJOG44-R256-v1:0145",
+          "OPT-RB-GUFJOG44-R256-v1:0147",
+          "OPT-RB-GUFJOG44-R256-v1:0149",
+          "OPT-RB-GUFJOG44-R256-v1:0157",
+          "OPT-RB-GUFJOG44-R256-v1:0162",
+          "OPT-RB-GUFJOG44-R256-v1:0164",
+          "OPT-RB-GUFJOG44-R256-v1:0166",
+          "OPT-RB-GUFJOG44-R256-v1:0168",
+          "OPT-RB-GUFJOG44-R256-v1:0169",
+          "OPT-RB-GUFJOG44-R256-v1:0174",
+          "OPT-RB-GUFJOG44-R256-v1:0175",
+          "OPT-RB-GUFJOG44-R256-v1:0177",
+          "OPT-RB-GUFJOG44-R256-v1:0179",
+          "OPT-RB-GUFJOG44-R256-v1:0181",
+          "OPT-RB-GUFJOG44-R256-v1:0189",
+          "OPT-RB-GUFJOG44-R256-v1:0194",
+          "OPT-RB-GUFJOG44-R256-v1:0196",
+          "OPT-RB-GUFJOG44-R256-v1:0198",
+          "OPT-RB-GUFJOG44-R256-v1:0200",
+          "OPT-RB-GUFJOG44-R256-v1:0201",
+          "OPT-RB-GUFJOG44-R256-v1:0206",
+          "OPT-RB-GUFJOG44-R256-v1:0207",
+          "OPT-RB-GUFJOG44-R256-v1:0209",
+          "OPT-RB-GUFJOG44-R256-v1:0211",
+          "OPT-RB-GUFJOG44-R256-v1:0213",
+          "OPT-RB-GUFJOG44-R256-v1:0221",
+          "OPT-RB-GUFJOG44-R256-v1:0226",
+          "OPT-RB-GUFJOG44-R256-v1:0228",
+          "OPT-RB-GUFJOG44-R256-v1:0230",
+          "OPT-RB-GUFJOG44-R256-v1:0232",
+          "OPT-RB-GUFJOG44-R256-v1:0233",
+          "OPT-RB-GUFJOG44-R256-v1:0238",
+          "OPT-RB-GUFJOG44-R256-v1:0239",
+          "OPT-RB-GUFJOG44-R256-v1:0241",
+          "OPT-RB-GUFJOG44-R256-v1:0243",
+          "OPT-RB-GUFJOG44-R256-v1:0245",
+          "OPT-RB-GUFJOG44-R256-v1:0253",
+          "OPT-RB-GUFJOG44-R256-v1:0254"
+        ],
+        "max_cell_rmsd_A": 0.3133636756725106,
+        "max_energy_error_eV_per_atom": 0.02539514934952339,
+        "max_final_fmax_error_eV_per_A": 0.029467148080626643,
+        "max_position_rmsd_A": 0.5166149532089711,
+        "max_step_difference": 52,
+        "max_stress_tensor_error_eV_per_A3": 0.0027868846975904363,
+        "passed": false,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "workload": "GUFJOG44"
+    },
+    {
+      "ase1_converged": 256,
+      "ase1_peak_allocated_bytes": 239177728,
+      "ase1_peak_reserved_bytes": 497025024,
+      "ase1_seconds": 429.6456912863068,
+      "fastest_screen_batch_size": 256,
+      "fastest_screen_method": "active",
+      "jobs": 256,
+      "mlip": "mace",
+      "mps32_converged": 256,
+      "mps32_peak_nvidia_smi_bytes": 36605788160,
+      "mps32_seconds": 48.68896743375808,
+      "mps32_vs_ase1_validation": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 1.5245815637980732e-11,
+            "median": 0.0,
+            "percentile_95": 1.2945081602613694e-11
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 8.268133652481166e-14,
+            "median": 0.0,
+            "percentile_95": 8.268133652481166e-14
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 1.2101930568775288e-11,
+            "median": 0.0,
+            "percentile_95": 4.4213452343733195e-12
+          },
+          "max_position_rmsd_A": {
+            "maximum": 1.5936800581408137e-11,
+            "median": 0.0,
+            "percentile_95": 1.584746735091066e-11
+          },
+          "max_step_difference": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 2.447072492556268e-13,
+            "median": 0.0,
+            "percentile_95": 1.5252664582743325e-13
+          }
+        },
+        "failed_checks": [],
+        "failed_job_count": 0,
+        "failed_job_ids": [],
+        "max_cell_rmsd_A": 1.5245815637980732e-11,
+        "max_energy_error_eV_per_atom": 8.268133652481166e-14,
+        "max_final_fmax_error_eV_per_A": 1.2101930568775288e-11,
+        "max_position_rmsd_A": 1.5936800581408137e-11,
+        "max_step_difference": 0,
+        "max_stress_tensor_error_eV_per_A3": 2.447072492556268e-13,
+        "passed": true,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "raw_files": {
+        "ase1": {
+          "path": "runs/robustness/production/confirm_ase1_mace_XATMOV88.json",
+          "sha256": "a7631c081576ba69cdae589131fc71ee57d6cd2355738b4b3c3108990d1127bc"
+        },
+        "mps32": {
+          "path": "runs/robustness/production/mps32_mace_XATMOV88.json",
+          "sha256": "d9a973a2305aa829258facd3da8ecaa63caff5dcddc450d9cd5c92344a4403e0"
+        },
+        "selected_tensor": {
+          "path": "runs/robustness/production/confirm_tensor_mace_XATMOV88_active_B256.json",
+          "sha256": "8a30f12458f9b140a5ca4440c561cc2727fd581e1c102054dcefb03892eefcf7"
+        }
+      },
+      "selected_batch_size": 256,
+      "selected_screen_gap_fraction": 0.0,
+      "selected_tensor_method": "active",
+      "tensor_candidates": [
+        {
+          "batch_size": 128,
+          "converged": 256,
+          "method": "active",
+          "model_evaluations": 234,
+          "optimizer_steps_total": 10712,
+          "path": "runs/robustness/production/tensor_mace_XATMOV88_active_B128.json",
+          "peak_allocated_bytes": 17399821312,
+          "peak_reserved_bytes": 22022193152,
+          "seconds": 35.17318281810731,
+          "sha256": "bef45ebcfde5f4ac8aa5b29c4e5cbf4f5abb22c7eeb4fcfd44703ff9630caa43",
+          "systems_per_second": 7.278272237228702
+        },
+        {
+          "batch_size": 256,
+          "converged": 256,
+          "method": "active",
+          "model_evaluations": 117,
+          "optimizer_steps_total": 10712,
+          "path": "runs/robustness/production/tensor_mace_XATMOV88_active_B256.json",
+          "peak_allocated_bytes": 34715056640,
+          "peak_reserved_bytes": 42135977984,
+          "seconds": 32.99748087162152,
+          "sha256": "8b362332240dc8f773b750824cc0bccd6fd9a6c919d45bade2db6d27a417ef63",
+          "systems_per_second": 7.758167994580611
+        }
+      ],
+      "tensor_converged": 256,
+      "tensor_peak_allocated_bytes": 34715056640,
+      "tensor_peak_reserved_bytes": 42135977984,
+      "tensor_seconds": 33.582316495943815,
+      "tensor_speedup_vs_ase1": 12.793807459297838,
+      "tensor_speedup_vs_mps32": 1.4498394546319906,
+      "tensor_vs_ase1_validation": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 6.760341797463434e-10,
+            "median": 1.0584984667752263e-10,
+            "percentile_95": 5.054387818546747e-10
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 6.6145069219849324e-12,
+            "median": 4.134066826240583e-13,
+            "percentile_95": 3.4726161340420898e-12
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 8.994486544455782e-10,
+            "median": 4.903806527511989e-12,
+            "percentile_95": 3.616800955952293e-10
+          },
+          "max_position_rmsd_A": {
+            "maximum": 7.627347240774668e-10,
+            "median": 1.0138075460786944e-10,
+            "percentile_95": 6.159718319773892e-10
+          },
+          "max_step_difference": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 1.9019743245640708e-11,
+            "median": 2.0539420045404683e-13,
+            "percentile_95": 7.48374645131826e-12
+          }
+        },
+        "failed_checks": [],
+        "failed_job_count": 0,
+        "failed_job_ids": [],
+        "max_cell_rmsd_A": 6.760341797463434e-10,
+        "max_energy_error_eV_per_atom": 6.6145069219849324e-12,
+        "max_final_fmax_error_eV_per_A": 8.994486544455782e-10,
+        "max_position_rmsd_A": 7.627347240774668e-10,
+        "max_step_difference": 0,
+        "max_stress_tensor_error_eV_per_A3": 1.9019743245640708e-11,
+        "passed": true,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "workload": "XATMOV88"
+    },
+    {
+      "ase1_converged": 256,
+      "ase1_peak_allocated_bytes": 433085952,
+      "ase1_peak_reserved_bytes": 706740224,
+      "ase1_seconds": 1931.6451673931442,
+      "fastest_screen_batch_size": 192,
+      "fastest_screen_method": "refill",
+      "jobs": 256,
+      "mlip": "mace",
+      "mps32_converged": 256,
+      "mps32_peak_nvidia_smi_bytes": 45329940480,
+      "mps32_seconds": 117.50749272434041,
+      "mps32_vs_ase1_validation": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 0.01182752614169861,
+            "median": 0.0,
+            "percentile_95": 0.006683243918912124
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 0.00040943504639223894,
+            "median": 0.0,
+            "percentile_95": 0.00031683721000180494
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 0.0013472274059677797,
+            "median": 0.0,
+            "percentile_95": 0.0007835773962791906
+          },
+          "max_position_rmsd_A": {
+            "maximum": 0.05212200461276977,
+            "median": 0.0,
+            "percentile_95": 0.03843996249512703
+          },
+          "max_step_difference": {
+            "maximum": 19.0,
+            "median": 0.0,
+            "percentile_95": 17.0
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 0.0004449424569898676,
+            "median": 0.0,
+            "percentile_95": 0.0002663311284270589
+          }
+        },
+        "failed_checks": [
+          "max_energy_error_eV_per_atom",
+          "max_position_rmsd_A"
+        ],
+        "failed_job_count": 23,
+        "failed_job_ids": [
+          "OPT-RB-OBEQIX220-R256-v1:0016",
+          "OPT-RB-OBEQIX220-R256-v1:0024",
+          "OPT-RB-OBEQIX220-R256-v1:0032",
+          "OPT-RB-OBEQIX220-R256-v1:0048",
+          "OPT-RB-OBEQIX220-R256-v1:0056",
+          "OPT-RB-OBEQIX220-R256-v1:0064",
+          "OPT-RB-OBEQIX220-R256-v1:0080",
+          "OPT-RB-OBEQIX220-R256-v1:0088",
+          "OPT-RB-OBEQIX220-R256-v1:0096",
+          "OPT-RB-OBEQIX220-R256-v1:0112",
+          "OPT-RB-OBEQIX220-R256-v1:0120",
+          "OPT-RB-OBEQIX220-R256-v1:0128",
+          "OPT-RB-OBEQIX220-R256-v1:0144",
+          "OPT-RB-OBEQIX220-R256-v1:0152",
+          "OPT-RB-OBEQIX220-R256-v1:0160",
+          "OPT-RB-OBEQIX220-R256-v1:0176",
+          "OPT-RB-OBEQIX220-R256-v1:0184",
+          "OPT-RB-OBEQIX220-R256-v1:0192",
+          "OPT-RB-OBEQIX220-R256-v1:0208",
+          "OPT-RB-OBEQIX220-R256-v1:0216",
+          "OPT-RB-OBEQIX220-R256-v1:0224",
+          "OPT-RB-OBEQIX220-R256-v1:0240",
+          "OPT-RB-OBEQIX220-R256-v1:0248"
+        ],
+        "max_cell_rmsd_A": 0.01182752614169861,
+        "max_energy_error_eV_per_atom": 0.00040943504639223894,
+        "max_final_fmax_error_eV_per_A": 0.0013472274059677797,
+        "max_position_rmsd_A": 0.05212200461276977,
+        "max_step_difference": 19,
+        "max_stress_tensor_error_eV_per_A3": 0.0004449424569898676,
+        "passed": false,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "raw_files": {
+        "ase1": {
+          "path": "runs/robustness/production/confirm_ase1_mace_OBEQIX220.json",
+          "sha256": "919bd59c19e9b8a0f05e8a3837c8aee94806f061a47d3662a79d3c33e2ca5d81"
+        },
+        "mps32": {
+          "path": "runs/robustness/production/mps32_mace_OBEQIX220.json",
+          "sha256": "4b6573a6813702a60f9ba2b14775c25aec7fcb8a17630501aca3fce0d9709b54"
+        },
+        "selected_tensor": {
+          "path": "runs/robustness/production/confirm_tensor_mace_OBEQIX220_active_B128.json",
+          "sha256": "835ac02729cadcf60ef92d2b63e1f76339e034b49f66580da2bde398922c1d8c"
+        }
+      },
+      "selected_batch_size": 128,
+      "selected_screen_gap_fraction": 0.002258019224927299,
+      "selected_tensor_method": "active",
+      "tensor_candidates": [
+        {
+          "batch_size": 128,
+          "converged": 256,
+          "method": "active",
+          "model_evaluations": 316,
+          "optimizer_steps_total": 23960,
+          "path": "runs/robustness/production/tensor_mace_OBEQIX220_active_B128.json",
+          "peak_allocated_bytes": 42922489856,
+          "peak_reserved_bytes": 52663681024,
+          "seconds": 120.28928228281438,
+          "sha256": "3a7d1153287974f489b36cdba06b2b98231e35aef206ebbff3dca5773e7bdca8",
+          "systems_per_second": 2.1282029050444713
+        },
+        {
+          "batch_size": 192,
+          "converged": 256,
+          "method": "active",
+          "model_evaluations": 328,
+          "optimizer_steps_total": 23812,
+          "path": "runs/robustness/production/tensor_mace_OBEQIX220_active_B192.json",
+          "peak_allocated_bytes": 64341868032,
+          "peak_reserved_bytes": 78932606976,
+          "seconds": 120.0494524659589,
+          "sha256": "37c3ef3c5fc2050630b4561caf1c16399f342ceeae813e035d6f4ea9a3cfedca",
+          "systems_per_second": 2.1324545405368767
+        },
+        {
+          "batch_size": 192,
+          "converged": 256,
+          "method": "refill",
+          "model_evaluations": 237,
+          "optimizer_steps_total": 23845,
+          "path": "runs/robustness/production/tensor_mace_OBEQIX220_refill_B192.json",
+          "peak_allocated_bytes": 64545704960,
+          "peak_reserved_bytes": 76418121728,
+          "seconds": 120.0182787021622,
+          "sha256": "315cd775246931b85a567d09b9b7a41b5cf848a9d07280b4e1eb56c678aa3e0a",
+          "systems_per_second": 2.133008428118608
+        }
+      ],
+      "tensor_converged": 256,
+      "tensor_peak_allocated_bytes": 42922489856,
+      "tensor_peak_reserved_bytes": 52663681024,
+      "tensor_seconds": 118.96771929785609,
+      "tensor_speedup_vs_ase1": 16.236716806825044,
+      "tensor_speedup_vs_mps32": 0.9877258588957248,
+      "tensor_vs_ase1_validation": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 0.03865388963977736,
+            "median": 0.00035031687316412687,
+            "percentile_95": 0.024605626005850742
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 0.0025796309126731518,
+            "median": 2.5331278911008586e-05,
+            "percentile_95": 0.0008562791236975251
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 0.010150926738822973,
+            "median": 0.0014247403658724442,
+            "percentile_95": 0.007168261887773433
+          },
+          "max_position_rmsd_A": {
+            "maximum": 0.21576792549091084,
+            "median": 0.0032673591802332286,
+            "percentile_95": 0.1182433083397948
+          },
+          "max_step_difference": {
+            "maximum": 51.0,
+            "median": 2.0,
+            "percentile_95": 34.0
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 0.0005675235322600668,
+            "median": 9.504047357830465e-05,
+            "percentile_95": 0.0004380123529453817
+          }
+        },
+        "failed_checks": [
+          "max_energy_error_eV_per_atom",
+          "max_position_rmsd_A",
+          "max_cell_rmsd_A",
+          "max_step_difference"
+        ],
+        "failed_job_count": 89,
+        "failed_job_ids": [
+          "OPT-RB-OBEQIX220-R256-v1:0000",
+          "OPT-RB-OBEQIX220-R256-v1:0002",
+          "OPT-RB-OBEQIX220-R256-v1:0007",
+          "OPT-RB-OBEQIX220-R256-v1:0008",
+          "OPT-RB-OBEQIX220-R256-v1:0010",
+          "OPT-RB-OBEQIX220-R256-v1:0015",
+          "OPT-RB-OBEQIX220-R256-v1:0016",
+          "OPT-RB-OBEQIX220-R256-v1:0020",
+          "OPT-RB-OBEQIX220-R256-v1:0021",
+          "OPT-RB-OBEQIX220-R256-v1:0024",
+          "OPT-RB-OBEQIX220-R256-v1:0025",
+          "OPT-RB-OBEQIX220-R256-v1:0029",
+          "OPT-RB-OBEQIX220-R256-v1:0030",
+          "OPT-RB-OBEQIX220-R256-v1:0034",
+          "OPT-RB-OBEQIX220-R256-v1:0039",
+          "OPT-RB-OBEQIX220-R256-v1:0040",
+          "OPT-RB-OBEQIX220-R256-v1:0042",
+          "OPT-RB-OBEQIX220-R256-v1:0047",
+          "OPT-RB-OBEQIX220-R256-v1:0048",
+          "OPT-RB-OBEQIX220-R256-v1:0052",
+          "OPT-RB-OBEQIX220-R256-v1:0053",
+          "OPT-RB-OBEQIX220-R256-v1:0056",
+          "OPT-RB-OBEQIX220-R256-v1:0057",
+          "OPT-RB-OBEQIX220-R256-v1:0061",
+          "OPT-RB-OBEQIX220-R256-v1:0062",
+          "OPT-RB-OBEQIX220-R256-v1:0066",
+          "OPT-RB-OBEQIX220-R256-v1:0071",
+          "OPT-RB-OBEQIX220-R256-v1:0072",
+          "OPT-RB-OBEQIX220-R256-v1:0074",
+          "OPT-RB-OBEQIX220-R256-v1:0079",
+          "OPT-RB-OBEQIX220-R256-v1:0080",
+          "OPT-RB-OBEQIX220-R256-v1:0084",
+          "OPT-RB-OBEQIX220-R256-v1:0085",
+          "OPT-RB-OBEQIX220-R256-v1:0088",
+          "OPT-RB-OBEQIX220-R256-v1:0089",
+          "OPT-RB-OBEQIX220-R256-v1:0093",
+          "OPT-RB-OBEQIX220-R256-v1:0094",
+          "OPT-RB-OBEQIX220-R256-v1:0098",
+          "OPT-RB-OBEQIX220-R256-v1:0103",
+          "OPT-RB-OBEQIX220-R256-v1:0104",
+          "OPT-RB-OBEQIX220-R256-v1:0106",
+          "OPT-RB-OBEQIX220-R256-v1:0111",
+          "OPT-RB-OBEQIX220-R256-v1:0112",
+          "OPT-RB-OBEQIX220-R256-v1:0116",
+          "OPT-RB-OBEQIX220-R256-v1:0117",
+          "OPT-RB-OBEQIX220-R256-v1:0120",
+          "OPT-RB-OBEQIX220-R256-v1:0121",
+          "OPT-RB-OBEQIX220-R256-v1:0125",
+          "OPT-RB-OBEQIX220-R256-v1:0126",
+          "OPT-RB-OBEQIX220-R256-v1:0128",
+          "OPT-RB-OBEQIX220-R256-v1:0135",
+          "OPT-RB-OBEQIX220-R256-v1:0143",
+          "OPT-RB-OBEQIX220-R256-v1:0144",
+          "OPT-RB-OBEQIX220-R256-v1:0148",
+          "OPT-RB-OBEQIX220-R256-v1:0149",
+          "OPT-RB-OBEQIX220-R256-v1:0151",
+          "OPT-RB-OBEQIX220-R256-v1:0152",
+          "OPT-RB-OBEQIX220-R256-v1:0153",
+          "OPT-RB-OBEQIX220-R256-v1:0158",
+          "OPT-RB-OBEQIX220-R256-v1:0160",
+          "OPT-RB-OBEQIX220-R256-v1:0167",
+          "OPT-RB-OBEQIX220-R256-v1:0175",
+          "OPT-RB-OBEQIX220-R256-v1:0176",
+          "OPT-RB-OBEQIX220-R256-v1:0180",
+          "OPT-RB-OBEQIX220-R256-v1:0181",
+          "OPT-RB-OBEQIX220-R256-v1:0183",
+          "OPT-RB-OBEQIX220-R256-v1:0184",
+          "OPT-RB-OBEQIX220-R256-v1:0185",
+          "OPT-RB-OBEQIX220-R256-v1:0190",
+          "OPT-RB-OBEQIX220-R256-v1:0192",
+          "OPT-RB-OBEQIX220-R256-v1:0199",
+          "OPT-RB-OBEQIX220-R256-v1:0207",
+          "OPT-RB-OBEQIX220-R256-v1:0208",
+          "OPT-RB-OBEQIX220-R256-v1:0212",
+          "OPT-RB-OBEQIX220-R256-v1:0213",
+          "OPT-RB-OBEQIX220-R256-v1:0215",
+          "OPT-RB-OBEQIX220-R256-v1:0216",
+          "OPT-RB-OBEQIX220-R256-v1:0217",
+          "OPT-RB-OBEQIX220-R256-v1:0222",
+          "OPT-RB-OBEQIX220-R256-v1:0224",
+          "OPT-RB-OBEQIX220-R256-v1:0231",
+          "OPT-RB-OBEQIX220-R256-v1:0239",
+          "OPT-RB-OBEQIX220-R256-v1:0240",
+          "OPT-RB-OBEQIX220-R256-v1:0244",
+          "OPT-RB-OBEQIX220-R256-v1:0245",
+          "OPT-RB-OBEQIX220-R256-v1:0247",
+          "OPT-RB-OBEQIX220-R256-v1:0248",
+          "OPT-RB-OBEQIX220-R256-v1:0249",
+          "OPT-RB-OBEQIX220-R256-v1:0254"
+        ],
+        "max_cell_rmsd_A": 0.03865388963977736,
+        "max_energy_error_eV_per_atom": 0.0025796309126731518,
+        "max_final_fmax_error_eV_per_A": 0.010150926738822973,
+        "max_position_rmsd_A": 0.21576792549091084,
+        "max_step_difference": 51,
+        "max_stress_tensor_error_eV_per_A3": 0.0005675235322600668,
+        "passed": false,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "workload": "OBEQIX220"
+    },
+    {
+      "ase1_converged": 256,
+      "ase1_peak_allocated_bytes": 522785280,
+      "ase1_peak_reserved_bytes": 838860800,
+      "ase1_seconds": 1271.2477225651965,
+      "fastest_screen_batch_size": 256,
+      "fastest_screen_method": "active",
+      "jobs": 256,
+      "mlip": "mace",
+      "mps32_converged": 256,
+      "mps32_peak_nvidia_smi_bytes": 41957720064,
+      "mps32_seconds": 118.98100060597062,
+      "mps32_vs_ase1_validation": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 2.2459005890338519e-10,
+            "median": 0.0,
+            "percentile_95": 1.419371048771432e-11
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 6.980986359554368e-12,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 7.602854429356043e-09,
+            "median": 0.0,
+            "percentile_95": 3.165465806143075e-11
+          },
+          "max_position_rmsd_A": {
+            "maximum": 1.6311494093442414e-09,
+            "median": 0.0,
+            "percentile_95": 1.724957866774942e-11
+          },
+          "max_step_difference": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 5.080952280819059e-12,
+            "median": 0.0,
+            "percentile_95": 7.888298575540326e-14
+          }
+        },
+        "failed_checks": [],
+        "failed_job_count": 0,
+        "failed_job_ids": [],
+        "max_cell_rmsd_A": 2.2459005890338519e-10,
+        "max_energy_error_eV_per_atom": 6.980986359554368e-12,
+        "max_final_fmax_error_eV_per_A": 7.602854429356043e-09,
+        "max_position_rmsd_A": 1.6311494093442414e-09,
+        "max_step_difference": 0,
+        "max_stress_tensor_error_eV_per_A3": 5.080952280819059e-12,
+        "passed": true,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "raw_files": {
+        "ase1": {
+          "path": "runs/robustness/production/confirm_ase1_mace_ROFA-MIX.json",
+          "sha256": "42650e08d767aa0ff55d0db634ff60173848247effd93a671372390fb129b789"
+        },
+        "mps32": {
+          "path": "runs/robustness/production/mps32_mace_ROFA-MIX.json",
+          "sha256": "5e1ef7e3bda3dcea25a50862d0c90dfb518f02bd4ea03e865a4c33e0e47e7587"
+        },
+        "selected_tensor": {
+          "path": "runs/robustness/production/confirm_tensor_mace_ROFA-MIX_active_B256.json",
+          "sha256": "b1016a605602dfc89189ae6c6dc80bbca422469034e90a65cb17cdf6488cc5f8"
+        }
+      },
+      "selected_batch_size": 256,
+      "selected_screen_gap_fraction": 0.0,
+      "selected_tensor_method": "active",
+      "tensor_candidates": [
+        {
+          "batch_size": 128,
+          "converged": 256,
+          "method": "active",
+          "model_evaluations": 276,
+          "optimizer_steps_total": 15160,
+          "path": "runs/robustness/production/tensor_mace_ROFA-MIX_active_B128.json",
+          "peak_allocated_bytes": 35902873088,
+          "peak_reserved_bytes": 44300238848,
+          "seconds": 69.12709092302248,
+          "sha256": "f8f6ffacd19e5a543ca3850f631b57a40a868d320e02cd5731fcfa24d6e9e421",
+          "systems_per_second": 3.7033237849553466
+        },
+        {
+          "batch_size": 192,
+          "converged": 256,
+          "method": "active",
+          "model_evaluations": 276,
+          "optimizer_steps_total": 15160,
+          "path": "runs/robustness/production/tensor_mace_ROFA-MIX_active_B192.json",
+          "peak_allocated_bytes": 53813277696,
+          "peak_reserved_bytes": 66408415232,
+          "seconds": 69.25157366739586,
+          "sha256": "179b07e175f27a88fc847ba151fa09ac4a0d5c50d1cb256819aa62340e54bee4",
+          "systems_per_second": 3.6966668978459136
+        },
+        {
+          "batch_size": 256,
+          "converged": 256,
+          "method": "active",
+          "model_evaluations": 138,
+          "optimizer_steps_total": 15160,
+          "path": "runs/robustness/production/tensor_mace_ROFA-MIX_active_B256.json",
+          "peak_allocated_bytes": 71727139840,
+          "peak_reserved_bytes": 83516981248,
+          "seconds": 65.16846304619685,
+          "sha256": "c0991f8cf3f40998df62a62d4e3efd273505778ccea9baceb97c05229aeb617f",
+          "systems_per_second": 3.928280460113442
+        },
+        {
+          "batch_size": 192,
+          "converged": 256,
+          "method": "refill",
+          "model_evaluations": 186,
+          "optimizer_steps_total": 15160,
+          "path": "runs/robustness/production/tensor_mace_ROFA-MIX_refill_B192.json",
+          "peak_allocated_bytes": 61691843072,
+          "peak_reserved_bytes": 77946945536,
+          "seconds": 67.65757099585608,
+          "sha256": "ee69d4422f1476e82ad880cde5734bc97e9efb75e44728610ea04b6a088341c2",
+          "systems_per_second": 3.783759839910298
+        }
+      ],
+      "tensor_converged": 256,
+      "tensor_peak_allocated_bytes": 71727139840,
+      "tensor_peak_reserved_bytes": 83516981248,
+      "tensor_seconds": 64.55008485587314,
+      "tensor_speedup_vs_ase1": 19.693974460353186,
+      "tensor_speedup_vs_mps32": 1.8432353864697522,
+      "tensor_vs_ase1_validation": {
+        "convergence_flags_match": true,
+        "distributions": {
+          "max_cell_rmsd_A": {
+            "maximum": 5.596341054549321e-09,
+            "median": 6.66620995797912e-10,
+            "percentile_95": 4.644182526377356e-09
+          },
+          "max_energy_error_eV_per_atom": {
+            "maximum": 3.539655055548694e-12,
+            "median": 2.7858396270522124e-13,
+            "percentile_95": 2.3597700370324626e-12
+          },
+          "max_final_fmax_error_eV_per_A": {
+            "maximum": 7.907433804965613e-10,
+            "median": 2.4410844873257176e-11,
+            "percentile_95": 5.126429836188606e-10
+          },
+          "max_position_rmsd_A": {
+            "maximum": 6.254744708456563e-09,
+            "median": 6.762950912849446e-10,
+            "percentile_95": 5.481956906167876e-09
+          },
+          "max_step_difference": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "percentile_95": 0.0
+          },
+          "max_stress_tensor_error_eV_per_A3": {
+            "maximum": 3.974025026155098e-11,
+            "median": 2.906264923272124e-12,
+            "percentile_95": 2.1588517432058474e-11
+          }
+        },
+        "failed_checks": [],
+        "failed_job_count": 0,
+        "failed_job_ids": [],
+        "max_cell_rmsd_A": 5.596341054549321e-09,
+        "max_energy_error_eV_per_atom": 3.539655055548694e-12,
+        "max_final_fmax_error_eV_per_A": 7.907433804965613e-10,
+        "max_position_rmsd_A": 6.254744708456563e-09,
+        "max_step_difference": 0,
+        "max_stress_tensor_error_eV_per_A3": 3.974025026155098e-11,
+        "passed": true,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_step_difference": 25,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "workload": "ROFA-MIX"
+    }
+  ],
+  "schema_version": 1,
+  "status": "complete",
+  "timing_interpretation": "single-run screen; differences below 2 percent are inconclusive",
+  "timing_repeats": 1
+}

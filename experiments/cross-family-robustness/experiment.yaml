@@ -40,12 +40,32 @@ commands:
       - runs/robustness/atombit_compatibility.json
       - runs/robustness/mace_compatibility.json
   - name: optimization-matrix
-    status: conditional_on_compatibility_and_capacity_screen
+    status: complete
+    outputs:
+      - experiments/cross-family-robustness/results/optimization_summary.json
+      - experiments/cross-family-robustness/results/optimization_summary.csv
+  - name: deterministic-three-step-equivalence
+    status: passed
+    scope: ASE BFGS versus batched eigen and Cholesky BFGS
+  - name: capacity-screen
+    status: complete
+    scope: B64-B256, one forced BFGS step
+  - name: controlled-production-timing
+    status: complete
+    cpu_threads_per_process: 1
+    timing_repeats: 1
+  - name: full-relaxation-b1-diagnostic
+    status: complete
+    scope: First 32 signed GUFJOG44 and OBEQIX220 jobs
 collect_json:
   - runs/robustness/workloads/index.json
+  - runs/robustness/production/summary.json
 decision_rules:
   - Exclude structures containing elements unsupported by the tested MLIP.
   - Require finite energy, forces, and stress for every selected representative.
   - Require B1 and batch-versus-single equivalence before optimization timing.
   - Treat timing differences below 2 percent as inconclusive.
   - Report peak allocated and reserved GPU memory with throughput.
+  - Require all 256 jobs to converge before selecting a timing point.
+  - Report full-relaxation basin changes separately from short-step numerical
+    equivalence; do not claim identical final minima when tolerances fail.
