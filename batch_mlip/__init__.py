@@ -29,6 +29,7 @@ from .execution import (
     run_parallel_workers,
 )
 from .interfaces.api import evaluate, molecular_dynamics, relax
+from .interfaces.ase_reference import relax_ase
 from .interfaces.reporting import (
     CompositeReporter,
     ExtXYZReporter,
@@ -70,8 +71,11 @@ from .planning import (
     CalibrationObservation,
     MemoryCoefficients,
     PlannedBucket,
+    RelaxationSchedule,
+    ScheduledRelaxationBatch,
     SystemProfile,
     fit_memory_coefficients,
+    plan_relaxation_execution,
 )
 from .profiling import RunTelemetry, RuntimeProfiler
 from .workloads import (
@@ -156,10 +160,12 @@ __all__ = [
     "OptimizerFactory",
     "ParallelWorkerError",
     "PlannedBucket",
+    "RelaxationSchedule",
     "RelaxationResult",
     "RuntimeProfiler",
     "RunTelemetry",
     "SystemProfile",
+    "ScheduledRelaxationBatch",
     "TorchStateCheckpointReporter",
     "TaskProfile",
     "WorkerResult",
@@ -187,8 +193,10 @@ __all__ = [
     "max_force_per_system",
     "materialize_workload",
     "molecular_dynamics",
+    "plan_relaxation_execution",
     "register_optimizer",
     "relax",
+    "relax_ase",
     "run_parallel_workers",
 ]
 

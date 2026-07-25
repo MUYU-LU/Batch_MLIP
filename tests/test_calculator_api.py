@@ -9,9 +9,12 @@ from batch_mlip import (
     ASECalculatorAdapter,
     BatchCalculator,
     BatchEvaluation,
+    BatchPlanner,
+    MemoryCoefficients,
     evaluate,
     molecular_dynamics,
     relax,
+    relax_ase,
 )
 
 
@@ -111,3 +114,57 @@ def test_ordinary_ase_calculator_adapter_is_compatible_but_sequential():
             dtype=torch.float64,
         ),
     )
+
+
+def test_auto_relaxation_chunks_and_restores_heterogeneous_input_order():
+    systems = [
+        Atoms("H", positions=[[0.8, -0.2, 0.1]]),
+        Atoms("He2", positions=[[0.3, 0.1, 0.0], [-0.4, 0.2, 0.1]]),
+    ]
+    calculator = QuadraticBatchCalculator()
+    planner = BatchPlanner(
+        MemoryCoefficients(100.0, 1.0, 1.0, 1.0),
+        memory_budget_bytes=1_000_000,
+        max_batch_size=1,
+        max_cost_ratio=100.0,
+    )
+
+    result = relax(
+        systems,
+        calculator,
+        scheduling="auto",
+        planner=planner,
+        fmax=1e-5,
+        max_steps=500,
+        dt_start=0.05,
+        dt_max=0.5,
+        active_compaction=True,
+    )
+
+    assert bool(result.converged.all())
+    assert [atoms.get_chemical_formula() for atoms in result.structures] == [
+        "H",
+        "He2",
+    ]
+    scheduling = result.metadata["scheduling"]
+    assert scheduling["decision"] == "memory_safe_planned_queues"
+    assert [batch["system_count"] for batch in scheduling["batches"]] == [1, 1]
+
+
+def test_relax_ase_runs_an_explicit_native_ase_reference():
+    systems = [
+        Atoms("H", positions=[[0.8, -0.2, 0.1]]),
+        Atoms("He", positions=[[-0.4, 0.2, 0.1]]),
+    ]
+
+    result = relax_ase(
+        systems,
+        QuadraticASECalculator(),
+        optimizer="bfgs",
+        fmax=1e-8,
+        max_steps=100,
+    )
+
+    assert bool(result.converged.all())
+    assert result.metadata["execution"] == "strict_ase_serial"
+    assert float(torch.linalg.vector_norm(result.state.positions, dim=1).max()) < 1e-8

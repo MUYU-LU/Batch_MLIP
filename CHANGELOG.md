@@ -14,6 +14,13 @@
 
 ## 0.2.0 - Unreleased
 
+- Add opt-in `relax(..., scheduling="auto", planner=...)` execution that selects
+  a calibrated whole pool or restores input order across memory-safe queues.
+- Add explicit `relax_ase()` native-ASE reference execution rather than
+  presenting the sequential batch-calculator adapter as strict ASE semantics.
+- Validate automatic scheduling on the signed six-family CROSS-MIX R192
+  variable-cell workload with AtomBit and MACE-OFF-Small; recommended whole-pool
+  execution is 1.63x and 1.24x faster than 32-worker CUDA MPS references.
 - Add opt-in deferred-CUDA runtime phase profiling for graph construction,
   model evaluation, BFGS updates, compaction, refill, and occupancy events.
 - Add generic per-structure variable-cell neighbor caching, exact-cutoff GPU

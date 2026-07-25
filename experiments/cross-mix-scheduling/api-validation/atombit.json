@@ -1,0 +1,50 @@
+{
+  "direct_converged": 0,
+  "fallback_converged": 0,
+  "fallback_schedule": {
+    "batches": [
+      {
+        "active_refill": true,
+        "resident_capacity": 2,
+        "system_count": 4
+      }
+    ],
+    "decision": "memory_safe_planned_queues",
+    "memory_budget_bytes": 68719476736,
+    "policy": "auto",
+    "profiling_seconds": 0.003434394020587206,
+    "total_predicted_bytes": 641273671
+  },
+  "fallback_systems_returned": 4,
+  "fallback_vs_direct_maximum_absolute_difference": {
+    "cell_A": 1.399091731357771e-09,
+    "energy_eV": 1.9073486328125e-06,
+    "force_eV_per_A": 0.00013068318367004395,
+    "position_A": 1.9073486328125e-06
+  },
+  "jobs": 4,
+  "mlip": "atombit",
+  "schema_version": 1,
+  "steps": 2,
+  "whole_converged": 0,
+  "whole_schedule": {
+    "batches": [
+      {
+        "active_refill": false,
+        "resident_capacity": 4,
+        "system_count": 4
+      }
+    ],
+    "decision": "whole_batch_predicted_to_fit",
+    "memory_budget_bytes": 68719476736,
+    "policy": "auto",
+    "profiling_seconds": 0.0035119089297950268,
+    "total_predicted_bytes": 641273671
+  },
+  "whole_vs_direct_maximum_absolute_difference": {
+    "cell_A": 0.0,
+    "energy_eV": 0.0,
+    "force_eV_per_A": 0.0,
+    "position_A": 0.0
+  }
+}

@@ -9,6 +9,7 @@ from batch_mlip import (
     MemoryCoefficients,
     SystemProfile,
     fit_memory_coefficients,
+    plan_relaxation_execution,
 )
 
 
@@ -109,6 +110,12 @@ def test_planner_buckets_heterogeneous_costs_and_enforces_budget():
         bucket.predicted_peak_bytes <= plan.memory_budget_bytes
         for bucket in plan.buckets
     )
+    expected_total = coefficients.estimate(
+        atom_count=sum(profile.atom_count for profile in profiles),
+        edge_count=sum(profile.edge_count for profile in profiles),
+        dof_squared=sum(profile.dof_squared for profile in profiles),
+    )
+    assert planner.estimate_profiles_bytes(plan.profiles) == expected_total
 
 
 def test_planner_rejects_a_system_larger_than_budget():
@@ -120,6 +127,32 @@ def test_planner_rejects_a_system_larger_than_budget():
         planner.plan_profiles(
             [SystemProfile(index=0, atom_count=1, edge_count=0, dof_squared=2_000)]
         )
+
+
+def test_execution_planner_uses_refill_only_when_optimizer_supports_it():
+    systems = [
+        Atoms("H", positions=[[0.0, 0.0, 0.0]]),
+        Atoms("H", positions=[[0.2, 0.0, 0.0]]),
+    ]
+    planner = BatchPlanner(
+        MemoryCoefficients(100.0, 1.0, 1.0, 1.0),
+        memory_budget_bytes=1_000_000,
+        max_batch_size=1,
+        max_cost_ratio=100.0,
+    )
+
+    schedule = plan_relaxation_execution(
+        planner,
+        systems,
+        cutoff=1.0,
+        supports_refill=True,
+    )
+
+    assert schedule.decision == "memory_safe_planned_queues"
+    assert len(schedule.batches) == 1
+    assert schedule.batches[0].system_indices == (0, 1)
+    assert schedule.batches[0].resident_capacity == 1
+    assert schedule.batches[0].active_refill
 
 
 @pytest.mark.parametrize(

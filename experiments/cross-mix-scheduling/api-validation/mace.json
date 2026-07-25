@@ -1,0 +1,50 @@
+{
+  "direct_converged": 0,
+  "fallback_converged": 0,
+  "fallback_schedule": {
+    "batches": [
+      {
+        "active_refill": true,
+        "resident_capacity": 2,
+        "system_count": 4
+      }
+    ],
+    "decision": "memory_safe_planned_queues",
+    "memory_budget_bytes": 68719476736,
+    "policy": "auto",
+    "profiling_seconds": 0.0015168790705502033,
+    "total_predicted_bytes": 687568616
+  },
+  "fallback_systems_returned": 4,
+  "fallback_vs_direct_maximum_absolute_difference": {
+    "cell_A": 3.0791341698588326e-17,
+    "energy_eV": 0.0,
+    "force_eV_per_A": 3.1241675912951905e-13,
+    "position_A": 3.552713678800501e-15
+  },
+  "jobs": 4,
+  "mlip": "mace",
+  "schema_version": 1,
+  "steps": 2,
+  "whole_converged": 0,
+  "whole_schedule": {
+    "batches": [
+      {
+        "active_refill": false,
+        "resident_capacity": 4,
+        "system_count": 4
+      }
+    ],
+    "decision": "whole_batch_predicted_to_fit",
+    "memory_budget_bytes": 68719476736,
+    "policy": "auto",
+    "profiling_seconds": 0.0019760201685130596,
+    "total_predicted_bytes": 687568616
+  },
+  "whole_vs_direct_maximum_absolute_difference": {
+    "cell_A": 2.4350720833114385e-18,
+    "energy_eV": 0.0,
+    "force_eV_per_A": 6.139533326177116e-14,
+    "position_A": 1.7763568394002505e-15
+  }
+}

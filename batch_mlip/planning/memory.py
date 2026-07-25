@@ -223,6 +223,15 @@ class BatchPlanner:
             dof_squared=profile.dof_squared,
         ) - math.ceil(coefficients.fixed_bytes)
 
+    def estimate_profiles_bytes(
+        self, profiles: Sequence[SystemProfile]
+    ) -> int:
+        """Estimate peak bytes if all supplied systems are resident together."""
+
+        return math.ceil(self.coefficients.fixed_bytes) + sum(
+            self._incremental_bytes(profile) for profile in profiles
+        )
+
     def _resident_capacity(
         self, profiles: Sequence[SystemProfile]
     ) -> tuple[int, int]:

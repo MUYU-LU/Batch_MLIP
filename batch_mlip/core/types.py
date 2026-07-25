@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 import torch
@@ -79,6 +79,7 @@ class RelaxationResult:
     model_evaluations: int = 0
     graph_evaluations: int = 0
     active_batch_sizes: tuple[int, ...] = ()
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def structures(self) -> list[Any]:

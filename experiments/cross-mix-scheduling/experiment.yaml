@@ -1,0 +1,63 @@
+id: cross-mix-scheduling
+date: 2026-07-25
+baseline_commit: 806910c1c0d6844daea89193bf3606f6c7885471
+hypothesis: >-
+  For a signed heterogeneous variable-cell optimization pool, executing the
+  largest calibrated memory-safe resident batch will outperform fixed FIFO
+  chunks, cost-only buckets, refill-backed planned buckets, and a 32-worker ASE
+  MPS reference without changing the requested optimizer or convergence gate.
+workload:
+  id: OPT-RB-CROSS-MIX-R192-v1
+  systems: 192
+  families: 6
+  atom_counts: [44, 48, 74, 88, 148, 220, 222, 296]
+  variable_cell: true
+matrix:
+  mlips: [atombit_smooth_rms_fp32, mace_off_small]
+  optimizer: bfgs
+  fmax_eV_per_A: 0.05
+  max_steps: 500
+  tensor_policies:
+    - fifo_B64
+    - fifo_B128
+    - fifo_B192
+    - refill_B128
+    - bucketed_B64
+    - planned_B192
+    - auto_B192
+  ase_reference: mps_32_workers
+  repeats: 1
+controls:
+  deterministic_algorithms: true
+  cpu_threads: 1
+  identical_signed_jobs: true
+metrics:
+  - end_to_end_seconds
+  - systems_per_second
+  - peak_allocated_bytes
+  - peak_reserved_bytes
+  - convergence
+  - optimizer_steps
+  - model_evaluations
+  - neighbor_rebuilds
+decision:
+  memory_safety: no_out_of_memory
+  correctness: all_jobs_returned_and_convergence_reported
+  automatic_policy: >-
+    Select the whole pool only when the calibrated estimate is within the
+    configured memory budget; otherwise execute memory-safe planned buckets.
+result:
+  all_capacity_probes_passed: true
+  all_full_optimizations_converged: true
+  recommended_policy:
+    atombit: auto_B192
+    mace: auto_B192
+  speedup_vs_mps32_end_to_end:
+    atombit: 1.6256377119241214
+    mace: 1.2364298499587563
+  speedup_vs_fifo_B64_end_to_end:
+    atombit: 1.2347237892025238
+    mace: 1.1641508853950544
+  refill_decision: >-
+    AtomBit refill is slower. MACE refill is 1.02% faster than auto but raises
+    reserved memory from 49.04 to 75.96 GiB, so it does not pass the 5% gate.

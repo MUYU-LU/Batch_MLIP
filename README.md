@@ -499,8 +499,45 @@ plan = planner.plan(
 
 Each planned bucket reports original system indices, a resident capacity, and a
 predicted peak. Calibration uses `fit_memory_coefficients` with measured batch
-peaks. Planning is an explicit safety tool; it is not automatically applied by
-`relax` because workload-dependent speedups did not pass the project 5% gate.
+peaks. Apply the plan through the same calculator-style relaxation interface:
+
+```python
+result = relax(
+    structures,
+    calculator,
+    optimizer="bfgs",
+    scheduling="auto",
+    planner=planner,
+    cell_filter=FrechetCellFilter(),
+    active_compaction=True,
+    fmax=0.05,
+)
+print(result.metadata["scheduling"])
+```
+
+The automatic policy uses the whole pool when its calibrated allocation is
+within both the byte budget and maximum resident count. Otherwise, it executes
+cost-compatible memory-safe queues, using active refill only when the selected
+optimizer supports it. This policy is opt-in because coefficients are
+model/device/optimizer specific; it does not guess a safe budget.
+
+For a strict ordinary-ASE reference, pass the MLIP's native ASE calculator
+explicitly. A `BatchCalculator` is not silently converted into an ASE
+calculator because that would not preserve the native calculator path:
+
+```python
+from ase.filters import FrechetCellFilter as ASEFrechetCellFilter
+from batch_mlip import relax_ase
+
+reference = relax_ase(
+    structures,
+    native_ase_calculator,
+    optimizer="bfgs",
+    cell_filter=ASEFrechetCellFilter,
+    fmax=0.05,
+    max_steps=500,
+)
+```
 
 The BFGS Hessian costs `O(D^2)` memory and its eigensolve costs `O(D^3)` for
 `D = 3N` fixed-cell or `D = 3N + 9` variable-cell degrees of freedom. It is a

@@ -1,0 +1,529 @@
+{
+  "jobs": 192,
+  "models": [
+    {
+      "capacity_probes": [
+        {
+          "batch_size": 64,
+          "peak_allocated_bytes": 10303672320,
+          "peak_reserved_bytes": 11618222080,
+          "status": "passed"
+        },
+        {
+          "batch_size": 128,
+          "peak_allocated_bytes": 23688449024,
+          "peak_reserved_bytes": 25581060096,
+          "status": "passed"
+        },
+        {
+          "batch_size": 192,
+          "peak_allocated_bytes": 41111412736,
+          "peak_reserved_bytes": 46091206656,
+          "status": "passed"
+        }
+      ],
+      "endpoint_diagnostics_recommended_vs_mps": {
+        "absolute_energy_difference_eV_per_atom": {
+          "maximum": 0.06567405570637096,
+          "median": 6.012073020091514e-06,
+          "p95": 0.0014911411025307338
+        },
+        "absolute_force_maximum_difference_eV_per_A": {
+          "maximum": 0.019272007048130035,
+          "median": 0.0009229574352502823,
+          "p95": 0.009431020542979235
+        },
+        "absolute_step_difference": {
+          "maximum": 129.0,
+          "median": 0.0,
+          "p95": 32.349999999999966
+        },
+        "cell_rmsd_A": {
+          "maximum": 0.43099780396064635,
+          "median": 0.0002658146971039727,
+          "p95": 0.041089316841415785
+        },
+        "convergence_mismatches": 0,
+        "interpretation": "descriptive basin diagnostic; convergence is the full-relaxation gate",
+        "maximum_stress_element_difference_eV_per_A3": {
+          "maximum": 0.005122856004163623,
+          "median": 3.889777326548938e-05,
+          "p95": 0.0009000127058243374
+        },
+        "position_rmsd_A": {
+          "maximum": 0.5029604220518175,
+          "median": 0.001580020189665946,
+          "p95": 0.1608228626036506
+        }
+      },
+      "measured_fastest_gain_over_auto": 0.0,
+      "measured_fastest_policy": "auto_B192",
+      "model": "atombit",
+      "mps32": {
+        "converged": 192,
+        "model_evaluations_total": 15205,
+        "optimizer_steps_total": 15013,
+        "peak_device_memory_bytes": 51881443328,
+        "systems_per_second": 1.567305004855756,
+        "wall_seconds": 122.50327754020691
+      },
+      "predicted_whole_pool_bytes": 50550644230,
+      "recommended_decision": "whole_batch_predicted_to_fit",
+      "recommended_policy": "auto_B192",
+      "recommended_speedup_vs_fifo_B64_end_to_end": 1.2347237892025238,
+      "recommended_speedup_vs_mps_end_to_end": 1.6256377119241214,
+      "tensor_policies": [
+        {
+          "converged": 192,
+          "decision": "fifo",
+          "end_to_end_seconds": 93.04515386465937,
+          "end_to_end_systems_per_second": 2.0635142404007127,
+          "execution_buckets": [
+            {
+              "refill": false,
+              "resident_capacity": 64,
+              "systems": 192
+            }
+          ],
+          "mode": "fifo_B64",
+          "model_evaluations": 954,
+          "neighbor_rebuilds": 452,
+          "optimization_seconds": 92.69569389941171,
+          "optimizer_steps_total": 15410,
+          "peak_allocated_bytes": 17586903552,
+          "peak_reserved_bytes": 65164804096,
+          "speedup_vs_mps_end_to_end": 1.3166003005207174,
+          "speedup_vs_mps_optimization": 1.3215638438732737,
+          "systems_per_second": 2.0712936267389925
+        },
+        {
+          "converged": 192,
+          "decision": "fifo",
+          "end_to_end_seconds": 84.9027733434923,
+          "end_to_end_systems_per_second": 2.2614102277109724,
+          "execution_buckets": [
+            {
+              "refill": false,
+              "resident_capacity": 128,
+              "systems": 192
+            }
+          ],
+          "mode": "fifo_B128",
+          "model_evaluations": 714,
+          "neighbor_rebuilds": 361,
+          "optimization_seconds": 84.55347457807511,
+          "optimizer_steps_total": 15475,
+          "peak_allocated_bytes": 23734796800,
+          "peak_reserved_bytes": 43211816960,
+          "speedup_vs_mps_end_to_end": 1.4428654414455195,
+          "speedup_vs_mps_optimization": 1.4488260612766382,
+          "systems_per_second": 2.270752337004327
+        },
+        {
+          "converged": 192,
+          "decision": "fifo",
+          "end_to_end_seconds": 76.50442159827799,
+          "end_to_end_systems_per_second": 2.5096588666232287,
+          "execution_buckets": [
+            {
+              "refill": false,
+              "resident_capacity": 192,
+              "systems": 192
+            }
+          ],
+          "mode": "fifo_B192",
+          "model_evaluations": 423,
+          "neighbor_rebuilds": 230,
+          "optimization_seconds": 76.15664736600593,
+          "optimizer_steps_total": 15409,
+          "peak_allocated_bytes": 41195160064,
+          "peak_reserved_bytes": 83418415104,
+          "speedup_vs_mps_end_to_end": 1.6012574826520132,
+          "speedup_vs_mps_optimization": 1.608569728016792,
+          "systems_per_second": 2.5211193853801803
+        },
+        {
+          "converged": 192,
+          "decision": "fifo_active_refill",
+          "end_to_end_seconds": 81.55940002715215,
+          "end_to_end_systems_per_second": 2.3541124620347964,
+          "execution_buckets": [
+            {
+              "refill": true,
+              "resident_capacity": 128,
+              "systems": 192
+            }
+          ],
+          "mode": "refill_B128",
+          "model_evaluations": 456,
+          "neighbor_rebuilds": 265,
+          "optimization_seconds": 81.21040569711477,
+          "optimizer_steps_total": 15814,
+          "peak_allocated_bytes": 32367742976,
+          "peak_reserved_bytes": 83680559104,
+          "speedup_vs_mps_end_to_end": 1.50201298071619,
+          "speedup_vs_mps_optimization": 1.5084677448490962,
+          "systems_per_second": 2.364229046165464
+        },
+        {
+          "converged": 192,
+          "decision": "cost_buckets_fixed_capacity",
+          "end_to_end_seconds": 102.78040626319125,
+          "end_to_end_systems_per_second": 1.8680603334875217,
+          "execution_buckets": [
+            {
+              "refill": false,
+              "resident_capacity": 64,
+              "systems": 66
+            },
+            {
+              "refill": false,
+              "resident_capacity": 43,
+              "systems": 43
+            },
+            {
+              "refill": false,
+              "resident_capacity": 46,
+              "systems": 46
+            },
+            {
+              "refill": false,
+              "resident_capacity": 37,
+              "systems": 37
+            }
+          ],
+          "mode": "bucketed_B64",
+          "model_evaluations": 1292,
+          "neighbor_rebuilds": 491,
+          "optimization_seconds": 102.42822139011696,
+          "optimizer_steps_total": 15421,
+          "peak_allocated_bytes": 24746617344,
+          "peak_reserved_bytes": 83240157184,
+          "speedup_vs_mps_end_to_end": 1.191893299453507,
+          "speedup_vs_mps_optimization": 1.195991455066181,
+          "systems_per_second": 1.8744833932899434
+        },
+        {
+          "converged": 192,
+          "decision": "cost_buckets_planned_capacity",
+          "end_to_end_seconds": 94.68978364299983,
+          "end_to_end_systems_per_second": 2.027673869483955,
+          "execution_buckets": [
+            {
+              "refill": false,
+              "resident_capacity": 66,
+              "systems": 66
+            },
+            {
+              "refill": false,
+              "resident_capacity": 43,
+              "systems": 43
+            },
+            {
+              "refill": false,
+              "resident_capacity": 46,
+              "systems": 46
+            },
+            {
+              "refill": false,
+              "resident_capacity": 37,
+              "systems": 37
+            }
+          ],
+          "mode": "planned_B192",
+          "model_evaluations": 1137,
+          "neighbor_rebuilds": 479,
+          "optimization_seconds": 94.34311476489529,
+          "optimizer_steps_total": 15419,
+          "peak_allocated_bytes": 25757400064,
+          "peak_reserved_bytes": 83961577472,
+          "speedup_vs_mps_end_to_end": 1.293732785387595,
+          "speedup_vs_mps_optimization": 1.298486676483888,
+          "systems_per_second": 2.0351246667917144
+        },
+        {
+          "converged": 192,
+          "decision": "whole_batch_predicted_to_fit",
+          "end_to_end_seconds": 75.35705935070291,
+          "end_to_end_systems_per_second": 2.547870121980935,
+          "execution_buckets": [
+            {
+              "refill": false,
+              "resident_capacity": 192,
+              "systems": 192
+            }
+          ],
+          "mode": "auto_B192",
+          "model_evaluations": 423,
+          "neighbor_rebuilds": 230,
+          "optimization_seconds": 75.0101685137488,
+          "optimizer_steps_total": 15409,
+          "peak_allocated_bytes": 41195160064,
+          "peak_reserved_bytes": 83418415104,
+          "speedup_vs_mps_end_to_end": 1.6256377119241214,
+          "speedup_vs_mps_optimization": 1.633155610332391,
+          "systems_per_second": 2.559652961782213
+        }
+      ]
+    },
+    {
+      "capacity_probes": [
+        {
+          "batch_size": 64,
+          "peak_allocated_bytes": 12427122688,
+          "peak_reserved_bytes": 13799260160,
+          "status": "passed"
+        },
+        {
+          "batch_size": 128,
+          "peak_allocated_bytes": 26592048128,
+          "peak_reserved_bytes": 29691478016,
+          "status": "passed"
+        },
+        {
+          "batch_size": 192,
+          "peak_allocated_bytes": 42910021632,
+          "peak_reserved_bytes": 48299507712,
+          "status": "passed"
+        }
+      ],
+      "endpoint_diagnostics_recommended_vs_mps": {
+        "absolute_energy_difference_eV_per_atom": {
+          "maximum": 0.03225534786708357,
+          "median": 1.3150124824746993e-08,
+          "p95": 0.0008285267429528171
+        },
+        "absolute_force_maximum_difference_eV_per_A": {
+          "maximum": 0.028830475207799494,
+          "median": 7.73851367645538e-05,
+          "p95": 0.009048876548622195
+        },
+        "absolute_step_difference": {
+          "maximum": 247.0,
+          "median": 0.0,
+          "p95": 32.89999999999998
+        },
+        "cell_rmsd_A": {
+          "maximum": 0.7993626759395512,
+          "median": 1.9555128049368714e-06,
+          "p95": 0.02318983138350987
+        },
+        "convergence_mismatches": 0,
+        "interpretation": "descriptive basin diagnostic; convergence is the full-relaxation gate",
+        "maximum_stress_element_difference_eV_per_A3": {
+          "maximum": 0.0030406723028270043,
+          "median": 1.7900165215866244e-06,
+          "p95": 0.0005584654341902443
+        },
+        "position_rmsd_A": {
+          "maximum": 1.526805903495248,
+          "median": 2.122510968276879e-05,
+          "p95": 0.10315307167162795
+        }
+      },
+      "measured_fastest_gain_over_auto": 0.010177710194855694,
+      "measured_fastest_policy": "refill_B128",
+      "model": "mace",
+      "mps32": {
+        "converged": 192,
+        "model_evaluations_total": 14521,
+        "optimizer_steps_total": 14361,
+        "peak_device_memory_bytes": 48243933184,
+        "systems_per_second": 2.403575460038652,
+        "wall_seconds": 79.88099528895691
+      },
+      "predicted_whole_pool_bytes": 43736203428,
+      "recommended_decision": "whole_batch_predicted_to_fit",
+      "recommended_policy": "auto_B192",
+      "recommended_speedup_vs_fifo_B64_end_to_end": 1.1641508853950544,
+      "recommended_speedup_vs_mps_end_to_end": 1.2364298499587563,
+      "tensor_policies": [
+        {
+          "converged": 192,
+          "decision": "fifo",
+          "end_to_end_seconds": 75.2113283216022,
+          "end_to_end_systems_per_second": 2.5528069279538808,
+          "execution_buckets": [
+            {
+              "refill": false,
+              "resident_capacity": 64,
+              "systems": 192
+            }
+          ],
+          "mode": "fifo_B64",
+          "model_evaluations": 653,
+          "neighbor_rebuilds": 0,
+          "optimization_seconds": 75.06692315079272,
+          "optimizer_steps_total": 14127,
+          "peak_allocated_bytes": 16399779328,
+          "peak_reserved_bytes": 25830621184,
+          "speedup_vs_mps_end_to_end": 1.0620872822161485,
+          "speedup_vs_mps_optimization": 1.0641304043925417,
+          "systems_per_second": 2.5577177262789204
+        },
+        {
+          "converged": 192,
+          "decision": "fifo",
+          "end_to_end_seconds": 69.96839735191315,
+          "end_to_end_systems_per_second": 2.7440960100074396,
+          "execution_buckets": [
+            {
+              "refill": false,
+              "resident_capacity": 128,
+              "systems": 192
+            }
+          ],
+          "mode": "fifo_B128",
+          "model_evaluations": 481,
+          "neighbor_rebuilds": 0,
+          "optimization_seconds": 69.82413891004398,
+          "optimizer_steps_total": 14033,
+          "peak_allocated_bytes": 26609496064,
+          "peak_reserved_bytes": 32853983232,
+          "speedup_vs_mps_end_to_end": 1.1416725023325507,
+          "speedup_vs_mps_optimization": 1.1440312266774877,
+          "systems_per_second": 2.7497653819599255
+        },
+        {
+          "converged": 192,
+          "decision": "fifo",
+          "end_to_end_seconds": 64.84127129986882,
+          "end_to_end_systems_per_second": 2.9610770447739267,
+          "execution_buckets": [
+            {
+              "refill": false,
+              "resident_capacity": 192,
+              "systems": 192
+            }
+          ],
+          "mode": "fifo_B192",
+          "model_evaluations": 272,
+          "neighbor_rebuilds": 0,
+          "optimization_seconds": 64.6967006828636,
+          "optimizer_steps_total": 14110,
+          "peak_allocated_bytes": 42925465088,
+          "peak_reserved_bytes": 52657389568,
+          "speedup_vs_mps_end_to_end": 1.2319467784574192,
+          "speedup_vs_mps_optimization": 1.2346996747256886,
+          "systems_per_second": 2.967693838688371
+        },
+        {
+          "converged": 192,
+          "decision": "fifo_active_refill",
+          "end_to_end_seconds": 63.955250546336174,
+          "end_to_end_systems_per_second": 3.0020990983514984,
+          "execution_buckets": [
+            {
+              "refill": true,
+              "resident_capacity": 128,
+              "systems": 192
+            }
+          ],
+          "mode": "refill_B128",
+          "model_evaluations": 272,
+          "neighbor_rebuilds": 0,
+          "optimization_seconds": 63.81103347800672,
+          "optimizer_steps_total": 14040,
+          "peak_allocated_bytes": 33046394368,
+          "peak_reserved_bytes": 81560338432,
+          "speedup_vs_mps_end_to_end": 1.2490138746479054,
+          "speedup_vs_mps_optimization": 1.2518367268959671,
+          "systems_per_second": 3.0088840367422542
+        },
+        {
+          "converged": 192,
+          "decision": "cost_buckets_fixed_capacity",
+          "end_to_end_seconds": 79.37911532912403,
+          "end_to_end_systems_per_second": 2.4187722325188927,
+          "execution_buckets": [
+            {
+              "refill": false,
+              "resident_capacity": 64,
+              "systems": 80
+            },
+            {
+              "refill": false,
+              "resident_capacity": 40,
+              "systems": 40
+            },
+            {
+              "refill": false,
+              "resident_capacity": 64,
+              "systems": 72
+            }
+          ],
+          "mode": "bucketed_B64",
+          "model_evaluations": 884,
+          "neighbor_rebuilds": 0,
+          "optimization_seconds": 79.23512774892151,
+          "optimizer_steps_total": 13984,
+          "peak_allocated_bytes": 24866136576,
+          "peak_reserved_bytes": 29406265344,
+          "speedup_vs_mps_end_to_end": 1.0063225693276117,
+          "speedup_vs_mps_optimization": 1.008151277828213,
+          "systems_per_second": 2.4231676713945016
+        },
+        {
+          "converged": 192,
+          "decision": "cost_buckets_planned_capacity",
+          "end_to_end_seconds": 71.83329596696422,
+          "end_to_end_systems_per_second": 2.672855218676028,
+          "execution_buckets": [
+            {
+              "refill": false,
+              "resident_capacity": 80,
+              "systems": 80
+            },
+            {
+              "refill": false,
+              "resident_capacity": 40,
+              "systems": 40
+            },
+            {
+              "refill": false,
+              "resident_capacity": 72,
+              "systems": 72
+            }
+          ],
+          "mode": "planned_B192",
+          "model_evaluations": 599,
+          "neighbor_rebuilds": 0,
+          "optimization_seconds": 71.68895098101348,
+          "optimizer_steps_total": 14180,
+          "peak_allocated_bytes": 31581665792,
+          "peak_reserved_bytes": 37429968896,
+          "speedup_vs_mps_end_to_end": 1.1120329954746027,
+          "speedup_vs_mps_optimization": 1.114272062791281,
+          "systems_per_second": 2.678236985931771
+        },
+        {
+          "converged": 192,
+          "decision": "whole_batch_predicted_to_fit",
+          "end_to_end_seconds": 64.60616855183616,
+          "end_to_end_systems_per_second": 2.971852445420139,
+          "execution_buckets": [
+            {
+              "refill": false,
+              "resident_capacity": 192,
+              "systems": 192
+            }
+          ],
+          "mode": "auto_B192",
+          "model_evaluations": 272,
+          "neighbor_rebuilds": 0,
+          "optimization_seconds": 64.46177533082664,
+          "optimizer_steps_total": 14110,
+          "peak_allocated_bytes": 42925465088,
+          "peak_reserved_bytes": 52657389568,
+          "speedup_vs_mps_end_to_end": 1.2364298499587563,
+          "speedup_vs_mps_optimization": 1.239199430654783,
+          "systems_per_second": 2.978509341615706
+        }
+      ]
+    }
+  ],
+  "schema_version": 1,
+  "selection_rule": "retain safe whole-pool auto when it is within 5% of the measured fastest fully converged point; one timing is insufficient to trade substantial memory headroom for a smaller difference",
+  "timing_repeats": 1,
+  "workload_id": "OPT-RB-CROSS-MIX-R192-v1"
+}
