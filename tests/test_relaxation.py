@@ -146,7 +146,13 @@ def test_fire_refill_preserves_state_and_original_output_order():
     systems = [Atoms("H", positions=[[x, 0.0, 0.0]]) for x in (1e-8, 0.2, 0.4, 0.8)]
     potential = AtomBitBatchCalculator(QuadraticWellModel(k=1.0), device="cpu", dtype=torch.float64)
 
-    def run(*, refill_storage: str, refill_interval: int = 1):
+    def run(
+        *,
+        refill_storage: str,
+        refill_batch_size: int = 2,
+        refill_interval: int = 1,
+        refill_tail_compaction_threshold: float | None = None,
+    ):
         state = AseGraphBatch.from_ase(systems, cutoff=2.5, device="cpu", dtype=torch.float64)
         return batched_fire_relax(
             state,
@@ -155,10 +161,11 @@ def test_fire_refill_preserves_state_and_original_output_order():
             max_steps=500,
             dt_start=0.05,
             dt_max=0.5,
-            refill_batch_size=2,
+            refill_batch_size=refill_batch_size,
             refill_storage=refill_storage,
             refill_min_chunk=1,
             refill_interval=refill_interval,
+            refill_tail_compaction_threshold=refill_tail_compaction_threshold,
         )
 
     repack = run(refill_storage="repack")
@@ -179,6 +186,18 @@ def test_fire_refill_preserves_state_and_original_output_order():
     assert max(slots.active_batch_sizes) == 2
     assert slots.active_batch_sizes[-1] == 1
 
+    tail_control = run(refill_storage="slots", refill_batch_size=4)
+    tail = run(
+        refill_storage="slots",
+        refill_batch_size=4,
+        refill_tail_compaction_threshold=0.5,
+    )
+    torch.testing.assert_close(tail.converged_step, tail_control.converged_step)
+    torch.testing.assert_close(tail.state.positions, tail_control.state.positions)
+    torch.testing.assert_close(tail.evaluation.energy, tail_control.evaluation.energy)
+    torch.testing.assert_close(tail.evaluation.forces, tail_control.evaluation.forces)
+    assert tail.graph_evaluations > tail_control.graph_evaluations
+
 
 def test_fire_rejects_invalid_refill_interval():
     potential = AtomBitBatchCalculator(
@@ -193,3 +212,18 @@ def test_fire_rejects_invalid_refill_interval():
         batched_fire_relax(state, potential, refill_interval=0)
     with pytest.raises(ValueError, match="require refill_batch_size"):
         batched_fire_relax(state, potential, refill_interval=2)
+    with pytest.raises(ValueError, match="refill_tail_compaction_threshold must be"):
+        batched_fire_relax(
+            state,
+            potential,
+            refill_batch_size=1,
+            refill_tail_compaction_threshold=0.0,
+        )
+    with pytest.raises(ValueError, match="tail compaction requires"):
+        batched_fire_relax(
+            state,
+            potential,
+            refill_batch_size=1,
+            refill_interval=2,
+            refill_tail_compaction_threshold=0.5,
+        )

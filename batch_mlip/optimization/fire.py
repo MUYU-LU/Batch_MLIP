@@ -904,6 +904,7 @@ def _batched_fire_refill_relax(
     refill_low_watermark: float,
     refill_min_chunk: int,
     refill_interval: int,
+    refill_tail_compaction_threshold: float | None,
     cell_filter: FrechetCellFilter | None,
     smax: float | None,
     callback: StepCallback | None,
@@ -1033,6 +1034,7 @@ def _batched_fire_refill_relax(
         full_energy = full_energy.to(evaluation.energy.dtype)
     active_batch_sizes = [active_state.n_systems]
     scheduler_step = 0
+    tail_reference_size = active_state.n_systems
 
     while True:
         if active_filter is not None and (
@@ -1116,10 +1118,20 @@ def _batched_fire_refill_relax(
 
         resident_finished = finished[active_system_ids]
         ready_local_ids = torch.nonzero(~resident_finished, as_tuple=False).flatten()
-        refill_due = bool(resident_finished.any()) and (
-            (scheduler_step + 1) % refill_interval == 0
-            or not bool((~resident_finished).any())
-        )
+        ready_count = ready_local_ids.numel()
+        if refill_tail_compaction_threshold is None:
+            refill_due = bool(resident_finished.any()) and (
+                (scheduler_step + 1) % refill_interval == 0
+                or not bool((~resident_finished).any())
+            )
+        elif next_pending < n_systems:
+            refill_due = bool(resident_finished.any())
+        else:
+            tail_limit = max(
+                1,
+                int(tail_reference_size * refill_tail_compaction_threshold),
+            )
+            refill_due = bool(resident_finished.any()) and ready_count <= tail_limit
         if refill_due:
             systems_before = active_state.n_systems
             remaining_local = torch.nonzero(~resident_finished, as_tuple=False).flatten()
@@ -1263,6 +1275,10 @@ def _batched_fire_refill_relax(
                 optimizer="fire",
                 policy=refill_policy,
                 interval=refill_interval,
+                tail_compaction_threshold=refill_tail_compaction_threshold,
+                tail_compaction=(
+                    refill_tail_compaction_threshold is not None and pending_before == 0
+                ),
                 low_watermark=refill_low_watermark,
                 min_chunk=refill_min_chunk,
                 scheduler_step=scheduler_step,
@@ -1274,6 +1290,8 @@ def _batched_fire_refill_relax(
                 systems_after=active_state.n_systems,
                 pending_after=n_systems - next_pending,
             )
+            if refill_tail_compaction_threshold is not None and next_pending == n_systems:
+                tail_reference_size = active_state.n_systems
 
         with profile_phase(
             "optimizer.fire_update",
@@ -1461,6 +1479,7 @@ def batched_fire_relax(
     refill_low_watermark: float = 0.8,
     refill_min_chunk: int | None = None,
     refill_interval: int = 1,
+    refill_tail_compaction_threshold: float | None = None,
 ) -> RelaxationResult:
     """Relax independent systems with optional removal of converged graphs.
 
@@ -1503,10 +1522,21 @@ def batched_fire_relax(
         or refill_interval <= 0
     ):
         raise ValueError("refill_interval must be a positive integer")
+    if refill_tail_compaction_threshold is not None and not (
+        0.0 < refill_tail_compaction_threshold < 1.0
+    ):
+        raise ValueError("refill_tail_compaction_threshold must be in (0, 1) or None")
+    if refill_tail_compaction_threshold is not None and (
+        refill_policy != "immediate" or refill_interval != 1
+    ):
+        raise ValueError(
+            "tail compaction requires refill_policy='immediate' and refill_interval=1"
+        )
     if refill_batch_size is None and (
         refill_policy != "immediate"
         or refill_min_chunk is not None
         or refill_interval != 1
+        or refill_tail_compaction_threshold is not None
     ):
         raise ValueError("refill policy options require refill_batch_size")
     if refill_batch_size is not None:
@@ -1528,6 +1558,7 @@ def batched_fire_relax(
                 max(8, refill_batch_size // 8) if refill_min_chunk is None else refill_min_chunk
             ),
             refill_interval=refill_interval,
+            refill_tail_compaction_threshold=refill_tail_compaction_threshold,
             cell_filter=cell_filter,
             smax=smax,
             callback=callback,

@@ -1,0 +1,15 @@
+file,model,workload,batch_size,mode,requested_config,reported_backend,wall_time_s,peak_allocated_GiB,peak_reserved_GiB,current_reserved_GiB,inactive_split_peak_GiB,allocation_retries,out_of_memory_count,effective_control
+atombit_bfgs_H276_B176_expandable_effective.json,atombit,OPT-H276-R256-v1,176,immediate,expandable_segments:True,native,88.99277873104438,64.01943635940552,71.123046875,71.123046875,0.0,0,0,True
+atombit_bfgs_H276_B176_native.json,atombit,OPT-H276-R256-v1,176,immediate,,native,90.15844522602856,64.03027820587158,78.029296875,73.86328125,19.18070888519287,8,0,True
+atombit_bfgs_H46_B128_immediate_cuda_malloc_async.json,atombit,OPT-H46-R256-v1,128,immediate,backend:cudaMallocAsync,,59.816383086144924,9.051275730133057,78.154296875,16.3515625,2.964690685272217,1,0,False
+atombit_bfgs_H46_B128_immediate_cuda_malloc_async_effective.json,atombit,OPT-H46-R256-v1,128,immediate,backend:cudaMallocAsync,cudaMallocAsync,65.26323798624799,9.037351888604462,9.6875,9.6875,0.0,0,0,True
+atombit_bfgs_H46_B128_immediate_expandable_effective.json,atombit,OPT-H46-R256-v1,128,immediate,expandable_segments:True,native,60.38672995939851,9.037543296813965,10.072265625,10.072265625,0.0,0,0,True
+atombit_bfgs_H46_B128_immediate_gc80.json,atombit,OPT-H46-R256-v1,128,immediate,garbage_collection_threshold:0.8,,60.28564687585458,9.051275730133057,78.154296875,16.3515625,2.964690685272217,1,0,False
+atombit_bfgs_H46_B128_immediate_gc80_effective.json,atombit,OPT-H46-R256-v1,128,immediate,garbage_collection_threshold:0.8,native,60.34869568422437,9.051275730133057,78.154296875,16.3515625,2.964690685272217,1,0,True
+atombit_bfgs_H46_B128_immediate_native.json,atombit,OPT-H46-R256-v1,128,immediate,,,60.69168568402529,9.051275730133057,78.154296875,16.3515625,2.964690685272217,1,0,True
+atombit_bfgs_H46_B128_tail75_expandable_effective.json,atombit,OPT-H46-R256-v1,128,tail,expandable_segments:True,native,60.38286342099309,9.311578273773193,10.072265625,10.072265625,0.0,0,0,True
+atombit_bfgs_H46_B128_tail75_native.json,atombit,OPT-H46-R256-v1,128,tail,,,60.34972328413278,9.316993713378906,78.154296875,16.3515625,3.1240949630737305,1,0,True
+mace_bfgs_H276_B176_expandable_effective.json,mace,OPT-H276-R256-v1,176,immediate,expandable_segments:True,native,144.84555083001032,69.48316431045532,77.970703125,77.970703125,0.0,5,0,True
+mace_bfgs_H276_B176_native.json,mace,OPT-H276-R256-v1,176,immediate,,native,143.0993061591871,69.49611854553223,76.66015625,76.66015625,37.53974103927612,1,0,True
+mace_bfgs_H46_B128_immediate_native.json,mace,OPT-H46-R256-v1,128,immediate,,,73.52525676693767,8.531838417053223,10.74609375,10.74609375,3.5391407012939453,0,0,True
+mace_bfgs_H46_B128_tail75_native.json,mace,OPT-H46-R256-v1,128,tail,,,76.98029160266742,8.720494747161865,10.74609375,10.74609375,3.5410280227661133,0,0,True

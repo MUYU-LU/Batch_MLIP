@@ -314,6 +314,7 @@ def test_variable_cell_bfgs_refill_policies_preserve_state_and_output_order():
         refill_policy: str = "immediate",
         refill_storage: str = "repack",
         refill_interval: int = 1,
+        refill_tail_compaction_threshold: float | None = None,
         linear_algebra_backend: str = "auto",
     ):
         calculator = ASECalculatorAdapter(
@@ -328,6 +329,7 @@ def test_variable_cell_bfgs_refill_policies_preserve_state_and_output_order():
             refill_policy=refill_policy,
             refill_storage=refill_storage,
             refill_interval=refill_interval,
+            refill_tail_compaction_threshold=refill_tail_compaction_threshold,
             refill_low_watermark=0.5,
             refill_min_chunk=(1 if refill_batch_size is not None else None),
             fmax=2e-5,
@@ -375,6 +377,20 @@ def test_variable_cell_bfgs_refill_policies_preserve_state_and_output_order():
         if name != "periodic":
             assert refill.active_batch_sizes[-1] == 1
     assert results["periodic"].graph_evaluations > results["slots"].graph_evaluations
+
+    tail_control = run(refill_batch_size=4, refill_storage="slots")
+    tail = run(
+        refill_batch_size=4,
+        refill_storage="slots",
+        refill_tail_compaction_threshold=0.5,
+    )
+    torch.testing.assert_close(tail.converged_step, tail_control.converged_step)
+    torch.testing.assert_close(tail.state.positions, tail_control.state.positions)
+    torch.testing.assert_close(tail.state.cells, tail_control.state.cells)
+    torch.testing.assert_close(tail.evaluation.energy, tail_control.evaluation.energy)
+    torch.testing.assert_close(tail.evaluation.forces, tail_control.evaluation.forces)
+    torch.testing.assert_close(tail.evaluation.stress, tail_control.evaluation.stress)
+    assert tail.graph_evaluations > tail_control.graph_evaluations
 
 
 @pytest.mark.parametrize(
@@ -622,6 +638,22 @@ def test_refill_preserves_survivor_neighbor_cache(monkeypatch):
         ),
         ({"refill_interval": 0}, "refill_interval must be"),
         ({"refill_interval": 2}, "require refill_batch_size"),
+        (
+            {"refill_batch_size": 1, "refill_tail_compaction_threshold": 1.0},
+            "refill_tail_compaction_threshold must be",
+        ),
+        (
+            {
+                "refill_batch_size": 1,
+                "refill_interval": 2,
+                "refill_tail_compaction_threshold": 0.5,
+            },
+            "tail compaction requires",
+        ),
+        (
+            {"refill_tail_compaction_threshold": 0.5},
+            "require refill_batch_size",
+        ),
     ],
 )
 def test_bfgs_rejects_invalid_options(kwargs, error):

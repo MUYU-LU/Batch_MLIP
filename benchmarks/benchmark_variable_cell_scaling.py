@@ -191,6 +191,7 @@ def run_batch(
     refill_low_watermark: float = 0.8,
     refill_min_chunk: int | None = None,
     refill_interval: int = 1,
+    refill_tail_compaction_threshold: float | None = None,
     linear_algebra_backend: str = "auto",
 ) -> dict[str, Any]:
     calculator = AtomBitBatchCalculator(
@@ -237,6 +238,7 @@ def run_batch(
                 refill_low_watermark=refill_low_watermark,
                 refill_min_chunk=refill_min_chunk,
                 refill_interval=refill_interval,
+                refill_tail_compaction_threshold=refill_tail_compaction_threshold,
                 **common,
             )
         elif optimizer_name == "bfgs":
@@ -251,6 +253,7 @@ def run_batch(
                 refill_low_watermark=refill_low_watermark,
                 refill_min_chunk=refill_min_chunk,
                 refill_interval=refill_interval,
+                refill_tail_compaction_threshold=refill_tail_compaction_threshold,
                 linear_algebra_backend=linear_algebra_backend,
                 **common,
             )
@@ -380,6 +383,7 @@ def main() -> None:
     parser.add_argument("--refill-low-watermark", type=float, default=0.8)
     parser.add_argument("--refill-min-chunk", type=int)
     parser.add_argument("--refill-interval", type=int, default=1)
+    parser.add_argument("--refill-tail-compaction-threshold", type=float)
     parser.add_argument(
         "--linear-algebra-backend",
         choices=("auto", "cholesky", "grouped", "serial"),
@@ -486,6 +490,7 @@ def main() -> None:
             "refill_low_watermark": args.refill_low_watermark,
             "refill_min_chunk": args.refill_min_chunk,
             "refill_interval": args.refill_interval,
+            "refill_tail_compaction_threshold": args.refill_tail_compaction_threshold,
             "linear_algebra_backend": args.linear_algebra_backend,
         },
         "points": [],
@@ -541,6 +546,9 @@ def main() -> None:
                         refill_low_watermark=args.refill_low_watermark,
                         refill_min_chunk=args.refill_min_chunk,
                         refill_interval=args.refill_interval,
+                        refill_tail_compaction_threshold=(
+                            args.refill_tail_compaction_threshold
+                        ),
                         linear_algebra_backend=args.linear_algebra_backend,
                     )
 

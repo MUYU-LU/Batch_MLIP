@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import gc
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -76,6 +77,27 @@ def _timed(fn, *, device: torch.device) -> tuple[Any, float]:
     return output, time.perf_counter() - started
 
 
+def _allocator_metrics(device: torch.device) -> dict[str, Any]:
+    if device.type != "cuda":
+        return {}
+    stats = torch.cuda.memory_stats(device)
+    return {
+        "cuda_allocator_config": (
+            os.environ.get("PYTORCH_ALLOC_CONF")
+            or os.environ.get("PYTORCH_CUDA_ALLOC_CONF")
+        ),
+        "cuda_allocator_backend": torch.cuda.memory.get_allocator_backend(),
+        "allocated_bytes_current": int(stats.get("allocated_bytes.all.current", 0)),
+        "reserved_bytes_current": int(stats.get("reserved_bytes.all.current", 0)),
+        "inactive_split_bytes_current": int(
+            stats.get("inactive_split_bytes.all.current", 0)
+        ),
+        "inactive_split_bytes_peak": int(stats.get("inactive_split_bytes.all.peak", 0)),
+        "allocation_retries": int(stats.get("num_alloc_retries", 0)),
+        "out_of_memory_count": int(stats.get("num_ooms", 0)),
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mlip", choices=("atombit", "mace"), required=True)
@@ -98,6 +120,7 @@ def main() -> None:
         default="repack",
     )
     parser.add_argument("--refill-interval", type=int, default=1)
+    parser.add_argument("--refill-tail-compaction-threshold", type=float)
     parser.add_argument("--cpu-threads", type=int, default=1)
     parser.add_argument("--deterministic", action="store_true")
     parser.add_argument("--profile-runtime", action="store_true")
@@ -133,6 +156,10 @@ def main() -> None:
         parser.error("CPU thread count must be positive")
     if args.refill_interval <= 0:
         parser.error("refill interval must be positive")
+    if args.refill_tail_compaction_threshold is not None and not (
+        0.0 < args.refill_tail_compaction_threshold < 1.0
+    ):
+        parser.error("refill tail compaction threshold must be in (0, 1)")
     if args.job_limit is not None and args.job_limit <= 0:
         parser.error("job limit must be positive")
     if args.method == "refill" and args.optimizer == "bfgslinesearch":
@@ -195,6 +222,7 @@ def main() -> None:
                 refill_storage=args.refill_storage,
                 refill_min_chunk=1 if args.method == "refill" else None,
                 refill_interval=args.refill_interval,
+                refill_tail_compaction_threshold=args.refill_tail_compaction_threshold,
                 linear_algebra_backend=args.linear_algebra_backend,
                 **common,
             )
@@ -227,6 +255,7 @@ def main() -> None:
                 refill_storage=args.refill_storage,
                 refill_min_chunk=1 if args.method == "refill" else None,
                 refill_interval=args.refill_interval,
+                refill_tail_compaction_threshold=args.refill_tail_compaction_threshold,
                 linear_algebra_backend=args.linear_algebra_backend,
                 **common,
             )
@@ -269,6 +298,9 @@ def main() -> None:
         "batch_size": None if args.method == "ase" else args.batch_size,
         "refill_storage": (args.refill_storage if args.method == "refill" else None),
         "refill_interval": (args.refill_interval if args.method == "refill" else None),
+        "refill_tail_compaction_threshold": (
+            args.refill_tail_compaction_threshold if args.method == "refill" else None
+        ),
         "fmax_eV_per_A": args.fmax,
         "max_steps": args.max_steps,
         "linear_algebra_backend": args.linear_algebra_backend,
@@ -279,6 +311,7 @@ def main() -> None:
         "systems_per_second": (None if elapsed is None else len(systems) / elapsed),
         "peak_allocated_bytes": torch.cuda.max_memory_allocated(device),
         "peak_reserved_bytes": torch.cuda.max_memory_reserved(device),
+        "allocator_metrics": _allocator_metrics(device),
         "environment": environment_metadata(device),
         **model_info,
         **output,

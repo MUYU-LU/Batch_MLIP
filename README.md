@@ -464,6 +464,26 @@ Values above one are experimental: they reduce scheduler mutations but spend
 extra model work on frozen graphs, and the measured H46 matrix did not justify
 automatic selection.
 
+`refill_tail_compaction_threshold` is a separate experimental control. It
+keeps immediate admission while pending jobs exist, then compacts the
+queue-empty tail geometrically at the requested occupancy fraction. The
+measured 50% and 75% thresholds did not produce a reproducible speedup, so the
+default remains `None`.
+
+AtomBit variable-cell BFGS with changing graph sizes should be launched with
+expandable CUDA allocator segments. On the validated PyTorch 2.9.1
+environment, set both compatibility variables before Python starts:
+
+```bash
+PYTORCH_ALLOC_CONF=expandable_segments:True \
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
+python your_relaxation.py
+```
+
+This reduced measured H46 B128 peak reserve from `78.15 GiB` to `10.07 GiB`
+without slowing the calculation. MACE did not benefit, so its default remains
+the native allocator.
+
 BFGS also accepts the experimental `refill_storage="arena"` mode for
 heterogeneous residents. It alternates between two reusable compact graph
 stores, preserving per-job Hessians and neighbor-cache state without padded

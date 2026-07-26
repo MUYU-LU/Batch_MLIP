@@ -1,0 +1,83 @@
+id: hybrid-tail-compaction
+date: 2026-07-26
+baseline_commit: e0b6c561977532d4a61459b83a250dd6f508bd9d
+hypothesis: >-
+  Immediate admission while pending jobs exist, followed by geometric
+  low-watermark compaction after the queue drains, can remove repeated
+  end-of-pool scheduler mutations without wasting inference on frozen slots
+  during the throughput-critical refill phase.
+mechanism:
+  parameter: refill_tail_compaction_threshold
+  control: null
+  candidates: [0.75, 0.5]
+  semantics: >-
+    Pending jobs always replace finished residents immediately. Once no pending
+    job remains, finished residents are frozen and physical compaction occurs
+    only when the unfinished population falls below the selected fraction of
+    the population at the previous tail compaction.
+stage_1:
+  workload: OPT-H46-R256-v1
+  models: [atombit_smooth_rms_fp32, mace_off_small]
+  optimizers: [bfgs, fire]
+  resident_batch_sizes: [64, 128]
+  tail_thresholds: [null, 0.75, 0.5]
+  timing_repeats: 1
+stage_2_allocator:
+  question: >-
+    Is the allocated/reserved gap harmful fragmentation, or reusable PyTorch
+    caching that should remain untouched?
+  workload: OPT-H276-R256-v1
+  models: [atombit_smooth_rms_fp32, mace_off_small]
+  optimizer: bfgs
+  resident_batch_size: 176
+  allocator_variants: [native_default, expandable_segments]
+  timing_repeats: 1
+  trim_cache_condition: >-
+    Add and test runtime cache trimming only if inactive split blocks exceed
+    5 percent of device memory, an allocation retry or OOM occurs, or the
+    allocator variant changes the maximum safe resident capacity.
+controls:
+  deterministic_algorithms: true
+  cublas_workspace_config: ":4096:8"
+  fmax_eV_per_A: 0.05
+  bfgs_max_steps: 500
+  fire_max_steps: 2000
+  memory_gate_fraction: 0.85
+correctness_gates:
+  - all 256 systems converge
+  - convergence flags match immediate refill
+  - endpoint energy difference stays within 1 meV per atom
+  - finished residents never take another optimizer step
+performance_gates:
+  - at least 1.02x end-to-end speedup versus immediate refill
+  - peak allocated memory remains below the 85 percent device-memory gate
+metrics:
+  - wall_time_s
+  - systems_per_second
+  - graph_evaluations
+  - frozen_graph_evaluations
+  - refill_events
+  - tail_compaction_events
+  - scheduler_time_s
+  - peak_allocated_GiB
+  - peak_reserved_GiB
+  - current_allocated_GiB
+  - current_reserved_GiB
+  - inactive_split_current_GiB
+  - inactive_split_peak_GiB
+  - allocation_retries
+  - out_of_memory_count
+decision_rule: >-
+  Keep immediate refill and the current allocator as defaults unless a candidate
+  passes correctness and the 2 percent speed gate. Do not treat reserved cache
+  alone as fragmentation.
+outcome:
+  tail_compaction: >-
+    Rejected for automatic selection. The only initial candidate did not
+    reproduce under matched native and effective-expandable allocator controls.
+  allocator: >-
+    Effective expandable segments are selected for AtomBit variable-cell BFGS.
+    Native allocation remains selected for MACE.
+  environment_finding: >-
+    On the measured PyTorch 2.9.1 build, PYTORCH_ALLOC_CONF did not activate the
+    requested options, while the deprecated PYTORCH_CUDA_ALLOC_CONF did.
