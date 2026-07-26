@@ -81,6 +81,8 @@ def test_runtime_profile_projection_uses_existing_phase_names():
                 "model.autograd": {"total_seconds": 0.3},
                 "graph.neighbor_search": {"total_seconds": 0.5},
                 "scheduler.refill_repack": {"total_seconds": 0.2},
+                "scheduler.refill_slot_swap": {"total_seconds": 0.03},
+                "scheduler.refill_arena": {"total_seconds": 0.07},
             },
             "events": [
                 {
@@ -105,7 +107,7 @@ def test_runtime_profile_projection_uses_existing_phase_names():
     assert fields["wall_time_s"] == 4.0
     assert fields["kernel_time_s"] == pytest.approx(1.5)
     assert fields["neighbor_time_s"] == 0.5
-    assert fields["pack_time_s"] == 0.2
+    assert fields["pack_time_s"] == pytest.approx(0.3)
     assert fields["peak_allocated_GB"] == 2.0
     assert fields["total_model_calls"] == 2
     assert fields["total_neighbor_rebuilds"] == 1

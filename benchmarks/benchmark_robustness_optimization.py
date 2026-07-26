@@ -40,7 +40,11 @@ from benchmark_variable_cell_scaling import (  # noqa: E402
     run_batch as run_atombit_batch,
 )
 
-from batch_mlip import AtomBitBatchCalculator, MACEBatchCalculator  # noqa: E402
+from batch_mlip import (  # noqa: E402
+    AtomBitBatchCalculator,
+    MACEBatchCalculator,
+    RuntimeProfiler,
+)
 from batch_mlip.workloads import read_workload_manifest  # noqa: E402
 
 
@@ -90,11 +94,12 @@ def main() -> None:
     parser.add_argument("--batch-size", type=int, default=64)
     parser.add_argument(
         "--refill-storage",
-        choices=("repack", "slots"),
+        choices=("repack", "slots", "arena"),
         default="repack",
     )
     parser.add_argument("--cpu-threads", type=int, default=1)
     parser.add_argument("--deterministic", action="store_true")
+    parser.add_argument("--profile-runtime", action="store_true")
     parser.add_argument(
         "--job-limit",
         type=int,
@@ -228,12 +233,19 @@ def main() -> None:
         compute_stress=True,
     )
     try:
-        output, elapsed = _timed(execute, device=device)
+        if args.profile_runtime:
+            with RuntimeProfiler(device=device) as profiler:
+                output, elapsed = _timed(execute, device=device)
+            runtime_profile = profiler.summary()
+        else:
+            output, elapsed = _timed(execute, device=device)
+            runtime_profile = None
         status = "passed"
         error = None
     except torch.OutOfMemoryError as exc:
         output = {}
         elapsed = None
+        runtime_profile = None
         status = "oom"
         error = str(exc)
     result = {
@@ -256,6 +268,7 @@ def main() -> None:
         "linear_algebra_backend": args.linear_algebra_backend,
         "deterministic_algorithms": args.deterministic,
         "cpu_threads": args.cpu_threads,
+        "runtime_profile": runtime_profile,
         "timing_seconds": elapsed,
         "systems_per_second": (None if elapsed is None else len(systems) / elapsed),
         "peak_allocated_bytes": torch.cuda.max_memory_allocated(device),

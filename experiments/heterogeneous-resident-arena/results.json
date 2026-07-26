@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "baseline_commit": "2bbce48",
+  "decision": "retain_explicit_experimental_bfgs_mode_only",
+  "automatic_selection": false,
+  "correctness": {
+    "jobs_compared": 768,
+    "source_order_mismatches": 0,
+    "convergence_mismatches": 0,
+    "step_count_mismatches": 0,
+    "max_energy_difference_eV": 0.0,
+    "max_force_difference_eV_per_A": 0.0,
+    "max_stress_difference_eV_per_A3": 0.0,
+    "max_position_difference_A": 0.0,
+    "max_cell_difference_A": 0.0
+  },
+  "runs": [
+    {
+      "workload": "OPT-RB-ROFA-MIX-R256-v1",
+      "mlip": "atombit_smooth_rms_fp32",
+      "batch_size": 128,
+      "storage": "repack",
+      "wall_seconds": 49.155047765001655,
+      "systems_per_second": 5.208010400556904,
+      "refill_seconds": 0.5542577965259552,
+      "refill_events": 25,
+      "peak_allocated_bytes": 32158157312,
+      "peak_reserved_bytes": 83636518912
+    },
+    {
+      "workload": "OPT-RB-ROFA-MIX-R256-v1",
+      "mlip": "atombit_smooth_rms_fp32",
+      "batch_size": 128,
+      "storage": "arena",
+      "wall_seconds": 49.733113368973136,
+      "systems_per_second": 5.147475849756674,
+      "refill_seconds": 0.4261286348104479,
+      "refill_events": 25,
+      "peak_allocated_bytes": 32187467776,
+      "peak_reserved_bytes": 83617644544
+    },
+    {
+      "workload": "OPT-MIX4-R256-v1",
+      "mlip": "atombit_smooth_rms_fp32",
+      "batch_size": 64,
+      "storage": "repack",
+      "wall_seconds": 111.52324657002464,
+      "systems_per_second": 2.295485541117739,
+      "refill_seconds": 4.394680076122288,
+      "refill_events": 209,
+      "peak_allocated_bytes": 15040803840,
+      "peak_reserved_bytes": 56226742272
+    },
+    {
+      "workload": "OPT-MIX4-R256-v1",
+      "mlip": "atombit_smooth_rms_fp32",
+      "batch_size": 64,
+      "storage": "arena",
+      "wall_seconds": 110.67271027062088,
+      "systems_per_second": 2.313126690166163,
+      "refill_seconds": 3.8828963543176647,
+      "refill_events": 209,
+      "peak_allocated_bytes": 15086278656,
+      "peak_reserved_bytes": 56226742272
+    },
+    {
+      "workload": "OPT-MIX4-R256-v1",
+      "mlip": "mace_off_small",
+      "batch_size": 64,
+      "storage": "repack",
+      "wall_seconds": 127.25142750190571,
+      "systems_per_second": 2.0117652510905324,
+      "refill_seconds": 2.6125911360979064,
+      "refill_events": 197,
+      "peak_allocated_bytes": 14813553664,
+      "peak_reserved_bytes": 18572378112
+    },
+    {
+      "workload": "OPT-MIX4-R256-v1",
+      "mlip": "mace_off_small",
+      "batch_size": 64,
+      "storage": "arena",
+      "wall_seconds": 125.83530279994011,
+      "systems_per_second": 2.0344052448222967,
+      "refill_seconds": 3.0242672967314723,
+      "refill_events": 197,
+      "peak_allocated_bytes": 14813553664,
+      "peak_reserved_bytes": 18574475264
+    }
+  ],
+  "gates": {
+    "pack_time_reduction_min": 0.3,
+    "end_to_end_improvement_min": 0.05,
+    "rofa_pack_time_reduction": 0.231185,
+    "rofa_end_to_end_improvement": -0.01176,
+    "atombit_mix4_pack_time_reduction": 0.11645528524028614,
+    "atombit_mix4_end_to_end_improvement": 0.007626538193269972,
+    "mace_mix4_pack_time_reduction": -0.15757389472293548,
+    "mace_mix4_end_to_end_improvement": 0.011128556510255239,
+    "passed": false
+  }
+}

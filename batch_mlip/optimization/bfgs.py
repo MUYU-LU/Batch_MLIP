@@ -9,6 +9,7 @@ from typing import cast
 
 import torch
 
+from ..core.arena import HeterogeneousResidentArena, SystemSelection
 from ..core.calculator import BatchCalculator
 from ..core.state import AseGraphBatch
 from ..core.types import BatchEvaluation, RelaxationResult, StepCallback
@@ -27,6 +28,8 @@ from .refill import (
 from .refill import (
     refill_insert_count as _refill_insert_count,
 )
+
+_REFILL_STORAGE_MODES = _REFILL_STORAGE_MODES | frozenset(("arena",))
 
 
 @dataclass
@@ -451,6 +454,9 @@ def batched_bfgs_relax(
     with per-system eigen fallback. CPU calculations retain the serial
     ASE-compatible path. ``refill_storage="slots"`` overwrites completed
     equal-size resident slots and safely falls back to repacking otherwise.
+    ``refill_storage="arena"`` uses reusable compact double buffers for
+    heterogeneous batches. It is an explicit BFGS-only experimental mode and
+    is not selected by the automatic planner.
     """
 
     _validate_options(
@@ -848,6 +854,11 @@ def _batched_bfgs_refill_relax(
         if capacity == n_systems
         else state.select_systems(active_system_ids.tolist(), rebuild_neighbors=False)
     )
+    resident_arena = (
+        HeterogeneousResidentArena(state, resident_capacity=capacity)
+        if refill_storage == "arena"
+        else None
+    )
 
     full_filter = None if cell_filter is None else cell_filter.bind(state, dtype=optimizer_dtype)
     active_filter = (
@@ -1058,8 +1069,17 @@ def _batched_bfgs_refill_relax(
                 )
             )
             use_slot_swap = refill_storage == "slots" and slot_counts_match
+            use_arena = refill_storage == "arena"
             with profile_phase(
-                ("scheduler.refill_slot_swap" if use_slot_swap else "scheduler.refill_repack"),
+                (
+                    "scheduler.refill_slot_swap"
+                    if use_slot_swap
+                    else (
+                        "scheduler.refill_arena"
+                        if use_arena
+                        else "scheduler.refill_repack"
+                    )
+                ),
                 device=device,
                 systems=systems_before,
                 atoms=active_state.n_atoms,
@@ -1126,19 +1146,40 @@ def _batched_bfgs_refill_relax(
                     )
                     active_system_ids = torch.cat((survivor_ids, refill_ids))
                     active_atom_ids = _global_atom_ids(state, active_system_ids)
-                    state_parts = []
-                    if remaining_list:
-                        state_parts.append(
-                            active_state.select_systems(remaining_list, rebuild_neighbors=False)
-                        )
-                    if refill_ids.numel():
-                        state_parts.append(
-                            state.select_systems(
-                                refill_ids.tolist(),
-                                rebuild_neighbors=False,
+                    if resident_arena is None:
+                        state_parts = []
+                        if remaining_list:
+                            state_parts.append(
+                                active_state.select_systems(
+                                    remaining_list,
+                                    rebuild_neighbors=False,
+                                )
                             )
-                        )
-                    active_state = AseGraphBatch.concatenate(state_parts)
+                        if refill_ids.numel():
+                            state_parts.append(
+                                state.select_systems(
+                                    refill_ids.tolist(),
+                                    rebuild_neighbors=False,
+                                )
+                            )
+                        active_state = AseGraphBatch.concatenate(state_parts)
+                    else:
+                        selections = []
+                        if remaining_list:
+                            selections.append(
+                                SystemSelection(
+                                    active_state,
+                                    tuple(remaining_list),
+                                )
+                            )
+                        if refill_ids.numel():
+                            selections.append(
+                                SystemSelection(
+                                    state,
+                                    tuple(refill_ids.tolist()),
+                                )
+                            )
+                        active_state = resident_arena.pack(selections)
                     active_filter = (
                         None
                         if full_filter is None
@@ -1147,21 +1188,54 @@ def _batched_bfgs_refill_relax(
                     optimizer_positions = (
                         None
                         if full_optimizer_positions is None
-                        else full_optimizer_positions[active_atom_ids].clone()
+                        else (
+                            full_optimizer_positions[active_atom_ids].clone()
+                            if resident_arena is None
+                            else resident_arena.work_tensor(
+                                "bfgs.optimizer_positions",
+                                (active_state.n_atoms, 3),
+                                dtype=optimizer_dtype,
+                            )
+                        )
                     )
-                    atomic_forces = torch.zeros(
-                        active_state.positions.shape,
-                        device=device,
-                        dtype=optimizer_dtype,
+                    if (
+                        optimizer_positions is not None
+                        and resident_arena is not None
+                    ):
+                        optimizer_positions.copy_(
+                            full_optimizer_positions[active_atom_ids]
+                        )
+                    atomic_forces = (
+                        torch.zeros(
+                            active_state.positions.shape,
+                            device=device,
+                            dtype=optimizer_dtype,
+                        )
+                        if resident_arena is None
+                        else resident_arena.work_tensor(
+                            "bfgs.atomic_forces",
+                            tuple(active_state.positions.shape),
+                            dtype=optimizer_dtype,
+                            zero=True,
+                        )
                     )
                     atomic_forces[: survivor_forces.shape[0]] = survivor_forces
                     if active_filter is None:
                         cell_forces = None
                     else:
-                        cell_forces = torch.zeros(
-                            (active_state.n_systems, 3, 3),
-                            device=device,
-                            dtype=optimizer_dtype,
+                        cell_forces = (
+                            torch.zeros(
+                                (active_state.n_systems, 3, 3),
+                                device=device,
+                                dtype=optimizer_dtype,
+                            )
+                            if resident_arena is None
+                            else resident_arena.work_tensor(
+                                "bfgs.cell_forces",
+                                (active_state.n_systems, 3, 3),
+                                dtype=optimizer_dtype,
+                                zero=True,
+                            )
                         )
                         if survivor_cell_forces is not None:
                             cell_forces[: len(remaining_list)] = survivor_cell_forces
@@ -1177,7 +1251,11 @@ def _batched_bfgs_refill_relax(
                 survivors=ready_count,
                 inserted=refill_ids.numel(),
                 triggered=bool(refill_ids.numel()),
-                storage=("slots" if use_slot_swap else "repack"),
+                storage=(
+                    "slots"
+                    if use_slot_swap
+                    else ("arena" if use_arena else "repack")
+                ),
                 systems_after=active_state.n_systems,
                 pending_after=n_systems - next_pending,
             )

@@ -457,6 +457,15 @@ runs should be launched with
 fragmentation. The default remains `"repack"` pending broader application
 validation.
 
+BFGS also accepts the experimental `refill_storage="arena"` mode for
+heterogeneous residents. It alternates between two reusable compact graph
+stores, preserving per-job Hessians and neighbor-cache state without padded
+model inputs. On the measured 256-job MIX4 B64 workload it reduced refill
+packing by 11.6% and total time by 0.8%, which is below the automatic-selection
+gate for AtomBit. On matched MACE-OFF-Small, arena packing was 15.8% slower;
+the 1.1% lower wall time came from variation in graph/model phases. FIRE does
+not accept this mode, and the planner never selects it.
+
 `linear_algebra_backend` accepts `"auto"`, `"serial"`, `"grouped"`, or
 `"cholesky"`. On CUDA, the automatic policy groups equal-sized Hessians and
 uses a Cholesky solve while they are positive definite. That solve is

@@ -350,6 +350,10 @@ def test_variable_cell_bfgs_refill_policies_preserve_state_and_output_order():
         refill_batch_size=2,
         refill_storage="slots",
     )
+    results["arena"] = run(
+        refill_batch_size=2,
+        refill_storage="arena",
+    )
 
     for refill in results.values():
         assert bool(refill.converged.all())
@@ -498,6 +502,49 @@ def test_slot_refill_falls_back_for_unequal_atom_counts():
 
     assert result.state.counts.tolist() == [1, 2]
     assert result.converged.tolist() == [False, False]
+
+
+def test_heterogeneous_arena_refill_matches_repack():
+    systems = [
+        Atoms("H", positions=[[1e-8, 0.0, 0.0]]),
+        Atoms(
+            "He2",
+            positions=[[0.8, 0.0, 0.0], [0.4, 0.0, 0.0]],
+        ),
+        Atoms(
+            "Li3",
+            positions=[
+                [0.6, 0.0, 0.0],
+                [0.3, 0.0, 0.0],
+                [0.1, 0.0, 0.0],
+            ],
+        ),
+        Atoms("Be", positions=[[0.2, 0.0, 0.0]]),
+    ]
+
+    def run(storage):
+        return relax(
+            systems,
+            _quadratic_potential(),
+            optimizer="bfgs",
+            refill_batch_size=2,
+            refill_storage=storage,
+            fmax=1e-5,
+            max_steps=200,
+            max_step=0.2,
+            optimizer_dtype="float64",
+        )
+
+    repack = run("repack")
+    arena = run("arena")
+
+    assert bool(repack.converged.all())
+    assert bool(arena.converged.all())
+    torch.testing.assert_close(arena.converged_step, repack.converged_step)
+    torch.testing.assert_close(arena.state.positions, repack.state.positions)
+    torch.testing.assert_close(arena.evaluation.energy, repack.evaluation.energy)
+    torch.testing.assert_close(arena.evaluation.forces, repack.evaluation.forces)
+    assert arena.active_batch_sizes == repack.active_batch_sizes
 
 
 def test_refill_preserves_survivor_neighbor_cache(monkeypatch):

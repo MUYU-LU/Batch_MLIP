@@ -1,0 +1,89 @@
+id: heterogeneous-resident-arena
+date: 2026-07-26
+baseline_commit: 2bbce48
+description: >-
+  Replace allocation-heavy heterogeneous BFGS refill repacking with reusable
+  double-buffered compact graph and optimizer-state storage.
+hypothesis: >-
+  Reusing resident atom, system, edge, neighbor-reference, and BFGS work
+  buffers will reduce heterogeneous refill packing and allocator overhead by
+  at least 30% without changing graph topology, optimizer trajectories, or
+  output order. The mechanism is retained only if end-to-end time improves by
+  at least 5% on one mixed production workload.
+mechanism:
+  - compact_double_buffered_graph_storage
+  - direct_selected_system_copy_without_intermediate_batches
+  - reusable_optimizer_force_and_position_buffers
+  - geometric_capacity_growth_with_no_live_source_overwrite
+invariants:
+  - compact_model_inputs_contain_no_padding_or_inactive_atoms
+  - every_edge_remains_inside_one_graph
+  - survivor_neighbor_reference_state_is_preserved
+  - newly_admitted_jobs_are_cache_cold
+  - BFGS_histories_remain_owned_by_global_job_id
+  - final_results_remain_in_original_input_order
+matrix:
+  optimizer: bfgs
+  cell_filter: FrechetCellFilter
+  models: [atombit_smooth_rms_fp32, mace_off_small]
+  workloads:
+    - ROFA-MIX-R256
+    - T2-MIX4-R256
+  policies: [refill_repack, refill_arena]
+  resident_batches: [64, 128]
+  repeats: 1
+metrics:
+  - wall_seconds
+  - systems_per_second
+  - refill_events
+  - refill_pack_seconds
+  - neighbor_seconds
+  - model_seconds
+  - peak_allocated_bytes
+  - peak_reserved_bytes
+  - converged_jobs
+  - endpoint_energy_distribution
+gates:
+  unit_and_integration_tests_pass: true
+  graph_and_cache_equivalence: true
+  all_jobs_converge: true
+  refill_pack_time_reduction_min: 0.30
+  end_to_end_improvement_min: 0.05
+  no_peak_reserved_memory_regression_over: 0.10
+commands:
+  - name: baseline-tests
+    command: [python, -m, pytest, -q]
+  - name: targeted-tests
+    command:
+      - python
+      - -m
+      - pytest
+      - -q
+      - tests/test_resident_arena.py
+      - tests/test_bfgs.py
+  - name: benchmark
+    command:
+      - python
+      - benchmarks/benchmark_robustness_optimization.py
+      - --mlip
+      - atombit
+      - --method
+      - refill
+      - --refill-storage
+      - arena
+      - --workload-manifest
+      - benchmarks/workloads/manifests/OPT-MIX4-R256-v1.json
+      - --dataset-dir
+      - data/T2_test/structures
+      - --batch-size
+      - "64"
+      - --profile-runtime
+      - --output
+      - runs/heterogeneous_resident_arena/atombit_mix4_b64_arena.json
+collect_json:
+  - runs/heterogeneous_resident_arena/atombit_rofa_mix_b128_repack.json
+  - runs/heterogeneous_resident_arena/atombit_rofa_mix_b128_arena.json
+  - runs/heterogeneous_resident_arena/atombit_mix4_b64_repack.json
+  - runs/heterogeneous_resident_arena/atombit_mix4_b64_arena.json
+  - runs/heterogeneous_resident_arena/mace_mix4_b64_repack.json
+  - runs/heterogeneous_resident_arena/mace_mix4_b64_arena.json

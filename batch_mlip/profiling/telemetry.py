@@ -185,7 +185,11 @@ def runtime_profile_registry_fields(profile: dict[str, Any]) -> dict[str, Any]:
         "optimizer_or_integrator_time_s": total(
             "optimizer.bfgs_update", "optimizer.fire_update", "integrator.update"
         ),
-        "pack_time_s": total("scheduler.refill_repack"),
+        "pack_time_s": total(
+            "scheduler.refill_repack",
+            "scheduler.refill_slot_swap",
+            "scheduler.refill_arena",
+        ),
         "compaction_time_s": total("scheduler.active_compaction"),
         "transfer_time_s": total("graph.to_device", "graph.geometry_to_host"),
         "peak_allocated_GB": (
