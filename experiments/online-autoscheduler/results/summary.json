@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "baseline_commit": "ced7af3",
+  "timing_repeats": 1,
+  "optimizer": "bfgs",
+  "cell_mode": "variable",
+  "deterministic_algorithms": true,
+  "results": [
+    {
+      "id": "atombit-h92-r32-cold",
+      "raw": "raw/atombit_bfgs_h92_cold_v2.json",
+      "sha256": "9354a7f6c2009246bfd2313fcde1e10d2d4fab5fcba564803e03427d60774c7a",
+      "wall_seconds": 35.89370669005439,
+      "peak_reserved_GiB": 4.390625,
+      "queues": [1, 4, 16, 11],
+      "converged": 32,
+      "accepted": true
+    },
+    {
+      "id": "atombit-h92-r32-warm",
+      "raw": "raw/atombit_bfgs_h92_warm.json",
+      "sha256": "a02882ab400e2f1ebdfdccc30b3725aebc7906718848006a9f84d43e7a551c86",
+      "wall_seconds": 17.226883180905133,
+      "peak_reserved_GiB": 8.6015625,
+      "queues": [32],
+      "converged": 32,
+      "accepted": true
+    },
+    {
+      "id": "atombit-h92-r256-unsafe-growth",
+      "raw": "raw/atombit_bfgs_h92_r256_warm_expand.json",
+      "sha256": "a9d81728a1f3a6a75c87824821b837bd96f819b404f418bcff954db60b410b2d",
+      "wall_seconds": 79.4385418840684,
+      "peak_reserved_GiB": 77.4375,
+      "memory_budget_GiB": 66.544,
+      "queues": [64, 192],
+      "converged": 256,
+      "accepted": false,
+      "rejection_reason": "reserved memory exceeded the configured safety budget"
+    },
+    {
+      "id": "atombit-h92-r256-safe-exploration",
+      "raw": "raw/atombit_bfgs_h92_r256_safe_growth.json",
+      "sha256": "2e2c287f46ac3ef024ccf4c3e79468b18488cf440398882cdab821b0cc7d27ea",
+      "wall_seconds": 91.01001225784421,
+      "peak_reserved_GiB": 46.810546875,
+      "queues": [64, 128, 64],
+      "converged": 256,
+      "accepted": true
+    },
+    {
+      "id": "atombit-h92-r256-warm-stable",
+      "raw": "raw/atombit_bfgs_h92_r256_warm_stable.json",
+      "sha256": "c8055fa2633555c18807643bff64c3b01ed2f25aaf38edf63ee9cf2f385962cb",
+      "wall_seconds": 81.03739923378453,
+      "peak_reserved_GiB": 46.810546875,
+      "queues": [128, 128],
+      "converged": 256,
+      "accepted": true
+    },
+    {
+      "id": "mace-h92-r32-cold",
+      "raw": "raw/mace_bfgs_h92_cold.json",
+      "sha256": "8a71578e124f9007492d53b49b5dd1ca750b2967a40a1cd5fa1a42602a0c53da",
+      "wall_seconds": 32.0294506107457,
+      "peak_reserved_GiB": 2.98046875,
+      "queues": [1, 4, 16, 11],
+      "converged": 32,
+      "accepted": true
+    },
+    {
+      "id": "mace-h92-r32-warm",
+      "raw": "raw/mace_bfgs_h92_warm.json",
+      "sha256": "6924c895c0abe408639fcca5a8db621d0552b02c8265bc7facead3a8f743d3a8",
+      "wall_seconds": 18.91072968998924,
+      "peak_reserved_GiB": 5.072265625,
+      "queues": [32],
+      "converged": 32,
+      "accepted": true
+    },
+    {
+      "id": "atombit-xatmov88-r256-cache-transfer",
+      "raw": "raw/atombit_bfgs_xatmov88_r256_cache_transfer.json",
+      "sha256": "1e3319aa534ba0e78f2c2d70c6643d230ed6289ff50c8fe9e2a868b55b3a14ee",
+      "wall_seconds": 20.227814115118235,
+      "peak_reserved_GiB": 37.291015625,
+      "queues": [128, 128],
+      "converged": 256,
+      "accepted": true
+    },
+    {
+      "id": "atombit-h92-r256-4gpu-warm",
+      "raw": "raw/atombit_bfgs_h92_r256_4gpu_warm.json",
+      "sha256": "90c56a29daefede05f34de3b08c7c40c29b65dfb1dbe30817b7806ee653843df",
+      "wall_seconds": 35.59284706786275,
+      "peak_reserved_GiB_per_gpu": 17.130859375,
+      "queues": [64, 64, 64, 64],
+      "gpu_count": 4,
+      "converged": 256,
+      "accepted": true
+    },
+    {
+      "id": "mace-h92-r32-2gpu-warm",
+      "raw": "raw/mace_bfgs_h92_r32_2gpu_warm.json",
+      "sha256": "a610a98227e0ebab83a9ff0ccc0f39436318a7dd8afe25e8f105b5e799c5c4ef",
+      "wall_seconds": 17.560320870019495,
+      "peak_reserved_GiB_per_gpu": 3.015625,
+      "queues": [16, 16],
+      "gpu_count": 2,
+      "converged": 32,
+      "accepted": true
+    }
+  ]
+}

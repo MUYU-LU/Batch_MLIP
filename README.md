@@ -492,8 +492,46 @@ did not beat immediate refill by the project performance gate. The current
 STEPVAR MPS comparison found both refill policies numerically slower than
 active drain, so refill is not a universal throughput default.
 
-For heterogeneous workloads, `BatchPlanner` provides calibrated memory-safe
-queues without coupling planning to a particular MLIP or optimizer:
+Normal users do not need to choose a batch size or construct a planner:
+
+```python
+result = relax(
+    structures,
+    calculator,
+    optimizer="bfgs",
+    scheduling="auto",
+    devices=["cuda:0", "cuda:1", "cuda:2", "cuda:3"],  # optional
+    cell_filter=FrechetCellFilter(),
+    fmax=0.05,
+)
+print(result.metadata["scheduling"])
+```
+
+The first matching workload is a cold start. The runtime profiles atoms, edges,
+and optimizer dimensions, then increases the capacity of subsequent production
+chunks. Every calibration structure remains part of the returned result; no
+job is repeated only for tuning. Capacity growth uses both allocated and
+reserved CUDA memory, slows near the allocator frontier, and stops at 65% of
+the configured safety budget. Active refill is admitted only after capacity
+growth stops, observed occupancy is below 65%, and at least two resident
+batches remain pending.
+
+The selected policy is stored in
+`~/.cache/batch_mlip/autoscheduler-v1.json` and reused only for compatible
+calculator, model architecture, precision, optimizer, cell mode, GPU, atom,
+and edge regimes. Override the location with
+`BATCH_MLIP_AUTOSCHEDULER_CACHE`. The cache contains performance decisions, not
+structures or scientific results.
+
+`AutoSchedulerConfig` exposes safety and cache controls for advanced use.
+Multiple homogeneous GPUs share the learned policy and pull compatible chunks
+from one pending queue. Cold calibration runs once on the primary device, and
+active optimizer states never migrate between GPUs. The current workers use
+threads so custom calculator objects need not be serialized; process-isolated
+workers and in-process MPS dispatch remain future execution layers.
+
+For frozen experiments, `BatchPlanner` still provides explicitly calibrated
+memory-safe queues without coupling planning to a particular MLIP or optimizer:
 
 ```python
 from batch_mlip import BatchPlanner
@@ -529,11 +567,10 @@ result = relax(
 print(result.metadata["scheduling"])
 ```
 
-The automatic policy uses the whole pool when its calibrated allocation is
+The explicit planner uses the whole pool when its calibrated allocation is
 within both the byte budget and maximum resident count. Otherwise, it executes
 cost-compatible memory-safe queues, using active refill only when the selected
-optimizer supports it. This policy is opt-in because coefficients are
-model/device/optimizer specific; it does not guess a safe budget.
+optimizer supports it.
 
 Supplying an `OptimizationPilot` activates the task-aware layer:
 

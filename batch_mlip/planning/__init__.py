@@ -1,5 +1,18 @@
 """Workload planning and memory calibration."""
 
+from .auto import (
+    AutoBatchAction,
+    AutoBatchObservation,
+    AutoPolicyCache,
+    AutoScheduler,
+    AutoSchedulerConfig,
+    AutoWorkloadBucket,
+    AutoWorkloadPlan,
+    CachedAutoPolicy,
+    OnlineCapacityController,
+    execution_fingerprint,
+    profile_auto_workload,
+)
 from .execution import (
     RelaxationSchedule,
     ScheduledRelaxationBatch,
@@ -23,12 +36,21 @@ from .policy import (
 )
 
 __all__ = [
+    "AutoBatchAction",
+    "AutoBatchObservation",
+    "AutoPolicyCache",
+    "AutoScheduler",
+    "AutoSchedulerConfig",
+    "AutoWorkloadBucket",
+    "AutoWorkloadPlan",
     "BatchPlan",
     "BatchPlanner",
     "BatchTimingPoint",
     "CalibrationObservation",
+    "CachedAutoPolicy",
     "MemoryCoefficients",
     "OptimizationPilot",
+    "OnlineCapacityController",
     "PilotRegime",
     "PlannedBucket",
     "RelaxationSchedule",
@@ -36,6 +58,8 @@ __all__ = [
     "SystemProfile",
     "TaskAwarePolicy",
     "fit_memory_coefficients",
+    "execution_fingerprint",
     "plan_relaxation_execution",
     "plan_task_aware_relaxation",
+    "profile_auto_workload",
 ]

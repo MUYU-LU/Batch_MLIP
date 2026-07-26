@@ -2,6 +2,15 @@
 
 ## 2026-07-26
 
+- Add plug-and-play `scheduling="auto"` without a user-authored planner or
+  pilot, using production-only cold-start capacity ramping and a persistent
+  hardware/model/optimizer policy cache.
+- Add conservative allocated/reserved-memory growth gates, online refill
+  admission, homogeneous multi-GPU calculator cloning, compatible chunking,
+  and pending-work stealing through `devices=[...]`.
+- Validate warm policies on AtomBit, MACE, T2 H92, and independent XATMOV88;
+  retain the rejected 77.44 GiB allocator-frontier result alongside the safe
+  B128 policy and multi-GPU scaling artifacts.
 - Separate refill behavior from atom count with a signed BFGS factorial over
   H46/H276, B32/B64/B128, AtomBit/MACE, drain/repack/slots, and MPS32.
 - Show that BFGS refill is strong at B32, weakens at B64, and is neutral or

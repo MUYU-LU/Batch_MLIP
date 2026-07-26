@@ -1,13 +1,21 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
 import pytest
 from ase import Atoms
 
 from batch_mlip import (
+    AutoBatchObservation,
+    AutoPolicyCache,
+    AutoSchedulerConfig,
+    AutoWorkloadBucket,
     BatchPlanner,
     BatchTimingPoint,
+    CachedAutoPolicy,
     CalibrationObservation,
     MemoryCoefficients,
+    OnlineCapacityController,
     OptimizationPilot,
     PilotRegime,
     SystemProfile,
@@ -353,6 +361,331 @@ def test_task_aware_policy_excludes_a_measured_capacity_over_budget():
 
     assert len(schedule.batches) == 2
     assert all(batch.resident_capacity == 1 for batch in schedule.batches)
+
+
+def _auto_observation(
+    capacity: int,
+    *,
+    throughput: float,
+    occupancy: float = 1.0,
+    active_refill: bool = False,
+    memory_budget_bytes: int | None = None,
+) -> AutoBatchObservation:
+    system_evaluations = capacity * 10
+    return AutoBatchObservation(
+        system_count=capacity,
+        resident_capacity=capacity,
+        active_refill=active_refill,
+        wall_seconds=system_evaluations / throughput,
+        system_evaluations=system_evaluations,
+        model_evaluations=10,
+        mean_active_occupancy=occupancy,
+        peak_allocated_bytes=(
+            None
+            if memory_budget_bytes is None
+            else 100 + capacity * 100
+        ),
+        peak_reserved_bytes=(
+            None
+            if memory_budget_bytes is None
+            else 100 + capacity * 100
+        ),
+        baseline_allocated_bytes=(
+            None if memory_budget_bytes is None else 100
+        ),
+        baseline_reserved_bytes=(
+            None if memory_budget_bytes is None else 100
+        ),
+        memory_budget_bytes=memory_budget_bytes,
+    )
+
+
+def _auto_bucket(count: int = 64) -> AutoWorkloadBucket:
+    return AutoWorkloadBucket(
+        system_indices=tuple(range(count)),
+        mean_atom_count=46.0,
+        mean_edge_count=1_000.0,
+        mean_dof_squared=20_000.0,
+        homogeneous_atom_count=True,
+    )
+
+
+def test_online_controller_grows_then_selects_smaller_capacity_in_performance_band():
+    controller = OnlineCapacityController(
+        bucket=_auto_bucket(),
+        fingerprint="fingerprint",
+        config=AutoSchedulerConfig(
+            cache_enabled=False,
+            growth_factor=4,
+            max_batch_size=64,
+        ),
+        cached_policy=None,
+        supports_refill=False,
+    )
+
+    assert controller.next_action(64).resident_capacity == 1
+    controller.observe(
+        _auto_observation(1, throughput=100.0),
+        remaining=63,
+    )
+    assert controller.next_action(63).resident_capacity == 4
+    controller.observe(
+        _auto_observation(4, throughput=104.0),
+        remaining=59,
+    )
+
+    assert controller.next_action(59).resident_capacity == 1
+    assert controller.cached_result().resident_capacity == 1
+
+
+def test_online_controller_caps_growth_from_observed_reserved_memory():
+    controller = OnlineCapacityController(
+        bucket=_auto_bucket(),
+        fingerprint="fingerprint",
+        config=AutoSchedulerConfig(
+            cache_enabled=False,
+            growth_factor=16,
+            max_batch_size=64,
+            memory_growth_margin=1.25,
+            near_frontier_budget_fraction=0.5,
+        ),
+        cached_policy=None,
+        supports_refill=False,
+    )
+
+    controller.observe(
+        _auto_observation(
+            1,
+            throughput=100.0,
+            memory_budget_bytes=600,
+        ),
+        remaining=63,
+    )
+
+    assert controller.next_action(63).resident_capacity == 4
+
+
+def test_online_controller_limits_unmeasured_growth_near_memory_frontier():
+    controller = OnlineCapacityController(
+        bucket=_auto_bucket(count=256),
+        fingerprint="fingerprint",
+        config=AutoSchedulerConfig(
+            cache_enabled=False,
+            initial_batch_size=64,
+            growth_factor=4,
+            max_batch_size=256,
+            memory_growth_margin=1.0,
+            near_frontier_budget_fraction=0.2,
+            near_frontier_growth_factor=2,
+        ),
+        cached_policy=None,
+        supports_refill=False,
+    )
+
+    controller.observe(
+        _auto_observation(
+            64,
+            throughput=100.0,
+            memory_budget_bytes=20_000,
+        ),
+        remaining=192,
+    )
+
+    assert controller.next_action(192).resident_capacity == 128
+
+
+def test_online_controller_stops_growth_at_reserved_memory_boundary():
+    controller = OnlineCapacityController(
+        bucket=_auto_bucket(count=256),
+        fingerprint="fingerprint",
+        config=AutoSchedulerConfig(
+            cache_enabled=False,
+            initial_batch_size=128,
+            growth_factor=4,
+            max_batch_size=256,
+            memory_growth_margin=1.0,
+            near_frontier_budget_fraction=0.2,
+            stop_growth_budget_fraction=0.65,
+        ),
+        cached_policy=None,
+        supports_refill=False,
+    )
+    observation = _auto_observation(
+        128,
+        throughput=100.0,
+        memory_budget_bytes=20_000,
+    )
+    observation = replace(
+        observation,
+        peak_allocated_bytes=14_000,
+        peak_reserved_bytes=14_000,
+    )
+
+    controller.observe(observation, remaining=128)
+
+    assert controller.next_action(128).resident_capacity == 128
+    policy = controller.cached_result()
+    assert policy.resident_capacity == 128
+    assert policy.capacity_source == "measured"
+
+
+def test_online_controller_does_not_treat_underfilled_tail_as_a_plateau():
+    controller = OnlineCapacityController(
+        bucket=_auto_bucket(count=32),
+        fingerprint="fingerprint",
+        config=AutoSchedulerConfig(
+            cache_enabled=False,
+            growth_factor=4,
+            max_batch_size=64,
+        ),
+        cached_policy=None,
+        supports_refill=False,
+    )
+
+    controller.observe(
+        _auto_observation(1, throughput=100.0),
+        remaining=31,
+    )
+    controller.observe(
+        _auto_observation(4, throughput=200.0),
+        remaining=27,
+    )
+    controller.observe(
+        _auto_observation(16, throughput=300.0),
+        remaining=11,
+    )
+    assert controller.next_action(11).resident_capacity == 11
+    controller.observe(
+        _auto_observation(11, throughput=250.0),
+        remaining=0,
+    )
+
+    policy = controller.cached_result()
+    assert policy.resident_capacity == 64
+    assert policy.capacity_source == "memory_extrapolated"
+
+
+def test_online_controller_enables_refill_only_after_growth_stops():
+    controller = OnlineCapacityController(
+        bucket=_auto_bucket(),
+        fingerprint="fingerprint",
+        config=AutoSchedulerConfig(
+            cache_enabled=False,
+            initial_batch_size=8,
+            max_batch_size=8,
+            refill_min_capacity=8,
+            refill_occupancy_threshold=0.7,
+        ),
+        cached_policy=None,
+        supports_refill=True,
+    )
+
+    controller.observe(
+        _auto_observation(8, throughput=100.0, occupancy=0.5),
+        remaining=32,
+    )
+    action = controller.next_action(32)
+
+    assert action.active_refill
+    assert action.system_count == 32
+    assert action.resident_capacity == 8
+    assert action.refill_storage == "slots"
+
+
+def test_auto_policy_cache_matches_only_compatible_fingerprints(tmp_path):
+    cache = AutoPolicyCache(tmp_path / "policies.json")
+    policy = CachedAutoPolicy(
+        fingerprint="model-a",
+        mean_atom_count=46.0,
+        mean_edge_count=1_000.0,
+        mean_dof_squared=20_000.0,
+        homogeneous_atom_count=True,
+        resident_capacity=32,
+        capacity_source="measured",
+        active_refill=False,
+        refill_storage="slots",
+        throughput=100.0,
+        peak_allocated_bytes=1_000,
+        peak_reserved_bytes=2_000,
+        updated_unix_seconds=1.0,
+    )
+    cache.update(policy)
+    config = AutoSchedulerConfig(cache_path=cache.path)
+
+    assert cache.find("model-a", _auto_bucket(), config) == policy
+    assert cache.find("model-b", _auto_bucket(), config) is None
+
+
+def test_cached_extrapolated_capacity_stays_labeled_until_measured():
+    cached = CachedAutoPolicy(
+        fingerprint="model-a",
+        mean_atom_count=46.0,
+        mean_edge_count=1_000.0,
+        mean_dof_squared=20_000.0,
+        homogeneous_atom_count=True,
+        resident_capacity=64,
+        capacity_source="memory_extrapolated",
+        active_refill=False,
+        refill_storage="slots",
+        throughput=100.0,
+        peak_allocated_bytes=1_000,
+        peak_reserved_bytes=2_000,
+        updated_unix_seconds=1.0,
+    )
+    controller = OnlineCapacityController(
+        bucket=_auto_bucket(count=32),
+        fingerprint="model-a",
+        config=AutoSchedulerConfig(cache_enabled=False),
+        cached_policy=cached,
+        supports_refill=False,
+    )
+
+    assert controller.next_action(32).resident_capacity == 32
+    controller.observe(
+        _auto_observation(32, throughput=200.0),
+        remaining=0,
+    )
+
+    updated = controller.cached_result()
+    assert updated.resident_capacity == 64
+    assert updated.capacity_source == "memory_extrapolated"
+
+
+def test_cached_extrapolated_capacity_continues_growth_on_a_larger_pool():
+    cached = CachedAutoPolicy(
+        fingerprint="model-a",
+        mean_atom_count=46.0,
+        mean_edge_count=1_000.0,
+        mean_dof_squared=20_000.0,
+        homogeneous_atom_count=True,
+        resident_capacity=64,
+        capacity_source="memory_extrapolated",
+        active_refill=False,
+        refill_storage="slots",
+        throughput=100.0,
+        peak_allocated_bytes=1_000,
+        peak_reserved_bytes=2_000,
+        updated_unix_seconds=1.0,
+    )
+    controller = OnlineCapacityController(
+        bucket=_auto_bucket(count=256),
+        fingerprint="model-a",
+        config=AutoSchedulerConfig(
+            cache_enabled=False,
+            growth_factor=4,
+            max_batch_size=256,
+        ),
+        cached_policy=cached,
+        supports_refill=False,
+    )
+
+    assert controller.next_action(256).resident_capacity == 64
+    controller.observe(
+        _auto_observation(64, throughput=200.0),
+        remaining=192,
+    )
+
+    assert controller.next_action(192).resident_capacity == 192
 
 
 @pytest.mark.parametrize(

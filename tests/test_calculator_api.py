@@ -8,6 +8,7 @@ from ase.calculators.calculator import Calculator, all_changes
 
 from batch_mlip import (
     ASECalculatorAdapter,
+    AutoSchedulerConfig,
     BatchCalculator,
     BatchEvaluation,
     BatchPlanner,
@@ -210,6 +211,119 @@ def test_task_aware_relaxation_executes_selected_tensor_schedule():
             "predicted_seconds": pytest.approx(0.132),
         }
     ]
+
+
+def test_online_auto_relaxation_needs_no_explicit_planner_or_pilot(tmp_path):
+    systems = [
+        Atoms("H", positions=[[0.2 + 0.05 * index, 0.0, 0.0]])
+        for index in range(8)
+    ]
+    config = AutoSchedulerConfig(
+        cache_path=tmp_path / "auto.json",
+        initial_batch_size=1,
+        growth_factor=2,
+        max_batch_size=4,
+        refill_min_capacity=4,
+    )
+
+    cold = relax(
+        systems,
+        QuadraticBatchCalculator(),
+        scheduling="auto",
+        auto_config=config,
+        fmax=1e-5,
+        max_steps=500,
+        dt_start=0.05,
+        dt_max=0.5,
+    )
+    warm = relax(
+        systems,
+        QuadraticBatchCalculator(),
+        scheduling="auto",
+        auto_config=config,
+        fmax=1e-5,
+        max_steps=500,
+        dt_start=0.05,
+        dt_max=0.5,
+    )
+
+    assert bool(cold.converged.all())
+    assert bool(warm.converged.all())
+    assert [
+        atoms.get_chemical_formula() for atoms in cold.structures
+    ] == ["H"] * len(systems)
+    cold_schedule = cold.metadata["scheduling"]
+    warm_schedule = warm.metadata["scheduling"]
+    assert cold_schedule["decision"] == "online_autotune"
+    assert not cold_schedule["buckets"][0]["cache_hit"]
+    assert warm_schedule["buckets"][0]["cache_hit"]
+    assert sum(
+        batch["system_count"] for batch in cold_schedule["batches"]
+    ) == len(systems)
+    assert config.resolved_cache_path().exists()
+
+
+def test_multi_device_auto_relaxation_cold_tunes_then_steals_pending_work(
+    tmp_path,
+):
+    systems = [
+        Atoms("H", positions=[[0.2 + 0.05 * index, 0.0, 0.0]])
+        for index in range(8)
+    ]
+    config = AutoSchedulerConfig(
+        cache_path=tmp_path / "multi-auto.json",
+        initial_batch_size=1,
+        growth_factor=2,
+        max_batch_size=4,
+        refill_min_capacity=4,
+        multi_gpu_cold_start_jobs=2,
+    )
+
+    result = relax(
+        systems,
+        QuadraticBatchCalculator(),
+        scheduling="auto",
+        devices=["cpu:0", "cpu:1"],
+        auto_config=config,
+        fmax=1e-5,
+        max_steps=500,
+        dt_start=0.05,
+        dt_max=0.5,
+    )
+
+    assert bool(result.converged.all())
+    schedule = result.metadata["scheduling"]
+    assert schedule["decision"] == "online_autotune_multi_gpu"
+    assert schedule["gpu_count"] == 2
+    assert schedule["active_gpu_count"] == 2
+    assert schedule["pending_work_stealing"]
+    assert sum(
+        record["system_count"] for record in schedule["cold_start"]
+    ) == 2
+    assert sum(
+        chunk["system_count"]
+        for worker in schedule["workers"]
+        for chunk in worker["chunks"]
+    ) == 6
+
+    warm = relax(
+        systems,
+        QuadraticBatchCalculator(),
+        scheduling="auto",
+        devices=["cpu:0", "cpu:1"],
+        auto_config=config,
+        fmax=1e-5,
+        max_steps=500,
+        dt_start=0.05,
+        dt_max=0.5,
+    )
+    warm_schedule = warm.metadata["scheduling"]
+    assert warm_schedule["cold_start"] == []
+    assert sum(
+        chunk["system_count"]
+        for worker in warm_schedule["workers"]
+        for chunk in worker["chunks"]
+    ) == len(systems)
 
 
 def test_scheduled_relaxation_reassembles_results_on_calculator_device():

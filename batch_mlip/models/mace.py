@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 from collections.abc import Sequence
 from threading import RLock
 from typing import Any, Literal
@@ -173,6 +174,25 @@ class MACEBatchCalculator(BatchCalculator):
         return super().create_state(
             systems,
             build_neighbors=build_neighbors and self.graph_mode == "cached",
+        )
+
+    def clone_to(
+        self,
+        device: str | torch.device,
+    ) -> MACEBatchCalculator:
+        """Clone model state without deep-copying imported MACE modules."""
+
+        return type(self)(
+            copy.deepcopy(self.model),
+            device=device,
+            dtype=self.dtype,
+            cutoff=self.cutoff,
+            skin=self.skin,
+            neighbor_backend=self.neighbor_backend,
+            graph_mode=self.graph_mode,
+            head=self.head,
+            energy_units_to_eV=self.energy_units_to_eV,
+            length_units_to_A=self.length_units_to_A,
         )
 
     def _build_batch(self, state: AseGraphBatch) -> Any:

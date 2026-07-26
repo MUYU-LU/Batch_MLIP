@@ -1,0 +1,58 @@
+id: online-autoscheduler-v1
+baseline_commit: ced7af3
+hypothesis: >-
+  A cold-start scheduler can select memory-safe tensor batch capacities from
+  completed production chunks, then reuse the measured policy on matching
+  workloads, without requiring a user-authored BatchPlanner or
+  OptimizationPilot and without repeating structures.
+mechanism:
+  - profile_atoms_edges_and_optimizer_state
+  - bucket_cost_compatible_structures
+  - conservative_production_capacity_ramp
+  - persistent_hardware_model_optimizer_policy_cache
+  - online_refill_gate_from_observed_occupancy
+invariants:
+  - every_input_index_executes_exactly_once
+  - optimizer_and_stopping_criteria_are_unchanged
+  - output_order_matches_input_order
+  - no_capacity_exceeds_observed_memory_safety_limit
+validation:
+  unit:
+    - cold_start_capacity_ramp
+    - warm_cache_reuse
+    - heterogeneous_bucketing
+    - cache_fingerprint_isolation
+    - result_reassembly
+  production:
+    models: [atombit_smooth_rms_fp32, mace_off_small]
+    optimizers: [bfgs, fire]
+    workloads:
+      - OPT-H92-R32-v1
+      - OPT-H92-R256-v1
+      - OPT-MIX4-R256-v1
+      - GUFJOG44-R256
+      - XATMOV88-R256
+      - OBEQIX220-R256
+      - ROFA-MIX-R256
+    worker_modes: [online_tensor_cold, online_tensor_warm, mps32]
+    repeats: 1
+metrics:
+  - wall_seconds
+  - systems_per_second
+  - peak_allocated_bytes
+  - peak_reserved_bytes
+  - scheduler_overhead_seconds
+  - batch_size_sequence
+  - cache_hit
+  - policy_regret
+  - converged_jobs
+  - failed_jobs
+gates:
+  no_oom: true
+  no_duplicate_or_missing_jobs: true
+  geometric_mean_policy_regret_max: 1.10
+  supported_workloads_within_15_percent_min_fraction: 0.90
+limitations:
+  - v1 multi-GPU workers share one Python process
+  - MPS remains a recorded external backend recommendation
+  - optimizer selection remains a scientific user decision

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from typing import Literal
@@ -71,6 +72,25 @@ class BatchCalculator(ABC):
             neighbor_backend=self.neighbor_backend,
             build_neighbors=build_neighbors,
         )
+
+    def clone_to(
+        self,
+        device: str | torch.device,
+    ) -> BatchCalculator:
+        """Clone this calculator and move model state to another device.
+
+        Built-in adapters contain ordinary ``nn.Module`` state and support
+        this default implementation. Custom adapters with external resources
+        can override the method.
+        """
+
+        resolved = torch.device(device)
+        clone = copy.deepcopy(self)
+        clone.device = resolved
+        model = getattr(clone, "model", None)
+        if model is not None:
+            clone.model = model.to(device=resolved, dtype=clone.dtype).eval()
+        return clone
 
     @abstractmethod
     def calculate(
