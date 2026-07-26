@@ -1,0 +1,58 @@
+id: nvalchemi-neighbor-backend
+description: >-
+  Compare the maintained NVIDIA Warp neighbor-list dispatcher with Matscipy,
+  cuda_dense, and the native sparse CUDA cell list without changing model or
+  optimizer arithmetic.
+hypothesis: >-
+  An optional nvalchemiops backend matches canonical directed edges and integer
+  shifts exactly and improves synchronized end-to-end time by at least 2% on
+  one production AtomBit and one production MACE workload without more than
+  10% additional peak allocated memory. Otherwise it remains an explicit
+  negative-result backend and is never selected by auto.
+baseline_commit: d51e174
+environment:
+  host: 210.45.70.177:2204
+  gpu: NVIDIA H100 80GB
+  atombit_env: /public/home/lmy/.conda/envs/lmy
+  mace_env: /public/home/lmy/.conda/envs/MACE_clean
+  cutoff_angstrom:
+  - 4.5
+  - 6.0
+  deterministic: true
+workloads:
+  neighbor_only:
+  - H46-B32
+  - H276-B16
+  - H1242-B2
+  - H2208-B2
+  production:
+  - AtomBit-H2208-B2-EVAL
+  - MACE-H2208-B2-EVAL
+  - AtomBit-H368-B4-variable-cell-BFGS-3step
+  - MACE-H368-B4-variable-cell-BFGS-3step
+  - AtomBit-H1242-B1-NVE-10step
+  - MACE-H1242-B1-NVE-10step
+correctness_gates:
+  canonical_ordered_edges_and_shifts: exact
+  energy_force_state: exact_or_declared_model_precision_tolerance
+  nve_drift: no_regression
+performance_gate:
+  minimum_end_to_end_speedup: 1.02
+  maximum_peak_allocated_memory_ratio: 1.10
+commands:
+- name: tests
+  command:
+  - python
+  - -m
+  - pytest
+  - -q
+- name: neighbor-benchmark
+  command:
+  - python
+  - benchmarks/benchmark_cell_neighbors.py
+  - --backends
+  - matscipy,cuda_dense,cuda_cell,nvalchemi
+  - --output
+  - experiments/nvalchemi-neighbor-backend/neighbor-results.json
+collect_json:
+- experiments/nvalchemi-neighbor-backend/neighbor-results.json

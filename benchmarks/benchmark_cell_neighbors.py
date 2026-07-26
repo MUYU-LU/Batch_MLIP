@@ -177,12 +177,13 @@ def _run_point(
     warmups: int,
     repeats: int,
     device: torch.device,
+    backends: tuple[str, ...],
 ) -> dict[str, Any]:
     structure = base.repeat(point.repeat)
     systems = [structure.copy() for _ in range(point.batch_size)]
     methods = {}
     reference = None
-    for backend in ("matscipy", "cuda_dense", "cuda_cell"):
+    for backend in backends:
         state = _state(
             systems,
             cutoff=cutoff,
@@ -239,6 +240,11 @@ def main() -> None:
     )
     parser.add_argument("--points", default="")
     parser.add_argument("--cutoffs", default="4.5,6.0")
+    parser.add_argument(
+        "--backends",
+        default="matscipy,cuda_dense,cuda_cell",
+        help="Comma-separated neighbor backends; the first is the topology reference",
+    )
     parser.add_argument("--warmups", type=int, default=2)
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--device", default="cuda:0")
@@ -250,6 +256,9 @@ def main() -> None:
     if device.type != "cuda" or not torch.cuda.is_available():
         raise RuntimeError("cell-list benchmarking requires CUDA")
     points = _parse_points(args.points)
+    backends = tuple(value.strip() for value in args.backends.split(",") if value.strip())
+    if not backends or "cuda_dense" not in backends:
+        parser.error("backends must be nonempty and include cuda_dense")
     bases = {
         atom_count: _load_base(atom_count, args.manifest_dir, args.dataset_dir)
         for atom_count in {point.source_atoms for point in points}
@@ -265,6 +274,7 @@ def main() -> None:
                     warmups=args.warmups,
                     repeats=args.repeats,
                     device=device,
+                    backends=backends,
                 )
             )
             args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -288,6 +298,7 @@ def main() -> None:
         "scope": "resident tensors through integrated graph replacement",
         "warmups": args.warmups,
         "repeats": args.repeats,
+        "backends": backends,
         "environment": {
             "python": platform.python_version(),
             "torch": torch.__version__,

@@ -17,7 +17,13 @@ except ImportError:  # pragma: no cover - environment dependent
     _matscipy_neighbor_list = None
     BACKEND = "ase"
 
-NeighborBackend = Literal["auto", "matscipy", "cuda_dense", "cuda_cell"]
+NeighborBackend = Literal[
+    "auto",
+    "matscipy",
+    "cuda_dense",
+    "cuda_cell",
+    "nvalchemi",
+]
 AUTO_CUDA_DENSE_LONG_CUTOFF_PAIR_THRESHOLD = 8192
 AUTO_CUDA_DENSE_SHORT_CUTOFF_PAIR_THRESHOLD = 32768
 AUTO_CUDA_CELL_CANDIDATE_REDUCTION_THRESHOLD = 0.98
@@ -26,9 +32,10 @@ AUTO_CUDA_CELL_CANDIDATE_REDUCTION_THRESHOLD = 0.98
 def validate_neighbor_backend(backend: str) -> NeighborBackend:
     """Validate and narrow a public neighbor backend name."""
 
-    if backend not in ("auto", "matscipy", "cuda_dense", "cuda_cell"):
+    if backend not in ("auto", "matscipy", "cuda_dense", "cuda_cell", "nvalchemi"):
         raise ValueError(
-            "neighbor_backend must be 'auto', 'matscipy', 'cuda_dense', or 'cuda_cell'"
+            "neighbor_backend must be 'auto', 'matscipy', 'cuda_dense', "
+            "'cuda_cell', or 'nvalchemi'"
         )
     return backend
 
@@ -42,7 +49,7 @@ def resolve_neighbor_backend(
     cells: torch.Tensor | None = None,
     pbc: torch.Tensor | None = None,
     positions: torch.Tensor | None = None,
-) -> Literal["matscipy", "cuda_dense", "cuda_cell"]:
+) -> Literal["matscipy", "cuda_dense", "cuda_cell", "nvalchemi"]:
     """Resolve the requested backend for one rebuild operation."""
 
     if backend == "matscipy":
@@ -55,6 +62,10 @@ def resolve_neighbor_backend(
         if device.type != "cuda":
             raise ValueError("cuda_cell neighbor construction requires a CUDA device")
         return "cuda_cell"
+    if backend == "nvalchemi":
+        if device.type != "cuda":
+            raise ValueError("nvalchemi neighbor construction requires a CUDA device")
+        return "nvalchemi"
     if cutoff <= 0.0:
         raise ValueError("cutoff must be positive")
     pair_work = int(torch.sum(counts.to(torch.int64) ** 2).item())

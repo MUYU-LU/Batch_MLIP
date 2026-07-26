@@ -15,6 +15,7 @@ from ase.constraints import FixAtoms
 from ..profiling.runtime import profile_event, profile_phase
 from .cell_neighbors import CellListUnsupportedError, cell_list_neighbor_blocks
 from .dense_neighbors import DenseNeighborUnsupportedError, dense_neighbor_blocks
+from .external_neighbors import nvalchemi_neighbor_blocks
 from .math_utils import scatter_sum
 from .neighbors import (
     NeighborBackend,
@@ -349,7 +350,7 @@ class AseGraphBatch:
         rebuilt_edges: dict[int, np.ndarray | torch.Tensor] = {}
         rebuilt_shifts: dict[int, np.ndarray | torch.Tensor] = {}
 
-        if resolved_backend in {"cuda_dense", "cuda_cell"}:
+        if resolved_backend in {"cuda_dense", "cuda_cell", "nvalchemi"}:
             try:
                 with profile_phase(
                     "graph.neighbor_search",
@@ -358,11 +359,12 @@ class AseGraphBatch:
                     atoms=selected_atom_ids.numel(),
                     backend=resolved_backend,
                 ):
-                    builder = (
-                        dense_neighbor_blocks
-                        if resolved_backend == "cuda_dense"
-                        else cell_list_neighbor_blocks
-                    )
+                    builders = {
+                        "cuda_dense": dense_neighbor_blocks,
+                        "cuda_cell": cell_list_neighbor_blocks,
+                        "nvalchemi": nvalchemi_neighbor_blocks,
+                    }
+                    builder = builders[resolved_backend]
                     rebuilt = builder(
                         self.positions,
                         self.cells,

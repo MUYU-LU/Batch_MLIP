@@ -1,0 +1,1449 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "scope": "resident tensors through integrated graph replacement",
+  "warmups": 2,
+  "repeats": 3,
+  "backends": [
+    "matscipy",
+    "cuda_dense",
+    "cuda_cell",
+    "nvalchemi"
+  ],
+  "environment": {
+    "python": "3.11.14",
+    "torch": "2.9.1+cu128",
+    "cuda": "12.8",
+    "gpu": "NVIDIA H100 80GB HBM3"
+  },
+  "points": [
+    {
+      "point": {
+        "source_atoms": 46,
+        "repeat": [
+          1,
+          1,
+          1
+        ],
+        "batch_size": 1
+      },
+      "name": "H46-S1x1x1-B1",
+      "atoms_per_system": 46,
+      "cutoff_A": 4.5,
+      "cell_statistics": {
+        "bins": [
+          2,
+          3,
+          2
+        ],
+        "occupied_bins": 10,
+        "max_bin_occupancy": 11,
+        "offset_extents": [
+          1,
+          1,
+          1
+        ],
+        "neighbor_bin_count": 27,
+        "cell_candidate_pairs": 4596,
+        "dense_candidate_pairs": 57132,
+        "candidate_reduction": 0.9195547153959253
+      },
+      "methods": {
+        "matscipy": {
+          "wall_seconds": [
+            0.00152580626308918,
+            0.0013967310078442097,
+            0.0013400870375335217
+          ],
+          "median_wall_seconds": 0.0013967310078442097,
+          "minimum_wall_seconds": 0.0013400870375335217,
+          "maximum_wall_seconds": 0.00152580626308918,
+          "systems_per_second": 715.957470968912,
+          "atoms_per_second": 32934.04366456995,
+          "directed_edges": 818,
+          "peak_allocated_bytes": 96256,
+          "peak_reserved_bytes": 2097152,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 3.61197410064555
+        },
+        "cuda_dense": {
+          "wall_seconds": [
+            0.005181854125112295,
+            0.005044956225901842,
+            0.004979703109711409
+          ],
+          "median_wall_seconds": 0.005044956225901842,
+          "minimum_wall_seconds": 0.004979703109711409,
+          "maximum_wall_seconds": 0.005181854125112295,
+          "systems_per_second": 198.21777538242938,
+          "atoms_per_second": 9118.017667591752,
+          "directed_edges": 818,
+          "peak_allocated_bytes": 33882624,
+          "peak_reserved_bytes": 35651584,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0
+        },
+        "cuda_cell": {
+          "wall_seconds": [
+            0.003419191110879183,
+            0.003412771038711071,
+            0.003360156901180744
+          ],
+          "median_wall_seconds": 0.003412771038711071,
+          "minimum_wall_seconds": 0.003360156901180744,
+          "maximum_wall_seconds": 0.003419191110879183,
+          "systems_per_second": 293.01702008631617,
+          "atoms_per_second": 13478.782923970544,
+          "directed_edges": 818,
+          "peak_allocated_bytes": 34838016,
+          "peak_reserved_bytes": 35651584,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.4782580397796659
+        },
+        "nvalchemi": {
+          "wall_seconds": [
+            0.004080918151885271,
+            0.004083438776433468,
+            0.004008071962743998
+          ],
+          "median_wall_seconds": 0.004080918151885271,
+          "minimum_wall_seconds": 0.004008071962743998,
+          "maximum_wall_seconds": 0.004083438776433468,
+          "systems_per_second": 245.04289544205332,
+          "atoms_per_second": 11271.973190334453,
+          "directed_edges": 818,
+          "peak_allocated_bytes": 33708544,
+          "peak_reserved_bytes": 35651584,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.2362306809734012
+        }
+      }
+    },
+    {
+      "point": {
+        "source_atoms": 46,
+        "repeat": [
+          1,
+          1,
+          1
+        ],
+        "batch_size": 32
+      },
+      "name": "H46-S1x1x1-B32",
+      "atoms_per_system": 46,
+      "cutoff_A": 4.5,
+      "cell_statistics": {
+        "bins": [
+          2,
+          3,
+          2
+        ],
+        "occupied_bins": 10,
+        "max_bin_occupancy": 11,
+        "offset_extents": [
+          1,
+          1,
+          1
+        ],
+        "neighbor_bin_count": 27,
+        "cell_candidate_pairs": 4596,
+        "dense_candidate_pairs": 57132,
+        "candidate_reduction": 0.9195547153959253
+      },
+      "methods": {
+        "matscipy": {
+          "wall_seconds": [
+            0.01590946177020669,
+            0.015775350388139486,
+            0.015742786694318056
+          ],
+          "median_wall_seconds": 0.015775350388139486,
+          "minimum_wall_seconds": 0.015742786694318056,
+          "maximum_wall_seconds": 0.01590946177020669,
+          "systems_per_second": 2028.4810931400184,
+          "atoms_per_second": 93310.13028444085,
+          "directed_edges": 26176,
+          "peak_allocated_bytes": 36413440,
+          "peak_reserved_bytes": 37748736,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 0.6813865694814526
+        },
+        "cuda_dense": {
+          "wall_seconds": [
+            0.010749111883342266,
+            0.0122700328938663,
+            0.010696128942072392
+          ],
+          "median_wall_seconds": 0.010749111883342266,
+          "minimum_wall_seconds": 0.010696128942072392,
+          "maximum_wall_seconds": 0.0122700328938663,
+          "systems_per_second": 2976.9901315837924,
+          "atoms_per_second": 136941.54605285445,
+          "directed_edges": 26176,
+          "peak_allocated_bytes": 43522560,
+          "peak_reserved_bytes": 60817408,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0
+        },
+        "cuda_cell": {
+          "wall_seconds": [
+            0.008015427272766829,
+            0.008077058009803295,
+            0.007987455930560827
+          ],
+          "median_wall_seconds": 0.008015427272766829,
+          "minimum_wall_seconds": 0.007987455930560827,
+          "maximum_wall_seconds": 0.008077058009803295,
+          "systems_per_second": 3992.301210033185,
+          "atoms_per_second": 183645.8556615265,
+          "directed_edges": 26176,
+          "peak_allocated_bytes": 75008512,
+          "peak_reserved_bytes": 85983232,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.3410528868327942
+        },
+        "nvalchemi": {
+          "wall_seconds": [
+            0.012003866024315357,
+            0.01195625914260745,
+            0.011804474983364344
+          ],
+          "median_wall_seconds": 0.01195625914260745,
+          "minimum_wall_seconds": 0.011804474983364344,
+          "maximum_wall_seconds": 0.012003866024315357,
+          "systems_per_second": 2676.4224176075663,
+          "atoms_per_second": 123115.43120994804,
+          "directed_edges": 26176,
+          "peak_allocated_bytes": 37973504,
+          "peak_reserved_bytes": 60817408,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 0.8990363754359102
+        }
+      }
+    },
+    {
+      "point": {
+        "source_atoms": 276,
+        "repeat": [
+          1,
+          1,
+          1
+        ],
+        "batch_size": 1
+      },
+      "name": "H276-S1x1x1-B1",
+      "atoms_per_system": 276,
+      "cutoff_A": 4.5,
+      "cell_statistics": {
+        "bins": [
+          5,
+          5,
+          5
+        ],
+        "occupied_bins": 62,
+        "max_bin_occupancy": 10,
+        "offset_extents": [
+          1,
+          1,
+          1
+        ],
+        "neighbor_bin_count": 27,
+        "cell_candidate_pairs": 21072,
+        "dense_candidate_pairs": 2056752,
+        "candidate_reduction": 0.9897547200634788
+      },
+      "methods": {
+        "matscipy": {
+          "wall_seconds": [
+            0.0023906459100544453,
+            0.0024271728470921516,
+            0.0024135527200996876
+          ],
+          "median_wall_seconds": 0.0024135527200996876,
+          "minimum_wall_seconds": 0.0023906459100544453,
+          "maximum_wall_seconds": 0.0024271728470921516,
+          "systems_per_second": 414.32697602673323,
+          "atoms_per_second": 114354.24538337837,
+          "directed_edges": 4776,
+          "peak_allocated_bytes": 34078720,
+          "peak_reserved_bytes": 35651584,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 2.1576856551094767
+        },
+        "cuda_dense": {
+          "wall_seconds": [
+            0.005156541708856821,
+            0.0062247817404568195,
+            0.005207688082009554
+          ],
+          "median_wall_seconds": 0.005207688082009554,
+          "minimum_wall_seconds": 0.005156541708856821,
+          "maximum_wall_seconds": 0.0062247817404568195,
+          "systems_per_second": 192.02378949203845,
+          "atoms_per_second": 52998.56589980261,
+          "directed_edges": 4776,
+          "peak_allocated_bytes": 41958912,
+          "peak_reserved_bytes": 56623104,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0
+        },
+        "cuda_cell": {
+          "wall_seconds": [
+            0.003435931634157896,
+            0.003474496304988861,
+            0.003561324905604124
+          ],
+          "median_wall_seconds": 0.003474496304988861,
+          "minimum_wall_seconds": 0.003435931634157896,
+          "maximum_wall_seconds": 0.003561324905604124,
+          "systems_per_second": 287.81150193314306,
+          "atoms_per_second": 79435.97453354749,
+          "directed_edges": 4776,
+          "peak_allocated_bytes": 39639552,
+          "peak_reserved_bytes": 60817408,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.4988325284824988
+        },
+        "nvalchemi": {
+          "wall_seconds": [
+            0.004073082935065031,
+            0.004000413231551647,
+            0.004002339206635952
+          ],
+          "median_wall_seconds": 0.004002339206635952,
+          "minimum_wall_seconds": 0.004000413231551647,
+          "maximum_wall_seconds": 0.004073082935065031,
+          "systems_per_second": 249.8538850335278,
+          "atoms_per_second": 68959.67226925367,
+          "directed_edges": 4776,
+          "peak_allocated_bytes": 34398720,
+          "peak_reserved_bytes": 35651584,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.301161099332888
+        }
+      }
+    },
+    {
+      "point": {
+        "source_atoms": 276,
+        "repeat": [
+          1,
+          1,
+          1
+        ],
+        "batch_size": 16
+      },
+      "name": "H276-S1x1x1-B16",
+      "atoms_per_system": 276,
+      "cutoff_A": 4.5,
+      "cell_statistics": {
+        "bins": [
+          5,
+          5,
+          5
+        ],
+        "occupied_bins": 62,
+        "max_bin_occupancy": 10,
+        "offset_extents": [
+          1,
+          1,
+          1
+        ],
+        "neighbor_bin_count": 27,
+        "cell_candidate_pairs": 21072,
+        "dense_candidate_pairs": 2056752,
+        "candidate_reduction": 0.9897547200634788
+      },
+      "methods": {
+        "matscipy": {
+          "wall_seconds": [
+            0.025863685179501772,
+            0.025926765985786915,
+            0.025857614818960428
+          ],
+          "median_wall_seconds": 0.025863685179501772,
+          "minimum_wall_seconds": 0.025857614818960428,
+          "maximum_wall_seconds": 0.025926765985786915,
+          "systems_per_second": 618.6280063709087,
+          "atoms_per_second": 170741.32975837082,
+          "directed_edges": 76416,
+          "peak_allocated_bytes": 41842688,
+          "peak_reserved_bytes": 60817408,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 0.3376234323957681
+        },
+        "cuda_dense": {
+          "wall_seconds": [
+            0.008732186164706945,
+            0.00879999715834856,
+            0.00870230607688427
+          ],
+          "median_wall_seconds": 0.008732186164706945,
+          "minimum_wall_seconds": 0.00870230607688427,
+          "maximum_wall_seconds": 0.00879999715834856,
+          "systems_per_second": 1832.3017510400232,
+          "atoms_per_second": 505715.28328704636,
+          "directed_edges": 76416,
+          "peak_allocated_bytes": 169625088,
+          "peak_reserved_bytes": 182452224,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0
+        },
+        "cuda_cell": {
+          "wall_seconds": [
+            0.006077542435377836,
+            0.006114606745541096,
+            0.0060949367471039295
+          ],
+          "median_wall_seconds": 0.0060949367471039295,
+          "minimum_wall_seconds": 0.006077542435377836,
+          "maximum_wall_seconds": 0.006114606745541096,
+          "systems_per_second": 2625.1297862283086,
+          "atoms_per_second": 724535.8209990131,
+          "directed_edges": 76416,
+          "peak_allocated_bytes": 132772864,
+          "peak_reserved_bytes": 155189248,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.4326951249914335
+        },
+        "nvalchemi": {
+          "wall_seconds": [
+            0.008388855960220098,
+            0.008349808864295483,
+            0.008273194078356028
+          ],
+          "median_wall_seconds": 0.008349808864295483,
+          "minimum_wall_seconds": 0.008273194078356028,
+          "maximum_wall_seconds": 0.008388855960220098,
+          "systems_per_second": 1916.2115277174078,
+          "atoms_per_second": 528874.3816500045,
+          "directed_edges": 76416,
+          "peak_allocated_bytes": 47022080,
+          "peak_reserved_bytes": 60817408,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0457947369366192
+        }
+      }
+    },
+    {
+      "point": {
+        "source_atoms": 46,
+        "repeat": [
+          2,
+          2,
+          2
+        ],
+        "batch_size": 8
+      },
+      "name": "H46-S2x2x2-B8",
+      "atoms_per_system": 368,
+      "cutoff_A": 4.5,
+      "cell_statistics": {
+        "bins": [
+          5,
+          6,
+          4
+        ],
+        "occupied_bins": 80,
+        "max_bin_occupancy": 10,
+        "offset_extents": [
+          1,
+          1,
+          1
+        ],
+        "neighbor_bin_count": 27,
+        "cell_candidate_pairs": 28464,
+        "dense_candidate_pairs": 3656448,
+        "candidate_reduction": 0.9922153959252258
+      },
+      "methods": {
+        "matscipy": {
+          "wall_seconds": [
+            0.016452654730528593,
+            0.016536084935069084,
+            0.016461396124213934
+          ],
+          "median_wall_seconds": 0.016461396124213934,
+          "minimum_wall_seconds": 0.016452654730528593,
+          "maximum_wall_seconds": 0.016536084935069084,
+          "systems_per_second": 485.9855105626417,
+          "atoms_per_second": 178842.66788705214,
+          "directed_edges": 52352,
+          "peak_allocated_bytes": 39221760,
+          "peak_reserved_bytes": 58720256,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 0.42843425563128684
+        },
+        "cuda_dense": {
+          "wall_seconds": [
+            0.007028663996607065,
+            0.007418234832584858,
+            0.007052625995129347
+          ],
+          "median_wall_seconds": 0.007052625995129347,
+          "minimum_wall_seconds": 0.007028663996607065,
+          "maximum_wall_seconds": 0.007418234832584858,
+          "systems_per_second": 1134.3292562975726,
+          "atoms_per_second": 417433.16631750675,
+          "directed_edges": 52352,
+          "peak_allocated_bytes": 152211968,
+          "peak_reserved_bytes": 174063616,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0
+        },
+        "cuda_cell": {
+          "wall_seconds": [
+            0.004809453152120113,
+            0.004777770023792982,
+            0.004795330110937357
+          ],
+          "median_wall_seconds": 0.004795330110937357,
+          "minimum_wall_seconds": 0.004777770023792982,
+          "maximum_wall_seconds": 0.004809453152120113,
+          "systems_per_second": 1668.2897349972466,
+          "atoms_per_second": 613930.6224789867,
+          "directed_edges": 52352,
+          "peak_allocated_bytes": 99706368,
+          "peak_reserved_bytes": 123731968,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.4707279440561287
+        },
+        "nvalchemi": {
+          "wall_seconds": [
+            0.006415334064513445,
+            0.0064425538294017315,
+            0.00640957010909915
+          ],
+          "median_wall_seconds": 0.006415334064513445,
+          "minimum_wall_seconds": 0.00640957010909915,
+          "maximum_wall_seconds": 0.0064425538294017315,
+          "systems_per_second": 1247.0122240792055,
+          "atoms_per_second": 458900.4984611476,
+          "directed_edges": 52352,
+          "peak_allocated_bytes": 42365440,
+          "peak_reserved_bytes": 62914560,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0993388534731334
+        }
+      }
+    },
+    {
+      "point": {
+        "source_atoms": 46,
+        "repeat": [
+          3,
+          3,
+          3
+        ],
+        "batch_size": 2
+      },
+      "name": "H46-S3x3x3-B2",
+      "atoms_per_system": 1242,
+      "cutoff_A": 4.5,
+      "cell_statistics": {
+        "bins": [
+          7,
+          9,
+          6
+        ],
+        "occupied_bins": 279,
+        "max_bin_occupancy": 12,
+        "offset_extents": [
+          1,
+          1,
+          1
+        ],
+        "neighbor_bin_count": 27,
+        "cell_candidate_pairs": 100548,
+        "dense_candidate_pairs": 41649228,
+        "candidate_reduction": 0.9975858376054413
+      },
+      "methods": {
+        "matscipy": {
+          "wall_seconds": [
+            0.012433458119630814,
+            0.012708463706076145,
+            0.012696000281721354
+          ],
+          "median_wall_seconds": 0.012696000281721354,
+          "minimum_wall_seconds": 0.012433458119630814,
+          "maximum_wall_seconds": 0.012708463706076145,
+          "systems_per_second": 157.52992719127724,
+          "atoms_per_second": 195652.1695715663,
+          "directed_edges": 44172,
+          "peak_allocated_bytes": 38338048,
+          "peak_reserved_bytes": 58720256,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 0.7838771604917216
+        },
+        "cuda_dense": {
+          "wall_seconds": [
+            0.009952104650437832,
+            0.009938376024365425,
+            0.010014469269663095
+          ],
+          "median_wall_seconds": 0.009952104650437832,
+          "minimum_wall_seconds": 0.009938376024365425,
+          "maximum_wall_seconds": 0.010014469269663095,
+          "systems_per_second": 200.9625170000611,
+          "atoms_per_second": 249595.4461140759,
+          "directed_edges": 44172,
+          "peak_allocated_bytes": 366956032,
+          "peak_reserved_bytes": 400556032,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0
+        },
+        "cuda_cell": {
+          "wall_seconds": [
+            0.00381499994546175,
+            0.004047841299325228,
+            0.0038564461283385754
+          ],
+          "median_wall_seconds": 0.0038564461283385754,
+          "minimum_wall_seconds": 0.00381499994546175,
+          "maximum_wall_seconds": 0.004047841299325228,
+          "systems_per_second": 518.6121971997143,
+          "atoms_per_second": 644116.3489220452,
+          "directed_edges": 44172,
+          "peak_allocated_bytes": 91718656,
+          "peak_reserved_bytes": 113246208,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 2.5806414297625295
+        },
+        "nvalchemi": {
+          "wall_seconds": [
+            0.004997452720999718,
+            0.005025274120271206,
+            0.005385121330618858
+          ],
+          "median_wall_seconds": 0.005025274120271206,
+          "minimum_wall_seconds": 0.004997452720999718,
+          "maximum_wall_seconds": 0.005385121330618858,
+          "systems_per_second": 397.9882394738027,
+          "atoms_per_second": 494301.393426463,
+          "directed_edges": 44172,
+          "peak_allocated_bytes": 41077760,
+          "peak_reserved_bytes": 60817408,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.9804103044433987
+        }
+      }
+    },
+    {
+      "point": {
+        "source_atoms": 276,
+        "repeat": [
+          2,
+          2,
+          2
+        ],
+        "batch_size": 2
+      },
+      "name": "H276-S2x2x2-B2",
+      "atoms_per_system": 2208,
+      "cutoff_A": 4.5,
+      "cell_statistics": {
+        "bins": [
+          10,
+          10,
+          10
+        ],
+        "occupied_bins": 496,
+        "max_bin_occupancy": 10,
+        "offset_extents": [
+          1,
+          1,
+          1
+        ],
+        "neighbor_bin_count": 27,
+        "cell_candidate_pairs": 168576,
+        "dense_candidate_pairs": 131632128,
+        "candidate_reduction": 0.9987193400079348
+      },
+      "methods": {
+        "matscipy": {
+          "wall_seconds": [
+            0.02336583798751235,
+            0.0233522136695683,
+            0.02344460180029273
+          ],
+          "median_wall_seconds": 0.02336583798751235,
+          "minimum_wall_seconds": 0.0233522136695683,
+          "maximum_wall_seconds": 0.02344460180029273,
+          "systems_per_second": 85.59504696852221,
+          "atoms_per_second": 188993.86370649704,
+          "directed_edges": 76416,
+          "peak_allocated_bytes": 41829376,
+          "peak_reserved_bytes": 60817408,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0594878347985077
+        },
+        "cuda_dense": {
+          "wall_seconds": [
+            0.024755821097642183,
+            0.02468404406681657,
+            0.024779130704700947
+          ],
+          "median_wall_seconds": 0.024755821097642183,
+          "minimum_wall_seconds": 0.02468404406681657,
+          "maximum_wall_seconds": 0.024779130704700947,
+          "systems_per_second": 80.7890795506874,
+          "atoms_per_second": 178382.2876479178,
+          "directed_edges": 76416,
+          "peak_allocated_bytes": 563999232,
+          "peak_reserved_bytes": 698351616,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0
+        },
+        "cuda_cell": {
+          "wall_seconds": [
+            0.004048255272209644,
+            0.004108470864593983,
+            0.0040574222803115845
+          ],
+          "median_wall_seconds": 0.0040574222803115845,
+          "minimum_wall_seconds": 0.004048255272209644,
+          "maximum_wall_seconds": 0.004108470864593983,
+          "systems_per_second": 492.9237978765209,
+          "atoms_per_second": 1088375.7457113583,
+          "directed_edges": 76416,
+          "peak_allocated_bytes": 132764672,
+          "peak_reserved_bytes": 155189248,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 6.101366677500744
+        },
+        "nvalchemi": {
+          "wall_seconds": [
+            0.005006446968764067,
+            0.005460067186504602,
+            0.00519585283473134
+          ],
+          "median_wall_seconds": 0.00519585283473134,
+          "minimum_wall_seconds": 0.005006446968764067,
+          "maximum_wall_seconds": 0.005460067186504602,
+          "systems_per_second": 384.92237244117655,
+          "atoms_per_second": 849908.5983501178,
+          "directed_edges": 76416,
+          "peak_allocated_bytes": 47015424,
+          "peak_reserved_bytes": 62914560,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 4.764534694316881
+        }
+      }
+    },
+    {
+      "point": {
+        "source_atoms": 46,
+        "repeat": [
+          1,
+          1,
+          1
+        ],
+        "batch_size": 1
+      },
+      "name": "H46-S1x1x1-B1",
+      "atoms_per_system": 46,
+      "cutoff_A": 6.0,
+      "cell_statistics": {
+        "bins": [
+          1,
+          2,
+          1
+        ],
+        "occupied_bins": 2,
+        "max_bin_occupancy": 32,
+        "offset_extents": [
+          1,
+          1,
+          1
+        ],
+        "neighbor_bin_count": 27,
+        "cell_candidate_pairs": 27108,
+        "dense_candidate_pairs": 57132,
+        "candidate_reduction": 0.5255198487712666
+      },
+      "methods": {
+        "matscipy": {
+          "wall_seconds": [
+            0.0018462250009179115,
+            0.0018487446941435337,
+            0.0018806778825819492
+          ],
+          "median_wall_seconds": 0.0018487446941435337,
+          "minimum_wall_seconds": 0.0018462250009179115,
+          "maximum_wall_seconds": 0.0018806778825819492,
+          "systems_per_second": 540.907569967777,
+          "atoms_per_second": 24881.748218517743,
+          "directed_edges": 1438,
+          "peak_allocated_bytes": 33714688,
+          "peak_reserved_bytes": 35651584,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 2.74974944265316
+        },
+        "cuda_dense": {
+          "wall_seconds": [
+            0.005079322960227728,
+            0.005088470876216888,
+            0.005083584692329168
+          ],
+          "median_wall_seconds": 0.005083584692329168,
+          "minimum_wall_seconds": 0.005079322960227728,
+          "maximum_wall_seconds": 0.005088470876216888,
+          "systems_per_second": 196.711584545634,
+          "atoms_per_second": 9048.732889099165,
+          "directed_edges": 1438,
+          "peak_allocated_bytes": 33991168,
+          "peak_reserved_bytes": 35651584,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0
+        },
+        "cuda_cell": {
+          "wall_seconds": [
+            0.0033368822187185287,
+            0.0033512208610773087,
+            0.0033665159717202187
+          ],
+          "median_wall_seconds": 0.0033512208610773087,
+          "minimum_wall_seconds": 0.0033368822187185287,
+          "maximum_wall_seconds": 0.0033665159717202187,
+          "systems_per_second": 298.39871540980215,
+          "atoms_per_second": 13726.3409088509,
+          "directed_edges": 1438,
+          "peak_allocated_bytes": 40108032,
+          "peak_reserved_bytes": 60817408,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.5169351418679582
+        },
+        "nvalchemi": {
+          "wall_seconds": [
+            0.003895851783454418,
+            0.003961583599448204,
+            0.00391031987965107
+          ],
+          "median_wall_seconds": 0.00391031987965107,
+          "minimum_wall_seconds": 0.003895851783454418,
+          "maximum_wall_seconds": 0.003961583599448204,
+          "systems_per_second": 255.73355397442145,
+          "atoms_per_second": 11763.743482823387,
+          "directed_edges": 1438,
+          "peak_allocated_bytes": 33844736,
+          "peak_reserved_bytes": 35651584,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.300043180299304
+        }
+      }
+    },
+    {
+      "point": {
+        "source_atoms": 46,
+        "repeat": [
+          1,
+          1,
+          1
+        ],
+        "batch_size": 32
+      },
+      "name": "H46-S1x1x1-B32",
+      "atoms_per_system": 46,
+      "cutoff_A": 6.0,
+      "cell_statistics": {
+        "bins": [
+          1,
+          2,
+          1
+        ],
+        "occupied_bins": 2,
+        "max_bin_occupancy": 32,
+        "offset_extents": [
+          1,
+          1,
+          1
+        ],
+        "neighbor_bin_count": 27,
+        "cell_candidate_pairs": 27108,
+        "dense_candidate_pairs": 57132,
+        "candidate_reduction": 0.5255198487712666
+      },
+      "methods": {
+        "matscipy": {
+          "wall_seconds": [
+            0.03318811394274235,
+            0.03315495792776346,
+            0.035122644156217575
+          ],
+          "median_wall_seconds": 0.03318811394274235,
+          "minimum_wall_seconds": 0.03315495792776346,
+          "maximum_wall_seconds": 0.035122644156217575,
+          "systems_per_second": 964.2006187880355,
+          "atoms_per_second": 44353.22846424963,
+          "directed_edges": 46016,
+          "peak_allocated_bytes": 38469632,
+          "peak_reserved_bytes": 58720256,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 0.3223375976057111
+        },
+        "cuda_dense": {
+          "wall_seconds": [
+            0.010678621008992195,
+            0.010697776917368174,
+            0.010739210993051529
+          ],
+          "median_wall_seconds": 0.010697776917368174,
+          "minimum_wall_seconds": 0.010678621008992195,
+          "maximum_wall_seconds": 0.010739210993051529,
+          "systems_per_second": 2991.2756871988054,
+          "atoms_per_second": 137598.68161114503,
+          "directed_edges": 46016,
+          "peak_allocated_bytes": 47014400,
+          "peak_reserved_bytes": 60817408,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0
+        },
+        "cuda_cell": {
+          "wall_seconds": [
+            0.008815971203148365,
+            0.008819409180432558,
+            0.008856333792209625
+          ],
+          "median_wall_seconds": 0.008819409180432558,
+          "minimum_wall_seconds": 0.008815971203148365,
+          "maximum_wall_seconds": 0.008856333792209625,
+          "systems_per_second": 3628.360964473419,
+          "atoms_per_second": 166904.60436577725,
+          "directed_edges": 46016,
+          "peak_allocated_bytes": 244052480,
+          "peak_reserved_bytes": 255852544,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.2129811304257332
+        },
+        "nvalchemi": {
+          "wall_seconds": [
+            0.011649755761027336,
+            0.011698404792696238,
+            0.012010920327156782
+          ],
+          "median_wall_seconds": 0.011698404792696238,
+          "minimum_wall_seconds": 0.011649755761027336,
+          "maximum_wall_seconds": 0.012010920327156782,
+          "systems_per_second": 2735.4156884688095,
+          "atoms_per_second": 125829.12166956524,
+          "directed_edges": 46016,
+          "peak_allocated_bytes": 42440704,
+          "peak_reserved_bytes": 60817408,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 0.9144645878596376
+        }
+      }
+    },
+    {
+      "point": {
+        "source_atoms": 276,
+        "repeat": [
+          1,
+          1,
+          1
+        ],
+        "batch_size": 1
+      },
+      "name": "H276-S1x1x1-B1",
+      "atoms_per_system": 276,
+      "cutoff_A": 6.0,
+      "cell_statistics": {
+        "bins": [
+          3,
+          3,
+          3
+        ],
+        "occupied_bins": 18,
+        "max_bin_occupancy": 24,
+        "offset_extents": [
+          1,
+          1,
+          1
+        ],
+        "neighbor_bin_count": 27,
+        "cell_candidate_pairs": 76176,
+        "dense_candidate_pairs": 2056752,
+        "candidate_reduction": 0.962962962962963
+      },
+      "methods": {
+        "matscipy": {
+          "wall_seconds": [
+            0.0040434557013213634,
+            0.004039647988975048,
+            0.004085090942680836
+          ],
+          "median_wall_seconds": 0.0040434557013213634,
+          "minimum_wall_seconds": 0.004039647988975048,
+          "maximum_wall_seconds": 0.004085090942680836,
+          "systems_per_second": 247.31320777749818,
+          "atoms_per_second": 68258.4453465895,
+          "directed_edges": 8160,
+          "peak_allocated_bytes": 34430464,
+          "peak_reserved_bytes": 35651584,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.2738721827241053
+        },
+        "cuda_dense": {
+          "wall_seconds": [
+            0.00512967724353075,
+            0.005150845739990473,
+            0.00519042182713747
+          ],
+          "median_wall_seconds": 0.005150845739990473,
+          "minimum_wall_seconds": 0.00512967724353075,
+          "maximum_wall_seconds": 0.00519042182713747,
+          "systems_per_second": 194.14287487511703,
+          "atoms_per_second": 53583.433465532304,
+          "directed_edges": 8160,
+          "peak_allocated_bytes": 42094080,
+          "peak_reserved_bytes": 56623104,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0
+        },
+        "cuda_cell": {
+          "wall_seconds": [
+            0.0034357020631432533,
+            0.0035072346217930317,
+            0.00344917643815279
+          ],
+          "median_wall_seconds": 0.00344917643815279,
+          "minimum_wall_seconds": 0.0034357020631432533,
+          "maximum_wall_seconds": 0.0035072346217930317,
+          "systems_per_second": 289.92428132657403,
+          "atoms_per_second": 80019.10164613443,
+          "directed_edges": 8160,
+          "peak_allocated_bytes": 52613120,
+          "peak_reserved_bytes": 60817408,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.4933552493907831
+        },
+        "nvalchemi": {
+          "wall_seconds": [
+            0.003987455274909735,
+            0.004008742980659008,
+            0.0039743538945913315
+          ],
+          "median_wall_seconds": 0.003987455274909735,
+          "minimum_wall_seconds": 0.0039743538945913315,
+          "maximum_wall_seconds": 0.004008742980659008,
+          "systems_per_second": 250.78651196222816,
+          "atoms_per_second": 69217.07730157497,
+          "directed_edges": 8160,
+          "peak_allocated_bytes": 35184128,
+          "peak_reserved_bytes": 35651584,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.2917626367877126
+        }
+      }
+    },
+    {
+      "point": {
+        "source_atoms": 276,
+        "repeat": [
+          1,
+          1,
+          1
+        ],
+        "batch_size": 16
+      },
+      "name": "H276-S1x1x1-B16",
+      "atoms_per_system": 276,
+      "cutoff_A": 6.0,
+      "cell_statistics": {
+        "bins": [
+          3,
+          3,
+          3
+        ],
+        "occupied_bins": 18,
+        "max_bin_occupancy": 24,
+        "offset_extents": [
+          1,
+          1,
+          1
+        ],
+        "neighbor_bin_count": 27,
+        "cell_candidate_pairs": 76176,
+        "dense_candidate_pairs": 2056752,
+        "candidate_reduction": 0.962962962962963
+      },
+      "methods": {
+        "matscipy": {
+          "wall_seconds": [
+            0.0538676711730659,
+            0.05395356519147754,
+            0.05377160478383303
+          ],
+          "median_wall_seconds": 0.0538676711730659,
+          "minimum_wall_seconds": 0.05377160478383303,
+          "maximum_wall_seconds": 0.05395356519147754,
+          "systems_per_second": 297.02416405927863,
+          "atoms_per_second": 81978.6692803609,
+          "directed_edges": 130560,
+          "peak_allocated_bytes": 47470592,
+          "peak_reserved_bytes": 62914560,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 0.16620959953273837
+        },
+        "cuda_dense": {
+          "wall_seconds": [
+            0.008953324053436518,
+            0.00903386902064085,
+            0.008812706917524338
+          ],
+          "median_wall_seconds": 0.008953324053436518,
+          "minimum_wall_seconds": 0.008812706917524338,
+          "maximum_wall_seconds": 0.00903386902064085,
+          "systems_per_second": 1787.0457837230615,
+          "atoms_per_second": 493224.636307565,
+          "directed_edges": 130560,
+          "peak_allocated_bytes": 171044352,
+          "peak_reserved_bytes": 203423744,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0
+        },
+        "cuda_cell": {
+          "wall_seconds": [
+            0.007239880971610546,
+            0.007244192995131016,
+            0.007240963168442249
+          ],
+          "median_wall_seconds": 0.007240963168442249,
+          "minimum_wall_seconds": 0.007239880971610546,
+          "maximum_wall_seconds": 0.007244192995131016,
+          "systems_per_second": 2209.650792001209,
+          "atoms_per_second": 609863.6185923336,
+          "directed_edges": 130560,
+          "peak_allocated_bytes": 340680704,
+          "peak_reserved_bytes": 364904448,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.2364824741074674
+        },
+        "nvalchemi": {
+          "wall_seconds": [
+            0.007810811046510935,
+            0.007750190794467926,
+            0.007995097897946835
+          ],
+          "median_wall_seconds": 0.007810811046510935,
+          "minimum_wall_seconds": 0.007750190794467926,
+          "maximum_wall_seconds": 0.007995097897946835,
+          "systems_per_second": 2048.4428447602954,
+          "atoms_per_second": 565370.2251538415,
+          "directed_edges": 130560,
+          "peak_allocated_bytes": 60033024,
+          "peak_reserved_bytes": 85983232,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.1462732871301424
+        }
+      }
+    },
+    {
+      "point": {
+        "source_atoms": 46,
+        "repeat": [
+          2,
+          2,
+          2
+        ],
+        "batch_size": 8
+      },
+      "name": "H46-S2x2x2-B8",
+      "atoms_per_system": 368,
+      "cutoff_A": 6.0,
+      "cell_statistics": {
+        "bins": [
+          3,
+          4,
+          3
+        ],
+        "occupied_bins": 36,
+        "max_bin_occupancy": 24,
+        "offset_extents": [
+          1,
+          1,
+          1
+        ],
+        "neighbor_bin_count": 27,
+        "cell_candidate_pairs": 96384,
+        "dense_candidate_pairs": 3656448,
+        "candidate_reduction": 0.9736399915984038
+      },
+      "methods": {
+        "matscipy": {
+          "wall_seconds": [
+            0.03364516515284777,
+            0.03358716703951359,
+            0.033648052252829075
+          ],
+          "median_wall_seconds": 0.03364516515284777,
+          "minimum_wall_seconds": 0.03358716703951359,
+          "maximum_wall_seconds": 0.033648052252829075,
+          "systems_per_second": 237.7756198745504,
+          "atoms_per_second": 87501.42811383455,
+          "directed_edges": 92032,
+          "peak_allocated_bytes": 43350528,
+          "peak_reserved_bytes": 60817408,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 0.20894187908555395
+        },
+        "cuda_dense": {
+          "wall_seconds": [
+            0.00702449306845665,
+            0.007038495037704706,
+            0.0070298840291798115
+          ],
+          "median_wall_seconds": 0.0070298840291798115,
+          "minimum_wall_seconds": 0.00702449306845665,
+          "maximum_wall_seconds": 0.007038495037704706,
+          "systems_per_second": 1137.9988584155028,
+          "atoms_per_second": 418783.579896905,
+          "directed_edges": 92032,
+          "peak_allocated_bytes": 154535424,
+          "peak_reserved_bytes": 171966464,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0
+        },
+        "cuda_cell": {
+          "wall_seconds": [
+            0.0054178740829229355,
+            0.0054284632205963135,
+            0.005363116972148418
+          ],
+          "median_wall_seconds": 0.0054178740829229355,
+          "minimum_wall_seconds": 0.005363116972148418,
+          "maximum_wall_seconds": 0.0054284632205963135,
+          "systems_per_second": 1476.5939328888965,
+          "atoms_per_second": 543386.5673031139,
+          "directed_edges": 92032,
+          "peak_allocated_bytes": 229111808,
+          "peak_reserved_bytes": 295698432,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.2975355132999324
+        },
+        "nvalchemi": {
+          "wall_seconds": [
+            0.005814177915453911,
+            0.0058001442812383175,
+            0.005792086012661457
+          ],
+          "median_wall_seconds": 0.0058001442812383175,
+          "minimum_wall_seconds": 0.005792086012661457,
+          "maximum_wall_seconds": 0.005814177915453911,
+          "systems_per_second": 1379.2760338527335,
+          "atoms_per_second": 507573.5804578059,
+          "directed_edges": 92032,
+          "peak_allocated_bytes": 51529216,
+          "peak_reserved_bytes": 62914560,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.2120188202764755
+        }
+      }
+    },
+    {
+      "point": {
+        "source_atoms": 46,
+        "repeat": [
+          3,
+          3,
+          3
+        ],
+        "batch_size": 2
+      },
+      "name": "H46-S3x3x3-B2",
+      "atoms_per_system": 1242,
+      "cutoff_A": 6.0,
+      "cell_statistics": {
+        "bins": [
+          5,
+          6,
+          4
+        ],
+        "occupied_bins": 117,
+        "max_bin_occupancy": 23,
+        "offset_extents": [
+          1,
+          1,
+          1
+        ],
+        "neighbor_bin_count": 27,
+        "cell_candidate_pairs": 327240,
+        "dense_candidate_pairs": 41649228,
+        "candidate_reduction": 0.9921429516052495
+      },
+      "methods": {
+        "matscipy": {
+          "wall_seconds": [
+            0.026845383923500776,
+            0.02686406299471855,
+            0.026839721016585827
+          ],
+          "median_wall_seconds": 0.026845383923500776,
+          "minimum_wall_seconds": 0.026839721016585827,
+          "maximum_wall_seconds": 0.02686406299471855,
+          "systems_per_second": 74.50070394594638,
+          "atoms_per_second": 92529.87430086541,
+          "directed_edges": 77652,
+          "peak_allocated_bytes": 41818624,
+          "peak_reserved_bytes": 60817408,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 0.37023641777211436
+        },
+        "cuda_dense": {
+          "wall_seconds": [
+            0.009939196985214949,
+            0.009912696201354265,
+            0.009939138777554035
+          ],
+          "median_wall_seconds": 0.009939138777554035,
+          "minimum_wall_seconds": 0.009912696201354265,
+          "maximum_wall_seconds": 0.009939196985214949,
+          "systems_per_second": 201.22467798886981,
+          "atoms_per_second": 249921.05006217633,
+          "directed_edges": 77652,
+          "peak_allocated_bytes": 368915968,
+          "peak_reserved_bytes": 398458880,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0
+        },
+        "cuda_cell": {
+          "wall_seconds": [
+            0.004336762707680464,
+            0.0043585640378296375,
+            0.0043705119751393795
+          ],
+          "median_wall_seconds": 0.0043585640378296375,
+          "minimum_wall_seconds": 0.004336762707680464,
+          "maximum_wall_seconds": 0.0043705119751393795,
+          "systems_per_second": 458.8667236826712,
+          "atoms_per_second": 569912.4708138776,
+          "directed_edges": 77652,
+          "peak_allocated_bytes": 198357504,
+          "peak_reserved_bytes": 266338304,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 2.280370023541805
+        },
+        "nvalchemi": {
+          "wall_seconds": [
+            0.004984438885003328,
+            0.005043707322329283,
+            0.005012931302189827
+          ],
+          "median_wall_seconds": 0.005012931302189827,
+          "minimum_wall_seconds": 0.004984438885003328,
+          "maximum_wall_seconds": 0.005043707322329283,
+          "systems_per_second": 398.96816442035197,
+          "atoms_per_second": 495518.4602100772,
+          "directed_edges": 77652,
+          "peak_allocated_bytes": 48531968,
+          "peak_reserved_bytes": 60817408,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.9826999769999372
+        }
+      }
+    },
+    {
+      "point": {
+        "source_atoms": 276,
+        "repeat": [
+          2,
+          2,
+          2
+        ],
+        "batch_size": 2
+      },
+      "name": "H276-S2x2x2-B2",
+      "atoms_per_system": 2208,
+      "cutoff_A": 6.0,
+      "cell_statistics": {
+        "bins": [
+          7,
+          7,
+          7
+        ],
+        "occupied_bins": 254,
+        "max_bin_occupancy": 23,
+        "offset_extents": [
+          1,
+          1,
+          1
+        ],
+        "neighbor_bin_count": 27,
+        "cell_candidate_pairs": 391440,
+        "dense_candidate_pairs": 131632128,
+        "candidate_reduction": 0.9970262579056688
+      },
+      "methods": {
+        "matscipy": {
+          "wall_seconds": [
+            0.040119845885783434,
+            0.040067750960588455,
+            0.0401277937926352
+          ],
+          "median_wall_seconds": 0.040119845885783434,
+          "minimum_wall_seconds": 0.040067750960588455,
+          "maximum_wall_seconds": 0.0401277937926352,
+          "systems_per_second": 49.85064014686819,
+          "atoms_per_second": 110070.21344428495,
+          "directed_edges": 130560,
+          "peak_allocated_bytes": 48064512,
+          "peak_reserved_bytes": 60817408,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 0.6171663025259564
+        },
+        "cuda_dense": {
+          "wall_seconds": [
+            0.024732170160859823,
+            0.024760616943240166,
+            0.0247771879658103
+          ],
+          "median_wall_seconds": 0.024760616943240166,
+          "minimum_wall_seconds": 0.024732170160859823,
+          "maximum_wall_seconds": 0.0247771879658103,
+          "systems_per_second": 80.77343163882736,
+          "atoms_per_second": 178347.73705853082,
+          "directed_edges": 130560,
+          "peak_allocated_bytes": 568547328,
+          "peak_reserved_bytes": 700448768,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0
+        },
+        "cuda_cell": {
+          "wall_seconds": [
+            0.004639414604753256,
+            0.004649267997592688,
+            0.004666448105126619
+          ],
+          "median_wall_seconds": 0.004649267997592688,
+          "minimum_wall_seconds": 0.004639414604753256,
+          "maximum_wall_seconds": 0.004666448105126619,
+          "systems_per_second": 430.17524501396053,
+          "atoms_per_second": 949826.9409908248,
+          "directed_edges": 130560,
+          "peak_allocated_bytes": 238412288,
+          "peak_reserved_bytes": 262144000,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 5.32570223012758
+        },
+        "nvalchemi": {
+          "wall_seconds": [
+            0.005073197651654482,
+            0.005100559908896685,
+            0.00508999265730381
+          ],
+          "median_wall_seconds": 0.00508999265730381,
+          "minimum_wall_seconds": 0.005073197651654482,
+          "maximum_wall_seconds": 0.005100559908896685,
+          "systems_per_second": 392.92787527505163,
+          "atoms_per_second": 867584.748607314,
+          "directed_edges": 130560,
+          "peak_allocated_bytes": 60156928,
+          "peak_reserved_bytes": 83886080,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 4.8645683030034
+        }
+      }
+    }
+  ]
+}

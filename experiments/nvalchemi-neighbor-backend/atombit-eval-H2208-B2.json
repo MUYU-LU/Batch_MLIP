@@ -1,0 +1,374 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "model": "atombit",
+  "task": "eval",
+  "source_atoms": 276,
+  "repeat": [
+    2,
+    2,
+    2
+  ],
+  "atoms_per_system": 2208,
+  "batch_size": 2,
+  "skin_A": 0.0,
+  "nve_steps": null,
+  "warmups": 1,
+  "repeats": 3,
+  "methods": {
+    "cuda_cell": {
+      "backend": "cuda_cell",
+      "wall_seconds": [
+        0.06862277397885919,
+        0.06773515278473496,
+        0.06834747502580285
+      ],
+      "median_wall_seconds": 0.06834747502580285,
+      "minimum_wall_seconds": 0.06773515278473496,
+      "maximum_wall_seconds": 0.06862277397885919,
+      "systems_per_second": 29.262236816282545,
+      "atoms_per_second": 64611.01889035186,
+      "peak_allocated_bytes": 5768921088,
+      "peak_reserved_bytes": 7130316800,
+      "runtime_profile": {
+        "schema_version": 1,
+        "total_seconds": 0.06843534018844366,
+        "phases": {
+          "calculator.graph_view": {
+            "count": 1,
+            "total_seconds": 1.6736000776290894e-05,
+            "mean_seconds": 1.6736000776290894e-05,
+            "max_seconds": 1.6736000776290894e-05,
+            "total_host_seconds": 2.866378054022789e-05
+          },
+          "calculator.neighbor_update": {
+            "count": 1,
+            "total_seconds": 0.006045087814331055,
+            "mean_seconds": 0.006045087814331055,
+            "max_seconds": 0.006045087814331055,
+            "total_host_seconds": 0.006050220225006342
+          },
+          "graph.neighbor_search": {
+            "count": 2,
+            "total_seconds": 0.0088372483253479,
+            "mean_seconds": 0.00441862416267395,
+            "max_seconds": 0.00453433609008789,
+            "total_host_seconds": 0.00883459858596325
+          },
+          "graph.to_device": {
+            "count": 2,
+            "total_seconds": 0.0010582720041275025,
+            "mean_seconds": 0.0005291360020637512,
+            "max_seconds": 0.0005316799879074097,
+            "total_host_seconds": 0.0010751262307167053
+          },
+          "model.autograd": {
+            "count": 1,
+            "total_seconds": 0.036211456298828125,
+            "mean_seconds": 0.036211456298828125,
+            "max_seconds": 0.036211456298828125,
+            "total_host_seconds": 0.011160395108163357
+          },
+          "model.forward": {
+            "count": 1,
+            "total_seconds": 0.01841926383972168,
+            "mean_seconds": 0.01841926383972168,
+            "max_seconds": 0.01841926383972168,
+            "total_host_seconds": 0.011432423256337643
+          }
+        },
+        "events": [
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 2,
+            "rebuilt_systems": 2,
+            "atoms": 4416,
+            "edges": 130560,
+            "rebuild_count": 1,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 2,
+            "rebuilt_systems": 2,
+            "atoms": 4416,
+            "edges": 130560,
+            "rebuild_count": 2,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "model_evaluation",
+            "adapter": "atombit",
+            "systems": 2,
+            "atoms": 4416,
+            "edges": 130560,
+            "candidate_edges": 130560,
+            "neighbor_rebuilds": 1,
+            "compute_stress": false
+          }
+        ],
+        "samples": [
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.00430291223526001,
+            "host_seconds": 0.004310139920562506,
+            "device": "cuda:0",
+            "systems": 2,
+            "atoms": 4416,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.0005265920162200927,
+            "host_seconds": 0.0005379682406783104,
+            "device": "cuda:0",
+            "systems": 2,
+            "atoms": 4416,
+            "edges": 130560
+          },
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.00453433609008789,
+            "host_seconds": 0.0045244586654007435,
+            "device": "cuda:0",
+            "systems": 2,
+            "atoms": 4416,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.0005316799879074097,
+            "host_seconds": 0.0005371579900383949,
+            "device": "cuda:0",
+            "systems": 2,
+            "atoms": 4416,
+            "edges": 130560
+          },
+          {
+            "name": "calculator.neighbor_update",
+            "seconds": 0.006045087814331055,
+            "host_seconds": 0.006050220225006342,
+            "device": "cuda:0",
+            "systems": 2,
+            "atoms": 4416
+          },
+          {
+            "name": "calculator.graph_view",
+            "seconds": 1.6736000776290894e-05,
+            "host_seconds": 2.866378054022789e-05,
+            "device": "cuda:0",
+            "systems": 2,
+            "atoms": 4416,
+            "candidate_edges": 130560
+          },
+          {
+            "name": "model.forward",
+            "seconds": 0.01841926383972168,
+            "host_seconds": 0.011432423256337643,
+            "device": "cuda:0",
+            "systems": 2,
+            "atoms": 4416,
+            "edges": 130560
+          },
+          {
+            "name": "model.autograd",
+            "seconds": 0.036211456298828125,
+            "host_seconds": 0.011160395108163357,
+            "device": "cuda:0",
+            "systems": 2,
+            "atoms": 4416,
+            "edges": 130560
+          }
+        ],
+        "peak_memory_bytes": 5768921088
+      },
+      "validation_vs_cuda_cell": {
+        "max_abs_positions_difference": 0.0,
+        "max_abs_cells_difference": 0.0,
+        "max_abs_energy_difference": 0.0,
+        "max_abs_forces_difference": 0.0
+      },
+      "speedup_vs_cuda_cell": 1.0
+    },
+    "nvalchemi": {
+      "backend": "nvalchemi",
+      "wall_seconds": [
+        0.0691411392763257,
+        0.0684218192473054,
+        0.06810957798734307
+      ],
+      "median_wall_seconds": 0.0684218192473054,
+      "minimum_wall_seconds": 0.06810957798734307,
+      "maximum_wall_seconds": 0.0691411392763257,
+      "systems_per_second": 29.23044172168463,
+      "atoms_per_second": 64540.81532147966,
+      "peak_allocated_bytes": 5767970816,
+      "peak_reserved_bytes": 7151288320,
+      "runtime_profile": {
+        "schema_version": 1,
+        "total_seconds": 0.06819286197423935,
+        "phases": {
+          "calculator.graph_view": {
+            "count": 1,
+            "total_seconds": 1.3824000023305415e-05,
+            "mean_seconds": 1.3824000023305415e-05,
+            "max_seconds": 1.3824000023305415e-05,
+            "total_host_seconds": 2.520717680454254e-05
+          },
+          "calculator.neighbor_update": {
+            "count": 1,
+            "total_seconds": 0.006066559791564941,
+            "mean_seconds": 0.006066559791564941,
+            "max_seconds": 0.006066559791564941,
+            "total_host_seconds": 0.006074516102671623
+          },
+          "graph.neighbor_search": {
+            "count": 2,
+            "total_seconds": 0.009176000118255615,
+            "mean_seconds": 0.004588000059127808,
+            "max_seconds": 0.004590784072875977,
+            "total_host_seconds": 0.00917654437944293
+          },
+          "graph.to_device": {
+            "count": 2,
+            "total_seconds": 0.0010583040118217469,
+            "mean_seconds": 0.0005291520059108734,
+            "max_seconds": 0.0005311999917030335,
+            "total_host_seconds": 0.0010972339659929276
+          },
+          "model.autograd": {
+            "count": 1,
+            "total_seconds": 0.03640278244018555,
+            "mean_seconds": 0.03640278244018555,
+            "max_seconds": 0.03640278244018555,
+            "total_host_seconds": 0.01175032090395689
+          },
+          "model.forward": {
+            "count": 1,
+            "total_seconds": 0.01821548843383789,
+            "mean_seconds": 0.01821548843383789,
+            "max_seconds": 0.01821548843383789,
+            "total_host_seconds": 0.009116013068705797
+          }
+        },
+        "events": [
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 2,
+            "rebuilt_systems": 2,
+            "atoms": 4416,
+            "edges": 130560,
+            "rebuild_count": 1,
+            "backend": "nvalchemi"
+          },
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 2,
+            "rebuilt_systems": 2,
+            "atoms": 4416,
+            "edges": 130560,
+            "rebuild_count": 2,
+            "backend": "nvalchemi"
+          },
+          {
+            "name": "model_evaluation",
+            "adapter": "atombit",
+            "systems": 2,
+            "atoms": 4416,
+            "edges": 130560,
+            "candidate_edges": 130560,
+            "neighbor_rebuilds": 1,
+            "compute_stress": false
+          }
+        ],
+        "samples": [
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.004590784072875977,
+            "host_seconds": 0.004600175190716982,
+            "device": "cuda:0",
+            "systems": 2,
+            "atoms": 4416,
+            "backend": "nvalchemi"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.0005271040201187134,
+            "host_seconds": 0.0005386890843510628,
+            "device": "cuda:0",
+            "systems": 2,
+            "atoms": 4416,
+            "edges": 130560
+          },
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.004585216045379639,
+            "host_seconds": 0.004576369188725948,
+            "device": "cuda:0",
+            "systems": 2,
+            "atoms": 4416,
+            "backend": "nvalchemi"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.0005311999917030335,
+            "host_seconds": 0.0005585448816418648,
+            "device": "cuda:0",
+            "systems": 2,
+            "atoms": 4416,
+            "edges": 130560
+          },
+          {
+            "name": "calculator.neighbor_update",
+            "seconds": 0.006066559791564941,
+            "host_seconds": 0.006074516102671623,
+            "device": "cuda:0",
+            "systems": 2,
+            "atoms": 4416
+          },
+          {
+            "name": "calculator.graph_view",
+            "seconds": 1.3824000023305415e-05,
+            "host_seconds": 2.520717680454254e-05,
+            "device": "cuda:0",
+            "systems": 2,
+            "atoms": 4416,
+            "candidate_edges": 130560
+          },
+          {
+            "name": "model.forward",
+            "seconds": 0.01821548843383789,
+            "host_seconds": 0.009116013068705797,
+            "device": "cuda:0",
+            "systems": 2,
+            "atoms": 4416,
+            "edges": 130560
+          },
+          {
+            "name": "model.autograd",
+            "seconds": 0.03640278244018555,
+            "host_seconds": 0.01175032090395689,
+            "device": "cuda:0",
+            "systems": 2,
+            "atoms": 4416,
+            "edges": 130560
+          }
+        ],
+        "peak_memory_bytes": 5767970816
+      },
+      "validation_vs_cuda_cell": {
+        "max_abs_positions_difference": 0.0,
+        "max_abs_cells_difference": 0.0,
+        "max_abs_energy_difference": 0.0,
+        "max_abs_forces_difference": 0.0
+      },
+      "speedup_vs_cuda_cell": 0.998913442783013
+    }
+  },
+  "environment": {
+    "python": "3.11.14",
+    "torch": "2.9.1+cu128",
+    "cuda": "12.8",
+    "gpu": "NVIDIA H100 80GB HBM3"
+  }
+}

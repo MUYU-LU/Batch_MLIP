@@ -705,6 +705,11 @@ geometry and occupied fractional span predict at least 98% fewer candidates
 than dense image expansion.
 Partial/nonperiodic or singular cells retain the existing dense/CPU paths.
 
+`neighbor_backend="nvalchemi"` is an optional explicit NVIDIA Warp control
+available through the `nvidia` package extra. It reproduces canonical topology
+but did not pass the end-to-end performance gate and is therefore never selected
+by `auto`.
+
 ## Current scientific scope
 
 Implemented:

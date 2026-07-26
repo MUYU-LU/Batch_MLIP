@@ -1,0 +1,1390 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "model": "mace",
+  "task": "bfgs",
+  "source_atoms": 46,
+  "repeat": [
+    2,
+    2,
+    2
+  ],
+  "atoms_per_system": 368,
+  "batch_size": 4,
+  "skin_A": 0.0,
+  "nve_steps": null,
+  "warmups": 1,
+  "repeats": 3,
+  "methods": {
+    "cuda_cell": {
+      "backend": "cuda_cell",
+      "wall_seconds": [
+        0.21615171805024147,
+        0.1789636481553316,
+        0.18606741586700082
+      ],
+      "median_wall_seconds": 0.18606741586700082,
+      "minimum_wall_seconds": 0.1789636481553316,
+      "maximum_wall_seconds": 0.21615171805024147,
+      "systems_per_second": 21.497584525273147,
+      "atoms_per_second": 7911.111105300518,
+      "peak_allocated_bytes": 2345836032,
+      "peak_reserved_bytes": 3198156800,
+      "runtime_profile": {
+        "schema_version": 1,
+        "total_seconds": 0.18640035996213555,
+        "phases": {
+          "calculator.neighbor_update": {
+            "count": 4,
+            "total_seconds": 0.023242431163787842,
+            "mean_seconds": 0.0058106077909469605,
+            "max_seconds": 0.008288607597351075,
+            "total_host_seconds": 0.02328764507547021
+          },
+          "graph.mace_tensor_state": {
+            "count": 4,
+            "total_seconds": 0.001300383985042572,
+            "mean_seconds": 0.000325095996260643,
+            "max_seconds": 0.00034575998783111574,
+            "total_host_seconds": 0.0013206754811108112
+          },
+          "graph.neighbor_search": {
+            "count": 5,
+            "total_seconds": 0.0184999361038208,
+            "mean_seconds": 0.00369998722076416,
+            "max_seconds": 0.0037342400550842286,
+            "total_host_seconds": 0.018473129253834486
+          },
+          "graph.to_device": {
+            "count": 5,
+            "total_seconds": 0.006098559975624085,
+            "mean_seconds": 0.001219711995124817,
+            "max_seconds": 0.003845695972442627,
+            "total_host_seconds": 0.006140768062323332
+          },
+          "model.forward": {
+            "count": 4,
+            "total_seconds": 0.10178790283203125,
+            "mean_seconds": 0.025446975708007812,
+            "max_seconds": 0.025810495376586914,
+            "total_host_seconds": 0.08764749206602573
+          },
+          "optimizer.bfgs_apply_displacement": {
+            "count": 3,
+            "total_seconds": 0.006250432014465332,
+            "mean_seconds": 0.0020834773381551105,
+            "max_seconds": 0.0020924479961395262,
+            "total_host_seconds": 0.006223347038030624
+          },
+          "optimizer.bfgs_cholesky": {
+            "count": 3,
+            "total_seconds": 0.011247231960296632,
+            "mean_seconds": 0.0037490773200988775,
+            "max_seconds": 0.0037618560791015626,
+            "total_host_seconds": 0.011259609833359718
+          },
+          "optimizer.bfgs_hessian_update": {
+            "count": 3,
+            "total_seconds": 0.0014188800025731326,
+            "mean_seconds": 0.0004729600008577109,
+            "max_seconds": 0.0007072640061378479,
+            "total_host_seconds": 0.0013518850319087505
+          },
+          "optimizer.bfgs_history_pack": {
+            "count": 3,
+            "total_seconds": 0.0007525440007448196,
+            "mean_seconds": 0.0002508480002482732,
+            "max_seconds": 0.0003274239897727966,
+            "total_host_seconds": 0.0007602903060615063
+          },
+          "optimizer.bfgs_history_store": {
+            "count": 3,
+            "total_seconds": 0.0004852479994297028,
+            "mean_seconds": 0.00016174933314323426,
+            "max_seconds": 0.00016547200083732606,
+            "total_host_seconds": 0.0004995847120881081
+          },
+          "optimizer.bfgs_linear_algebra": {
+            "count": 3,
+            "total_seconds": 0.015223999977111817,
+            "mean_seconds": 0.005074666659037272,
+            "max_seconds": 0.0054011201858520505,
+            "total_host_seconds": 0.015269813127815723
+          },
+          "optimizer.bfgs_solve": {
+            "count": 3,
+            "total_seconds": 0.0004726079851388931,
+            "mean_seconds": 0.0001575359950462977,
+            "max_seconds": 0.0001610559970140457,
+            "total_host_seconds": 0.0005007167346775532
+          },
+          "optimizer.bfgs_update": {
+            "count": 3,
+            "total_seconds": 0.024132192134857178,
+            "mean_seconds": 0.008044064044952393,
+            "max_seconds": 0.008363360404968262,
+            "total_host_seconds": 0.024236959870904684
+          }
+        },
+        "events": [
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 4,
+            "rebuilt_systems": 4,
+            "atoms": 1472,
+            "edges": 26176,
+            "rebuild_count": 1,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 4,
+            "rebuilt_systems": 4,
+            "atoms": 1472,
+            "edges": 26176,
+            "rebuild_count": 2,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "native_graph",
+            "adapter": "mace",
+            "graph_mode": "cached",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26176
+          },
+          {
+            "name": "model_evaluation",
+            "adapter": "mace",
+            "graph_mode": "cached",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26176,
+            "neighbor_rebuilds": 1,
+            "compute_stress": true
+          },
+          {
+            "name": "optimizer_evaluation",
+            "optimizer": "bfgs",
+            "scheduler_step": 0,
+            "active_systems": 4,
+            "active_atoms": 1472,
+            "active_edges": 26176,
+            "pending_systems": 0
+          },
+          {
+            "name": "bfgs_cholesky",
+            "systems": 4,
+            "fallback_systems": 0,
+            "dimension": 1113
+          },
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 4,
+            "rebuilt_systems": 4,
+            "atoms": 1472,
+            "edges": 26304,
+            "rebuild_count": 3,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "native_graph",
+            "adapter": "mace",
+            "graph_mode": "cached",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26304
+          },
+          {
+            "name": "model_evaluation",
+            "adapter": "mace",
+            "graph_mode": "cached",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26304,
+            "neighbor_rebuilds": 1,
+            "compute_stress": true
+          },
+          {
+            "name": "optimizer_evaluation",
+            "optimizer": "bfgs",
+            "scheduler_step": 1,
+            "active_systems": 4,
+            "active_atoms": 1472,
+            "active_edges": 26304,
+            "pending_systems": 0
+          },
+          {
+            "name": "bfgs_cholesky",
+            "systems": 4,
+            "fallback_systems": 0,
+            "dimension": 1113
+          },
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 4,
+            "rebuilt_systems": 4,
+            "atoms": 1472,
+            "edges": 26240,
+            "rebuild_count": 4,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "native_graph",
+            "adapter": "mace",
+            "graph_mode": "cached",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26240
+          },
+          {
+            "name": "model_evaluation",
+            "adapter": "mace",
+            "graph_mode": "cached",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26240,
+            "neighbor_rebuilds": 1,
+            "compute_stress": true
+          },
+          {
+            "name": "optimizer_evaluation",
+            "optimizer": "bfgs",
+            "scheduler_step": 2,
+            "active_systems": 4,
+            "active_atoms": 1472,
+            "active_edges": 26240,
+            "pending_systems": 0
+          },
+          {
+            "name": "bfgs_cholesky",
+            "systems": 4,
+            "fallback_systems": 0,
+            "dimension": 1113
+          },
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 4,
+            "rebuilt_systems": 4,
+            "atoms": 1472,
+            "edges": 26112,
+            "rebuild_count": 5,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "native_graph",
+            "adapter": "mace",
+            "graph_mode": "cached",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26112
+          },
+          {
+            "name": "model_evaluation",
+            "adapter": "mace",
+            "graph_mode": "cached",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26112,
+            "neighbor_rebuilds": 1,
+            "compute_stress": true
+          },
+          {
+            "name": "optimizer_evaluation",
+            "optimizer": "bfgs",
+            "scheduler_step": 3,
+            "active_systems": 4,
+            "active_atoms": 1472,
+            "active_edges": 26112,
+            "pending_systems": 0
+          }
+        ],
+        "samples": [
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.0037151360511779785,
+            "host_seconds": 0.0037215817719697952,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.0005693439841270447,
+            "host_seconds": 0.0005804412066936493,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26176
+          },
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.003656991958618164,
+            "host_seconds": 0.003649324644356966,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.0005598080158233643,
+            "host_seconds": 0.0005713477730751038,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26176
+          },
+          {
+            "name": "calculator.neighbor_update",
+            "seconds": 0.004943391799926758,
+            "host_seconds": 0.004961980041116476,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "graph.mace_tensor_state",
+            "seconds": 0.00032121598720550535,
+            "host_seconds": 0.0003236839547753334,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26176
+          },
+          {
+            "name": "model.forward",
+            "seconds": 0.024766752243041992,
+            "host_seconds": 0.02111068181693554,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26176
+          },
+          {
+            "name": "optimizer.bfgs_history_pack",
+            "seconds": 0.00011446399986743927,
+            "host_seconds": 0.00011261133477091789,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_hessian_update",
+            "seconds": 9.600000455975533e-06,
+            "host_seconds": 1.6367994248867035e-05,
+            "device": "cuda:0",
+            "systems": 0,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_cholesky",
+            "seconds": 0.0037370879650115967,
+            "host_seconds": 0.0037354640662670135,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_solve",
+            "seconds": 0.00015465599298477174,
+            "host_seconds": 0.0001619448885321617,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_history_store",
+            "seconds": 0.00015488000214099884,
+            "host_seconds": 0.0001586107537150383,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_linear_algebra",
+            "seconds": 0.0044410557746887205,
+            "host_seconds": 0.004456338007003069,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_apply_displacement",
+            "seconds": 0.0020924479961395262,
+            "host_seconds": 0.002083898987621069,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "optimizer.bfgs_update",
+            "seconds": 0.007414432048797608,
+            "host_seconds": 0.00745024811476469,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.0036960959434509276,
+            "host_seconds": 0.0036873300559818745,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.0005628799796104431,
+            "host_seconds": 0.0005737538449466228,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26304
+          },
+          {
+            "name": "calculator.neighbor_update",
+            "seconds": 0.00498748779296875,
+            "host_seconds": 0.004995501134544611,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "graph.mace_tensor_state",
+            "seconds": 0.0003166080117225647,
+            "host_seconds": 0.00032096635550260544,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26304
+          },
+          {
+            "name": "model.forward",
+            "seconds": 0.02553670310974121,
+            "host_seconds": 0.022026147227734327,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26304
+          },
+          {
+            "name": "optimizer.bfgs_history_pack",
+            "seconds": 0.00031065601110458375,
+            "host_seconds": 0.0003140373155474663,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_hessian_update",
+            "seconds": 0.0007020159959793091,
+            "host_seconds": 0.0006616897881031036,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_cholesky",
+            "seconds": 0.0037618560791015626,
+            "host_seconds": 0.0037697977386415005,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_solve",
+            "seconds": 0.0001610559970140457,
+            "host_seconds": 0.00016801990568637848,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_history_store",
+            "seconds": 0.00016547200083732606,
+            "host_seconds": 0.00016993796452879906,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_linear_algebra",
+            "seconds": 0.005381824016571045,
+            "host_seconds": 0.005396116059273481,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_apply_displacement",
+            "seconds": 0.0020822720527648927,
+            "host_seconds": 0.0020722700282931328,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "optimizer.bfgs_update",
+            "seconds": 0.008354399681091309,
+            "host_seconds": 0.008387904614210129,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.0037342400550842286,
+            "host_seconds": 0.0037250416353344917,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.0005608320236206055,
+            "host_seconds": 0.0005713319405913353,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26240
+          },
+          {
+            "name": "calculator.neighbor_update",
+            "seconds": 0.00502294397354126,
+            "host_seconds": 0.005032015964388847,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "graph.mace_tensor_state",
+            "seconds": 0.0003167999982833862,
+            "host_seconds": 0.0003212518058717251,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26240
+          },
+          {
+            "name": "model.forward",
+            "seconds": 0.025810495376586914,
+            "host_seconds": 0.022346857003867626,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26240
+          },
+          {
+            "name": "optimizer.bfgs_history_pack",
+            "seconds": 0.0003274239897727966,
+            "host_seconds": 0.0003336416557431221,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_hessian_update",
+            "seconds": 0.0007072640061378479,
+            "host_seconds": 0.0006738272495567799,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_cholesky",
+            "seconds": 0.003748287916183472,
+            "host_seconds": 0.0037543480284512043,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_solve",
+            "seconds": 0.00015689599514007567,
+            "host_seconds": 0.00017075194045901299,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_history_store",
+            "seconds": 0.00016489599645137787,
+            "host_seconds": 0.0001710359938442707,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_linear_algebra",
+            "seconds": 0.0054011201858520505,
+            "host_seconds": 0.005417359061539173,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_apply_displacement",
+            "seconds": 0.002075711965560913,
+            "host_seconds": 0.0020671780221164227,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "optimizer.bfgs_update",
+            "seconds": 0.008363360404968262,
+            "host_seconds": 0.008398807141929865,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.003697472095489502,
+            "host_seconds": 0.0036898511461913586,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.003845695972442627,
+            "host_seconds": 0.0038438932970166206,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26112
+          },
+          {
+            "name": "calculator.neighbor_update",
+            "seconds": 0.008288607597351075,
+            "host_seconds": 0.008298147935420275,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "graph.mace_tensor_state",
+            "seconds": 0.00034575998783111574,
+            "host_seconds": 0.0003547733649611473,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26112
+          },
+          {
+            "name": "model.forward",
+            "seconds": 0.025673952102661133,
+            "host_seconds": 0.02216380601748824,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26112
+          }
+        ],
+        "peak_memory_bytes": 2345836032
+      },
+      "validation_vs_cuda_cell": {
+        "max_abs_velocities_difference": 0.0,
+        "max_abs_positions_difference": 0.0,
+        "max_abs_cells_difference": 0.0,
+        "max_abs_energy_difference": 0.0,
+        "max_abs_forces_difference": 0.0
+      },
+      "speedup_vs_cuda_cell": 1.0
+    },
+    "nvalchemi": {
+      "backend": "nvalchemi",
+      "wall_seconds": [
+        0.20408269204199314,
+        0.1943467939272523,
+        0.1914034029468894
+      ],
+      "median_wall_seconds": 0.1943467939272523,
+      "minimum_wall_seconds": 0.1914034029468894,
+      "maximum_wall_seconds": 0.20408269204199314,
+      "systems_per_second": 20.581764788449643,
+      "atoms_per_second": 7574.089442149469,
+      "peak_allocated_bytes": 2345975296,
+      "peak_reserved_bytes": 2692743168,
+      "runtime_profile": {
+        "schema_version": 1,
+        "total_seconds": 0.19173375517129898,
+        "phases": {
+          "calculator.neighbor_update": {
+            "count": 4,
+            "total_seconds": 0.025191936016082765,
+            "mean_seconds": 0.006297984004020691,
+            "max_seconds": 0.0063591041564941405,
+            "total_host_seconds": 0.025250300765037537
+          },
+          "graph.mace_tensor_state": {
+            "count": 4,
+            "total_seconds": 0.0013768000006675722,
+            "mean_seconds": 0.00034420000016689305,
+            "max_seconds": 0.0003914240002632141,
+            "total_host_seconds": 0.001390100922435522
+          },
+          "graph.neighbor_search": {
+            "count": 5,
+            "total_seconds": 0.024976319789886476,
+            "mean_seconds": 0.004995263957977295,
+            "max_seconds": 0.005043935775756836,
+            "total_host_seconds": 0.02495860680937767
+          },
+          "graph.to_device": {
+            "count": 5,
+            "total_seconds": 0.002891871988773346,
+            "mean_seconds": 0.0005783743977546693,
+            "max_seconds": 0.0005969280004501343,
+            "total_host_seconds": 0.0029537929221987724
+          },
+          "model.forward": {
+            "count": 4,
+            "total_seconds": 0.10186268806457519,
+            "mean_seconds": 0.025465672016143796,
+            "max_seconds": 0.025929792404174805,
+            "total_host_seconds": 0.08993111317977309
+          },
+          "optimizer.bfgs_apply_displacement": {
+            "count": 3,
+            "total_seconds": 0.006569439888000488,
+            "mean_seconds": 0.002189813296000163,
+            "max_seconds": 0.002229919910430908,
+            "total_host_seconds": 0.006505428347736597
+          },
+          "optimizer.bfgs_cholesky": {
+            "count": 3,
+            "total_seconds": 0.011409152269363404,
+            "mean_seconds": 0.0038030507564544677,
+            "max_seconds": 0.003819904088973999,
+            "total_host_seconds": 0.01141499588266015
+          },
+          "optimizer.bfgs_hessian_update": {
+            "count": 3,
+            "total_seconds": 0.0014519039634615183,
+            "mean_seconds": 0.0004839679878205061,
+            "max_seconds": 0.0007240319848060608,
+            "total_host_seconds": 0.0014113867655396461
+          },
+          "optimizer.bfgs_history_pack": {
+            "count": 3,
+            "total_seconds": 0.0007619519829750062,
+            "mean_seconds": 0.00025398399432500205,
+            "max_seconds": 0.0003312959969043732,
+            "total_host_seconds": 0.0007696053944528103
+          },
+          "optimizer.bfgs_history_store": {
+            "count": 3,
+            "total_seconds": 0.0004975999891757964,
+            "mean_seconds": 0.0001658666630585988,
+            "max_seconds": 0.0001714559942483902,
+            "total_host_seconds": 0.0005241930484771729
+          },
+          "optimizer.bfgs_linear_algebra": {
+            "count": 3,
+            "total_seconds": 0.015539936065673828,
+            "mean_seconds": 0.0051799786885579424,
+            "max_seconds": 0.0055305280685424806,
+            "total_host_seconds": 0.015589688438922167
+          },
+          "optimizer.bfgs_solve": {
+            "count": 3,
+            "total_seconds": 0.0005007039904594421,
+            "mean_seconds": 0.00016690133015314737,
+            "max_seconds": 0.00017574399709701537,
+            "total_host_seconds": 0.0005242032930254936
+          },
+          "optimizer.bfgs_update": {
+            "count": 3,
+            "total_seconds": 0.024831999778747556,
+            "mean_seconds": 0.008277333259582518,
+            "max_seconds": 0.008643072128295898,
+            "total_host_seconds": 0.02494898485019803
+          }
+        },
+        "events": [
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 4,
+            "rebuilt_systems": 4,
+            "atoms": 1472,
+            "edges": 26176,
+            "rebuild_count": 1,
+            "backend": "nvalchemi"
+          },
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 4,
+            "rebuilt_systems": 4,
+            "atoms": 1472,
+            "edges": 26176,
+            "rebuild_count": 2,
+            "backend": "nvalchemi"
+          },
+          {
+            "name": "native_graph",
+            "adapter": "mace",
+            "graph_mode": "cached",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26176
+          },
+          {
+            "name": "model_evaluation",
+            "adapter": "mace",
+            "graph_mode": "cached",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26176,
+            "neighbor_rebuilds": 1,
+            "compute_stress": true
+          },
+          {
+            "name": "optimizer_evaluation",
+            "optimizer": "bfgs",
+            "scheduler_step": 0,
+            "active_systems": 4,
+            "active_atoms": 1472,
+            "active_edges": 26176,
+            "pending_systems": 0
+          },
+          {
+            "name": "bfgs_cholesky",
+            "systems": 4,
+            "fallback_systems": 0,
+            "dimension": 1113
+          },
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 4,
+            "rebuilt_systems": 4,
+            "atoms": 1472,
+            "edges": 26304,
+            "rebuild_count": 3,
+            "backend": "nvalchemi"
+          },
+          {
+            "name": "native_graph",
+            "adapter": "mace",
+            "graph_mode": "cached",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26304
+          },
+          {
+            "name": "model_evaluation",
+            "adapter": "mace",
+            "graph_mode": "cached",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26304,
+            "neighbor_rebuilds": 1,
+            "compute_stress": true
+          },
+          {
+            "name": "optimizer_evaluation",
+            "optimizer": "bfgs",
+            "scheduler_step": 1,
+            "active_systems": 4,
+            "active_atoms": 1472,
+            "active_edges": 26304,
+            "pending_systems": 0
+          },
+          {
+            "name": "bfgs_cholesky",
+            "systems": 4,
+            "fallback_systems": 0,
+            "dimension": 1113
+          },
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 4,
+            "rebuilt_systems": 4,
+            "atoms": 1472,
+            "edges": 26240,
+            "rebuild_count": 4,
+            "backend": "nvalchemi"
+          },
+          {
+            "name": "native_graph",
+            "adapter": "mace",
+            "graph_mode": "cached",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26240
+          },
+          {
+            "name": "model_evaluation",
+            "adapter": "mace",
+            "graph_mode": "cached",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26240,
+            "neighbor_rebuilds": 1,
+            "compute_stress": true
+          },
+          {
+            "name": "optimizer_evaluation",
+            "optimizer": "bfgs",
+            "scheduler_step": 2,
+            "active_systems": 4,
+            "active_atoms": 1472,
+            "active_edges": 26240,
+            "pending_systems": 0
+          },
+          {
+            "name": "bfgs_cholesky",
+            "systems": 4,
+            "fallback_systems": 0,
+            "dimension": 1113
+          },
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 4,
+            "rebuilt_systems": 4,
+            "atoms": 1472,
+            "edges": 26112,
+            "rebuild_count": 5,
+            "backend": "nvalchemi"
+          },
+          {
+            "name": "native_graph",
+            "adapter": "mace",
+            "graph_mode": "cached",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26112
+          },
+          {
+            "name": "model_evaluation",
+            "adapter": "mace",
+            "graph_mode": "cached",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26112,
+            "neighbor_rebuilds": 1,
+            "compute_stress": true
+          },
+          {
+            "name": "optimizer_evaluation",
+            "optimizer": "bfgs",
+            "scheduler_step": 3,
+            "active_systems": 4,
+            "active_atoms": 1472,
+            "active_edges": 26112,
+            "pending_systems": 0
+          }
+        ],
+        "samples": [
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.005035071849822998,
+            "host_seconds": 0.0050445981323719025,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "backend": "nvalchemi"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.0005969280004501343,
+            "host_seconds": 0.000615634024143219,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26176
+          },
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.0049313921928405766,
+            "host_seconds": 0.0049243769608438015,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "backend": "nvalchemi"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.0005761280059814453,
+            "host_seconds": 0.0005868528969585896,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26176
+          },
+          {
+            "name": "calculator.neighbor_update",
+            "seconds": 0.006214431762695313,
+            "host_seconds": 0.006234611850231886,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "graph.mace_tensor_state",
+            "seconds": 0.00032844799757003785,
+            "host_seconds": 0.0003311219625174999,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26176
+          },
+          {
+            "name": "model.forward",
+            "seconds": 0.02508937644958496,
+            "host_seconds": 0.022698213811963797,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26176
+          },
+          {
+            "name": "optimizer.bfgs_history_pack",
+            "seconds": 0.00011724799871444702,
+            "host_seconds": 0.00011604512110352516,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_hessian_update",
+            "seconds": 1.056000031530857e-05,
+            "host_seconds": 1.7220154404640198e-05,
+            "device": "cuda:0",
+            "systems": 0,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_cholesky",
+            "seconds": 0.0037933120727539063,
+            "host_seconds": 0.003790615126490593,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_solve",
+            "seconds": 0.00016124799847602844,
+            "host_seconds": 0.00016726506873965263,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_history_store",
+            "seconds": 0.00015887999534606933,
+            "host_seconds": 0.00016364408656954765,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_linear_algebra",
+            "seconds": 0.0045212159156799315,
+            "host_seconds": 0.004536953754723072,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_apply_displacement",
+            "seconds": 0.002138047933578491,
+            "host_seconds": 0.0020985030569136143,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "optimizer.bfgs_update",
+            "seconds": 0.007557375907897949,
+            "host_seconds": 0.007588982116430998,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.0049601922035217285,
+            "host_seconds": 0.0049538398161530495,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "backend": "nvalchemi"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.000572767972946167,
+            "host_seconds": 0.0005829590372741222,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26304
+          },
+          {
+            "name": "calculator.neighbor_update",
+            "seconds": 0.006292511940002441,
+            "host_seconds": 0.006310745142400265,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "graph.mace_tensor_state",
+            "seconds": 0.0003296000063419342,
+            "host_seconds": 0.0003329669125378132,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26304
+          },
+          {
+            "name": "model.forward",
+            "seconds": 0.025929792404174805,
+            "host_seconds": 0.022580245044082403,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26304
+          },
+          {
+            "name": "optimizer.bfgs_history_pack",
+            "seconds": 0.0003312959969043732,
+            "host_seconds": 0.00033651525154709816,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_hessian_update",
+            "seconds": 0.0007240319848060608,
+            "host_seconds": 0.0006826287135481834,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_cholesky",
+            "seconds": 0.003795936107635498,
+            "host_seconds": 0.0038045928813517094,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_solve",
+            "seconds": 0.0001637119948863983,
+            "host_seconds": 0.0001706872135400772,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_history_store",
+            "seconds": 0.000167263999581337,
+            "host_seconds": 0.000183815136551857,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_linear_algebra",
+            "seconds": 0.005488192081451416,
+            "host_seconds": 0.005507329013198614,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_apply_displacement",
+            "seconds": 0.002229919910430908,
+            "host_seconds": 0.002216688357293606,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "optimizer.bfgs_update",
+            "seconds": 0.008643072128295898,
+            "host_seconds": 0.008690353948622942,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.005005727767944336,
+            "host_seconds": 0.004999130964279175,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "backend": "nvalchemi"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.0005742080211639404,
+            "host_seconds": 0.0005849758163094521,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26240
+          },
+          {
+            "name": "calculator.neighbor_update",
+            "seconds": 0.006325888156890869,
+            "host_seconds": 0.006337272003293037,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "graph.mace_tensor_state",
+            "seconds": 0.0003273279964923859,
+            "host_seconds": 0.0003328640013933182,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26240
+          },
+          {
+            "name": "model.forward",
+            "seconds": 0.025893280029296875,
+            "host_seconds": 0.023011034354567528,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26240
+          },
+          {
+            "name": "optimizer.bfgs_history_pack",
+            "seconds": 0.00031340798735618594,
+            "host_seconds": 0.00031704502180218697,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_hessian_update",
+            "seconds": 0.0007173119783401489,
+            "host_seconds": 0.0007115378975868225,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_cholesky",
+            "seconds": 0.003819904088973999,
+            "host_seconds": 0.003819787874817848,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_solve",
+            "seconds": 0.00017574399709701537,
+            "host_seconds": 0.00018625101074576378,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_history_store",
+            "seconds": 0.0001714559942483902,
+            "host_seconds": 0.0001767338253557682,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_linear_algebra",
+            "seconds": 0.0055305280685424806,
+            "host_seconds": 0.005545405671000481,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_apply_displacement",
+            "seconds": 0.002201472043991089,
+            "host_seconds": 0.002190236933529377,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "optimizer.bfgs_update",
+            "seconds": 0.00863155174255371,
+            "host_seconds": 0.00866964878514409,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.005043935775756836,
+            "host_seconds": 0.005036660935729742,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "backend": "nvalchemi"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.0005718399882316589,
+            "host_seconds": 0.0005833711475133896,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26112
+          },
+          {
+            "name": "calculator.neighbor_update",
+            "seconds": 0.0063591041564941405,
+            "host_seconds": 0.0063676717691123486,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "graph.mace_tensor_state",
+            "seconds": 0.0003914240002632141,
+            "host_seconds": 0.0003931480459868908,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26112
+          },
+          {
+            "name": "model.forward",
+            "seconds": 0.024950239181518556,
+            "host_seconds": 0.021641619969159365,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 26112
+          }
+        ],
+        "peak_memory_bytes": 2345975296
+      },
+      "validation_vs_cuda_cell": {
+        "max_abs_velocities_difference": 0.0,
+        "max_abs_positions_difference": 0.0,
+        "max_abs_cells_difference": 0.0,
+        "max_abs_energy_difference": 0.0,
+        "max_abs_forces_difference": 0.0
+      },
+      "speedup_vs_cuda_cell": 0.9573989470423134
+    }
+  },
+  "environment": {
+    "python": "3.11.14",
+    "torch": "2.9.1+cu128",
+    "cuda": "12.8",
+    "gpu": "NVIDIA H100 80GB HBM3"
+  }
+}
