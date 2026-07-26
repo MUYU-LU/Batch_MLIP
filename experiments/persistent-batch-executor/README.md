@@ -14,6 +14,8 @@ neighbor caching do not address.
 - Models: smooth-RMS AtomBit float32 and MACE-OFF23 Small float64.
 - Comparison: three calls through the existing fresh process scheduler versus
   three calls through one `BatchExecutor`.
+- Cold calibration: C256, an intentional whole-pool override used to isolate
+  process/model reuse. This is not the package's C32 automatic default.
 - GPU counts: 1, 2, and 4 for AtomBit H46; the model/size adaptation checks use
   two GPUs.
 - Timing: synchronized end-to-end wall time, one measured session. The first

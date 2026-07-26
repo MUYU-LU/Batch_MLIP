@@ -1,0 +1,279 @@
+{
+  "experiment": "distributed-cold-pilot",
+  "pairs": [
+    {
+      "c256": {
+        "calls_s": [
+          10.917516492772847,
+          1.8617339222691953,
+          0.9156779553741217
+        ],
+        "first_call_s": 10.917516492772847,
+        "last_call_s": 0.9156779553741217,
+        "peak_reserved_GiB": 9.216796875,
+        "post_first_mean_s": 1.3887059388216585,
+        "session_s": 13.694928370416164
+      },
+      "c32": {
+        "calls_s": [
+          10.704097996931523,
+          0.9023358779959381,
+          0.9087656736373901
+        ],
+        "first_call_s": 10.704097996931523,
+        "last_call_s": 0.9087656736373901,
+        "peak_reserved_GiB": 4.828125,
+        "post_first_mean_s": 0.9055507758166641,
+        "session_s": 12.515199548564851
+      },
+      "identity": {
+        "atoms": 11776,
+        "gpu_count": 4,
+        "jobs": 256,
+        "max_steps": 2,
+        "mlip": "atombit",
+        "resident_batch_size": 128,
+        "workload_id": "OPT-H46-R256-v1"
+      },
+      "label": "atombit-H46-B128-4gpu",
+      "numerical": null,
+      "source": {
+        "c256": "experiments/persistent-batch-executor/results/raw/atombit_h46_b128_persistent_4gpu_2step.json",
+        "c32": "experiments/distributed-cold-pilot/results/raw/atombit_h46_b128_c32_4gpu_2step.json"
+      },
+      "speedup_c256_over_c32": {
+        "first_call_s": 1.019938017748203,
+        "last_call_s": 1.0076062311080312,
+        "post_first_mean_s": 1.5335483949746105,
+        "session_s": 1.0942636845120537
+      }
+    },
+    {
+      "c256": {
+        "calls_s": [
+          14.900210612919182,
+          4.472780503798276,
+          4.083637144882232
+        ],
+        "first_call_s": 14.900210612919182,
+        "last_call_s": 4.083637144882232,
+        "peak_reserved_GiB": 24.7578125,
+        "post_first_mean_s": 4.278208824340254,
+        "session_s": 23.45662826159969
+      },
+      "c32": {
+        "calls_s": [
+          12.526729111559689,
+          4.070558055769652,
+          4.061516533140093
+        ],
+        "first_call_s": 12.526729111559689,
+        "last_call_s": 4.061516533140093,
+        "peak_reserved_GiB": 24.875,
+        "post_first_mean_s": 4.066037294454873,
+        "session_s": 20.658803700469434
+      },
+      "identity": {
+        "atoms": 70656,
+        "gpu_count": 2,
+        "jobs": 256,
+        "max_steps": 2,
+        "mlip": "atombit",
+        "resident_batch_size": 64,
+        "workload_id": "OPT-H276-R256-v1"
+      },
+      "label": "atombit-H276-B64-2gpu",
+      "numerical": {
+        "calls": [
+          {
+            "call": 1,
+            "converged_steps_equal": true,
+            "max_abs_cells_A": 1.3142198440618813e-09,
+            "max_abs_energies_eV": 6.4849853515625e-05,
+            "max_abs_forces_eV_per_A": 0.00029921531677246094,
+            "max_abs_positions_A": 1.9073486328125e-06
+          },
+          {
+            "call": 2,
+            "converged_steps_equal": true,
+            "max_abs_cells_A": 9.795257938094437e-10,
+            "max_abs_energies_eV": 5.7220458984375e-05,
+            "max_abs_forces_eV_per_A": 0.0002999305725097656,
+            "max_abs_positions_A": 1.9073486328125e-06
+          },
+          {
+            "call": 3,
+            "converged_steps_equal": true,
+            "max_abs_cells_A": 1.7535057850182056e-09,
+            "max_abs_energies_eV": 4.1961669921875e-05,
+            "max_abs_forces_eV_per_A": 0.0003006458282470703,
+            "max_abs_positions_A": 1.9073486328125e-06
+          }
+        ]
+      },
+      "source": {
+        "c256": "experiments/persistent-batch-executor/results/raw/atombit_h276_b64_persistent_2gpu_2step.json",
+        "c32": "experiments/distributed-cold-pilot/results/raw/atombit_h276_b64_c32_2gpu_2step.json"
+      },
+      "speedup_c256_over_c32": {
+        "first_call_s": 1.1894733637346113,
+        "last_call_s": 1.0054463921448171,
+        "post_first_mean_s": 1.0521814028058065,
+        "session_s": 1.1354301343725282
+      }
+    },
+    {
+      "c256": {
+        "calls_s": [
+          22.22879962529987,
+          2.5754085928201675,
+          1.6698907800018787
+        ],
+        "first_call_s": 22.22879962529987,
+        "last_call_s": 1.6698907800018787,
+        "peak_reserved_GiB": 9.193359375,
+        "post_first_mean_s": 2.122649686411023,
+        "session_s": 26.474098998121917
+      },
+      "c32": {
+        "calls_s": [
+          22.506065242923796,
+          1.6751865199767053,
+          0.8350112210027874
+        ],
+        "first_call_s": 22.506065242923796,
+        "last_call_s": 0.8350112210027874,
+        "peak_reserved_GiB": 9.43359375,
+        "post_first_mean_s": 1.2550988704897463,
+        "session_s": 25.01626298390329
+      },
+      "identity": {
+        "atoms": 11776,
+        "gpu_count": 2,
+        "jobs": 256,
+        "max_steps": 2,
+        "mlip": "mace",
+        "resident_batch_size": 128,
+        "workload_id": "OPT-H46-R256-v1"
+      },
+      "label": "mace-H46-B128-2gpu",
+      "numerical": null,
+      "source": {
+        "c256": "experiments/distributed-cold-pilot/results/raw/mace_h46_b128_c256_control_2gpu_2step.json",
+        "c32": "experiments/distributed-cold-pilot/results/raw/mace_h46_b128_c32_2gpu_2step.json"
+      },
+      "speedup_c256_over_c32": {
+        "first_call_s": 0.9876804046095484,
+        "last_call_s": 1.9998423230725715,
+        "post_first_mean_s": 1.6912210952614066,
+        "session_s": 1.0582755312077057
+      }
+    },
+    {
+      "c256": {
+        "calls_s": [
+          28.243561569135636,
+          4.473751775920391,
+          3.6304992577061057
+        ],
+        "first_call_s": 28.243561569135636,
+        "last_call_s": 3.6304992577061057,
+        "peak_reserved_GiB": 26.92578125,
+        "post_first_mean_s": 4.052125516813248,
+        "session_s": 36.34781260276213
+      },
+      "c32": {
+        "calls_s": [
+          25.181030824780464,
+          2.8104218328371644,
+          2.81493913102895
+        ],
+        "first_call_s": 25.181030824780464,
+        "last_call_s": 2.81493913102895,
+        "peak_reserved_GiB": 26.96875,
+        "post_first_mean_s": 2.8126804819330573,
+        "session_s": 30.80639178864658
+      },
+      "identity": {
+        "atoms": 70656,
+        "gpu_count": 2,
+        "jobs": 256,
+        "max_steps": 2,
+        "mlip": "mace",
+        "resident_batch_size": 64,
+        "workload_id": "OPT-H276-R256-v1"
+      },
+      "label": "mace-H276-B64-2gpu",
+      "numerical": {
+        "calls": [
+          {
+            "call": 1,
+            "converged_steps_equal": true,
+            "max_abs_cells_A": 7.105427357601002e-15,
+            "max_abs_energies_eV": 2.3283064365386963e-10,
+            "max_abs_forces_eV_per_A": 3.201328091506639e-13,
+            "max_abs_positions_A": 1.0658141036401503e-14
+          },
+          {
+            "call": 2,
+            "converged_steps_equal": true,
+            "max_abs_cells_A": 7.105427357601002e-15,
+            "max_abs_energies_eV": 2.0372681319713593e-10,
+            "max_abs_forces_eV_per_A": 3.2951419370874646e-13,
+            "max_abs_positions_A": 7.105427357601002e-15
+          },
+          {
+            "call": 3,
+            "converged_steps_equal": true,
+            "max_abs_cells_A": 7.105427357601002e-15,
+            "max_abs_energies_eV": 2.3283064365386963e-10,
+            "max_abs_forces_eV_per_A": 3.306244167333716e-13,
+            "max_abs_positions_A": 7.105427357601002e-15
+          }
+        ]
+      },
+      "source": {
+        "c256": "experiments/persistent-batch-executor/results/raw/mace_h276_b64_persistent_2gpu_2step.json",
+        "c32": "experiments/distributed-cold-pilot/results/raw/mace_h276_b64_c32_2gpu_2step.json"
+      },
+      "speedup_c256_over_c32": {
+        "first_call_s": 1.1216205470564518,
+        "last_call_s": 1.2897256703305844,
+        "post_first_mean_s": 1.4406632899974348,
+        "session_s": 1.1798789307145603
+      }
+    }
+  ],
+  "rejected_shape_warmup": {
+    "no_warmup": {
+      "calls_s": [
+        22.506065242923796,
+        1.6751865199767053,
+        0.8350112210027874
+      ],
+      "first_call_s": 22.506065242923796,
+      "last_call_s": 0.8350112210027874,
+      "peak_reserved_GiB": 9.43359375,
+      "post_first_mean_s": 1.2550988704897463,
+      "session_s": 25.01626298390329
+    },
+    "session_speedup_no_warmup_over_warmup": 1.0898025876329585,
+    "source": {
+      "no_warmup": "experiments/distributed-cold-pilot/results/raw/mace_h46_b128_c32_2gpu_2step.json",
+      "warmup": "experiments/distributed-cold-pilot/results/raw/mace_h46_b128_c32_warm_2gpu_2step.json"
+    },
+    "warmup": {
+      "calls_s": [
+        25.590485267806798,
+        0.8350864159874618,
+        0.837216448970139
+      ],
+      "first_call_s": 25.590485267806798,
+      "last_call_s": 0.837216448970139,
+      "peak_reserved_GiB": 9.19140625,
+      "post_first_mean_s": 0.8361514324788004,
+      "session_s": 27.2627881327644
+    }
+  },
+  "schema_version": 1
+}

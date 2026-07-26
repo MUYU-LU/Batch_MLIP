@@ -1,0 +1,60 @@
+id: distributed-cold-pilot
+date: 2026-07-26
+baseline_commit: d206f16502d9830327d482884c3ea0a00b0e3c7c
+hypothesis: >-
+  Limiting cache-miss calibration to the existing default 32-structure pilot
+  will let the remaining R256 workload dispatch across every persistent GPU
+  during the first call, reducing first-call and three-call session time
+  relative to the previous C256 benchmark without changing steady-state
+  throughput, peak memory, or numerical results.
+mechanism: >-
+  The leader worker completes C32 production jobs while learning or
+  extrapolating a resident-capacity policy. Those outputs are retained. The
+  remaining 224 jobs are then split by the learned policy and dynamically
+  dispatched to all persistent workers. No structure is evaluated twice.
+scope:
+  task: variable-cell BFGS relaxation
+  models: [AtomBit, MACE-OFF-Small]
+  structure_groups: [H46, H276]
+  pool_size: 256
+  resident_batch_sizes: [64, 128]
+  gpu_counts: [2, 4]
+  pilot_sizes: [32, 256]
+  sequential_calls_per_executor: 3
+  optimizer_steps_per_call: 2
+comparisons:
+  - persistent BatchExecutor with C256 whole-pool calibration
+  - persistent BatchExecutor with automatic C32 pilot
+  - experimental C32 plus explicit production-shape warmup
+correctness_gates:
+  - The pilot and production index sets are disjoint and cover R256 exactly.
+  - Every input structure appears exactly once in input order.
+  - C32 and C256 agree within existing model-specific trajectory tolerances.
+  - Worker PIDs and allocator generation remain stable across compatible calls.
+performance_measurement:
+  timing: synchronized end-to-end wall time per independent pool
+  primary_metrics:
+    - first_call_wall_time_s
+    - three_call_session_wall_time_s
+    - fully_warm_last_call_wall_time_s
+    - systems_per_s
+    - atoms_per_s
+    - peak_allocated_GiB_per_worker
+    - peak_reserved_GiB_per_worker
+  supporting_metrics:
+    - cold_start_run_seconds
+    - production_run_seconds
+    - worker_task_distribution
+    - selected_resident_capacity
+  repeats: 1
+decision_gates:
+  - Keep C32 as the automatic default if first-call time improves by at least
+    20 percent and the fully warm call changes by less than 10 percent.
+  - Retain explicit shape prewarming only if total session time improves.
+  - Do not add concurrent cache writers or duplicate optimization work.
+limitations:
+  - One synchronized session does not provide a confidence interval.
+  - This experiment changes pilot size, not model, optimizer, neighbor, or
+    force kernels.
+  - CUDA-MPS is excluded because the current harness omits worker/model startup;
+    it will be compared in the lifecycle-matched full-task study.

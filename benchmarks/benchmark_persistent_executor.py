@@ -111,7 +111,11 @@ def main() -> None:
     parser.add_argument("--devices", required=True)
     parser.add_argument("--calls", type=int, default=3)
     parser.add_argument("--resident-batch-size", type=int, default=128)
-    parser.add_argument("--cold-start-jobs", type=int, default=256)
+    parser.add_argument(
+        "--cold-start-jobs",
+        type=int,
+        default=AutoSchedulerConfig().multi_gpu_cold_start_jobs,
+    )
     parser.add_argument("--max-steps", type=int)
     parser.add_argument("--fmax", type=float, default=0.05)
     parser.add_argument("--deterministic", action="store_true")
