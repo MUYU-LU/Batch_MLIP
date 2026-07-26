@@ -2,6 +2,10 @@
 
 ## 2026-07-26
 
+- Add an allocator-aware one-or-more-GPU process launcher. It selects
+  expandable segments for measured AtomBit variable-cell BFGS workloads,
+  preserves native allocation elsewhere, sets both PyTorch compatibility
+  variables before child CUDA initialization, and reports worker telemetry.
 - Add spawn-isolated multi-GPU task workers to the plug-and-play relaxation API,
   with persistent per-worker calculators, deterministic first-wave assignment,
   pending-chunk stealing, CPU result offload, and child-lifetime handshakes.

@@ -57,6 +57,9 @@ class AutoSchedulerConfig:
     multi_gpu_worker_backend: Literal["auto", "process", "thread"] = "auto"
     multi_gpu_process_cpu_threads: int = 1
     multi_gpu_process_min_chunks_per_device: int = 8
+    cuda_allocator_policy: Literal[
+        "auto", "native", "expandable_segments"
+    ] = "auto"
 
     def __post_init__(self) -> None:
         _positive_int("initial_batch_size", self.initial_batch_size)
@@ -84,6 +87,15 @@ class AutoSchedulerConfig:
         if self.multi_gpu_worker_backend not in ("auto", "process", "thread"):
             raise ValueError(
                 "multi_gpu_worker_backend must be 'auto', 'process', or 'thread'"
+            )
+        if self.cuda_allocator_policy not in (
+            "auto",
+            "native",
+            "expandable_segments",
+        ):
+            raise ValueError(
+                "cuda_allocator_policy must be 'auto', 'native', or "
+                "'expandable_segments'"
             )
         if not math.isfinite(self.max_cost_ratio) or self.max_cost_ratio < 1.0:
             raise ValueError("max_cost_ratio must be at least 1")

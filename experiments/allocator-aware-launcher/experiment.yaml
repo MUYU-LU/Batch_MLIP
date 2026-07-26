@@ -1,0 +1,80 @@
+id: allocator-aware-launcher
+date: 2026-07-26
+baseline_commit: 247177407f4de53278f7318ebec36a4c8aed2ac4
+hypothesis: >-
+  Installing the experimentally selected CUDA allocator configuration before
+  spawned workers initialize CUDA will reproduce manual allocator control:
+  expandable segments will reduce AtomBit variable-cell BFGS reserved memory
+  without changing relaxation results, while native allocation remains the
+  default for MACE and unmeasured optimizer/model combinations.
+mechanism: >-
+  Select a typed allocator plan from calculator, optimizer, and variable-cell
+  mode; pass environment updates through the generic process-worker launcher;
+  install them before calculator cloning and CUDA warm-up; report requested and
+  effective worker allocator telemetry.
+scope:
+  task: variable-cell relaxation
+  models: [AtomBit, MACE-OFF-Small]
+  optimizers: [BFGS, FIRE]
+  worker_counts: [1, 2]
+  atom_count: 46
+  pool_sizes: [128, 256]
+policies:
+  auto:
+    AtomBit_variable_cell_BFGS: expandable_segments
+    fallback: native
+  explicit: [native, expandable_segments]
+allocator_environment:
+  compatibility_keys:
+    - PYTORCH_ALLOC_CONF
+    - PYTORCH_CUDA_ALLOC_CONF
+  expandable_value: expandable_segments:True
+correctness_gates:
+  - Parent allocator environment is not mutated by process workers.
+  - Every worker receives the same selected environment before preparation.
+  - Automatic and manual allocator runs preserve convergence, steps, energies,
+    forces, positions, and cells within the existing relaxation tolerances.
+  - CPU and thread execution do not claim that a child allocator was applied.
+  - Invalid allocator policies fail before worker launch.
+performance_measurement:
+  repeats: 1
+  cuda_synchronized: true
+  metrics:
+    - wall_time_s
+    - systems_per_s
+    - peak_allocated_GB
+    - peak_reserved_GB
+    - allocator_retries
+  comparison: manual environment versus allocator-aware process launch
+limitations:
+  - Auto selection is evidence-based and intentionally conservative.
+  - CUDA allocator configuration cannot be changed safely in a process after
+    CUDA has initialized; in-process single-batch calls inherit their launcher.
+  - This experiment does not alter model, optimizer, force, or neighbor logic.
+result:
+  status: passed
+  AtomBit_H46_B128_auto_cold_1gpu:
+    converged: 256
+    jobs: 256
+    wall_time_s: 57.31716967886314
+    peak_allocated_GiB: 8.575597763061523
+    peak_reserved_GiB: 9.26953125
+  AtomBit_H46_B128_auto_warm_2gpu:
+    converged: 256
+    jobs: 256
+    wall_time_s: 38.877035337965935
+    speedup_vs_isolated_explicit_1gpu: 1.353621109342725
+  numerical_gate:
+    convergence_equal: true
+    steps_equal: true
+    max_position_difference_A: 9.5367431640625e-07
+    max_cell_difference_A: 9.5367431640625e-07
+    max_energy_difference_eV: 6.67572021484375e-06
+    max_force_difference_eV_per_A: 0.00014638900756835938
+  MACE_negative_control:
+    cold_start_backend: process
+    selected_allocator: native
+    inherited_expandable_environment_removed: true
+  conclusion: >-
+    Retain the conservative automatic rule and apply it through spawned cold
+    and production workers; timings are one-repeat screening measurements.

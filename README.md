@@ -470,9 +470,36 @@ queue-empty tail geometrically at the requested occupancy fraction. The
 measured 50% and 75% thresholds did not produce a reproducible speedup, so the
 default remains `None`.
 
-AtomBit variable-cell BFGS with changing graph sizes should be launched with
-expandable CUDA allocator segments. On the validated PyTorch 2.9.1
-environment, set both compatibility variables before Python starts:
+The automatic process launcher selects expandable CUDA allocator segments for
+AtomBit variable-cell BFGS with changing graph sizes:
+
+```python
+from batch_mlip import AutoSchedulerConfig, FrechetCellFilter, relax
+
+result = relax(
+    structures,
+    calculator,
+    optimizer="bfgs",
+    scheduling="auto",
+    devices=["cuda:0"],  # add more devices for one process per GPU
+    auto_config=AutoSchedulerConfig(),
+    cell_filter=FrechetCellFilter(),
+    fmax=0.05,
+)
+print(result.metadata["scheduling"]["allocator"])
+```
+
+The launcher installs the allocator before each spawned worker initializes
+CUDA and reports the selected policy, reason, effective environment, and
+reported backend. It sets both compatibility variables because the validated
+PyTorch 2.9.1 environment responds only to the deprecated spelling. MACE,
+FIRE, fixed-cell BFGS, and combinations without matched evidence remain on the
+native allocator. Override the conservative rule with
+`AutoSchedulerConfig(cuda_allocator_policy="native" | "expandable_segments")`.
+
+Calls without `devices=[...]` run in the current Python process and cannot
+safely change an allocator after CUDA initialization. For those calls, set
+both variables before Python starts:
 
 ```bash
 PYTORCH_ALLOC_CONF=expandable_segments:True \
@@ -480,9 +507,8 @@ PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
 python your_relaxation.py
 ```
 
-This reduced measured H46 B128 peak reserve from `78.15 GiB` to `10.07 GiB`
-without slowing the calculation. MACE did not benefit, so its default remains
-the native allocator.
+The manual experiment reduced measured H46 B128 peak reserve from `78.15 GiB`
+to `10.07 GiB` without slowing the calculation. MACE did not benefit.
 
 BFGS also accepts the experimental `refill_storage="arena"` mode for
 heterogeneous residents. It alternates between two reusable compact graph

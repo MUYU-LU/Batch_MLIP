@@ -300,6 +300,11 @@ def test_multi_device_auto_relaxation_cold_tunes_then_steals_pending_work(
     assert schedule["pending_work_stealing"]
     assert schedule["worker_backend"] == "process"
     assert schedule["worker_backend_fallback_reason"] is None
+    assert schedule["allocator"]["selected_policy"] == "native"
+    assert not schedule["allocator"]["applied_to_workers"]
+    assert all(
+        not worker["allocator"]["applied"] for worker in schedule["workers"]
+    )
     assert sum(
         record["system_count"] for record in schedule["cold_start"]
     ) == 2
@@ -327,6 +332,39 @@ def test_multi_device_auto_relaxation_cold_tunes_then_steals_pending_work(
         for worker in warm_schedule["workers"]
         for chunk in worker["chunks"]
     ) == len(systems)
+
+
+def test_single_explicit_device_can_use_process_worker(tmp_path):
+    systems = [
+        Atoms("H", positions=[[0.2 + 0.05 * index, 0.0, 0.0]])
+        for index in range(4)
+    ]
+    config = AutoSchedulerConfig(
+        cache_path=tmp_path / "single-process-auto.json",
+        max_batch_size=2,
+        multi_gpu_cold_start_jobs=1,
+        multi_gpu_worker_backend="process",
+    )
+
+    result = relax(
+        systems,
+        QuadraticBatchCalculator(),
+        scheduling="auto",
+        devices=["cpu:0"],
+        auto_config=config,
+        fmax=1e-5,
+        max_steps=500,
+        dt_start=0.05,
+        dt_max=0.5,
+    )
+
+    schedule = result.metadata["scheduling"]
+    assert bool(result.converged.all())
+    assert schedule["gpu_count"] == 1
+    assert schedule["active_gpu_count"] == 1
+    assert schedule["worker_backend"] == "process"
+    assert schedule["allocator"]["selected_policy"] == "native"
+    assert not schedule["allocator"]["applied_to_workers"]
 
 
 def test_multi_device_auto_relaxation_accepts_explicit_thread_backend(tmp_path):

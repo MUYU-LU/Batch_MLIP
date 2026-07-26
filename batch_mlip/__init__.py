@@ -21,6 +21,8 @@ from .dynamics.integrators import (
     initialize_maxwell_boltzmann,
 )
 from .execution import (
+    CudaAllocatorPlan,
+    CudaAllocatorPolicy,
     MultiGPUExecution,
     MultiGPUTaskExecution,
     ParallelWorkerError,
@@ -32,6 +34,7 @@ from .execution import (
     balance_work,
     run_parallel_task_workers,
     run_parallel_workers,
+    select_cuda_allocator,
 )
 from .interfaces.api import evaluate, molecular_dynamics, relax
 from .interfaces.ase_reference import relax_ase
@@ -177,6 +180,8 @@ __all__ = [
     "CompositeReporter",
     "CalibrationObservation",
     "CachedAutoPolicy",
+    "CudaAllocatorPlan",
+    "CudaAllocatorPolicy",
     "EvaluationResult",
     "ExtXYZReporter",
     "FIREConfig",
@@ -242,6 +247,7 @@ __all__ = [
     "relax_ase",
     "run_parallel_workers",
     "run_parallel_task_workers",
+    "select_cuda_allocator",
 ]
 
 __version__ = "0.2.0"

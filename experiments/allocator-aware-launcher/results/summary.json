@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "experiment": "allocator-aware-launcher",
+  "status": "passed",
+  "atombit_h46_b128": {
+    "jobs": 256,
+    "automatic_cold_1gpu": {
+      "all_converged": true,
+      "peak_allocated_GiB": 8.575597763061523,
+      "peak_reserved_GiB": 9.26953125,
+      "selected_allocator": "expandable_segments",
+      "wall_time_s": 57.31716967886314
+    },
+    "explicit_expandable_warm_1gpu": {
+      "all_converged": true,
+      "peak_allocated_GiB": 8.575597763061523,
+      "peak_reserved_GiB": 9.26953125,
+      "wall_time_s": 52.624775702133775
+    },
+    "automatic_warm_2gpu": {
+      "all_converged": true,
+      "peak_allocated_GiB_per_worker": 8.575597763061523,
+      "peak_reserved_GiB_per_worker": 9.26953125,
+      "wall_time_s": 38.877035337965935,
+      "speedup_vs_isolated_explicit_1gpu": 1.353621109342725
+    },
+    "auto_vs_explicit_two_step_maximum_absolute_difference": {
+      "cells_A": 9.5367431640625e-07,
+      "energies_eV": 6.67572021484375e-06,
+      "forces_eV_per_A": 0.00014638900756835938,
+      "positions_A": 9.5367431640625e-07,
+      "convergence_equal": true,
+      "steps_equal": true
+    },
+    "one_vs_two_gpu_two_step_maximum_absolute_difference": {
+      "cells_A": 9.5367431640625e-07,
+      "energies_eV": 5.245208740234375e-06,
+      "forces_eV_per_A": 0.00014781951904296875,
+      "positions_A": 9.5367431640625e-07,
+      "convergence_equal": true,
+      "steps_equal": true
+    }
+  },
+  "mace_native_negative_control": {
+    "parent_environment": "expandable_segments",
+    "selected_allocator": "native",
+    "cold_start_backend": "process",
+    "worker_effective_environment": {
+      "PYTORCH_ALLOC_CONF": null,
+      "PYTORCH_CUDA_ALLOC_CONF": null
+    },
+    "cuda_initialized_before_prepare": false,
+    "reported_backend": "native"
+  },
+  "limitations": [
+    "Performance points have one timing sample and no uncertainty estimate.",
+    "The two-step validation intentionally stops before convergence.",
+    "Allocator policy does not apply to calls that omit the devices argument."
+  ]
+}

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 
 import pytest
@@ -38,6 +39,25 @@ class StubTaskRunner:
 class StubTaskPreparer:
     def __call__(self, worker):
         return StubTaskRunner(worker.worker_id)
+
+
+@dataclass(frozen=True)
+class EnvironmentTaskRunner:
+    values: tuple[str | None, ...]
+
+    def __call__(self, value):
+        return value, self.values
+
+
+@dataclass(frozen=True)
+class EnvironmentTaskPreparer:
+    names: tuple[str, ...]
+
+    def __call__(self, worker):
+        del worker
+        return EnvironmentTaskRunner(
+            tuple(os.environ.get(name) for name in self.names)
+        )
 
 
 def test_balance_work_is_deterministic_and_cost_balanced():
@@ -115,6 +135,46 @@ def test_parallel_task_workers_propagate_worker_failure():
             StubTaskPreparer(),
             startup_timeout_seconds=30.0,
             run_timeout_seconds=30.0,
+        )
+
+
+@pytest.mark.parametrize("worker_count", [1, 2])
+def test_parallel_task_workers_install_child_only_environment(
+    monkeypatch,
+    worker_count,
+):
+    names = (
+        "BATCH_MLIP_TEST_WORKER_SET",
+        "BATCH_MLIP_TEST_WORKER_UNSET",
+    )
+    monkeypatch.setenv(names[0], "parent")
+    monkeypatch.setenv(names[1], "remove-me")
+
+    execution = run_parallel_task_workers(
+        list(range(worker_count)),
+        [1.0] * worker_count,
+        [f"cpu:{index}" for index in range(worker_count)],
+        EnvironmentTaskPreparer(names),
+        worker_environment={names[0]: "child", names[1]: None},
+        startup_timeout_seconds=30.0,
+        run_timeout_seconds=30.0,
+    )
+
+    assert [
+        result.payload[1] for result in execution.task_results
+    ] == [("child", None)] * worker_count
+    assert os.environ[names[0]] == "parent"
+    assert os.environ[names[1]] == "remove-me"
+
+
+def test_parallel_workers_reject_invalid_environment_before_spawn():
+    shards = balance_work([1.0], ["cpu:0"])
+
+    with pytest.raises(ValueError, match="environment name"):
+        run_parallel_workers(
+            shards,
+            StubPreparer(),
+            worker_environment={"BAD=NAME": "value"},
         )
 
 

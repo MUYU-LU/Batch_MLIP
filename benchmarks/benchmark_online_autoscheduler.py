@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import gc
+import hashlib
 import json
 import sys
 import time
@@ -57,6 +58,11 @@ def schedule_cache_hits(schedule: dict[str, object]) -> list[bool]:
     return hits
 
 
+def tensor_sha256(tensor: torch.Tensor) -> str:
+    values = tensor.detach().cpu().contiguous().numpy()
+    return hashlib.sha256(values.tobytes()).hexdigest()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mlip", choices=("atombit", "mace"), required=True)
@@ -74,6 +80,12 @@ def main() -> None:
     )
     parser.add_argument("--worker-cpu-threads", type=int, default=1)
     parser.add_argument("--process-min-chunks-per-device", type=int, default=8)
+    parser.add_argument("--cold-start-jobs", type=int, default=32)
+    parser.add_argument(
+        "--cuda-allocator-policy",
+        choices=("auto", "native", "expandable_segments"),
+        default="auto",
+    )
     parser.add_argument("--fmax", type=float, default=0.05)
     parser.add_argument("--max-steps", type=int)
     parser.add_argument("--max-batch-size", type=int, default=256)
@@ -81,6 +93,7 @@ def main() -> None:
     parser.add_argument("--growth-factor", type=int, default=4)
     parser.add_argument("--memory-safety-fraction", type=float, default=0.85)
     parser.add_argument("--deterministic", action="store_true")
+    parser.add_argument("--store-final-tensors", action="store_true")
     parser.add_argument("--workload-manifest", type=Path, required=True)
     parser.add_argument(
         "--dataset-dir",
@@ -184,6 +197,8 @@ def main() -> None:
         multi_gpu_process_min_chunks_per_device=(
             args.process_min_chunks_per_device
         ),
+        multi_gpu_cold_start_jobs=args.cold_start_jobs,
+        cuda_allocator_policy=args.cuda_allocator_policy,
     )
 
     gc.collect()
@@ -233,6 +248,8 @@ def main() -> None:
             "multi_gpu_process_min_chunks_per_device": (
                 args.process_min_chunks_per_device
             ),
+            "multi_gpu_cold_start_jobs": args.cold_start_jobs,
+            "cuda_allocator_policy": args.cuda_allocator_policy,
             "deterministic_algorithms": args.deterministic,
         },
         "schedule": schedule,
@@ -246,9 +263,26 @@ def main() -> None:
         "converged": int(result.converged.sum().item()),
         "converged_steps": result.converged_step.detach().cpu().tolist(),
         "energies_eV": result.evaluation.energy.detach().cpu().tolist(),
+        "state_sha256": {
+            "positions": tensor_sha256(result.state.positions),
+            "cells": tensor_sha256(result.state.cells),
+            "energies": tensor_sha256(result.evaluation.energy),
+            "forces": tensor_sha256(result.evaluation.forces),
+            "converged": tensor_sha256(result.converged),
+            "converged_step": tensor_sha256(result.converged_step),
+        },
         "environment": environment_metadata(device),
         **model_info,
     }
+    if args.store_final_tensors:
+        output["final_tensors"] = {
+            "positions_A": result.state.positions.detach().cpu().tolist(),
+            "cells_A": result.state.cells.detach().cpu().tolist(),
+            "energies_eV": result.evaluation.energy.detach().cpu().tolist(),
+            "forces_eV_per_A": (
+                result.evaluation.forces.detach().cpu().tolist()
+            ),
+        }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(output, indent=2, sort_keys=True) + "\n",

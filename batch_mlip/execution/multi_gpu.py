@@ -5,10 +5,11 @@ from __future__ import annotations
 import heapq
 import math
 import multiprocessing as mp
+import os
 import queue
 import time
 import traceback
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, Protocol
 
@@ -104,6 +105,34 @@ class ParallelWorkerError(RuntimeError):
     """Raised when a child process fails during preparation or execution."""
 
 
+def _normalize_worker_environment(
+    environment: Mapping[str, str | None] | None,
+) -> tuple[tuple[str, str | None], ...]:
+    if environment is None:
+        return ()
+    normalized = []
+    for raw_name, raw_value in environment.items():
+        name = str(raw_name)
+        if not name or "=" in name or "\x00" in name:
+            raise ValueError(f"invalid worker environment name {name!r}")
+        if raw_value is not None and not isinstance(raw_value, str):
+            raise TypeError("worker environment values must be strings or None")
+        if isinstance(raw_value, str) and "\x00" in raw_value:
+            raise ValueError(f"worker environment value for {name!r} contains NUL")
+        normalized.append((name, raw_value))
+    return tuple(sorted(normalized))
+
+
+def _install_worker_environment(
+    environment: tuple[tuple[str, str | None], ...],
+) -> None:
+    for name, value in environment:
+        if value is None:
+            os.environ.pop(name, None)
+        else:
+            os.environ[name] = value
+
+
 def balance_work(
     costs: Sequence[float], devices: Sequence[str]
 ) -> tuple[WorkerShard, ...]:
@@ -153,12 +182,14 @@ def balance_work(
 def _worker_entry(
     shard: WorkerShard,
     prepare: WorkerPreparer,
+    worker_environment: tuple[tuple[str, str | None], ...],
     ready_queue: Any,
     result_queue: Any,
     start_event: Any,
 ) -> None:
     startup_started = time.perf_counter()
     try:
+        _install_worker_environment(worker_environment)
         runner = prepare(shard)
         startup_seconds = time.perf_counter() - startup_started
         ready_queue.put((shard.worker_id, startup_seconds, None))
@@ -186,6 +217,7 @@ def _terminate(processes: Sequence[mp.Process]) -> None:
 def _task_worker_entry(
     worker: TaskWorker,
     prepare: TaskWorkerPreparer,
+    worker_environment: tuple[tuple[str, str | None], ...],
     initial_item: tuple[int, Any],
     task_queue: Any,
     ready_queue: Any,
@@ -195,6 +227,7 @@ def _task_worker_entry(
 ) -> None:
     startup_started = time.perf_counter()
     try:
+        _install_worker_environment(worker_environment)
         runner = prepare(worker)
         startup_seconds = time.perf_counter() - startup_started
         ready_queue.put((worker.worker_id, startup_seconds, None))
@@ -276,6 +309,7 @@ def run_parallel_task_workers(
     devices: Sequence[str],
     prepare: TaskWorkerPreparer,
     *,
+    worker_environment: Mapping[str, str | None] | None = None,
     start_method: str = "spawn",
     startup_timeout_seconds: float = 1800.0,
     run_timeout_seconds: float = 7200.0,
@@ -290,6 +324,7 @@ def run_parallel_task_workers(
     normalized_tasks = tuple(tasks)
     normalized_costs = tuple(float(cost) for cost in costs)
     normalized_devices = tuple(str(device) for device in devices)
+    normalized_environment = _normalize_worker_environment(worker_environment)
     if not normalized_tasks:
         raise ValueError("tasks must not be empty")
     if len(normalized_tasks) != len(normalized_costs):
@@ -333,6 +368,7 @@ def run_parallel_task_workers(
             args=(
                 worker,
                 prepare,
+                normalized_environment,
                 initial_items[worker.worker_id],
                 task_queue,
                 ready_queue,
@@ -442,6 +478,7 @@ def run_parallel_workers(
     shards: Sequence[WorkerShard],
     prepare: WorkerPreparer,
     *,
+    worker_environment: Mapping[str, str | None] | None = None,
     start_method: str = "spawn",
     startup_timeout_seconds: float = 1800.0,
     run_timeout_seconds: float = 7200.0,
@@ -455,6 +492,7 @@ def run_parallel_workers(
     """
 
     normalized = tuple(shards)
+    normalized_environment = _normalize_worker_environment(worker_environment)
     if not normalized:
         raise ValueError("shards must not be empty")
     if startup_timeout_seconds <= 0.0 or run_timeout_seconds <= 0.0:
@@ -473,7 +511,14 @@ def run_parallel_workers(
     processes = [
         context.Process(
             target=_worker_entry,
-            args=(shard, prepare, ready_queue, result_queue, start_event),
+            args=(
+                shard,
+                prepare,
+                normalized_environment,
+                ready_queue,
+                result_queue,
+                start_event,
+            ),
             name=f"batch-mlip-worker-{shard.worker_id}",
         )
         for shard in normalized

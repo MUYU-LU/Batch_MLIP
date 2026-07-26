@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import math
+import os
 import pickle
 import sys
 import time
@@ -25,7 +26,12 @@ from ..core.types import (
     RelaxationResult,
 )
 from ..dynamics.integrators import batched_langevin_baoab, batched_velocity_verlet
-from ..execution import TaskWorker, run_parallel_task_workers
+from ..execution import (
+    CudaAllocatorPlan,
+    TaskWorker,
+    run_parallel_task_workers,
+    select_cuda_allocator,
+)
 from ..optimization.registry import BatchOptimizer, create_optimizer
 from ..planning.auto import (
     AutoBatchAction,
@@ -107,7 +113,7 @@ def relax(
                 "automatic scheduling controls refill_batch_size; do not set it"
             )
         capabilities = resolved.capabilities()
-        if len(resolved_devices) > 1:
+        if resolved_devices:
             if planner is not None or pilot is not None or policy is not None:
                 raise ValueError(
                     "multi-GPU automatic scheduling does not accept an "
@@ -648,6 +654,7 @@ class _ProcessAutoWorkerRunner:
     optimizer: BatchOptimizer
     config: AutoSchedulerConfig
     optimizer_kwargs: dict[str, Any]
+    allocator_metadata: dict[str, Any]
 
     def __call__(self, chunk: _PendingAutoChunk) -> RelaxationResult:
         result = relax(
@@ -663,6 +670,7 @@ class _ProcessAutoWorkerRunner:
             torch.cuda.synchronize(device)
             result = _offload_relaxation_result(result)
             _empty_device_cache(device)
+        result.metadata["worker_allocator"] = dict(self.allocator_metadata)
         return result
 
 
@@ -677,10 +685,17 @@ class _ProcessAutoWorkerPreparer:
     optimizer_template: BatchOptimizer | None
     config: AutoSchedulerConfig
     optimizer_kwargs: dict[str, Any]
+    allocator_plan: CudaAllocatorPlan
 
     def __call__(self, worker: TaskWorker) -> _ProcessAutoWorkerRunner:
         torch.set_num_threads(self.config.multi_gpu_process_cpu_threads)
         device = torch.device(worker.device)
+        cuda_initialized_before_prepare = torch.cuda.is_initialized()
+        if device.type == "cuda" and cuda_initialized_before_prepare:
+            raise RuntimeError(
+                "CUDA initialized before the worker allocator environment "
+                "could take effect"
+            )
         if device.type == "cuda":
             torch.cuda.set_device(device)
         calculator = self.calculator_template.clone_to(device)
@@ -697,12 +712,27 @@ class _ProcessAutoWorkerPreparer:
             torch.cuda.synchronize(device)
             torch.cuda.empty_cache()
             torch.cuda.reset_peak_memory_stats(device)
+        allocator_metadata = {
+            **self.allocator_plan.metadata(),
+            "applied": device.type == "cuda",
+            "cuda_initialized_before_prepare": cuda_initialized_before_prepare,
+            "effective_environment": {
+                name: os.environ.get(name)
+                for name in self.allocator_plan.environment()
+            },
+            "reported_backend": (
+                torch.cuda.memory.get_allocator_backend()
+                if device.type == "cuda"
+                else None
+            ),
+        }
         return _ProcessAutoWorkerRunner(
             systems=self.systems,
             calculator=calculator,
             optimizer=optimizer,
             config=self.config,
             optimizer_kwargs=self.optimizer_kwargs,
+            allocator_metadata=allocator_metadata,
         )
 
 
@@ -740,6 +770,7 @@ def _prepare_process_workers(
     optimizer: BatchOptimizer,
     config: AutoSchedulerConfig,
     optimizer_kwargs: dict[str, Any],
+    allocator_plan: CudaAllocatorPlan,
 ) -> tuple[_ProcessAutoWorkerPreparer | None, str | None]:
     """Build and pickle-check a CPU template before production work starts."""
 
@@ -769,6 +800,7 @@ def _prepare_process_workers(
             optimizer_template=optimizer_template,
             config=config,
             optimizer_kwargs=optimizer_kwargs,
+            allocator_plan=allocator_plan,
         )
         pickle.dumps(preparer)
     except Exception as error:
@@ -796,9 +828,47 @@ def _execute_multi_device_auto_relaxation(
         supports_refill=getattr(capabilities, "active_refill", False),
     )
     plan = scheduler.plan(systems)
+    allocator_plan = select_cuda_allocator(
+        calculator,
+        optimizer,
+        variable_cell=optimizer_kwargs.get("cell_filter") is not None,
+        policy=config.cuda_allocator_policy,
+    )
+    has_cuda_devices = any(device.type == "cuda" for device in devices)
+    allocator_environment_differs = any(
+        os.environ.get(name) != value
+        for name, value in allocator_plan.environment().items()
+    )
+    cold_process_required = (
+        has_cuda_devices
+        and config.multi_gpu_worker_backend != "thread"
+        and (
+            allocator_plan.selected_policy == "expandable_segments"
+            or allocator_environment_differs
+        )
+    )
+    process_preparer = None
+    process_preparation_seconds = 0.0
+    if cold_process_required:
+        preparation_started = time.perf_counter()
+        process_preparer, preparation_error = _prepare_process_workers(
+            systems,
+            calculator,
+            optimizer,
+            config,
+            optimizer_kwargs,
+            allocator_plan,
+        )
+        process_preparation_seconds = time.perf_counter() - preparation_started
+        if process_preparer is None:
+            raise TypeError(
+                "allocator-aware cold-start workers require a serializable "
+                f"calculator and optimizer: {preparation_error}"
+            )
     indexed_results: list[tuple[tuple[int, ...], RelaxationResult]] = []
     cold_indices: set[int] = set()
     cold_records = []
+    cold_chunks: list[_PendingAutoChunk] = []
 
     # Only the primary worker pays cold-start exploration. Its structures are
     # production jobs and remain in the final result.
@@ -811,25 +881,57 @@ def _execute_multi_device_auto_relaxation(
             config.multi_gpu_cold_start_jobs,
         )
         cold_indices.update(indices)
-        started = time.perf_counter()
-        cold_result = _execute_online_auto_relaxation(
-            [systems[index] for index in indices],
-            calculator,
-            optimizer,
-            scheduler,
-            optimizer_kwargs,
+        cold_chunks.append(
+            _PendingAutoChunk(
+                indices=indices,
+                estimated_cost=sum(
+                    _profile_cost_for_dispatch(plan.profiles[index])
+                    for index in indices
+                ),
+                bucket_index=bucket_index,
+            )
         )
-        elapsed = time.perf_counter() - started
-        if cold_result.state.device.type == "cuda":
-            result_device = cold_result.state.device
-            cold_result = _offload_relaxation_result(cold_result)
-            _empty_device_cache(result_device)
-        indexed_results.append((indices, cold_result))
+
+    if cold_chunks and cold_process_required:
+        if process_preparer is None:  # pragma: no cover - narrowed above
+            raise RuntimeError("cold-start process preparation is missing")
+        cold_execution = run_parallel_task_workers(
+            cold_chunks,
+            [chunk.estimated_cost for chunk in cold_chunks],
+            [str(devices[0])],
+            process_preparer,
+            worker_environment=allocator_plan.environment(),
+        )
+        cold_task_results = cold_execution.task_results
+    else:
+        cold_task_results = ()
+
+    for cold_task_index, chunk in enumerate(cold_chunks):
+        if cold_process_required:
+            cold_task = cold_task_results[cold_task_index]
+            cold_result = cold_task.payload
+            elapsed = cold_task.run_seconds
+        else:
+            started = time.perf_counter()
+            cold_result = _execute_online_auto_relaxation(
+                [systems[index] for index in chunk.indices],
+                calculator,
+                optimizer,
+                scheduler,
+                optimizer_kwargs,
+            )
+            elapsed = time.perf_counter() - started
+            if cold_result.state.device.type == "cuda":
+                result_device = cold_result.state.device
+                cold_result = _offload_relaxation_result(cold_result)
+                _empty_device_cache(result_device)
+        indexed_results.append((chunk.indices, cold_result))
         cold_records.append(
             {
-                "bucket_index": bucket_index,
-                "system_count": len(indices),
+                "bucket_index": chunk.bucket_index,
+                "system_count": len(chunk.indices),
                 "wall_seconds": elapsed,
+                "allocator": cold_result.metadata.get("worker_allocator"),
                 "schedule": cold_result.metadata["scheduling"],
             }
         )
@@ -891,19 +993,26 @@ def _execute_multi_device_auto_relaxation(
             serial += 1
 
     worker_count = min(len(devices), len(planned_chunks))
+    has_cuda_workers = any(
+        device.type == "cuda" for device in devices[:worker_count]
+    )
     worker_records: list[dict[str, Any]] = []
     requested_backend = config.multi_gpu_worker_backend
     selected_backend = "thread"
     fallback_reason = None
-    process_preparer = None
     preparation_started = time.perf_counter()
     process_has_enough_work = len(planned_chunks) >= (
         config.multi_gpu_process_min_chunks_per_device * worker_count
+    )
+    allocator_requires_fresh_process = (
+        has_cuda_workers
+        and allocator_plan.selected_policy == "expandable_segments"
     )
     if (
         planned_chunks
         and requested_backend == "auto"
         and not process_has_enough_work
+        and not allocator_requires_fresh_process
     ):
         fallback_reason = (
             "process workers require at least "
@@ -911,13 +1020,15 @@ def _execute_multi_device_auto_relaxation(
             "per active device to amortize spawn startup"
         )
     elif planned_chunks and requested_backend != "thread":
-        process_preparer, fallback_reason = _prepare_process_workers(
-            systems,
-            calculator,
-            optimizer,
-            config,
-            optimizer_kwargs,
-        )
+        if process_preparer is None:
+            process_preparer, fallback_reason = _prepare_process_workers(
+                systems,
+                calculator,
+                optimizer,
+                config,
+                optimizer_kwargs,
+                allocator_plan,
+            )
         if process_preparer is not None:
             selected_backend = "process"
         elif requested_backend == "process":
@@ -925,7 +1036,11 @@ def _execute_multi_device_auto_relaxation(
                 "process multi-GPU workers require a serializable calculator "
                 f"and optimizer: {fallback_reason}"
             )
-    preparation_seconds = time.perf_counter() - preparation_started
+    preparation_seconds = (
+        process_preparation_seconds
+        + time.perf_counter()
+        - preparation_started
+    )
 
     parallel_started = time.perf_counter()
     if planned_chunks:
@@ -937,6 +1052,9 @@ def _execute_multi_device_auto_relaxation(
                 [chunk.estimated_cost for chunk in execution_chunks],
                 [str(device) for device in devices[:worker_count]],
                 process_preparer,
+                worker_environment=(
+                    allocator_plan.environment() if has_cuda_workers else None
+                ),
             )
             task_results = {
                 task.task_index: task for task in execution.task_results
@@ -946,9 +1064,13 @@ def _execute_multi_device_auto_relaxation(
                 indexed_results.append((chunk.indices, task_result.payload))
             for worker_result in execution.worker_results:
                 completed = []
+                worker_allocator = None
                 for task_index in worker_result.task_indices:
                     chunk = execution_chunks[task_index]
                     task_result = task_results[task_index]
+                    worker_allocator = task_result.payload.metadata.get(
+                        "worker_allocator"
+                    )
                     completed.append(
                         {
                             "bucket_index": chunk.bucket_index,
@@ -964,6 +1086,7 @@ def _execute_multi_device_auto_relaxation(
                         "device": worker_result.worker.device,
                         "startup_seconds": worker_result.startup_seconds,
                         "wall_seconds": worker_result.run_seconds,
+                        "allocator": worker_allocator,
                         "chunks": completed,
                     }
                 )
@@ -1082,6 +1205,22 @@ def _execute_multi_device_auto_relaxation(
         "worker_startup_wall_seconds": worker_startup_wall_seconds,
         "worker_run_wall_seconds": worker_run_wall_seconds,
         "worker_process_end_to_end_seconds": process_end_to_end_seconds,
+        "cold_start_backend": (
+            "process" if cold_process_required else "in_process"
+        ),
+        "allocator": {
+            **allocator_plan.metadata(),
+            "applied_to_workers": (
+                cold_process_required
+                or (selected_backend == "process" and has_cuda_workers)
+            ),
+            "application": (
+                "spawn_environment"
+                if cold_process_required
+                or (selected_backend == "process" and has_cuda_workers)
+                else "not_applied"
+            ),
+        },
         "cold_start": cold_records,
         "planned_chunks": planned_chunks,
         "workers": sorted(
