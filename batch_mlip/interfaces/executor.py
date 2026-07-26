@@ -1,0 +1,590 @@
+"""Reusable process workers for independent batched relaxation calls."""
+
+from __future__ import annotations
+
+import copy
+import math
+import os
+import pickle
+import sys
+import time
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
+from typing import Any
+
+import torch
+from ase import Atoms
+
+from ..core.calculator import BatchCalculator
+from ..core.types import RelaxationResult
+from ..execution import (
+    CudaAllocatorPlan,
+    PersistentTaskExecution,
+    PersistentTaskPool,
+    TaskWorker,
+    select_cuda_allocator,
+)
+from ..optimization.registry import (
+    BatchOptimizer,
+    _validate_capabilities,
+    create_optimizer,
+)
+from ..planning.auto import AutoScheduler, AutoSchedulerConfig
+from ..planning.memory import SystemProfile
+from .api import (
+    _combine_relaxation_results,
+    _normalize_devices,
+    _normalize_systems,
+    _offload_relaxation_result,
+    relax,
+)
+
+
+@dataclass(frozen=True)
+class _OptimizerSpec:
+    factory: type[Any] | None
+    options: dict[str, Any] | None
+    template: BatchOptimizer | None
+
+    @classmethod
+    def from_optimizer(cls, optimizer: BatchOptimizer) -> _OptimizerSpec:
+        options = getattr(optimizer, "options", None)
+        if isinstance(options, Mapping):
+            return cls(type(optimizer), dict(options), None)
+        return cls(None, None, optimizer)
+
+    def create(self) -> BatchOptimizer:
+        if self.factory is not None:
+            return self.factory(**(self.options or {}))
+        if self.template is None:  # pragma: no cover - construction guarantees one
+            raise RuntimeError("optimizer representation is missing")
+        return copy.deepcopy(self.template)
+
+
+@dataclass(frozen=True)
+class _ExecutorRelaxTask:
+    systems: tuple[Atoms, ...]
+    optimizer: _OptimizerSpec
+    config: AutoSchedulerConfig
+    optimizer_kwargs: dict[str, Any]
+
+
+@dataclass
+class _ExecutorWorkerRunner:
+    calculator: BatchCalculator
+    allocator_metadata: dict[str, Any]
+
+    def __call__(self, task: _ExecutorRelaxTask) -> RelaxationResult:
+        result = relax(
+            task.systems,
+            self.calculator,
+            optimizer=task.optimizer.create(),
+            scheduling="auto",
+            auto_config=task.config,
+            **task.optimizer_kwargs,
+        )
+        if result.state.device.type == "cuda":
+            torch.cuda.synchronize(result.state.device)
+            result = _offload_relaxation_result(result)
+        result.metadata["executor_worker"] = {
+            **self.allocator_metadata,
+            "pid": os.getpid(),
+        }
+        return result
+
+
+@dataclass
+class _ExecutorWorkerPreparer:
+    calculator_template: BatchCalculator
+    warmup_system: Atoms
+    compute_stress: bool
+    cpu_threads: int
+    allocator_plan: CudaAllocatorPlan
+
+    def __call__(self, worker: TaskWorker) -> _ExecutorWorkerRunner:
+        torch.set_num_threads(self.cpu_threads)
+        device = torch.device(worker.device)
+        cuda_initialized_before_prepare = torch.cuda.is_initialized()
+        if device.type == "cuda" and cuda_initialized_before_prepare:
+            raise RuntimeError(
+                "CUDA initialized before the worker allocator environment "
+                "could take effect"
+            )
+        if device.type == "cuda":
+            torch.cuda.set_device(device)
+        calculator = self.calculator_template.clone_to(device)
+        warm_state = calculator.create_state([self.warmup_system])
+        calculator(warm_state, compute_stress=self.compute_stress)
+        if device.type == "cuda":
+            torch.cuda.synchronize(device)
+            torch.cuda.empty_cache()
+            torch.cuda.reset_peak_memory_stats(device)
+        return _ExecutorWorkerRunner(
+            calculator=calculator,
+            allocator_metadata={
+                **self.allocator_plan.metadata(),
+                "applied": device.type == "cuda",
+                "cuda_initialized_before_prepare": (
+                    cuda_initialized_before_prepare
+                ),
+                "effective_environment": {
+                    name: os.environ.get(name)
+                    for name in self.allocator_plan.environment()
+                },
+                "reported_backend": (
+                    torch.cuda.memory.get_allocator_backend()
+                    if device.type == "cuda"
+                    else None
+                ),
+            },
+        )
+
+
+@dataclass(frozen=True)
+class _ExecutorChunk:
+    indices: tuple[int, ...]
+    cost: float
+    bucket_index: int
+
+
+def _dispatch_cost(profile: SystemProfile) -> float:
+    return max(
+        1.0,
+        profile.atom_count
+        + profile.edge_count
+        + math.sqrt(profile.dof_squared),
+    )
+
+
+def _uniform_sample(indices: tuple[int, ...], count: int) -> tuple[int, ...]:
+    if count >= len(indices):
+        return indices
+    return tuple(
+        indices[position * len(indices) // count]
+        for position in range(count)
+    )
+
+
+def _worker_records(
+    execution: PersistentTaskExecution | None,
+    chunks: Sequence[_ExecutorChunk],
+) -> list[dict[str, Any]]:
+    if execution is None:
+        return []
+    task_results = {
+        result.task_index: result for result in execution.task_results
+    }
+    records = []
+    for worker_result in execution.worker_results:
+        completed = []
+        allocator = None
+        for task_index in worker_result.task_indices:
+            chunk = chunks[task_index]
+            task_result = task_results[task_index]
+            allocator = task_result.payload.metadata.get("executor_worker")
+            completed.append(
+                {
+                    "bucket_index": chunk.bucket_index,
+                    "system_count": len(chunk.indices),
+                    "estimated_cost": chunk.cost,
+                    "wall_seconds": task_result.run_seconds,
+                    "schedule": task_result.payload.metadata["scheduling"],
+                }
+            )
+        records.append(
+            {
+                "worker_id": worker_result.worker.worker_id,
+                "device": worker_result.worker.device,
+                "startup_seconds": worker_result.startup_seconds,
+                "task_seconds": worker_result.run_seconds,
+                "allocator": allocator,
+                "chunks": completed,
+            }
+        )
+    return records
+
+
+class BatchExecutor:
+    """Reuse child-owned calculators across independent relaxation pools.
+
+    Workers start lazily because the optimizer and cell mode determine the CUDA
+    allocator policy. Compatible calls retain the same worker generation;
+    incompatible allocator or CPU-thread settings trigger a clean restart.
+    """
+
+    def __init__(
+        self,
+        calculator: BatchCalculator,
+        *,
+        devices: Sequence[str | torch.device],
+        auto_config: AutoSchedulerConfig | None = None,
+        start_method: str = "spawn",
+        startup_timeout_seconds: float = 1800.0,
+        run_timeout_seconds: float = 7200.0,
+    ) -> None:
+        resolved_devices = _normalize_devices(devices)
+        if calculator.cutoff is None:
+            raise ValueError("BatchExecutor requires a calculator cutoff")
+        self.calculator = (
+            calculator
+            if resolved_devices[0] == calculator.device
+            else calculator.clone_to(resolved_devices[0])
+        )
+        self.devices = resolved_devices
+        self.auto_config = auto_config or AutoSchedulerConfig()
+        self.start_method = start_method
+        self.startup_timeout_seconds = float(startup_timeout_seconds)
+        self.run_timeout_seconds = float(run_timeout_seconds)
+        self._pool: PersistentTaskPool | None = None
+        self._pool_key: tuple[Any, ...] | None = None
+        self._closed = False
+        self._generation = 0
+        self._relaxation_calls = 0
+
+    @property
+    def worker_generation(self) -> int:
+        return self._generation
+
+    @property
+    def worker_pids(self) -> tuple[int, ...]:
+        return () if self._pool is None else self._pool.worker_pids
+
+    @property
+    def started(self) -> bool:
+        return self._pool is not None
+
+    @property
+    def closed(self) -> bool:
+        return self._closed
+
+    def _desired_pool_key(
+        self,
+        allocator_plan: CudaAllocatorPlan,
+        config: AutoSchedulerConfig,
+    ) -> tuple[Any, ...]:
+        device_type = self.devices[0].type
+        allocator = (
+            allocator_plan.selected_policy
+            if device_type == "cuda"
+            else "not_applicable"
+        )
+        return (
+            device_type,
+            allocator,
+            config.multi_gpu_process_cpu_threads,
+            self.start_method,
+        )
+
+    def _ensure_pool(
+        self,
+        *,
+        allocator_plan: CudaAllocatorPlan,
+        config: AutoSchedulerConfig,
+        warmup_system: Atoms,
+        compute_stress: bool,
+    ) -> tuple[bool, float]:
+        desired_key = self._desired_pool_key(allocator_plan, config)
+        restarted = self._pool is not None and self._pool_key != desired_key
+        if self._pool is not None and (
+            restarted or self._pool.broken or self._pool.closed
+        ):
+            self._pool.close()
+            self._pool = None
+            self._pool_key = None
+            restarted = True
+        if self._pool is not None:
+            return False, 0.0
+
+        main_module = sys.modules.get("__main__")
+        if not getattr(main_module, "__file__", None):
+            raise RuntimeError(
+                "BatchExecutor with spawn requires a file-backed __main__ module"
+            )
+        calculator_template = self.calculator.clone_to("cpu")
+        model = getattr(calculator_template, "model", None)
+        if isinstance(model, torch.nn.Module):
+            model.share_memory()
+        preparer = _ExecutorWorkerPreparer(
+            calculator_template=calculator_template,
+            warmup_system=warmup_system,
+            compute_stress=compute_stress,
+            cpu_threads=config.multi_gpu_process_cpu_threads,
+            allocator_plan=allocator_plan,
+        )
+        try:
+            pickle.dumps(preparer)
+        except Exception as error:
+            raise TypeError(
+                "BatchExecutor requires a serializable calculator: "
+                f"{type(error).__name__}: {error}"
+            ) from error
+        has_cuda = self.devices[0].type == "cuda"
+        self._pool = PersistentTaskPool(
+            [str(device) for device in self.devices],
+            preparer,
+            worker_environment=(
+                allocator_plan.environment() if has_cuda else None
+            ),
+            start_method=self.start_method,
+            startup_timeout_seconds=self.startup_timeout_seconds,
+            run_timeout_seconds=self.run_timeout_seconds,
+        )
+        self._pool_key = desired_key
+        self._generation += 1
+        return restarted, self._pool.startup_wall_seconds
+
+    def relax(
+        self,
+        systems: Atoms | Sequence[Atoms],
+        *,
+        optimizer: str | BatchOptimizer = "fire",
+        auto_config: AutoSchedulerConfig | None = None,
+        **optimizer_kwargs: Any,
+    ) -> RelaxationResult:
+        if self._closed:
+            raise RuntimeError("BatchExecutor is closed")
+        total_started = time.perf_counter()
+        normalized = _normalize_systems(systems)
+        resolved = (
+            create_optimizer(optimizer)
+            if isinstance(optimizer, str)
+            else optimizer
+        )
+        if not isinstance(resolved, BatchOptimizer):
+            raise TypeError(
+                "optimizer must be a registered name or implement BatchOptimizer"
+            )
+        config = auto_config or self.auto_config
+        if not config.cache_enabled:
+            raise ValueError(
+                "BatchExecutor cold-start coordination requires the policy cache"
+            )
+        if config.multi_gpu_worker_backend == "thread":
+            raise ValueError(
+                "BatchExecutor owns process workers and does not accept "
+                "multi_gpu_worker_backend='thread'"
+            )
+        capabilities = resolved.capabilities()
+        options = dict(optimizer_kwargs)
+        if options.get("refill_batch_size") is not None:
+            raise ValueError(
+                "BatchExecutor controls refill_batch_size; do not set it"
+            )
+        if getattr(capabilities, "active_compaction", False):
+            options.setdefault("active_compaction", True)
+        _validate_capabilities(resolved, options)
+        allocator_plan = select_cuda_allocator(
+            self.calculator,
+            resolved,
+            variable_cell=options.get("cell_filter") is not None,
+            policy=config.cuda_allocator_policy,
+        )
+        restarted, startup_seconds = self._ensure_pool(
+            allocator_plan=allocator_plan,
+            config=config,
+            warmup_system=normalized[0],
+            compute_stress=options.get("cell_filter") is not None,
+        )
+        if self._pool is None:  # pragma: no cover - narrowed by _ensure_pool
+            raise RuntimeError("persistent worker pool did not start")
+        self._relaxation_calls += 1
+
+        planning_started = time.perf_counter()
+        scheduler = AutoScheduler(
+            self.calculator,
+            resolved,
+            options,
+            config=config,
+            supports_refill=getattr(capabilities, "active_refill", False),
+        )
+        plan = scheduler.plan(normalized)
+        planning_seconds = time.perf_counter() - planning_started
+        optimizer_spec = _OptimizerSpec.from_optimizer(resolved)
+        indexed_results: list[
+            tuple[tuple[int, ...], RelaxationResult]
+        ] = []
+        cold_indices: set[int] = set()
+        cold_chunks: list[_ExecutorChunk] = []
+        cold_tasks: list[_ExecutorRelaxTask] = []
+        for bucket_index, bucket in enumerate(plan.buckets):
+            controller = scheduler.controller(plan, bucket)
+            if controller.cache_hit:
+                continue
+            indices = _uniform_sample(
+                bucket.system_indices,
+                config.multi_gpu_cold_start_jobs,
+            )
+            cold_indices.update(indices)
+            cold_chunks.append(
+                _ExecutorChunk(
+                    indices=indices,
+                    cost=sum(
+                        _dispatch_cost(plan.profiles[index])
+                        for index in indices
+                    ),
+                    bucket_index=bucket_index,
+                )
+            )
+            cold_tasks.append(
+                _ExecutorRelaxTask(
+                    systems=tuple(normalized[index] for index in indices),
+                    optimizer=optimizer_spec,
+                    config=config,
+                    optimizer_kwargs=options,
+                )
+            )
+        cold_execution = (
+            self._pool.execute(
+                cold_tasks,
+                [chunk.cost for chunk in cold_chunks],
+            )
+            if cold_tasks
+            else None
+        )
+        if cold_execution is not None:
+            for chunk, task_result in zip(
+                cold_chunks,
+                cold_execution.task_results,
+                strict=True,
+            ):
+                indexed_results.append((chunk.indices, task_result.payload))
+
+        by_index = {profile.index: profile for profile in plan.profiles}
+        production_chunks: list[_ExecutorChunk] = []
+        production_tasks: list[_ExecutorRelaxTask] = []
+        for bucket_index, bucket in enumerate(plan.buckets):
+            pending = [
+                index
+                for index in bucket.system_indices
+                if index not in cold_indices
+            ]
+            if not pending:
+                continue
+            policy = scheduler.cache.find(plan.fingerprint, bucket, config)
+            if policy is None:
+                raise RuntimeError(
+                    "persistent cold-start scheduling did not produce a policy"
+                )
+            per_gpu_share = math.ceil(len(pending) / len(self.devices))
+            capacity = max(
+                1,
+                min(
+                    policy.resident_capacity,
+                    per_gpu_share,
+                    config.max_batch_size,
+                ),
+            )
+            for start in range(0, len(pending), capacity):
+                indices = tuple(pending[start : start + capacity])
+                chunk = _ExecutorChunk(
+                    indices=indices,
+                    cost=sum(
+                        _dispatch_cost(by_index[index]) for index in indices
+                    ),
+                    bucket_index=bucket_index,
+                )
+                production_chunks.append(chunk)
+                production_tasks.append(
+                    _ExecutorRelaxTask(
+                        systems=tuple(normalized[index] for index in indices),
+                        optimizer=optimizer_spec,
+                        config=config,
+                        optimizer_kwargs=options,
+                    )
+                )
+        production_execution = (
+            self._pool.execute(
+                production_tasks,
+                [chunk.cost for chunk in production_chunks],
+            )
+            if production_tasks
+            else None
+        )
+        if production_execution is not None:
+            for chunk, task_result in zip(
+                production_chunks,
+                production_execution.task_results,
+                strict=True,
+            ):
+                indexed_results.append((chunk.indices, task_result.payload))
+
+        reassembly_started = time.perf_counter()
+        executed = [
+            index for indices, _ in indexed_results for index in indices
+        ]
+        if sorted(executed) != list(range(len(normalized))):
+            raise RuntimeError(
+                "persistent scheduling duplicated or omitted input systems"
+            )
+        result = _combine_relaxation_results(
+            indexed_results,
+            workload_size=len(normalized),
+            calculator=self.calculator,
+        )
+        reassembly_seconds = time.perf_counter() - reassembly_started
+        result.metadata["scheduling"] = {
+            "policy": "auto",
+            "decision": "persistent_batch_executor",
+            "devices": [str(device) for device in self.devices],
+            "gpu_count": len(self.devices),
+            "fingerprint": plan.fingerprint,
+            "cache_path": str(scheduler.cache.path),
+            "profiling_seconds": plan.profiling_seconds,
+            "planning_seconds": planning_seconds,
+            "reassembly_seconds": reassembly_seconds,
+            "executor_call": self._relaxation_calls,
+            "worker_generation": self._generation,
+            "worker_generation_restarted": restarted,
+            "worker_pids": list(self._pool.worker_pids),
+            "worker_startup_seconds_this_call": startup_seconds,
+            "worker_startup_seconds_generation": (
+                self._pool.startup_wall_seconds
+            ),
+            "allocator": {
+                **allocator_plan.metadata(),
+                "applied_to_workers": self.devices[0].type == "cuda",
+            },
+            "cold_start_run_seconds": (
+                0.0
+                if cold_execution is None
+                else cold_execution.run_wall_seconds
+            ),
+            "production_run_seconds": (
+                0.0
+                if production_execution is None
+                else production_execution.run_wall_seconds
+            ),
+            "cold_start": _worker_records(cold_execution, cold_chunks),
+            "workers": _worker_records(
+                production_execution,
+                production_chunks,
+            ),
+            "pending_work_stealing": True,
+            "total_seconds": time.perf_counter() - total_started,
+        }
+        return result
+
+    def close(self) -> None:
+        if self._closed:
+            return
+        self._closed = True
+        if self._pool is not None:
+            self._pool.close()
+            self._pool = None
+            self._pool_key = None
+
+    def __enter__(self) -> BatchExecutor:
+        if self._closed:
+            raise RuntimeError("BatchExecutor is closed")
+        return self
+
+    def __exit__(self, exc_type: Any, exc: Any, traceback_: Any) -> None:
+        del exc_type, exc, traceback_
+        self.close()
+
+    def __del__(self) -> None:  # pragma: no cover - best-effort process cleanup
+        if hasattr(self, "_closed") and not self._closed:
+            try:
+                self.close()
+            except Exception:
+                pass

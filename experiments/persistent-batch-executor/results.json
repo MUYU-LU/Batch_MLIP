@@ -1,0 +1,433 @@
+{
+  "experiment": "persistent-batch-executor",
+  "pairs": [
+    {
+      "fresh": {
+        "first_call_s": 7.326749895233661,
+        "fully_warm_last_call_s": 7.823022183030844,
+        "peak_reserved_GiB": 9.216796875,
+        "post_first_mean_s": 7.603450392140076,
+        "session_s": 22.533650679513812
+      },
+      "identity": {
+        "atoms": 11776,
+        "gpu_count": 1,
+        "jobs": 256,
+        "max_steps": 2,
+        "mlip": "atombit",
+        "optimizer_sequence": [
+          "bfgs",
+          "bfgs",
+          "bfgs"
+        ],
+        "resident_batch_size": 128,
+        "workload_id": "OPT-H46-R256-v1"
+      },
+      "label": "atombit-H46-B128-1gpu-2step",
+      "numerical": null,
+      "persistent": {
+        "first_call_s": 6.771359861828387,
+        "first_generation_startup_s": 4.01271772896871,
+        "fully_warm_last_call_s": 2.002240105997771,
+        "peak_reserved_GiB": 9.216796875,
+        "post_first_mean_s": 2.0004995451308787,
+        "session_s": 10.772358952090144
+      },
+      "source": {
+        "fresh": "experiments/persistent-batch-executor/results/raw/atombit_h46_b128_fresh_1gpu_2step.json",
+        "persistent": "experiments/persistent-batch-executor/results/raw/atombit_h46_b128_persistent_1gpu_2step.json"
+      },
+      "speedup_fresh_over_persistent": {
+        "first_call_s": 1.0820204574469785,
+        "fully_warm_last_call_s": 3.9071348933610626,
+        "post_first_mean_s": 3.800775866531194,
+        "session_s": 2.0918028056558255
+      }
+    },
+    {
+      "fresh": {
+        "first_call_s": 62.874961440917104,
+        "fully_warm_last_call_s": 38.28505651699379,
+        "peak_reserved_GiB": 9.291015625,
+        "post_first_mean_s": 38.013850634451956,
+        "session_s": 138.90266270982102
+      },
+      "identity": {
+        "atoms": 11776,
+        "gpu_count": 2,
+        "jobs": 256,
+        "max_steps": 500,
+        "mlip": "atombit",
+        "optimizer_sequence": [
+          "bfgs",
+          "bfgs",
+          "bfgs"
+        ],
+        "resident_batch_size": 128,
+        "workload_id": "OPT-H46-R256-v1"
+      },
+      "label": "atombit-H46-B128-2gpu-full",
+      "numerical": {
+        "calls": [
+          {
+            "call": 1,
+            "converged_steps_equal": false,
+            "max_abs_cells_A": 1.7446006536483765,
+            "max_abs_energies_eV": 0.2852473258972168,
+            "max_abs_forces_eV_per_A": 0.0977429747581482,
+            "max_abs_positions_A": 2.0974735617637634
+          },
+          {
+            "call": 2,
+            "converged_steps_equal": false,
+            "max_abs_cells_A": 1.7663583755493164,
+            "max_abs_energies_eV": 0.2907681465148926,
+            "max_abs_forces_eV_per_A": 0.08568691089749336,
+            "max_abs_positions_A": 2.113662540912628
+          },
+          {
+            "call": 3,
+            "converged_steps_equal": false,
+            "max_abs_cells_A": 1.7757806181907654,
+            "max_abs_energies_eV": 0.29134178161621094,
+            "max_abs_forces_eV_per_A": 0.08021606504917145,
+            "max_abs_positions_A": 2.1204037070274353
+          }
+        ]
+      },
+      "persistent": {
+        "first_call_s": 66.65167339192703,
+        "first_generation_startup_s": 7.849819167982787,
+        "fully_warm_last_call_s": 29.256705967709422,
+        "peak_reserved_GiB": 9.291015625,
+        "post_first_mean_s": 29.556326447287574,
+        "session_s": 125.76432628650218
+      },
+      "source": {
+        "fresh": "experiments/persistent-batch-executor/results/raw/atombit_h46_b128_fresh_2gpu_full.json",
+        "persistent": "experiments/persistent-batch-executor/results/raw/atombit_h46_b128_persistent_deterministic_2gpu_full.json"
+      },
+      "speedup_fresh_over_persistent": {
+        "first_call_s": 0.9433365771808608,
+        "fully_warm_last_call_s": 1.308590808522632,
+        "post_first_mean_s": 1.2861493698226676,
+        "session_s": 1.1044679108238415
+      }
+    },
+    {
+      "fresh": {
+        "first_call_s": 7.365153769031167,
+        "fully_warm_last_call_s": 15.041824945248663,
+        "peak_reserved_GiB": 9.216796875,
+        "post_first_mean_s": 14.859370309161022,
+        "session_s": 37.08389438735321
+      },
+      "identity": {
+        "atoms": 11776,
+        "gpu_count": 4,
+        "jobs": 256,
+        "max_steps": 2,
+        "mlip": "atombit",
+        "optimizer_sequence": [
+          "bfgs",
+          "bfgs",
+          "bfgs"
+        ],
+        "resident_batch_size": 128,
+        "workload_id": "OPT-H46-R256-v1"
+      },
+      "label": "atombit-H46-B128-4gpu-2step",
+      "numerical": null,
+      "persistent": {
+        "first_call_s": 10.917516492772847,
+        "first_generation_startup_s": 8.14461038261652,
+        "fully_warm_last_call_s": 0.9156779553741217,
+        "peak_reserved_GiB": 9.216796875,
+        "post_first_mean_s": 1.3887059388216585,
+        "session_s": 13.694928370416164
+      },
+      "source": {
+        "fresh": "experiments/persistent-batch-executor/results/raw/atombit_h46_b128_fresh_4gpu_2step.json",
+        "persistent": "experiments/persistent-batch-executor/results/raw/atombit_h46_b128_persistent_4gpu_2step.json"
+      },
+      "speedup_fresh_over_persistent": {
+        "first_call_s": 0.6746180574956525,
+        "fully_warm_last_call_s": 16.42698162270705,
+        "post_first_mean_s": 10.700156090474747,
+        "session_s": 2.707856031394949
+      }
+    },
+    {
+      "fresh": {
+        "first_call_s": 11.864964968990535,
+        "fully_warm_last_call_s": 13.817183054052293,
+        "peak_reserved_GiB": 24.7578125,
+        "post_first_mean_s": 13.28401587670669,
+        "session_s": 38.432996722403914
+      },
+      "identity": {
+        "atoms": 70656,
+        "gpu_count": 2,
+        "jobs": 256,
+        "max_steps": 2,
+        "mlip": "atombit",
+        "optimizer_sequence": [
+          "bfgs",
+          "bfgs",
+          "bfgs"
+        ],
+        "resident_batch_size": 64,
+        "workload_id": "OPT-H276-R256-v1"
+      },
+      "label": "atombit-H276-B64-2gpu-2step",
+      "numerical": {
+        "calls": [
+          {
+            "call": 1,
+            "converged_steps_equal": true,
+            "max_abs_cells_A": 1.178705133497715e-09,
+            "max_abs_energies_eV": 5.7220458984375e-05,
+            "max_abs_forces_eV_per_A": 0.00030028820037841797,
+            "max_abs_positions_A": 1.9073486328125e-06
+          },
+          {
+            "call": 2,
+            "converged_steps_equal": true,
+            "max_abs_cells_A": 1.760781742632389e-09,
+            "max_abs_energies_eV": 5.7220458984375e-05,
+            "max_abs_forces_eV_per_A": 0.000301361083984375,
+            "max_abs_positions_A": 1.9073486328125e-06
+          },
+          {
+            "call": 3,
+            "converged_steps_equal": true,
+            "max_abs_cells_A": 1.025910023599863e-09,
+            "max_abs_energies_eV": 4.1961669921875e-05,
+            "max_abs_forces_eV_per_A": 0.00030112266540527344,
+            "max_abs_positions_A": 1.9073486328125e-06
+          }
+        ]
+      },
+      "persistent": {
+        "first_call_s": 14.900210612919182,
+        "first_generation_startup_s": 7.780598307959735,
+        "fully_warm_last_call_s": 4.083637144882232,
+        "peak_reserved_GiB": 24.7578125,
+        "post_first_mean_s": 4.278208824340254,
+        "session_s": 23.45662826159969
+      },
+      "source": {
+        "fresh": "experiments/persistent-batch-executor/results/raw/atombit_h276_b64_fresh_2gpu_2step.json",
+        "persistent": "experiments/persistent-batch-executor/results/raw/atombit_h276_b64_persistent_2gpu_2step.json"
+      },
+      "speedup_fresh_over_persistent": {
+        "first_call_s": 0.7962951180504155,
+        "fully_warm_last_call_s": 3.383548186049906,
+        "post_first_mean_s": 3.1050414839802096,
+        "session_s": 1.6384706401014035
+      }
+    },
+    {
+      "fresh": {
+        "first_call_s": 4.026407504919916,
+        "fully_warm_last_call_s": 22.50298104993999,
+        "peak_reserved_GiB": 9.201171875,
+        "post_first_mean_s": 22.13183723250404,
+        "session_s": 48.290081969927996
+      },
+      "identity": {
+        "atoms": 11776,
+        "gpu_count": 2,
+        "jobs": 256,
+        "max_steps": 2,
+        "mlip": "mace",
+        "optimizer_sequence": [
+          "bfgs",
+          "bfgs",
+          "bfgs"
+        ],
+        "resident_batch_size": 128,
+        "workload_id": "OPT-H46-R256-v1"
+      },
+      "label": "mace-H46-B128-2gpu-2step",
+      "numerical": {
+        "calls": [
+          {
+            "call": 1,
+            "converged_steps_equal": true,
+            "max_abs_cells_A": 2.220446049250313e-16,
+            "max_abs_energies_eV": 4.3655745685100555e-11,
+            "max_abs_forces_eV_per_A": 1.7674750552032492e-13,
+            "max_abs_positions_A": 1.7763568394002505e-15
+          },
+          {
+            "call": 2,
+            "converged_steps_equal": true,
+            "max_abs_cells_A": 2.220446049250313e-16,
+            "max_abs_energies_eV": 5.820766091346741e-11,
+            "max_abs_forces_eV_per_A": 1.8030021919912542e-13,
+            "max_abs_positions_A": 1.7763568394002505e-15
+          },
+          {
+            "call": 3,
+            "converged_steps_equal": true,
+            "max_abs_cells_A": 2.220446049250313e-16,
+            "max_abs_energies_eV": 5.820766091346741e-11,
+            "max_abs_forces_eV_per_A": 1.765254609153999e-13,
+            "max_abs_positions_A": 1.7763568394002505e-15
+          }
+        ]
+      },
+      "persistent": {
+        "first_call_s": 24.015122990123928,
+        "first_generation_startup_s": 19.66368221817538,
+        "fully_warm_last_call_s": 1.700185637921095,
+        "peak_reserved_GiB": 9.193359375,
+        "post_first_mean_s": 2.220839474350214,
+        "session_s": 28.456801938824356
+      },
+      "source": {
+        "fresh": "experiments/persistent-batch-executor/results/raw/mace_h46_b128_fresh_2gpu_2step.json",
+        "persistent": "experiments/persistent-batch-executor/results/raw/mace_h46_b128_persistent_2gpu_2step.json"
+      },
+      "speedup_fresh_over_persistent": {
+        "first_call_s": 0.16766133184392817,
+        "fully_warm_last_call_s": 13.235602364842672,
+        "post_first_mean_s": 9.965527670107495,
+        "session_s": 1.69696096116987
+      }
+    },
+    {
+      "fresh": {
+        "first_call_s": 7.7954210988245904,
+        "fully_warm_last_call_s": 25.387365189846605,
+        "peak_reserved_GiB": 27.052734375,
+        "post_first_mean_s": 25.298403213964775,
+        "session_s": 58.39222752675414
+      },
+      "identity": {
+        "atoms": 70656,
+        "gpu_count": 2,
+        "jobs": 256,
+        "max_steps": 2,
+        "mlip": "mace",
+        "optimizer_sequence": [
+          "bfgs",
+          "bfgs",
+          "bfgs"
+        ],
+        "resident_batch_size": 64,
+        "workload_id": "OPT-H276-R256-v1"
+      },
+      "label": "mace-H276-B64-2gpu-2step",
+      "numerical": {
+        "calls": [
+          {
+            "call": 1,
+            "converged_steps_equal": true,
+            "max_abs_cells_A": 7.105427357601002e-15,
+            "max_abs_energies_eV": 1.1350493878126144e-09,
+            "max_abs_forces_eV_per_A": 3.3018032752352156e-13,
+            "max_abs_positions_A": 1.0658141036401503e-14
+          },
+          {
+            "call": 2,
+            "converged_steps_equal": true,
+            "max_abs_cells_A": 7.105427357601002e-15,
+            "max_abs_energies_eV": 2.3283064365386963e-10,
+            "max_abs_forces_eV_per_A": 3.195776976383513e-13,
+            "max_abs_positions_A": 7.105427357601002e-15
+          },
+          {
+            "call": 3,
+            "converged_steps_equal": true,
+            "max_abs_cells_A": 7.105427357601002e-15,
+            "max_abs_energies_eV": 2.3283064365386963e-10,
+            "max_abs_forces_eV_per_A": 3.224642775023767e-13,
+            "max_abs_positions_A": 7.105427357601002e-15
+          }
+        ]
+      },
+      "persistent": {
+        "first_call_s": 28.243561569135636,
+        "first_generation_startup_s": 20.33136106841266,
+        "fully_warm_last_call_s": 3.6304992577061057,
+        "peak_reserved_GiB": 26.92578125,
+        "post_first_mean_s": 4.052125516813248,
+        "session_s": 36.34781260276213
+      },
+      "source": {
+        "fresh": "experiments/persistent-batch-executor/results/raw/mace_h276_b64_fresh_2gpu_2step.json",
+        "persistent": "experiments/persistent-batch-executor/results/raw/mace_h276_b64_persistent_2gpu_2step.json"
+      },
+      "speedup_fresh_over_persistent": {
+        "first_call_s": 0.27600701419127577,
+        "fully_warm_last_call_s": 6.992802749087286,
+        "post_first_mean_s": 6.243242739889371,
+        "session_s": 1.6064853245754
+      }
+    },
+    {
+      "fresh": {
+        "first_call_s": 7.404042629990727,
+        "fully_warm_last_call_s": 9.52899826085195,
+        "peak_reserved_GiB": 9.216796875,
+        "post_first_mean_s": 9.52899826085195,
+        "session_s": 16.933040890842676
+      },
+      "identity": {
+        "atoms": 11776,
+        "gpu_count": 2,
+        "jobs": 256,
+        "max_steps": 2,
+        "mlip": "atombit",
+        "optimizer_sequence": [
+          "bfgs",
+          "bfgs"
+        ],
+        "resident_batch_size": 128,
+        "workload_id": "OPT-H46-R256-v1"
+      },
+      "label": "atombit-H46-B128-2gpu-short",
+      "numerical": {
+        "calls": [
+          {
+            "call": 1,
+            "converged_steps_equal": true,
+            "max_abs_cells_A": 9.5367431640625e-07,
+            "max_abs_energies_eV": 5.7220458984375e-06,
+            "max_abs_forces_eV_per_A": 0.0001475214958190918,
+            "max_abs_positions_A": 9.5367431640625e-07
+          },
+          {
+            "call": 2,
+            "converged_steps_equal": true,
+            "max_abs_cells_A": 9.5367431640625e-07,
+            "max_abs_energies_eV": 6.198883056640625e-06,
+            "max_abs_forces_eV_per_A": 0.00014704465866088867,
+            "max_abs_positions_A": 9.5367431640625e-07
+          }
+        ]
+      },
+      "persistent": {
+        "first_call_s": 9.80405906913802,
+        "first_generation_startup_s": 7.106064348015934,
+        "fully_warm_last_call_s": 1.8863300951197743,
+        "peak_reserved_GiB": 9.216796875,
+        "post_first_mean_s": 1.8863300951197743,
+        "session_s": 11.690389164257795
+      },
+      "source": {
+        "fresh": "experiments/persistent-batch-executor/results/raw/smoke_atombit_h46_fresh_2gpu.json",
+        "persistent": "experiments/persistent-batch-executor/results/raw/smoke_atombit_h46_persistent_deterministic_2gpu.json"
+      },
+      "speedup_fresh_over_persistent": {
+        "first_call_s": 0.7552017565150896,
+        "fully_warm_last_call_s": 5.051606972451392,
+        "post_first_mean_s": 5.051606972451392,
+        "session_s": 1.4484582722544233
+      }
+    }
+  ],
+  "schema_version": 1
+}

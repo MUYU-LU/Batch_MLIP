@@ -7,8 +7,10 @@ import math
 import multiprocessing as mp
 import os
 import queue
+import threading
 import time
 import traceback
+from collections import deque
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, Protocol
@@ -81,6 +83,16 @@ class MultiGPUTaskExecution:
     startup_wall_seconds: float
     run_wall_seconds: float
     end_to_end_wall_seconds: float
+
+
+@dataclass(frozen=True)
+class PersistentTaskExecution:
+    """One call completed by an already initialized task-worker pool."""
+
+    call_id: int
+    task_results: tuple[TaskResult, ...]
+    worker_results: tuple[TaskWorkerResult, ...]
+    run_wall_seconds: float
 
 
 class PreparedWorker(Protocol):
@@ -274,6 +286,49 @@ def _task_worker_entry(
         result_queue.put(
             ("error", worker.worker_id, None, None, None, error)
         )
+
+
+def _persistent_task_worker_entry(
+    worker: TaskWorker,
+    prepare: TaskWorkerPreparer,
+    worker_environment: tuple[tuple[str, str | None], ...],
+    task_queue: Any,
+    ready_queue: Any,
+    result_queue: Any,
+) -> None:
+    startup_started = time.perf_counter()
+    try:
+        _install_worker_environment(worker_environment)
+        runner = prepare(worker)
+        ready_queue.put(
+            (
+                worker.worker_id,
+                time.perf_counter() - startup_started,
+                os.getpid(),
+                None,
+            )
+        )
+        while True:
+            item = task_queue.get()
+            if item is None:
+                return
+            call_id, task_index, task = item
+            task_started = time.perf_counter()
+            payload = runner(task)
+            result_queue.put(
+                (
+                    int(call_id),
+                    worker.worker_id,
+                    int(task_index),
+                    time.perf_counter() - task_started,
+                    payload,
+                    None,
+                )
+            )
+    except Exception:
+        error = traceback.format_exc()
+        ready_queue.put((worker.worker_id, None, os.getpid(), error))
+        result_queue.put((None, worker.worker_id, None, None, None, error))
 
 
 def _get_message(
@@ -582,3 +637,251 @@ def run_parallel_workers(
     finally:
         ready_queue.close()
         result_queue.close()
+
+
+class PersistentTaskPool:
+    """Lifecycle-managed task workers that retain prepared state across calls."""
+
+    def __init__(
+        self,
+        devices: Sequence[str],
+        prepare: TaskWorkerPreparer,
+        *,
+        worker_environment: Mapping[str, str | None] | None = None,
+        start_method: str = "spawn",
+        startup_timeout_seconds: float = 1800.0,
+        run_timeout_seconds: float = 7200.0,
+    ) -> None:
+        normalized_devices = tuple(str(device) for device in devices)
+        if not normalized_devices:
+            raise ValueError("devices must not be empty")
+        if len(set(normalized_devices)) != len(normalized_devices):
+            raise ValueError("devices must be unique")
+        if startup_timeout_seconds <= 0.0 or run_timeout_seconds <= 0.0:
+            raise ValueError("worker timeouts must be positive")
+
+        self._environment = _normalize_worker_environment(worker_environment)
+        self._workers = tuple(
+            TaskWorker(worker_id=index, device=device)
+            for index, device in enumerate(normalized_devices)
+        )
+        self._startup_timeout_seconds = float(startup_timeout_seconds)
+        self._run_timeout_seconds = float(run_timeout_seconds)
+        self._execute_lock = threading.Lock()
+        self._closed = False
+        self._broken = False
+        self._call_id = 0
+
+        context = mp.get_context(start_method)
+        self._task_queues = tuple(
+            context.Queue() for _ in self._workers
+        )
+        self._ready_queue = context.Queue()
+        self._result_queue = context.Queue()
+        self._processes = [
+            context.Process(
+                target=_persistent_task_worker_entry,
+                args=(
+                    worker,
+                    prepare,
+                    self._environment,
+                    self._task_queues[worker.worker_id],
+                    self._ready_queue,
+                    self._result_queue,
+                ),
+                name=f"batch-mlip-persistent-worker-{worker.worker_id}",
+            )
+            for worker in self._workers
+        ]
+        startup_started = time.perf_counter()
+        try:
+            for process in self._processes:
+                process.start()
+            deadline = time.perf_counter() + self._startup_timeout_seconds
+            startup_by_worker: dict[int, float] = {}
+            pids_by_worker: dict[int, int] = {}
+            while len(startup_by_worker) < len(self._workers):
+                worker_id, startup_seconds, pid, error = _get_message(
+                    self._ready_queue,
+                    self._processes,
+                    deadline=deadline,
+                    phase="persistent startup",
+                )
+                if error is not None:
+                    raise ParallelWorkerError(
+                        f"worker {worker_id} failed during startup:\n{error}"
+                    )
+                startup_by_worker[int(worker_id)] = float(startup_seconds)
+                pids_by_worker[int(worker_id)] = int(pid)
+            self.startup_wall_seconds = time.perf_counter() - startup_started
+            self.worker_startup_seconds = tuple(
+                startup_by_worker[index] for index in range(len(self._workers))
+            )
+            self.worker_pids = tuple(
+                pids_by_worker[index] for index in range(len(self._workers))
+            )
+        except BaseException:
+            self._broken = True
+            _terminate(self._processes)
+            self._close_queues()
+            raise
+
+    @property
+    def devices(self) -> tuple[str, ...]:
+        return tuple(worker.device for worker in self._workers)
+
+    @property
+    def closed(self) -> bool:
+        return self._closed
+
+    @property
+    def broken(self) -> bool:
+        return self._broken
+
+    def execute(
+        self,
+        tasks: Sequence[Any],
+        costs: Sequence[float],
+    ) -> PersistentTaskExecution:
+        normalized_tasks = tuple(tasks)
+        normalized_costs = tuple(float(cost) for cost in costs)
+        if self._closed:
+            raise RuntimeError("persistent task pool is closed")
+        if self._broken:
+            raise RuntimeError("persistent task pool is broken")
+        if not normalized_tasks:
+            raise ValueError("tasks must not be empty")
+        if len(normalized_tasks) != len(normalized_costs):
+            raise ValueError("tasks and costs must have the same length")
+        if any(not math.isfinite(cost) or cost <= 0.0 for cost in normalized_costs):
+            raise ValueError("costs must be finite and positive")
+
+        with self._execute_lock:
+            self._call_id += 1
+            call_id = self._call_id
+            pending = deque(
+                sorted(
+                    range(len(normalized_tasks)),
+                    key=lambda index: (-normalized_costs[index], index),
+                )
+            )
+            for worker in self._workers:
+                if not pending:
+                    break
+                task_index = pending.popleft()
+                self._task_queues[worker.worker_id].put(
+                    (call_id, task_index, normalized_tasks[task_index])
+                )
+
+            started = time.perf_counter()
+            deadline = started + self._run_timeout_seconds
+            outputs: dict[int, TaskResult] = {}
+            assignments: dict[int, list[int]] = {
+                worker.worker_id: [] for worker in self._workers
+            }
+            run_seconds: dict[int, float] = {
+                worker.worker_id: 0.0 for worker in self._workers
+            }
+            try:
+                while len(outputs) < len(normalized_tasks):
+                    (
+                        returned_call_id,
+                        worker_id,
+                        task_index,
+                        task_seconds,
+                        payload,
+                        error,
+                    ) = _get_message(
+                        self._result_queue,
+                        self._processes,
+                        deadline=deadline,
+                        phase=f"persistent call {call_id}",
+                    )
+                    if error is not None:
+                        raise ParallelWorkerError(
+                            f"worker {worker_id} failed during call {call_id}:\n{error}"
+                        )
+                    if int(returned_call_id) != call_id:
+                        raise ParallelWorkerError(
+                            "persistent worker returned a result for the wrong call"
+                        )
+                    worker_id = int(worker_id)
+                    task_index = int(task_index)
+                    if task_index in outputs:
+                        raise ParallelWorkerError(
+                            f"task {task_index} was returned more than once"
+                        )
+                    outputs[task_index] = TaskResult(
+                        task_index=task_index,
+                        worker_id=worker_id,
+                        run_seconds=float(task_seconds),
+                        payload=payload,
+                    )
+                    assignments[worker_id].append(task_index)
+                    run_seconds[worker_id] += float(task_seconds)
+                    if pending:
+                        next_index = pending.popleft()
+                        self._task_queues[worker_id].put(
+                            (
+                                call_id,
+                                next_index,
+                                normalized_tasks[next_index],
+                            )
+                        )
+            except BaseException:
+                self._broken = True
+                _terminate(self._processes)
+                raise
+
+            return PersistentTaskExecution(
+                call_id=call_id,
+                task_results=tuple(
+                    outputs[index] for index in range(len(normalized_tasks))
+                ),
+                worker_results=tuple(
+                    TaskWorkerResult(
+                        worker=worker,
+                        startup_seconds=self.worker_startup_seconds[
+                            worker.worker_id
+                        ],
+                        run_seconds=run_seconds[worker.worker_id],
+                        task_indices=tuple(assignments[worker.worker_id]),
+                    )
+                    for worker in self._workers
+                ),
+                run_wall_seconds=time.perf_counter() - started,
+            )
+
+    def close(self) -> None:
+        if self._closed:
+            return
+        self._closed = True
+        if not self._broken:
+            for task_queue in self._task_queues:
+                task_queue.put(None)
+            for process in self._processes:
+                process.join(timeout=30.0)
+        _terminate(self._processes)
+        self._close_queues()
+
+    def _close_queues(self) -> None:
+        for message_queue in (
+            *self._task_queues,
+            self._ready_queue,
+            self._result_queue,
+        ):
+            message_queue.close()
+
+    def __enter__(self) -> PersistentTaskPool:
+        return self
+
+    def __exit__(self, exc_type: Any, exc: Any, traceback_: Any) -> None:
+        del exc_type, exc, traceback_
+        self.close()
+
+    def __del__(self) -> None:  # pragma: no cover - best-effort process cleanup
+        if hasattr(self, "_closed") and not self._closed:
+            try:
+                self.close()
+            except Exception:
+                pass

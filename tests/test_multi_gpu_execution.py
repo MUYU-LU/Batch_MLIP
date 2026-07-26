@@ -7,6 +7,7 @@ import pytest
 
 from batch_mlip import (
     ParallelWorkerError,
+    PersistentTaskPool,
     balance_work,
     run_parallel_task_workers,
     run_parallel_workers,
@@ -136,6 +137,61 @@ def test_parallel_task_workers_propagate_worker_failure():
             startup_timeout_seconds=30.0,
             run_timeout_seconds=30.0,
         )
+
+
+def test_persistent_task_pool_reuses_workers_and_preserves_call_order():
+    with PersistentTaskPool(
+        ["cpu:0", "cpu:1"],
+        StubTaskPreparer(),
+        startup_timeout_seconds=30.0,
+        run_timeout_seconds=30.0,
+    ) as pool:
+        worker_pids = pool.worker_pids
+        first = pool.execute(
+            [0, 1, 2, 3, 4],
+            [1.0, 5.0, 2.0, 4.0, 3.0],
+        )
+        second = pool.execute([5, 6], [1.0, 2.0])
+
+        assert pool.worker_pids == worker_pids
+        assert first.call_id == 1
+        assert second.call_id == 2
+        assert [result.task_index for result in first.task_results] == list(range(5))
+        assert [result.payload[1] for result in first.task_results] == [
+            0,
+            1,
+            4,
+            9,
+            16,
+        ]
+        assert [result.payload[1] for result in second.task_results] == [25, 36]
+        assert [
+            worker.task_indices[0] for worker in first.worker_results
+        ] == [1, 3]
+        assert sorted(
+            index
+            for worker in first.worker_results
+            for index in worker.task_indices
+        ) == list(range(5))
+
+    assert pool.closed
+
+
+def test_persistent_task_pool_failure_breaks_generation():
+    pool = PersistentTaskPool(
+        ["cpu:0"],
+        StubTaskPreparer(),
+        startup_timeout_seconds=30.0,
+        run_timeout_seconds=30.0,
+    )
+    try:
+        with pytest.raises(ParallelWorkerError, match="intentional task failure"):
+            pool.execute([1, "fail"], [1.0, 2.0])
+        assert pool.broken
+        with pytest.raises(RuntimeError, match="broken"):
+            pool.execute([2], [1.0])
+    finally:
+        pool.close()
 
 
 @pytest.mark.parametrize("worker_count", [1, 2])

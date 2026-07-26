@@ -1,0 +1,61 @@
+id: persistent-batch-executor
+date: 2026-07-26
+baseline_commit: 078618e4adbeb7257fbe31bc1f7721c8f0b4b291
+hypothesis: >-
+  Reusing one initialized calculator process per GPU across independent
+  relaxation calls will remove repeated spawn, import, model reconstruction,
+  and CUDA warm-up cost while preserving the automatic scheduler, allocator
+  policy, input order, and numerical results.
+mechanism: >-
+  Add a lifecycle-managed persistent task pool and a lazy BatchExecutor. The
+  executor starts workers on its first workload, retains calculator/model state,
+  dispatches cost-ordered chunks through a shared queue, and restarts workers
+  only when the required CUDA allocator or fixed worker configuration changes.
+scope:
+  task: variable-cell BFGS relaxation
+  models: [AtomBit, MACE-OFF-Small]
+  structure_groups: [H46, H276]
+  pool_size: 256
+  resident_batch_sizes: [64, 128]
+  gpu_counts: [1, 2, 4]
+  sequential_calls_per_executor: 3
+comparisons:
+  - fresh allocator-aware relax call per pool
+  - persistent BatchExecutor first call
+  - persistent BatchExecutor steady-state calls
+correctness_gates:
+  - Persistent task workers execute each submitted task exactly once.
+  - Input system order is restored after dynamic worker assignment.
+  - Parent environment and calculator state are not mutated by child workers.
+  - Worker PIDs remain stable across compatible calls.
+  - Worker failure breaks and closes the pool instead of returning partial data.
+  - Allocator incompatibility causes an explicit worker-generation restart.
+  - Fresh and persistent convergence, steps, energies, forces, positions, and
+    cells agree within existing model-specific trajectory tolerances.
+performance_measurement:
+  warmup: calculator preparation and one stress evaluation per worker
+  timing: synchronized end-to-end wall time per independent pool
+  primary_metrics:
+    - first_call_wall_time_s
+    - steady_state_wall_time_s
+    - speedup_vs_fresh
+    - startup_amortization_s
+    - peak_allocated_GiB_per_worker
+    - peak_reserved_GiB_per_worker
+  supporting_metrics:
+    - planning_time_s
+    - worker_task_time_s
+    - result_reassembly_time_s
+    - systems_per_s
+    - worker_generation
+    - worker_task_distribution
+  repeats: 1
+decision_gates:
+  - Retain persistent execution only if steady-state wall time improves by at
+    least 10 percent for a workload whose fresh-call startup exceeds 5 percent.
+  - Report short workloads where persistence remains slower.
+  - Do not claim ideal multi-GPU scaling from a single timing measurement.
+limitations:
+  - CUDA allocator configuration is fixed for a live worker generation.
+  - This experiment changes execution lifecycle only, not optimization,
+    neighbor construction, model precision, or integration algorithms.

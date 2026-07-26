@@ -217,6 +217,43 @@ Each result exposes `.structures`, an input-ordered list of ASE `Atoms` with a
 only the `BatchCalculator` contract; model-specific graph and output conversion
 belongs in calculator adapters.
 
+For repeated independent relaxation pools, keep one initialized calculator
+process per GPU with `BatchExecutor`:
+
+```python
+from batch_mlip import AutoSchedulerConfig, BatchExecutor
+
+config = AutoSchedulerConfig(
+    cache_path="runs/batch-policy.json",
+    initial_batch_size=128,
+    max_batch_size=128,
+)
+with BatchExecutor(
+    calculator,
+    devices=["cuda:0", "cuda:1"],
+    auto_config=config,
+) as executor:
+    first = executor.relax(
+        first_pool,
+        optimizer="bfgs",
+        cell_filter=FrechetCellFilter(),
+        fmax=0.03,
+        max_steps=500,
+    )
+    second = executor.relax(
+        second_pool,
+        optimizer="bfgs",
+        cell_filter=FrechetCellFilter(),
+        fmax=0.03,
+        max_steps=500,
+    )
+```
+
+The first call starts and warms the worker generation. Compatible later calls
+reuse the same worker PIDs and model instances. A change that requires an
+incompatible CUDA allocator policy closes that generation and starts a new one;
+leaving the context releases all worker processes and GPU reservations.
+
 Internal phase timing is opt-in and does not change calculator or optimizer
 signatures:
 

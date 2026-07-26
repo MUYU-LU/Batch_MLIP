@@ -26,6 +26,8 @@ from .execution import (
     MultiGPUExecution,
     MultiGPUTaskExecution,
     ParallelWorkerError,
+    PersistentTaskExecution,
+    PersistentTaskPool,
     TaskResult,
     TaskWorker,
     TaskWorkerResult,
@@ -38,6 +40,7 @@ from .execution import (
 )
 from .interfaces.api import evaluate, molecular_dynamics, relax
 from .interfaces.ase_reference import relax_ase
+from .interfaces.executor import BatchExecutor
 from .interfaces.reporting import (
     CompositeReporter,
     ExtXYZReporter,
@@ -163,6 +166,7 @@ __all__ = [
     "AutoWorkloadBucket",
     "AutoWorkloadPlan",
     "BatchEvaluation",
+    "BatchExecutor",
     "BatchCalculator",
     "BatchOptimizer",
     "BatchPlan",
@@ -198,6 +202,8 @@ __all__ = [
     "OptimizerCapabilities",
     "OptimizerFactory",
     "ParallelWorkerError",
+    "PersistentTaskExecution",
+    "PersistentTaskPool",
     "PlannedBucket",
     "PilotRegime",
     "RelaxationSchedule",
