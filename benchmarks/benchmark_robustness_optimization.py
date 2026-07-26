@@ -97,6 +97,7 @@ def main() -> None:
         choices=("repack", "slots", "arena"),
         default="repack",
     )
+    parser.add_argument("--refill-interval", type=int, default=1)
     parser.add_argument("--cpu-threads", type=int, default=1)
     parser.add_argument("--deterministic", action="store_true")
     parser.add_argument("--profile-runtime", action="store_true")
@@ -130,6 +131,8 @@ def main() -> None:
         parser.error("batch size must be positive")
     if args.cpu_threads <= 0:
         parser.error("CPU thread count must be positive")
+    if args.refill_interval <= 0:
+        parser.error("refill interval must be positive")
     if args.job_limit is not None and args.job_limit <= 0:
         parser.error("job limit must be positive")
     if args.method == "refill" and args.optimizer == "bfgslinesearch":
@@ -191,6 +194,7 @@ def main() -> None:
                 refill_policy="immediate",
                 refill_storage=args.refill_storage,
                 refill_min_chunk=1 if args.method == "refill" else None,
+                refill_interval=args.refill_interval,
                 linear_algebra_backend=args.linear_algebra_backend,
                 **common,
             )
@@ -222,6 +226,7 @@ def main() -> None:
                 refill_policy="immediate",
                 refill_storage=args.refill_storage,
                 refill_min_chunk=1 if args.method == "refill" else None,
+                refill_interval=args.refill_interval,
                 linear_algebra_backend=args.linear_algebra_backend,
                 **common,
             )
@@ -263,6 +268,7 @@ def main() -> None:
         "job_limit": args.job_limit,
         "batch_size": None if args.method == "ase" else args.batch_size,
         "refill_storage": (args.refill_storage if args.method == "refill" else None),
+        "refill_interval": (args.refill_interval if args.method == "refill" else None),
         "fmax_eV_per_A": args.fmax,
         "max_steps": args.max_steps,
         "linear_algebra_backend": args.linear_algebra_backend,

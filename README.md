@@ -439,6 +439,7 @@ result = relax(
     refill_batch_size=64,
     refill_policy="immediate",
     refill_storage="slots",
+    refill_interval=1,
     fmax=0.05,
     smax=None,
 )
@@ -456,6 +457,12 @@ runs should be launched with
 `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` to avoid measured allocator
 fragmentation. The default remains `"repack"` pending broader application
 validation.
+
+`refill_interval` optionally accumulates finished, immutable slots before
+physically replacing or repacking them. Its default is `1` (immediate refill).
+Values above one are experimental: they reduce scheduler mutations but spend
+extra model work on frozen graphs, and the measured H46 matrix did not justify
+automatic selection.
 
 BFGS also accepts the experimental `refill_storage="arena"` mode for
 heterogeneous residents. It alternates between two reusable compact graph

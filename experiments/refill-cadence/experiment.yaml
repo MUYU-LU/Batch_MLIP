@@ -1,0 +1,61 @@
+id: refill-cadence
+date: 2026-07-26
+baseline_commit: 28e8aebd0c23e029db2d8ee8acaa7b87edfeca7b
+hypothesis: >-
+  Deferring physical refill mutations while freezing finished resident systems
+  can reduce scheduler and graph-repacking overhead, but only when the saved
+  mutations cost more than the extra model work on frozen slots.
+mechanism:
+  parameter: refill_interval
+  control: 1
+  candidates: [2, 5]
+  semantics: >-
+    Convergence and exhaustion are detected every optimizer step. Finished
+    systems are immutable immediately and are removed or replaced together at
+    the next interval boundary, or sooner when no resident system can advance.
+stage_1:
+  workload: OPT-H46-R256-v1
+  reason: widest measured convergence-horizon distribution
+  models: [atombit_smooth_rms_fp32, mace_off_small]
+  optimizers: [bfgs, fire]
+  resident_batch_sizes: [64, 128]
+  refill_intervals: [1, 2, 5]
+  timing_repeats: 1
+stage_2:
+  condition: run only if stage_1 produces a candidate at least 2 percent faster
+  workloads: [OPT-H276-R256-v1, OPT-MIX4-R256-v1]
+  comparison: [active_drain, refill_interval_1, winning_refill_interval]
+controls:
+  pool_size: 256
+  deterministic_algorithms: true
+  cublas_workspace_config: ":4096:8"
+  allocator: expandable_segments
+  fmax_eV_per_A: 0.05
+  bfgs_max_steps: 500
+  fire_max_steps: 2000
+correctness_gates:
+  - all systems have identical convergence flags to refill_interval_1
+  - converged steps match refill_interval_1
+  - endpoint energy distributions remain within the established optimizer gate
+  - finished systems never move while waiting for a swap boundary
+performance_gates:
+  - at least 1.02x end-to-end speedup versus refill_interval_1
+  - no out-of-memory result below the existing 85 percent memory gate
+metrics:
+  - wall_time_s
+  - systems_per_second
+  - atoms_per_second
+  - model_evaluations
+  - graph_evaluations
+  - frozen_graph_evaluations
+  - refill_events
+  - jobs_per_refill_event
+  - scheduler_time_s
+  - model_forward_time_s
+  - neighbor_time_s
+  - peak_allocated_GiB
+  - peak_reserved_GiB
+decision_rule: >-
+  Keep interval 1 as the default. Select a larger interval only in a measured
+  workload regime where it passes both correctness gates and the 2 percent
+  end-to-end speed gate; otherwise retain the negative result.

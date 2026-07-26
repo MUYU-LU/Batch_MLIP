@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pytest
 import torch
 from ase import Atoms
 from ase.calculators.calculator import Calculator, all_changes
@@ -145,7 +146,7 @@ def test_fire_refill_preserves_state_and_original_output_order():
     systems = [Atoms("H", positions=[[x, 0.0, 0.0]]) for x in (1e-8, 0.2, 0.4, 0.8)]
     potential = AtomBitBatchCalculator(QuadraticWellModel(k=1.0), device="cpu", dtype=torch.float64)
 
-    def run(*, refill_storage: str):
+    def run(*, refill_storage: str, refill_interval: int = 1):
         state = AseGraphBatch.from_ase(systems, cutoff=2.5, device="cpu", dtype=torch.float64)
         return batched_fire_relax(
             state,
@@ -157,10 +158,12 @@ def test_fire_refill_preserves_state_and_original_output_order():
             refill_batch_size=2,
             refill_storage=refill_storage,
             refill_min_chunk=1,
+            refill_interval=refill_interval,
         )
 
     repack = run(refill_storage="repack")
     slots = run(refill_storage="slots")
+    periodic = run(refill_storage="slots", refill_interval=5)
 
     assert create_optimizer("fire").capabilities().active_refill
     assert bool(repack.converged.all())
@@ -168,5 +171,25 @@ def test_fire_refill_preserves_state_and_original_output_order():
     torch.testing.assert_close(slots.state.positions, repack.state.positions)
     torch.testing.assert_close(slots.evaluation.energy, repack.evaluation.energy)
     torch.testing.assert_close(slots.evaluation.forces, repack.evaluation.forces)
+    torch.testing.assert_close(periodic.converged_step, repack.converged_step)
+    torch.testing.assert_close(periodic.state.positions, repack.state.positions)
+    torch.testing.assert_close(periodic.evaluation.energy, repack.evaluation.energy)
+    torch.testing.assert_close(periodic.evaluation.forces, repack.evaluation.forces)
+    assert periodic.graph_evaluations > slots.graph_evaluations
     assert max(slots.active_batch_sizes) == 2
     assert slots.active_batch_sizes[-1] == 1
+
+
+def test_fire_rejects_invalid_refill_interval():
+    potential = AtomBitBatchCalculator(
+        QuadraticWellModel(k=1.0),
+        cutoff=2.5,
+        device="cpu",
+        dtype=torch.float64,
+    )
+    state = potential.create_state([Atoms("H", positions=[[0.1, 0.0, 0.0]])])
+
+    with pytest.raises(ValueError, match="refill_interval must be"):
+        batched_fire_relax(state, potential, refill_interval=0)
+    with pytest.raises(ValueError, match="require refill_batch_size"):
+        batched_fire_relax(state, potential, refill_interval=2)

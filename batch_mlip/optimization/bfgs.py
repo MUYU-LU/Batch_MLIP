@@ -441,6 +441,7 @@ def batched_bfgs_relax(
     refill_storage: str = "repack",
     refill_low_watermark: float = 0.8,
     refill_min_chunk: int | None = None,
+    refill_interval: int = 1,
     linear_algebra_backend: str = "auto",
 ) -> RelaxationResult:
     """Relax systems with independent full BFGS Hessians.
@@ -486,7 +487,17 @@ def batched_bfgs_relax(
         or refill_min_chunk <= 0
     ):
         raise ValueError("refill_min_chunk must be a positive integer or None")
-    if refill_batch_size is None and (refill_policy != "immediate" or refill_min_chunk is not None):
+    if (
+        isinstance(refill_interval, bool)
+        or not isinstance(refill_interval, int)
+        or refill_interval <= 0
+    ):
+        raise ValueError("refill_interval must be a positive integer")
+    if refill_batch_size is None and (
+        refill_policy != "immediate"
+        or refill_min_chunk is not None
+        or refill_interval != 1
+    ):
         raise ValueError("refill policy options require refill_batch_size")
     if refill_batch_size is not None:
         if (
@@ -505,6 +516,7 @@ def batched_bfgs_relax(
             refill_min_chunk=(
                 max(8, refill_batch_size // 8) if refill_min_chunk is None else refill_min_chunk
             ),
+            refill_interval=refill_interval,
             fmax=fmax,
             max_steps=max_steps,
             max_step=max_step,
@@ -829,6 +841,7 @@ def _batched_bfgs_refill_relax(
     refill_storage: str,
     refill_low_watermark: float,
     refill_min_chunk: int,
+    refill_interval: int,
     fmax: float,
     max_steps: int,
     max_step: float,
@@ -985,9 +998,11 @@ def _batched_bfgs_refill_relax(
             )
 
         sync_active_state(evaluation, current_fmax, current_smax, current_generalized_fmax)
+        resident_finished_before = finished[active_system_ids]
         exhausted_now = local_steps[active_system_ids] >= max_steps
-        finish_now = convergence_now | exhausted_now
-        newly_converged_ids = active_system_ids[convergence_now]
+        finish_now = (convergence_now | exhausted_now) & ~resident_finished_before
+        newly_converged = convergence_now & ~resident_finished_before
+        newly_converged_ids = active_system_ids[newly_converged]
         converged_step[newly_converged_ids] = local_steps[newly_converged_ids]
         finished[active_system_ids[finish_now]] = True
 
@@ -1032,15 +1047,20 @@ def _batched_bfgs_refill_relax(
         if bool(finished.all()):
             break
 
-        ready_count = active_state.n_systems
-        ready_local_ids = torch.arange(ready_count, device=device, dtype=torch.long)
-        if bool(finish_now.any()):
+        resident_finished = finished[active_system_ids]
+        ready_local_ids = torch.nonzero(~resident_finished, as_tuple=False).flatten()
+        ready_count = ready_local_ids.numel()
+        refill_due = bool(resident_finished.any()) and (
+            (scheduler_step + 1) % refill_interval == 0
+            or not bool((~resident_finished).any())
+        )
+        if refill_due:
             systems_before = active_state.n_systems
-            remaining_local = torch.nonzero(~finish_now, as_tuple=False).flatten()
+            remaining_local = torch.nonzero(~resident_finished, as_tuple=False).flatten()
             remaining_list = remaining_local.tolist()
             survivor_ids = active_system_ids[remaining_local]
-            finished_local = torch.nonzero(finish_now, as_tuple=False).flatten()
-            for system_id in active_system_ids[finish_now].tolist():
+            finished_local = torch.nonzero(resident_finished, as_tuple=False).flatten()
+            for system_id in active_system_ids[resident_finished].tolist():
                 histories[system_id] = None
 
             pending_before = n_systems - next_pending
@@ -1244,6 +1264,7 @@ def _batched_bfgs_refill_relax(
             profile_event(
                 "refill",
                 policy=refill_policy,
+                interval=refill_interval,
                 low_watermark=refill_low_watermark,
                 min_chunk=refill_min_chunk,
                 scheduler_step=scheduler_step,

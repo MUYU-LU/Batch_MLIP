@@ -190,6 +190,7 @@ def run_batch(
     refill_storage: str = "repack",
     refill_low_watermark: float = 0.8,
     refill_min_chunk: int | None = None,
+    refill_interval: int = 1,
     linear_algebra_backend: str = "auto",
 ) -> dict[str, Any]:
     calculator = AtomBitBatchCalculator(
@@ -235,6 +236,7 @@ def run_batch(
                 refill_storage=refill_storage,
                 refill_low_watermark=refill_low_watermark,
                 refill_min_chunk=refill_min_chunk,
+                refill_interval=refill_interval,
                 **common,
             )
         elif optimizer_name == "bfgs":
@@ -248,6 +250,7 @@ def run_batch(
                 refill_storage=refill_storage,
                 refill_low_watermark=refill_low_watermark,
                 refill_min_chunk=refill_min_chunk,
+                refill_interval=refill_interval,
                 linear_algebra_backend=linear_algebra_backend,
                 **common,
             )
@@ -288,14 +291,20 @@ def run_batch(
                 )
             )
 
+    optimizer_steps_total = sum(record["steps"] for record in records)
     return {
         "records": records,
         "model_evaluations": model_evaluations,
         "graph_evaluations": graph_evaluations,
+        "frozen_graph_evaluations": (
+            graph_evaluations - optimizer_steps_total - len(records)
+            if refill
+            else 0
+        ),
         "uncompacted_graph_evaluations": uncompacted_graph_evaluations,
         "avoided_graph_evaluations": uncompacted_graph_evaluations - graph_evaluations,
         "neighbor_rebuilds": neighbor_rebuilds,
-        "optimizer_steps_total": sum(record["steps"] for record in records),
+        "optimizer_steps_total": optimizer_steps_total,
         "active_batch_sizes": active_batch_sizes,
     }
 
@@ -370,6 +379,7 @@ def main() -> None:
     )
     parser.add_argument("--refill-low-watermark", type=float, default=0.8)
     parser.add_argument("--refill-min-chunk", type=int)
+    parser.add_argument("--refill-interval", type=int, default=1)
     parser.add_argument(
         "--linear-algebra-backend",
         choices=("auto", "cholesky", "grouped", "serial"),
@@ -475,6 +485,7 @@ def main() -> None:
             "refill_storage": args.refill_storage,
             "refill_low_watermark": args.refill_low_watermark,
             "refill_min_chunk": args.refill_min_chunk,
+            "refill_interval": args.refill_interval,
             "linear_algebra_backend": args.linear_algebra_backend,
         },
         "points": [],
@@ -529,6 +540,7 @@ def main() -> None:
                         refill_storage=args.refill_storage,
                         refill_low_watermark=args.refill_low_watermark,
                         refill_min_chunk=args.refill_min_chunk,
+                        refill_interval=args.refill_interval,
                         linear_algebra_backend=args.linear_algebra_backend,
                     )
 
