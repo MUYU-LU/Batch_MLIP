@@ -1,0 +1,610 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "scope": "resident tensors through integrated graph replacement",
+  "warmups": 2,
+  "repeats": 3,
+  "environment": {
+    "python": "3.11.14",
+    "torch": "2.9.1+cu128",
+    "cuda": "12.8",
+    "gpu": "NVIDIA H100 80GB HBM3"
+  },
+  "points": [
+    {
+      "point": {
+        "source_atoms": 46,
+        "repeat": [
+          1,
+          1,
+          1
+        ],
+        "batch_size": 1
+      },
+      "name": "H46-S1x1x1-B1",
+      "atoms_per_system": 46,
+      "cutoff_A": 4.5,
+      "cell_statistics": {
+        "bins": [
+          2,
+          3,
+          2
+        ],
+        "occupied_bins": 10,
+        "max_bin_occupancy": 11,
+        "offset_extents": [
+          1,
+          1,
+          1
+        ],
+        "neighbor_bin_count": 27,
+        "cell_candidate_pairs": 4596,
+        "dense_candidate_pairs": 57132,
+        "candidate_reduction": 0.9195547153959253
+      },
+      "methods": {
+        "matscipy": {
+          "wall_seconds": [
+            0.0014481870457530022,
+            0.0013908790424466133,
+            0.0013002529740333557
+          ],
+          "median_wall_seconds": 0.0013908790424466133,
+          "minimum_wall_seconds": 0.0013002529740333557,
+          "maximum_wall_seconds": 0.0014481870457530022,
+          "systems_per_second": 718.9697806079233,
+          "atoms_per_second": 33072.60990796447,
+          "directed_edges": 818,
+          "peak_allocated_bytes": 96256,
+          "peak_reserved_bytes": 2097152,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 3.5190047172811854
+        },
+        "cuda_dense": {
+          "wall_seconds": [
+            0.004914380609989166,
+            0.00489450991153717,
+            0.004850831348448992
+          ],
+          "median_wall_seconds": 0.00489450991153717,
+          "minimum_wall_seconds": 0.004850831348448992,
+          "maximum_wall_seconds": 0.004914380609989166,
+          "systems_per_second": 204.3105475469228,
+          "atoms_per_second": 9398.28518715845,
+          "directed_edges": 818,
+          "peak_allocated_bytes": 33882624,
+          "peak_reserved_bytes": 35651584,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0
+        },
+        "cuda_cell": {
+          "wall_seconds": [
+            0.0032249162904918194,
+            0.0032064621336758137,
+            0.00321635277941823
+          ],
+          "median_wall_seconds": 0.00321635277941823,
+          "minimum_wall_seconds": 0.0032064621336758137,
+          "maximum_wall_seconds": 0.0032249162904918194,
+          "systems_per_second": 310.911168202413,
+          "atoms_per_second": 14301.913737310999,
+          "directed_edges": 818,
+          "peak_allocated_bytes": 34838016,
+          "peak_reserved_bytes": 35651584,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.521757794374311
+        }
+      }
+    },
+    {
+      "point": {
+        "source_atoms": 46,
+        "repeat": [
+          1,
+          1,
+          1
+        ],
+        "batch_size": 32
+      },
+      "name": "H46-S1x1x1-B32",
+      "atoms_per_system": 46,
+      "cutoff_A": 4.5,
+      "cell_statistics": {
+        "bins": [
+          2,
+          3,
+          2
+        ],
+        "occupied_bins": 10,
+        "max_bin_occupancy": 11,
+        "offset_extents": [
+          1,
+          1,
+          1
+        ],
+        "neighbor_bin_count": 27,
+        "cell_candidate_pairs": 4596,
+        "dense_candidate_pairs": 57132,
+        "candidate_reduction": 0.9195547153959253
+      },
+      "methods": {
+        "matscipy": {
+          "wall_seconds": [
+            0.01566363126039505,
+            0.015652064699679613,
+            0.015556219033896923
+          ],
+          "median_wall_seconds": 0.015652064699679613,
+          "minimum_wall_seconds": 0.015556219033896923,
+          "maximum_wall_seconds": 0.01566363126039505,
+          "systems_per_second": 2044.4587096969396,
+          "atoms_per_second": 94045.10064605923,
+          "directed_edges": 26176,
+          "peak_allocated_bytes": 36413440,
+          "peak_reserved_bytes": 37748736,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 0.655540357199288
+        },
+        "cuda_dense": {
+          "wall_seconds": [
+            0.010302003938704729,
+            0.010260271839797497,
+            0.01026056008413434
+          ],
+          "median_wall_seconds": 0.01026056008413434,
+          "minimum_wall_seconds": 0.010260271839797497,
+          "maximum_wall_seconds": 0.010302003938704729,
+          "systems_per_second": 3118.738132968086,
+          "atoms_per_second": 143461.95411653197,
+          "directed_edges": 26176,
+          "peak_allocated_bytes": 43522560,
+          "peak_reserved_bytes": 60817408,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0
+        },
+        "cuda_cell": {
+          "wall_seconds": [
+            0.007738234009593725,
+            0.007880557794123888,
+            0.007667548954486847
+          ],
+          "median_wall_seconds": 0.007738234009593725,
+          "minimum_wall_seconds": 0.007667548954486847,
+          "maximum_wall_seconds": 0.007880557794123888,
+          "systems_per_second": 4135.310454598164,
+          "atoms_per_second": 190224.28091151553,
+          "directed_edges": 26176,
+          "peak_allocated_bytes": 75008512,
+          "peak_reserved_bytes": 85983232,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.3259562933110423
+        }
+      }
+    },
+    {
+      "point": {
+        "source_atoms": 276,
+        "repeat": [
+          1,
+          1,
+          1
+        ],
+        "batch_size": 1
+      },
+      "name": "H276-S1x1x1-B1",
+      "atoms_per_system": 276,
+      "cutoff_A": 4.5,
+      "cell_statistics": {
+        "bins": [
+          5,
+          5,
+          5
+        ],
+        "occupied_bins": 62,
+        "max_bin_occupancy": 10,
+        "offset_extents": [
+          1,
+          1,
+          1
+        ],
+        "neighbor_bin_count": 27,
+        "cell_candidate_pairs": 21072,
+        "dense_candidate_pairs": 2056752,
+        "candidate_reduction": 0.9897547200634788
+      },
+      "methods": {
+        "matscipy": {
+          "wall_seconds": [
+            0.0023392457515001297,
+            0.002337748184800148,
+            0.0023381481878459454
+          ],
+          "median_wall_seconds": 0.0023381481878459454,
+          "minimum_wall_seconds": 0.002337748184800148,
+          "maximum_wall_seconds": 0.0023392457515001297,
+          "systems_per_second": 427.68888866760204,
+          "atoms_per_second": 118042.13327225817,
+          "directed_edges": 4776,
+          "peak_allocated_bytes": 34078720,
+          "peak_reserved_bytes": 35651584,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 2.09231936603975
+        },
+        "cuda_dense": {
+          "wall_seconds": [
+            0.004886918235570192,
+            0.004892152734100819,
+            0.004916503094136715
+          ],
+          "median_wall_seconds": 0.004892152734100819,
+          "minimum_wall_seconds": 0.004886918235570192,
+          "maximum_wall_seconds": 0.004916503094136715,
+          "systems_per_second": 204.4089901424144,
+          "atoms_per_second": 56416.88127930638,
+          "directed_edges": 4776,
+          "peak_allocated_bytes": 41958912,
+          "peak_reserved_bytes": 56623104,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0
+        },
+        "cuda_cell": {
+          "wall_seconds": [
+            0.0032399501651525497,
+            0.003223550971597433,
+            0.003244853112846613
+          ],
+          "median_wall_seconds": 0.0032399501651525497,
+          "minimum_wall_seconds": 0.003223550971597433,
+          "maximum_wall_seconds": 0.003244853112846613,
+          "systems_per_second": 308.64672264269717,
+          "atoms_per_second": 85186.49544938443,
+          "directed_edges": 4776,
+          "peak_allocated_bytes": 39639552,
+          "peak_reserved_bytes": 60817408,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.5099469080477281
+        }
+      }
+    },
+    {
+      "point": {
+        "source_atoms": 276,
+        "repeat": [
+          1,
+          1,
+          1
+        ],
+        "batch_size": 16
+      },
+      "name": "H276-S1x1x1-B16",
+      "atoms_per_system": 276,
+      "cutoff_A": 4.5,
+      "cell_statistics": {
+        "bins": [
+          5,
+          5,
+          5
+        ],
+        "occupied_bins": 62,
+        "max_bin_occupancy": 10,
+        "offset_extents": [
+          1,
+          1,
+          1
+        ],
+        "neighbor_bin_count": 27,
+        "cell_candidate_pairs": 21072,
+        "dense_candidate_pairs": 2056752,
+        "candidate_reduction": 0.9897547200634788
+      },
+      "methods": {
+        "matscipy": {
+          "wall_seconds": [
+            0.02562402794137597,
+            0.02554346201941371,
+            0.025584446731954813
+          ],
+          "median_wall_seconds": 0.025584446731954813,
+          "minimum_wall_seconds": 0.02554346201941371,
+          "maximum_wall_seconds": 0.02562402794137597,
+          "systems_per_second": 625.379949296152,
+          "atoms_per_second": 172604.86600573792,
+          "directed_edges": 76416,
+          "peak_allocated_bytes": 41842688,
+          "peak_reserved_bytes": 60817408,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 0.32899627701346623
+        },
+        "cuda_dense": {
+          "wall_seconds": [
+            0.008417187724262476,
+            0.008413866627961397,
+            0.008420178666710854
+          ],
+          "median_wall_seconds": 0.008417187724262476,
+          "minimum_wall_seconds": 0.008413866627961397,
+          "maximum_wall_seconds": 0.008420178666710854,
+          "systems_per_second": 1900.8724201172477,
+          "atoms_per_second": 524640.7879523603,
+          "directed_edges": 76416,
+          "peak_allocated_bytes": 169625088,
+          "peak_reserved_bytes": 182452224,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0
+        },
+        "cuda_cell": {
+          "wall_seconds": [
+            0.005795169156044722,
+            0.005810178350657225,
+            0.005803055129945278
+          ],
+          "median_wall_seconds": 0.005803055129945278,
+          "minimum_wall_seconds": 0.005795169156044722,
+          "maximum_wall_seconds": 0.005810178350657225,
+          "systems_per_second": 2757.168360754635,
+          "atoms_per_second": 760978.4675682794,
+          "directed_edges": 76416,
+          "peak_allocated_bytes": 132772864,
+          "peak_reserved_bytes": 155189248,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.4504752299918007
+        }
+      }
+    },
+    {
+      "point": {
+        "source_atoms": 46,
+        "repeat": [
+          2,
+          2,
+          2
+        ],
+        "batch_size": 8
+      },
+      "name": "H46-S2x2x2-B8",
+      "atoms_per_system": 368,
+      "cutoff_A": 4.5,
+      "cell_statistics": {
+        "bins": [
+          5,
+          6,
+          4
+        ],
+        "occupied_bins": 80,
+        "max_bin_occupancy": 10,
+        "offset_extents": [
+          1,
+          1,
+          1
+        ],
+        "neighbor_bin_count": 27,
+        "cell_candidate_pairs": 28464,
+        "dense_candidate_pairs": 3656448,
+        "candidate_reduction": 0.9922153959252258
+      },
+      "methods": {
+        "matscipy": {
+          "wall_seconds": [
+            0.016203504987061024,
+            0.016228755004704,
+            0.016271584201604128
+          ],
+          "median_wall_seconds": 0.016228755004704,
+          "minimum_wall_seconds": 0.016203504987061024,
+          "maximum_wall_seconds": 0.016271584201604128,
+          "systems_per_second": 492.9521702484974,
+          "atoms_per_second": 181406.39865144706,
+          "directed_edges": 52352,
+          "peak_allocated_bytes": 39221760,
+          "peak_reserved_bytes": 58720256,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 0.41633063121944386
+        },
+        "cuda_dense": {
+          "wall_seconds": [
+            0.006765695754438639,
+            0.006756527815014124,
+            0.006742238067090511
+          ],
+          "median_wall_seconds": 0.006756527815014124,
+          "minimum_wall_seconds": 0.006742238067090511,
+          "maximum_wall_seconds": 0.006765695754438639,
+          "systems_per_second": 1184.0401192788217,
+          "atoms_per_second": 435726.7638946064,
+          "directed_edges": 52352,
+          "peak_allocated_bytes": 152211968,
+          "peak_reserved_bytes": 174063616,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0
+        },
+        "cuda_cell": {
+          "wall_seconds": [
+            0.004524251911789179,
+            0.004573851823806763,
+            0.004543382208794355
+          ],
+          "median_wall_seconds": 0.004543382208794355,
+          "minimum_wall_seconds": 0.004524251911789179,
+          "maximum_wall_seconds": 0.004573851823806763,
+          "systems_per_second": 1760.8027747511258,
+          "atoms_per_second": 647975.4211084143,
+          "directed_edges": 52352,
+          "peak_allocated_bytes": 99706368,
+          "peak_reserved_bytes": 123731968,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.4871141155450038
+        }
+      }
+    },
+    {
+      "point": {
+        "source_atoms": 46,
+        "repeat": [
+          3,
+          3,
+          3
+        ],
+        "batch_size": 2
+      },
+      "name": "H46-S3x3x3-B2",
+      "atoms_per_system": 1242,
+      "cutoff_A": 4.5,
+      "cell_statistics": {
+        "bins": [
+          7,
+          9,
+          6
+        ],
+        "occupied_bins": 279,
+        "max_bin_occupancy": 12,
+        "offset_extents": [
+          1,
+          1,
+          1
+        ],
+        "neighbor_bin_count": 27,
+        "cell_candidate_pairs": 100548,
+        "dense_candidate_pairs": 41649228,
+        "candidate_reduction": 0.9975858376054413
+      },
+      "methods": {
+        "matscipy": {
+          "wall_seconds": [
+            0.012321863789111376,
+            0.01230592094361782,
+            0.012338332366198301
+          ],
+          "median_wall_seconds": 0.012321863789111376,
+          "minimum_wall_seconds": 0.01230592094361782,
+          "maximum_wall_seconds": 0.012338332366198301,
+          "systems_per_second": 162.31310735372406,
+          "atoms_per_second": 201592.87933332528,
+          "directed_edges": 44172,
+          "peak_allocated_bytes": 38338048,
+          "peak_reserved_bytes": 58720256,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 0.7877388689868535
+        },
+        "cuda_dense": {
+          "wall_seconds": [
+            0.009702437091618776,
+            0.009728780016303062,
+            0.00970641104504466
+          ],
+          "median_wall_seconds": 0.00970641104504466,
+          "minimum_wall_seconds": 0.009702437091618776,
+          "maximum_wall_seconds": 0.009728780016303062,
+          "systems_per_second": 206.0493822813165,
+          "atoms_per_second": 255913.3327933951,
+          "directed_edges": 44172,
+          "peak_allocated_bytes": 366956032,
+          "peak_reserved_bytes": 400556032,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0
+        },
+        "cuda_cell": {
+          "wall_seconds": [
+            0.0036414540372788906,
+            0.003889612853527069,
+            0.003687415737658739
+          ],
+          "median_wall_seconds": 0.003687415737658739,
+          "minimum_wall_seconds": 0.0036414540372788906,
+          "maximum_wall_seconds": 0.003889612853527069,
+          "systems_per_second": 542.3852752957727,
+          "atoms_per_second": 673642.5119173496,
+          "directed_edges": 44172,
+          "peak_allocated_bytes": 91718656,
+          "peak_reserved_bytes": 113246208,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 2.6323072134002388
+        }
+      }
+    },
+    {
+      "point": {
+        "source_atoms": 276,
+        "repeat": [
+          2,
+          2,
+          2
+        ],
+        "batch_size": 2
+      },
+      "name": "H276-S2x2x2-B2",
+      "atoms_per_system": 2208,
+      "cutoff_A": 4.5,
+      "cell_statistics": {
+        "bins": [
+          10,
+          10,
+          10
+        ],
+        "occupied_bins": 496,
+        "max_bin_occupancy": 10,
+        "offset_extents": [
+          1,
+          1,
+          1
+        ],
+        "neighbor_bin_count": 27,
+        "cell_candidate_pairs": 168576,
+        "dense_candidate_pairs": 131632128,
+        "candidate_reduction": 0.9987193400079348
+      },
+      "methods": {
+        "matscipy": {
+          "wall_seconds": [
+            0.022775357123464346,
+            0.02310039009898901,
+            0.02317205723375082
+          ],
+          "median_wall_seconds": 0.02310039009898901,
+          "minimum_wall_seconds": 0.022775357123464346,
+          "maximum_wall_seconds": 0.02317205723375082,
+          "systems_per_second": 86.57862449203965,
+          "atoms_per_second": 191165.60287842352,
+          "directed_edges": 76416,
+          "peak_allocated_bytes": 41829376,
+          "peak_reserved_bytes": 60817408,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0592137593128166
+        },
+        "cuda_dense": {
+          "wall_seconds": [
+            0.02440199488773942,
+            0.025159516371786594,
+            0.024468251038342714
+          ],
+          "median_wall_seconds": 0.024468251038342714,
+          "minimum_wall_seconds": 0.02440199488773942,
+          "maximum_wall_seconds": 0.025159516371786594,
+          "systems_per_second": 81.73857611914808,
+          "atoms_per_second": 180478.77607107896,
+          "directed_edges": 76416,
+          "peak_allocated_bytes": 563999232,
+          "peak_reserved_bytes": 698351616,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 1.0
+        },
+        "cuda_cell": {
+          "wall_seconds": [
+            0.0038464260287582874,
+            0.0038829920813441277,
+            0.00390736386179924
+          ],
+          "median_wall_seconds": 0.0038829920813441277,
+          "minimum_wall_seconds": 0.0038464260287582874,
+          "maximum_wall_seconds": 0.00390736386179924,
+          "systems_per_second": 515.0667212557602,
+          "atoms_per_second": 1137267.3205327187,
+          "directed_edges": 76416,
+          "peak_allocated_bytes": 132764672,
+          "peak_reserved_bytes": 155189248,
+          "exact_ordered_vs_matscipy": true,
+          "speedup_vs_cuda_dense": 6.301390918591016
+        }
+      }
+    }
+  ]
+}

@@ -280,7 +280,7 @@ def main() -> None:
     parser.add_argument("--skin", type=float, default=0.0)
     parser.add_argument(
         "--neighbor-backend",
-        choices=("auto", "matscipy", "cuda_dense"),
+        choices=("auto", "matscipy", "cuda_dense", "cuda_cell"),
         default="auto",
     )
     parser.add_argument("--fmax", type=float, default=0.05)

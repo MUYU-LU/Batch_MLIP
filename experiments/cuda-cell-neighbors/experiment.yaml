@@ -1,0 +1,110 @@
+name: cuda-cell-neighbors
+date: 2026-07-26
+baseline_commit: 59a7b64
+description: >-
+  Replace quadratic CUDA-dense candidate generation with exact GPU spatial
+  bins for large fully periodic systems while retaining existing fallbacks.
+hypothesis: >-
+  For periodic structures large enough to occupy multiple cutoff-sized bins,
+  a sparse CUDA cell list will preserve Matscipy edge and integer-shift
+  topology exactly, reduce neighbor rebuild time by at least 30% relative to
+  cuda_dense, and reduce peak temporary GPU memory by at least 30%. It must not
+  be selected automatically where one-bin occupancy removes the sparse-work
+  advantage.
+mechanism:
+  - wrap coordinates in fractional space using float64 topology arithmetic
+  - sort atoms by graph-local spatial bin on CUDA
+  - use searchsorted to expand only occupied neighboring-bin pairs
+  - evaluate exact Cartesian distances before emitting directed edges
+  - restore canonical system-center-neighbor-shift ordering
+scope:
+  supported:
+    - full-rank fully periodic cells
+    - triclinic cells
+    - unwrapped coordinates
+    - multiple periodic images
+    - heterogeneous batches
+    - selective neighbor-cache rebuilds
+  fallback:
+    - partial or nonperiodic cells
+    - singular periodic cells
+    - work estimates exceeding the configured temporary-memory budget
+backends: [matscipy, cuda_dense, cuda_cell]
+correctness:
+  - exact edge_index and shifts_int versus Matscipy
+  - graph isolation
+  - batch-size-one and batched model equivalence
+  - variable-cell selective rebuild equivalence
+  - real-model short NVE trajectory and energy-drift comparison
+screening_matrix:
+  cutoff_A: [4.5, 6.0]
+  base_workloads:
+    - {name: H46, resident_batches: [1, 8, 32]}
+    - {name: H276, resident_batches: [1, 8, 16]}
+  replicated_cells:
+    - {source: H46, repeat: [2, 2, 2], atoms: 368, resident_batches: [1, 4, 8]}
+    - {source: H46, repeat: [3, 3, 3], atoms: 1242, resident_batches: [1, 2]}
+    - {source: H276, repeat: [2, 2, 2], atoms: 2208, resident_batches: [1, 2]}
+production_matrix:
+  models: [atombit_smooth_rms_fp32, mace_off_small]
+  tasks: [eval, variable_cell_bfgs, nve]
+  selection: only neighbor points passing correctness and performance gates
+measurement:
+  warmups: 2
+  repeats: 3
+  deterministic: true
+  synchronized_cuda: true
+  cpu_threads: 1
+metrics:
+  - systems_per_second
+  - atoms_per_second
+  - directed_edges
+  - neighbor_seconds
+  - model_forward_seconds
+  - host_to_device_seconds
+  - peak_allocated_bytes
+  - peak_reserved_bytes
+  - neighbor_rebuilds
+  - nve_energy_drift
+gates:
+  exact_topology: true
+  model_force_tolerance_eV_per_A: 1.0e-5
+  neighbor_speedup_vs_cuda_dense_min: 1.30
+  temporary_memory_reduction_min: 0.30
+  end_to_end_speedup_min: 1.05
+  nve_drift_no_regression_fraction: 0.05
+decision_policy:
+  - explicit cuda_cell may be retained after correctness passes
+  - auto policy changes require a measured crossover and at least 5 percent end-to-end gain
+  - negative and one-bin results remain recorded
+commands:
+  baseline:
+    - python
+    - -m
+    - pytest
+    - -q
+  targeted:
+    - python
+    - -m
+    - pytest
+    - -q
+    - tests/test_cell_neighbors.py
+    - tests/test_dense_neighbors.py
+  benchmark:
+    - python
+    - benchmarks/benchmark_cell_neighbors.py
+    - --dataset-dir
+    - data/T2_test/structures
+    - --device
+    - cuda:0
+    - --output
+    - runs/cuda_cell_neighbors/screen.json
+raw_outputs:
+  - runs/cuda_cell_neighbors/screen.json
+  - runs/cuda_cell_neighbors/production.json
+  - runs/cuda_cell_neighbors/nve_validation.json
+final_checks:
+  pytest_main: 195 passed, 8 skipped
+  pytest_cuda_neighbors: 15 passed
+  pytest_mace_optional: 8 passed
+  ruff: All checks passed

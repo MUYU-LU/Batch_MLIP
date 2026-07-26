@@ -1,0 +1,1412 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "model": "atombit",
+  "task": "bfgs",
+  "source_atoms": 46,
+  "repeat": [
+    2,
+    2,
+    2
+  ],
+  "atoms_per_system": 368,
+  "batch_size": 4,
+  "skin_A": 0.0,
+  "nve_steps": null,
+  "warmups": 1,
+  "repeats": 3,
+  "methods": {
+    "cuda_dense": {
+      "backend": "cuda_dense",
+      "wall_seconds": [
+        0.2221915195696056,
+        0.2225293223746121,
+        0.2186298631131649
+      ],
+      "median_wall_seconds": 0.2221915195696056,
+      "minimum_wall_seconds": 0.2186298631131649,
+      "maximum_wall_seconds": 0.2225293223746121,
+      "systems_per_second": 18.0024872585064,
+      "atoms_per_second": 6624.915311130355,
+      "peak_allocated_bytes": 2135680000,
+      "peak_reserved_bytes": 2652897280,
+      "runtime_profile": {
+        "schema_version": 1,
+        "total_seconds": 0.21896753506734967,
+        "phases": {
+          "calculator.graph_view": {
+            "count": 4,
+            "total_seconds": 6.060800049453974e-05,
+            "mean_seconds": 1.5152000123634935e-05,
+            "max_seconds": 1.5680000185966492e-05,
+            "total_host_seconds": 0.00013048946857452393
+          },
+          "calculator.neighbor_update": {
+            "count": 4,
+            "total_seconds": 0.03301132774353027,
+            "mean_seconds": 0.008252831935882568,
+            "max_seconds": 0.008290656089782715,
+            "total_host_seconds": 0.03305756440386176
+          },
+          "graph.neighbor_search": {
+            "count": 5,
+            "total_seconds": 0.033737248420715335,
+            "mean_seconds": 0.006747449684143067,
+            "max_seconds": 0.006812320232391357,
+            "total_host_seconds": 0.033702369313687086
+          },
+          "graph.to_device": {
+            "count": 5,
+            "total_seconds": 0.0029423039555549623,
+            "mean_seconds": 0.0005884607911109924,
+            "max_seconds": 0.0005941439867019654,
+            "total_host_seconds": 0.0029960116371512413
+          },
+          "model.autograd": {
+            "count": 4,
+            "total_seconds": 0.07619308853149413,
+            "mean_seconds": 0.019048272132873533,
+            "max_seconds": 0.019399839401245116,
+            "total_host_seconds": 0.046593903098255396
+          },
+          "model.forward": {
+            "count": 4,
+            "total_seconds": 0.03833785533905029,
+            "mean_seconds": 0.009584463834762573,
+            "max_seconds": 0.009593695640563964,
+            "total_host_seconds": 0.035767598543316126
+          },
+          "optimizer.bfgs_apply_displacement": {
+            "count": 3,
+            "total_seconds": 0.006211072206497192,
+            "mean_seconds": 0.002070357402165731,
+            "max_seconds": 0.0020824320316314695,
+            "total_host_seconds": 0.006164283026009798
+          },
+          "optimizer.bfgs_cholesky": {
+            "count": 3,
+            "total_seconds": 0.011196863889694214,
+            "mean_seconds": 0.0037322879632314047,
+            "max_seconds": 0.0037499520778656007,
+            "total_host_seconds": 0.011230851989239454
+          },
+          "optimizer.bfgs_hessian_update": {
+            "count": 3,
+            "total_seconds": 0.00139452803786844,
+            "mean_seconds": 0.00046484267928948,
+            "max_seconds": 0.0006954240202903748,
+            "total_host_seconds": 0.001309771090745926
+          },
+          "optimizer.bfgs_history_pack": {
+            "count": 3,
+            "total_seconds": 0.0007240320071578027,
+            "mean_seconds": 0.00024134400238593422,
+            "max_seconds": 0.0003110400140285492,
+            "total_host_seconds": 0.0007279445417225361
+          },
+          "optimizer.bfgs_history_store": {
+            "count": 3,
+            "total_seconds": 0.0004617279917001724,
+            "mean_seconds": 0.00015390933056672412,
+            "max_seconds": 0.00015756799280643464,
+            "total_host_seconds": 0.0004794839769601822
+          },
+          "optimizer.bfgs_linear_algebra": {
+            "count": 3,
+            "total_seconds": 0.015035231590270995,
+            "mean_seconds": 0.005011743863423665,
+            "max_seconds": 0.005314879894256592,
+            "total_host_seconds": 0.01508174417540431
+          },
+          "optimizer.bfgs_solve": {
+            "count": 3,
+            "total_seconds": 0.0004580159932374954,
+            "mean_seconds": 0.00015267199774583178,
+            "max_seconds": 0.00015423999726772307,
+            "total_host_seconds": 0.0004780692979693413
+          },
+          "optimizer.bfgs_update": {
+            "count": 3,
+            "total_seconds": 0.02382335948944092,
+            "mean_seconds": 0.00794111982981364,
+            "max_seconds": 0.008250144004821778,
+            "total_host_seconds": 0.023931431584060192
+          }
+        },
+        "events": [
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 4,
+            "rebuilt_systems": 4,
+            "atoms": 1472,
+            "edges": 46016,
+            "rebuild_count": 1,
+            "backend": "cuda_dense"
+          },
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 4,
+            "rebuilt_systems": 4,
+            "atoms": 1472,
+            "edges": 46016,
+            "rebuild_count": 2,
+            "backend": "cuda_dense"
+          },
+          {
+            "name": "model_evaluation",
+            "adapter": "atombit",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 46016,
+            "candidate_edges": 46016,
+            "neighbor_rebuilds": 1,
+            "compute_stress": true
+          },
+          {
+            "name": "optimizer_evaluation",
+            "optimizer": "bfgs",
+            "scheduler_step": 0,
+            "active_systems": 4,
+            "active_atoms": 1472,
+            "active_edges": 46016,
+            "pending_systems": 0
+          },
+          {
+            "name": "bfgs_cholesky",
+            "systems": 4,
+            "fallback_systems": 0,
+            "dimension": 1113
+          },
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 4,
+            "rebuilt_systems": 4,
+            "atoms": 1472,
+            "edges": 45632,
+            "rebuild_count": 3,
+            "backend": "cuda_dense"
+          },
+          {
+            "name": "model_evaluation",
+            "adapter": "atombit",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 45632,
+            "candidate_edges": 45632,
+            "neighbor_rebuilds": 1,
+            "compute_stress": true
+          },
+          {
+            "name": "optimizer_evaluation",
+            "optimizer": "bfgs",
+            "scheduler_step": 1,
+            "active_systems": 4,
+            "active_atoms": 1472,
+            "active_edges": 45632,
+            "pending_systems": 0
+          },
+          {
+            "name": "bfgs_cholesky",
+            "systems": 4,
+            "fallback_systems": 0,
+            "dimension": 1113
+          },
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 4,
+            "rebuilt_systems": 4,
+            "atoms": 1472,
+            "edges": 46016,
+            "rebuild_count": 4,
+            "backend": "cuda_dense"
+          },
+          {
+            "name": "model_evaluation",
+            "adapter": "atombit",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 46016,
+            "candidate_edges": 46016,
+            "neighbor_rebuilds": 1,
+            "compute_stress": true
+          },
+          {
+            "name": "optimizer_evaluation",
+            "optimizer": "bfgs",
+            "scheduler_step": 2,
+            "active_systems": 4,
+            "active_atoms": 1472,
+            "active_edges": 46016,
+            "pending_systems": 0
+          },
+          {
+            "name": "bfgs_cholesky",
+            "systems": 4,
+            "fallback_systems": 0,
+            "dimension": 1113
+          },
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 4,
+            "rebuilt_systems": 4,
+            "atoms": 1472,
+            "edges": 45888,
+            "rebuild_count": 5,
+            "backend": "cuda_dense"
+          },
+          {
+            "name": "model_evaluation",
+            "adapter": "atombit",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 45888,
+            "candidate_edges": 45888,
+            "neighbor_rebuilds": 1,
+            "compute_stress": true
+          },
+          {
+            "name": "optimizer_evaluation",
+            "optimizer": "bfgs",
+            "scheduler_step": 3,
+            "active_systems": 4,
+            "active_atoms": 1472,
+            "active_edges": 45888,
+            "pending_systems": 0
+          }
+        ],
+        "samples": [
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.006812320232391357,
+            "host_seconds": 0.006818513851612806,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "backend": "cuda_dense"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.0005823360085487366,
+            "host_seconds": 0.0005943132564425468,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 46016
+          },
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.006731904029846191,
+            "host_seconds": 0.006720173638314009,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "backend": "cuda_dense"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.0005889279842376709,
+            "host_seconds": 0.0006001237779855728,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 46016
+          },
+          {
+            "name": "calculator.neighbor_update",
+            "seconds": 0.00823366355895996,
+            "host_seconds": 0.008251368068158627,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "calculator.graph_view",
+            "seconds": 1.5135999768972398e-05,
+            "host_seconds": 3.2015610486269e-05,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "candidate_edges": 46016
+          },
+          {
+            "name": "model.forward",
+            "seconds": 0.009593695640563964,
+            "host_seconds": 0.008947726804763079,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 46016
+          },
+          {
+            "name": "model.autograd",
+            "seconds": 0.019399839401245116,
+            "host_seconds": 0.011929384898394346,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 46016
+          },
+          {
+            "name": "optimizer.bfgs_history_pack",
+            "seconds": 0.00011395200341939927,
+            "host_seconds": 0.00010913936421275139,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_hessian_update",
+            "seconds": 9.887999854981899e-06,
+            "host_seconds": 1.5791039913892746e-05,
+            "device": "cuda:0",
+            "systems": 0,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_cholesky",
+            "seconds": 0.0037499520778656007,
+            "host_seconds": 0.003748253919184208,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_solve",
+            "seconds": 0.00015423999726772307,
+            "host_seconds": 0.00015996722504496574,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_history_store",
+            "seconds": 0.00014972800016403197,
+            "host_seconds": 0.00015511643141508102,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_linear_algebra",
+            "seconds": 0.004431583881378174,
+            "host_seconds": 0.00444691302254796,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_apply_displacement",
+            "seconds": 0.0020824320316314695,
+            "host_seconds": 0.0020687910728156567,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "optimizer.bfgs_update",
+            "seconds": 0.007363967895507813,
+            "host_seconds": 0.007400252856314182,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.006765247821807862,
+            "host_seconds": 0.006755696143954992,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "backend": "cuda_dense"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.0005895040035247803,
+            "host_seconds": 0.000600161962211132,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 45632
+          },
+          {
+            "name": "calculator.neighbor_update",
+            "seconds": 0.008290656089782715,
+            "host_seconds": 0.00830079521983862,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "calculator.graph_view",
+            "seconds": 1.5680000185966492e-05,
+            "host_seconds": 3.3828895539045334e-05,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "candidate_edges": 45632
+          },
+          {
+            "name": "model.forward",
+            "seconds": 0.009578847885131836,
+            "host_seconds": 0.008985104970633984,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 45632
+          },
+          {
+            "name": "model.autograd",
+            "seconds": 0.019303647994995118,
+            "host_seconds": 0.011993343010544777,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 45632
+          },
+          {
+            "name": "optimizer.bfgs_history_pack",
+            "seconds": 0.0003110400140285492,
+            "host_seconds": 0.0003160662017762661,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_hessian_update",
+            "seconds": 0.0006954240202903748,
+            "host_seconds": 0.0006510280072689056,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_cholesky",
+            "seconds": 0.0037265279293060304,
+            "host_seconds": 0.00374411279335618,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_solve",
+            "seconds": 0.0001518079936504364,
+            "host_seconds": 0.00015925895422697067,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_history_store",
+            "seconds": 0.0001544319987297058,
+            "host_seconds": 0.00016134930774569511,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_linear_algebra",
+            "seconds": 0.005314879894256592,
+            "host_seconds": 0.005331226158887148,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_apply_displacement",
+            "seconds": 0.002062848091125488,
+            "host_seconds": 0.002039375714957714,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "optimizer.bfgs_update",
+            "seconds": 0.008250144004821778,
+            "host_seconds": 0.00828605005517602,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.00671830415725708,
+            "host_seconds": 0.00670750392600894,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "backend": "cuda_dense"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.0005873919725418091,
+            "host_seconds": 0.0005974373780190945,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 46016
+          },
+          {
+            "name": "calculator.neighbor_update",
+            "seconds": 0.008248736381530761,
+            "host_seconds": 0.008259064052253962,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "calculator.graph_view",
+            "seconds": 1.5072000212967396e-05,
+            "host_seconds": 3.217719495296478e-05,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "candidate_edges": 46016
+          },
+          {
+            "name": "model.forward",
+            "seconds": 0.009575200080871583,
+            "host_seconds": 0.008899528998881578,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 46016
+          },
+          {
+            "name": "model.autograd",
+            "seconds": 0.01875801658630371,
+            "host_seconds": 0.011343831196427345,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 46016
+          },
+          {
+            "name": "optimizer.bfgs_history_pack",
+            "seconds": 0.00029903998970985413,
+            "host_seconds": 0.0003027389757335186,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_hessian_update",
+            "seconds": 0.0006892160177230835,
+            "host_seconds": 0.0006429520435631275,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_cholesky",
+            "seconds": 0.003720383882522583,
+            "host_seconds": 0.003738485276699066,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_solve",
+            "seconds": 0.00015196800231933593,
+            "host_seconds": 0.00015884311869740486,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_history_store",
+            "seconds": 0.00015756799280643464,
+            "host_seconds": 0.00016301823779940605,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_linear_algebra",
+            "seconds": 0.005288767814636231,
+            "host_seconds": 0.005303604993969202,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_apply_displacement",
+            "seconds": 0.0020657920837402343,
+            "host_seconds": 0.0020561162382364273,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "optimizer.bfgs_update",
+            "seconds": 0.008209247589111329,
+            "host_seconds": 0.00824512867256999,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.0067094721794128415,
+            "host_seconds": 0.006700481753796339,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "backend": "cuda_dense"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.0005941439867019654,
+            "host_seconds": 0.0006039752624928951,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 45888
+          },
+          {
+            "name": "calculator.neighbor_update",
+            "seconds": 0.008238271713256836,
+            "host_seconds": 0.008246337063610554,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "calculator.graph_view",
+            "seconds": 1.4720000326633453e-05,
+            "host_seconds": 3.246776759624481e-05,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "candidate_edges": 45888
+          },
+          {
+            "name": "model.forward",
+            "seconds": 0.00959011173248291,
+            "host_seconds": 0.008935237769037485,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 45888
+          },
+          {
+            "name": "model.autograd",
+            "seconds": 0.018731584548950197,
+            "host_seconds": 0.011327343992888927,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 45888
+          }
+        ],
+        "peak_memory_bytes": 2135680000
+      },
+      "validation_vs_cuda_dense": {
+        "max_abs_velocities_difference": 0.0,
+        "max_abs_positions_difference": 0.0,
+        "max_abs_cells_difference": 0.0,
+        "max_abs_energy_difference": 0.0,
+        "max_abs_forces_difference": 0.0
+      },
+      "speedup_vs_cuda_dense": 1.0
+    },
+    "cuda_cell": {
+      "backend": "cuda_cell",
+      "wall_seconds": [
+        0.20709127560257912,
+        0.20626471703872085,
+        0.20650883810594678
+      ],
+      "median_wall_seconds": 0.20650883810594678,
+      "minimum_wall_seconds": 0.20626471703872085,
+      "maximum_wall_seconds": 0.20709127560257912,
+      "systems_per_second": 19.369631037039927,
+      "atoms_per_second": 7128.024221630692,
+      "peak_allocated_bytes": 2134581248,
+      "peak_reserved_bytes": 2682257408,
+      "runtime_profile": {
+        "schema_version": 1,
+        "total_seconds": 0.20685162395238876,
+        "phases": {
+          "calculator.graph_view": {
+            "count": 4,
+            "total_seconds": 6.019199918955564e-05,
+            "mean_seconds": 1.504799979738891e-05,
+            "max_seconds": 1.535999961197376e-05,
+            "total_host_seconds": 0.00012917118147015572
+          },
+          "calculator.neighbor_update": {
+            "count": 4,
+            "total_seconds": 0.02164182424545288,
+            "mean_seconds": 0.00541045606136322,
+            "max_seconds": 0.0054481601715087894,
+            "total_host_seconds": 0.02168796444311738
+          },
+          "graph.neighbor_search": {
+            "count": 5,
+            "total_seconds": 0.01944431972503662,
+            "mean_seconds": 0.003888863945007324,
+            "max_seconds": 0.003914623975753784,
+            "total_host_seconds": 0.019408576656132936
+          },
+          "graph.to_device": {
+            "count": 5,
+            "total_seconds": 0.0029073599576950075,
+            "mean_seconds": 0.0005814719915390015,
+            "max_seconds": 0.000585919976234436,
+            "total_host_seconds": 0.0029733609408140182
+          },
+          "model.autograd": {
+            "count": 4,
+            "total_seconds": 0.07760249710083007,
+            "mean_seconds": 0.019400624275207518,
+            "max_seconds": 0.019744543075561522,
+            "total_host_seconds": 0.048341416753828526
+          },
+          "model.forward": {
+            "count": 4,
+            "total_seconds": 0.03820639991760254,
+            "mean_seconds": 0.009551599979400634,
+            "max_seconds": 0.00957583999633789,
+            "total_host_seconds": 0.035660401452332735
+          },
+          "optimizer.bfgs_apply_displacement": {
+            "count": 3,
+            "total_seconds": 0.006220127820968627,
+            "mean_seconds": 0.0020733759403228757,
+            "max_seconds": 0.002078655958175659,
+            "total_host_seconds": 0.00618602754548192
+          },
+          "optimizer.bfgs_cholesky": {
+            "count": 3,
+            "total_seconds": 0.011175423860549927,
+            "mean_seconds": 0.0037251412868499756,
+            "max_seconds": 0.0037402238845825196,
+            "total_host_seconds": 0.011212493292987347
+          },
+          "optimizer.bfgs_hessian_update": {
+            "count": 3,
+            "total_seconds": 0.0013984960233792663,
+            "mean_seconds": 0.00046616534112642213,
+            "max_seconds": 0.0006950719952583313,
+            "total_host_seconds": 0.0013090935535728931
+          },
+          "optimizer.bfgs_history_pack": {
+            "count": 3,
+            "total_seconds": 0.0007190719842910768,
+            "mean_seconds": 0.00023969066143035892,
+            "max_seconds": 0.00030563199520111087,
+            "total_host_seconds": 0.0007114284671843052
+          },
+          "optimizer.bfgs_history_store": {
+            "count": 3,
+            "total_seconds": 0.000464031994342804,
+            "mean_seconds": 0.00015467733144760134,
+            "max_seconds": 0.00015756799280643464,
+            "total_host_seconds": 0.0004797792062163353
+          },
+          "optimizer.bfgs_linear_algebra": {
+            "count": 3,
+            "total_seconds": 0.014997280120849608,
+            "mean_seconds": 0.004999093373616536,
+            "max_seconds": 0.005296256065368652,
+            "total_host_seconds": 0.015042080078274012
+          },
+          "optimizer.bfgs_solve": {
+            "count": 3,
+            "total_seconds": 0.0004574399888515472,
+            "mean_seconds": 0.00015247999628384908,
+            "max_seconds": 0.000156031996011734,
+            "total_host_seconds": 0.00047591235488653183
+          },
+          "optimizer.bfgs_update": {
+            "count": 3,
+            "total_seconds": 0.023786272525787355,
+            "mean_seconds": 0.007928757508595785,
+            "max_seconds": 0.008227904319763184,
+            "total_host_seconds": 0.023893755860626698
+          }
+        },
+        "events": [
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 4,
+            "rebuilt_systems": 4,
+            "atoms": 1472,
+            "edges": 46016,
+            "rebuild_count": 1,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 4,
+            "rebuilt_systems": 4,
+            "atoms": 1472,
+            "edges": 46016,
+            "rebuild_count": 2,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "model_evaluation",
+            "adapter": "atombit",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 46016,
+            "candidate_edges": 46016,
+            "neighbor_rebuilds": 1,
+            "compute_stress": true
+          },
+          {
+            "name": "optimizer_evaluation",
+            "optimizer": "bfgs",
+            "scheduler_step": 0,
+            "active_systems": 4,
+            "active_atoms": 1472,
+            "active_edges": 46016,
+            "pending_systems": 0
+          },
+          {
+            "name": "bfgs_cholesky",
+            "systems": 4,
+            "fallback_systems": 0,
+            "dimension": 1113
+          },
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 4,
+            "rebuilt_systems": 4,
+            "atoms": 1472,
+            "edges": 45632,
+            "rebuild_count": 3,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "model_evaluation",
+            "adapter": "atombit",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 45632,
+            "candidate_edges": 45632,
+            "neighbor_rebuilds": 1,
+            "compute_stress": true
+          },
+          {
+            "name": "optimizer_evaluation",
+            "optimizer": "bfgs",
+            "scheduler_step": 1,
+            "active_systems": 4,
+            "active_atoms": 1472,
+            "active_edges": 45632,
+            "pending_systems": 0
+          },
+          {
+            "name": "bfgs_cholesky",
+            "systems": 4,
+            "fallback_systems": 0,
+            "dimension": 1113
+          },
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 4,
+            "rebuilt_systems": 4,
+            "atoms": 1472,
+            "edges": 46016,
+            "rebuild_count": 4,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "model_evaluation",
+            "adapter": "atombit",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 46016,
+            "candidate_edges": 46016,
+            "neighbor_rebuilds": 1,
+            "compute_stress": true
+          },
+          {
+            "name": "optimizer_evaluation",
+            "optimizer": "bfgs",
+            "scheduler_step": 2,
+            "active_systems": 4,
+            "active_atoms": 1472,
+            "active_edges": 46016,
+            "pending_systems": 0
+          },
+          {
+            "name": "bfgs_cholesky",
+            "systems": 4,
+            "fallback_systems": 0,
+            "dimension": 1113
+          },
+          {
+            "name": "neighbor_rebuild",
+            "resident_systems": 4,
+            "rebuilt_systems": 4,
+            "atoms": 1472,
+            "edges": 45888,
+            "rebuild_count": 5,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "model_evaluation",
+            "adapter": "atombit",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 45888,
+            "candidate_edges": 45888,
+            "neighbor_rebuilds": 1,
+            "compute_stress": true
+          },
+          {
+            "name": "optimizer_evaluation",
+            "optimizer": "bfgs",
+            "scheduler_step": 3,
+            "active_systems": 4,
+            "active_atoms": 1472,
+            "active_edges": 45888,
+            "pending_systems": 0
+          }
+        ],
+        "samples": [
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.003880831956863403,
+            "host_seconds": 0.0038869413547217846,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.0005784000158309936,
+            "host_seconds": 0.0005899346433579922,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 46016
+          },
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.0038566079139709473,
+            "host_seconds": 0.0038488381542265415,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.0005795519948005676,
+            "host_seconds": 0.0005925353616476059,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 46016
+          },
+          {
+            "name": "calculator.neighbor_update",
+            "seconds": 0.005363584041595459,
+            "host_seconds": 0.005380608141422272,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "calculator.graph_view",
+            "seconds": 1.535999961197376e-05,
+            "host_seconds": 3.242911770939827e-05,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "candidate_edges": 46016
+          },
+          {
+            "name": "model.forward",
+            "seconds": 0.00957583999633789,
+            "host_seconds": 0.008895676117390394,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 46016
+          },
+          {
+            "name": "model.autograd",
+            "seconds": 0.01968262481689453,
+            "host_seconds": 0.012276879977434874,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 46016
+          },
+          {
+            "name": "optimizer.bfgs_history_pack",
+            "seconds": 0.00011452800035476685,
+            "host_seconds": 0.00010910211130976677,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_hessian_update",
+            "seconds": 9.952000342309476e-06,
+            "host_seconds": 1.5849247574806213e-05,
+            "device": "cuda:0",
+            "systems": 0,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_cholesky",
+            "seconds": 0.0037402238845825196,
+            "host_seconds": 0.003739010076969862,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_solve",
+            "seconds": 0.00015094399452209473,
+            "host_seconds": 0.00015543820336461067,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_history_store",
+            "seconds": 0.00014921599626541138,
+            "host_seconds": 0.0001539001241326332,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_linear_algebra",
+            "seconds": 0.004414656162261963,
+            "host_seconds": 0.0044302018359303474,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_apply_displacement",
+            "seconds": 0.002068671941757202,
+            "host_seconds": 0.0020557818934321404,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "optimizer.bfgs_update",
+            "seconds": 0.0073311362266540525,
+            "host_seconds": 0.007366479840129614,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.003914623975753784,
+            "host_seconds": 0.003904283046722412,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.000585919976234436,
+            "host_seconds": 0.0006050737574696541,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 45632
+          },
+          {
+            "name": "calculator.neighbor_update",
+            "seconds": 0.0054481601715087894,
+            "host_seconds": 0.005459817126393318,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "calculator.graph_view",
+            "seconds": 1.4879999682307244e-05,
+            "host_seconds": 3.183400258421898e-05,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "candidate_edges": 45632
+          },
+          {
+            "name": "model.forward",
+            "seconds": 0.009525152206420898,
+            "host_seconds": 0.008951020892709494,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 45632
+          },
+          {
+            "name": "model.autograd",
+            "seconds": 0.019744543075561522,
+            "host_seconds": 0.012407395988702774,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 45632
+          },
+          {
+            "name": "optimizer.bfgs_history_pack",
+            "seconds": 0.00030563199520111087,
+            "host_seconds": 0.00029957015067338943,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_hessian_update",
+            "seconds": 0.0006934720277786255,
+            "host_seconds": 0.0006476542912423611,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_cholesky",
+            "seconds": 0.0037156479358673097,
+            "host_seconds": 0.0037333141081035137,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_solve",
+            "seconds": 0.000156031996011734,
+            "host_seconds": 0.00016270624473690987,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_history_store",
+            "seconds": 0.00015724800527095796,
+            "host_seconds": 0.000163285993039608,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_linear_algebra",
+            "seconds": 0.005296256065368652,
+            "host_seconds": 0.005310145206749439,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_apply_displacement",
+            "seconds": 0.0020727999210357665,
+            "host_seconds": 0.00206391466781497,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "optimizer.bfgs_update",
+            "seconds": 0.008227904319763184,
+            "host_seconds": 0.008263821247965097,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.0038939199447631835,
+            "host_seconds": 0.003882537130266428,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.0005822719931602478,
+            "host_seconds": 0.000594171229749918,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 46016
+          },
+          {
+            "name": "calculator.neighbor_update",
+            "seconds": 0.0054098558425903324,
+            "host_seconds": 0.005417391192167997,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "calculator.graph_view",
+            "seconds": 1.5168000012636184e-05,
+            "host_seconds": 3.308430314064026e-05,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "candidate_edges": 46016
+          },
+          {
+            "name": "model.forward",
+            "seconds": 0.009569952011108399,
+            "host_seconds": 0.008908591233193874,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 46016
+          },
+          {
+            "name": "model.autograd",
+            "seconds": 0.018987680435180666,
+            "host_seconds": 0.011533153243362904,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 46016
+          },
+          {
+            "name": "optimizer.bfgs_history_pack",
+            "seconds": 0.000298911988735199,
+            "host_seconds": 0.000302756205201149,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_hessian_update",
+            "seconds": 0.0006950719952583313,
+            "host_seconds": 0.0006455900147557259,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_cholesky",
+            "seconds": 0.003719552040100098,
+            "host_seconds": 0.003740169107913971,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_solve",
+            "seconds": 0.00015046399831771852,
+            "host_seconds": 0.0001577679067850113,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_history_store",
+            "seconds": 0.00015756799280643464,
+            "host_seconds": 0.00016259308904409409,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_linear_algebra",
+            "seconds": 0.005286367893218994,
+            "host_seconds": 0.005301733035594225,
+            "device": "cuda:0",
+            "systems": 4,
+            "dimension": 1113
+          },
+          {
+            "name": "optimizer.bfgs_apply_displacement",
+            "seconds": 0.002078655958175659,
+            "host_seconds": 0.00206633098423481,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "optimizer.bfgs_update",
+            "seconds": 0.008227231979370118,
+            "host_seconds": 0.008263454772531986,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "graph.neighbor_search",
+            "seconds": 0.003898335933685303,
+            "host_seconds": 0.0038859769701957703,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "backend": "cuda_cell"
+          },
+          {
+            "name": "graph.to_device",
+            "seconds": 0.0005812159776687622,
+            "host_seconds": 0.0005916459485888481,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 45888
+          },
+          {
+            "name": "calculator.neighbor_update",
+            "seconds": 0.005420224189758301,
+            "host_seconds": 0.005430147983133793,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472
+          },
+          {
+            "name": "calculator.graph_view",
+            "seconds": 1.4783999882638455e-05,
+            "host_seconds": 3.182375803589821e-05,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "candidate_edges": 45888
+          },
+          {
+            "name": "model.forward",
+            "seconds": 0.009535455703735351,
+            "host_seconds": 0.008905113209038973,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 45888
+          },
+          {
+            "name": "model.autograd",
+            "seconds": 0.019187648773193358,
+            "host_seconds": 0.012123987544327974,
+            "device": "cuda:0",
+            "systems": 4,
+            "atoms": 1472,
+            "edges": 45888
+          }
+        ],
+        "peak_memory_bytes": 2134581248
+      },
+      "validation_vs_cuda_dense": {
+        "max_abs_velocities_difference": 0.0,
+        "max_abs_positions_difference": 0.0,
+        "max_abs_cells_difference": 0.0,
+        "max_abs_energy_difference": 0.0,
+        "max_abs_forces_difference": 0.0
+      },
+      "speedup_vs_cuda_dense": 1.0759419384056241
+    }
+  },
+  "environment": {
+    "python": "3.11.14",
+    "torch": "2.9.1+cu128",
+    "cuda": "12.8",
+    "gpu": "NVIDIA H100 80GB HBM3"
+  }
+}

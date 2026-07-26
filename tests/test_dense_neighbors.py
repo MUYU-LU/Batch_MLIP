@@ -192,6 +192,8 @@ def test_neighbor_backend_validation_and_cpu_auto_resolution():
     )
     with pytest.raises(ValueError, match="requires a CUDA device"):
         resolve_neighbor_backend("cuda_dense", device=state.device, counts=state.counts, cutoff=4.7)
+    with pytest.raises(ValueError, match="requires a CUDA device"):
+        resolve_neighbor_backend("cuda_cell", device=state.device, counts=state.counts, cutoff=4.7)
     with pytest.raises(ValueError, match="neighbor_backend"):
         AseGraphBatch.from_ase(systems, cutoff=4.7, neighbor_backend="invalid")
 

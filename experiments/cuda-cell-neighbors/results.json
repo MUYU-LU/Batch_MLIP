@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "baseline_commit": "59a7b64",
+  "status": "passed",
+  "neighbor_topology_points": 14,
+  "neighbor_topology_exact": true,
+  "auto_candidate_reduction_threshold": 0.98,
+  "neighbor_frontier": [
+    {
+      "cutoff_A": 6.0,
+      "system": "H1242",
+      "batch_size": 2,
+      "speedup_vs_cuda_dense": 2.336040685826873,
+      "dense_peak_allocated_bytes": 368915968,
+      "cell_peak_allocated_bytes": 198357504
+    },
+    {
+      "cutoff_A": 6.0,
+      "system": "H2208",
+      "batch_size": 2,
+      "speedup_vs_cuda_dense": 5.4619703937998265,
+      "dense_peak_allocated_bytes": 568547328,
+      "cell_peak_allocated_bytes": 238412288
+    },
+    {
+      "cutoff_A": 4.5,
+      "system": "H1242",
+      "batch_size": 2,
+      "speedup_vs_cuda_dense": 2.6323072134002388,
+      "dense_peak_allocated_bytes": 366956032,
+      "cell_peak_allocated_bytes": 91718656
+    },
+    {
+      "cutoff_A": 4.5,
+      "system": "H2208",
+      "batch_size": 2,
+      "speedup_vs_cuda_dense": 6.301390918591016,
+      "dense_peak_allocated_bytes": 563999232,
+      "cell_peak_allocated_bytes": 132764672
+    }
+  ],
+  "production": [
+    {
+      "model": "atombit_smooth_rms_fp32",
+      "task": "eval",
+      "system": "H2208",
+      "batch_size": 2,
+      "speedup_vs_cuda_dense": 1.6079860181420886,
+      "max_output_difference": 0.0
+    },
+    {
+      "model": "mace_off_small",
+      "task": "eval",
+      "system": "H2208",
+      "batch_size": 2,
+      "speedup_vs_cuda_dense": 1.7651606014753223,
+      "max_output_difference": 0.0
+    },
+    {
+      "model": "atombit_smooth_rms_fp32",
+      "task": "variable_cell_bfgs_3_steps",
+      "system": "H368",
+      "batch_size": 4,
+      "speedup_vs_cuda_dense": 1.0759419384056241,
+      "max_output_difference": 0.0
+    },
+    {
+      "model": "mace_off_small",
+      "task": "variable_cell_bfgs_3_steps",
+      "system": "H368",
+      "batch_size": 4,
+      "speedup_vs_cuda_dense": 1.0745433850980475,
+      "max_output_difference": 0.0
+    },
+    {
+      "model": "atombit_smooth_rms_fp32",
+      "task": "nve_10_steps_skin_0",
+      "system": "H1242",
+      "batch_size": 1,
+      "speedup_vs_cuda_dense": 1.076317393385338,
+      "energy_drift_eV_per_atom": 0.000032956281529916466,
+      "max_output_difference": 0.0
+    },
+    {
+      "model": "mace_off_small",
+      "task": "nve_10_steps_skin_0",
+      "system": "H1242",
+      "batch_size": 1,
+      "speedup_vs_cuda_dense": 1.1277726272698594,
+      "energy_drift_eV_per_atom": 0.00006255403164048317,
+      "max_output_difference": 0.0
+    }
+  ],
+  "auto_validation": {
+    "H46_B32_cutoff_6A": "cuda_dense",
+    "H276_B16_cutoff_6A": "cuda_dense",
+    "H2208_B2_cutoff_6A": "cuda_cell",
+    "auto_vs_explicit_cell_max_output_difference": 0.0
+  },
+  "limitations": [
+    "cell backend currently supports only full-rank three-dimensional periodic cells",
+    "automatic threshold is calibrated on one NVIDIA H100",
+    "MACE EVAL contains one first-repeat allocation outlier; the reported median is robust to it",
+    "cached positive-skin MD gains only on neighbor rebuild steps"
+  ],
+  "final_checks": {
+    "pytest_main": "195 passed, 8 skipped",
+    "pytest_cuda_neighbors": "15 passed",
+    "pytest_mace_optional": "8 passed",
+    "ruff": "All checks passed"
+  }
+}

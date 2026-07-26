@@ -2,7 +2,7 @@
 
 A model-independent interface for **true batched geometry optimization and molecular dynamics** with graph MLIPs. Native adapters are included for AtomBit-style models and MACE.
 
-The engine concatenates independent atomic systems into one heterogeneous graph batch and performs one model forward pass per simulation step. ASE is used at the boundary for structure I/O. An adaptive matscipy/ASE CPU or dense CUDA backend constructs neighbour lists, while PyTorch owns batched model evaluation, optimizer state, and MD integration.
+The engine concatenates independent atomic systems into one heterogeneous graph batch and performs one model forward pass per simulation step. ASE is used at the boundary for structure I/O. Adaptive matscipy/ASE CPU, dense CUDA, and sparse CUDA cell-list backends construct neighbour lists, while PyTorch owns batched model evaluation, optimizer state, and MD integration.
 
 ## What is included
 
@@ -184,7 +184,7 @@ calculator = AtomBitBatchCalculator(
     dtype=torch.float32,
     force_mode="autograd",
     e0_dict=e0_dict,
-    neighbor_backend="auto",  # auto | matscipy | cuda_dense
+    neighbor_backend="auto",  # auto | matscipy | cuda_dense | cuda_cell
 )
 
 single_points = evaluate(systems, calculator)
@@ -696,7 +696,14 @@ Do not add E0 both inside the model and in `AtomBitBatchCalculator`; choose one 
 
 With `skin: 0`, the list is rebuilt every force evaluation. With a positive skin, edges are built to `cutoff + skin` and rebuilt after any atom moves more than `skin / 2` from the reference positions. The supplied AtomBit envelope becomes zero at the physical cutoff, so extra skin edges do not contribute.
 
-The baseline builder runs on CPU through matscipy when installed, otherwise ASE. GPU-native PBC cell lists are a priority experiment rather than an unverified default.
+The baseline builder runs on CPU through matscipy when installed, otherwise
+ASE. `cuda_dense` performs exact memory-bounded quadratic construction on CUDA.
+`cuda_cell` uses exact float64 periodic spatial bins for full-rank 3D-periodic
+cells and restores Matscipy-compatible edge ordering. `auto` first applies the
+existing CPU/CUDA launch crossover, then selects the cell list only when cell
+geometry and occupied fractional span predict at least 98% fewer candidates
+than dense image expansion.
+Partial/nonperiodic or singular cells retain the existing dense/CPU paths.
 
 ## Current scientific scope
 

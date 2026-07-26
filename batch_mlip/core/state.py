@@ -13,6 +13,7 @@ from ase.calculators.singlepoint import SinglePointCalculator
 from ase.constraints import FixAtoms
 
 from ..profiling.runtime import profile_event, profile_phase
+from .cell_neighbors import CellListUnsupportedError, cell_list_neighbor_blocks
 from .dense_neighbors import DenseNeighborUnsupportedError, dense_neighbor_blocks
 from .math_utils import scatter_sum
 from .neighbors import (
@@ -341,11 +342,14 @@ class AseGraphBatch:
             device=self.device,
             counts=self.counts[selected_graph_ids],
             cutoff=self.cutoff + self.skin,
+            cells=self.cells[selected_graph_ids],
+            pbc=self.pbc[selected_graph_ids],
+            positions=self.positions[selected_atom_ids],
         )
         rebuilt_edges: dict[int, np.ndarray | torch.Tensor] = {}
         rebuilt_shifts: dict[int, np.ndarray | torch.Tensor] = {}
 
-        if resolved_backend == "cuda_dense":
+        if resolved_backend in {"cuda_dense", "cuda_cell"}:
             try:
                 with profile_phase(
                     "graph.neighbor_search",
@@ -354,7 +358,12 @@ class AseGraphBatch:
                     atoms=selected_atom_ids.numel(),
                     backend=resolved_backend,
                 ):
-                    rebuilt = dense_neighbor_blocks(
+                    builder = (
+                        dense_neighbor_blocks
+                        if resolved_backend == "cuda_dense"
+                        else cell_list_neighbor_blocks
+                    )
+                    rebuilt = builder(
                         self.positions,
                         self.cells,
                         self.pbc,
@@ -364,6 +373,36 @@ class AseGraphBatch:
                     )
                 rebuilt_edges = {graph_idx: values[0] for graph_idx, values in rebuilt.items()}
                 rebuilt_shifts = {graph_idx: values[1] for graph_idx, values in rebuilt.items()}
+            except CellListUnsupportedError:
+                if self.neighbor_backend != "auto":
+                    raise
+                resolved_backend = "cuda_dense"
+                try:
+                    with profile_phase(
+                        "graph.neighbor_search",
+                        device=self.device,
+                        systems=len(ids),
+                        atoms=selected_atom_ids.numel(),
+                        backend=resolved_backend,
+                    ):
+                        rebuilt = dense_neighbor_blocks(
+                            self.positions,
+                            self.cells,
+                            self.pbc,
+                            self.ptr,
+                            ids,
+                            cutoff=self.cutoff + self.skin,
+                        )
+                    rebuilt_edges = {
+                        graph_idx: values[0]
+                        for graph_idx, values in rebuilt.items()
+                    }
+                    rebuilt_shifts = {
+                        graph_idx: values[1]
+                        for graph_idx, values in rebuilt.items()
+                    }
+                except DenseNeighborUnsupportedError:
+                    resolved_backend = "matscipy"
             except DenseNeighborUnsupportedError:
                 if self.neighbor_backend != "auto":
                     raise
