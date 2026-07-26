@@ -1,0 +1,317 @@
+{
+  "converged": 32,
+  "converged_steps": [
+    92,
+    116,
+    22,
+    120,
+    101,
+    26,
+    103,
+    243,
+    164,
+    91,
+    137,
+    209,
+    128,
+    120,
+    55,
+    143,
+    112,
+    200,
+    255,
+    116,
+    106,
+    83,
+    28,
+    112,
+    127,
+    146,
+    180,
+    193,
+    149,
+    184,
+    134,
+    189
+  ],
+  "energies_eV": [
+    -78381.89829613297,
+    -78383.76832776994,
+    -78381.36890189379,
+    -78382.60062680609,
+    -78381.80894397771,
+    -78382.04476192001,
+    -78383.00219494237,
+    -78383.70328054384,
+    -78384.08676770357,
+    -78383.11160393403,
+    -78382.88996664782,
+    -78383.62060751065,
+    -78383.59633582715,
+    -78381.9635025728,
+    -78382.20169066703,
+    -78383.53820990387,
+    -78382.40422612768,
+    -78381.97254954376,
+    -78383.73901710377,
+    -78382.4490135271,
+    -78382.30348101689,
+    -78382.86823068712,
+    -78381.38538606853,
+    -78382.41048958508,
+    -78382.87549623537,
+    -78382.78967540947,
+    -78382.8380318889,
+    -78383.26811848702,
+    -78382.26111946565,
+    -78382.74592542519,
+    -78383.13973028473,
+    -78383.85844558243
+  ],
+  "environment": {
+    "ase": "3.27.0",
+    "cuda_version": "12.8",
+    "device": "cuda:0",
+    "gpu_capability": [
+      9,
+      0
+    ],
+    "gpu_name": "NVIDIA H100 80GB HBM3",
+    "gpu_total_memory_bytes": 85017886720,
+    "numpy": "2.4.2",
+    "platform": "Linux-6.12.43+deb13-amd64-x86_64-with-glibc2.41",
+    "python": "3.11.14",
+    "torch": "2.9.1+cu128"
+  },
+  "graph_evaluations": 4216,
+  "jobs": 32,
+  "mlip": "mace",
+  "model": "small",
+  "model_evaluations": 500,
+  "neighbor_rebuilds": 0,
+  "optimizer": "bfgs",
+  "parameters": {
+    "deterministic_algorithms": true,
+    "fmax_eV_per_A": 0.05,
+    "growth_factor": 4,
+    "initial_batch_size": 1,
+    "max_batch_size": 32,
+    "max_steps": 500,
+    "memory_safety_fraction": 0.85,
+    "multi_gpu_process_cpu_threads": 1,
+    "multi_gpu_worker_backend": "process"
+  },
+  "peak_allocated_bytes": 2359510528,
+  "peak_reserved_bytes": 3204448256,
+  "schedule": {
+    "active_gpu_count": 2,
+    "cache_path": "runs/process_worker_autoscheduler/mace_h92_policy.json",
+    "cold_start": [],
+    "decision": "online_autotune_multi_gpu",
+    "devices": [
+      "cuda:0",
+      "cuda:1"
+    ],
+    "fingerprint": "d215dcbe1b244545781d2f0f1b3dd9588bc33eb8b82719f521b54cebc437ce74",
+    "gpu_count": 2,
+    "mps_requires_external_dispatch": false,
+    "parallel_seconds": 33.90563359297812,
+    "pending_work_stealing": true,
+    "planned_chunks": [
+      {
+        "bucket_index": 0,
+        "estimated_cost": 35140.0,
+        "resident_target": 16,
+        "system_count": 16
+      },
+      {
+        "bucket_index": 0,
+        "estimated_cost": 34472.0,
+        "resident_target": 16,
+        "system_count": 16
+      }
+    ],
+    "policy": "auto",
+    "profiling_seconds": 0.018070905935019255,
+    "recommended_worker_mode": "tensor",
+    "total_seconds": 34.0573834720999,
+    "worker_backend": "process",
+    "worker_backend_fallback_reason": null,
+    "worker_backend_requested": "process",
+    "worker_preparation_seconds": 0.1242473809979856,
+    "worker_process_end_to_end_seconds": 33.57067046081647,
+    "worker_run_wall_seconds": 14.15741887781769,
+    "worker_startup_wall_seconds": 17.878817425109446,
+    "workers": [
+      {
+        "chunks": [
+          {
+            "bucket_index": 0,
+            "estimated_cost": 35140.0,
+            "schedule": {
+              "batches": [
+                {
+                  "active_refill": false,
+                  "baseline_allocated_bytes": 74264064,
+                  "baseline_reserved_bytes": 94371840,
+                  "mean_active_occupancy": 0.48309426229508196,
+                  "memory_budget_bytes": 70622396416,
+                  "model_evaluations": 244,
+                  "peak_allocated_bytes": 2359510528,
+                  "peak_reserved_bytes": 3204448256,
+                  "resident_capacity": 16,
+                  "system_count": 16,
+                  "system_evaluations": 1886,
+                  "throughput": 146.71841731890018,
+                  "wall_seconds": 12.854555238969624
+                }
+              ],
+              "buckets": [
+                {
+                  "cache_hit": true,
+                  "homogeneous_atom_count": true,
+                  "mean_atom_count": 92.0,
+                  "mean_dof_squared": 81225.0,
+                  "mean_edge_count": 1819.25,
+                  "selected_active_refill": false,
+                  "selected_capacity_source": "memory_extrapolated",
+                  "selected_resident_capacity": 32,
+                  "selected_throughput": 180.1593616683563,
+                  "system_count": 16
+                }
+              ],
+              "cache_enabled": true,
+              "cache_path": "runs/process_worker_autoscheduler/mace_h92_policy.json",
+              "controller_seconds": 4.2139552533626556e-05,
+              "decision": "online_autotune",
+              "fingerprint": "d215dcbe1b244545781d2f0f1b3dd9588bc33eb8b82719f521b54cebc437ce74",
+              "fingerprint_fields": {
+                "calculator_type": "batch_mlip.models.mace.MACEBatchCalculator",
+                "cell_filter_type": "batch_mlip.optimization.cell_filters.FrechetCellFilter",
+                "cutoff": 4.5,
+                "dtype": "torch.float64",
+                "force_mode": null,
+                "graph_mode": "rebuild",
+                "hardware": {
+                  "device_type": "cuda",
+                  "gpu_compute_capability": [
+                    9,
+                    0
+                  ],
+                  "gpu_name": "NVIDIA H100 80GB HBM3",
+                  "gpu_total_memory": 85017886720
+                },
+                "model_type": "mace.modules.models.ScaleShiftMACE",
+                "neighbor_backend": "auto",
+                "optimizer_type": "batch_mlip.optimization.registry.BatchedBFGS",
+                "parameter_count": 694320,
+                "schema_version": 1,
+                "skin": 0.0,
+                "torch_version": "2.9.1+cu128",
+                "variable_cell": true
+              },
+              "mps_requires_external_dispatch": false,
+              "policy": "auto",
+              "profiling_seconds": 0.011305372696369886,
+              "recommended_worker_mode": "tensor"
+            },
+            "system_count": 16,
+            "wall_seconds": 12.89398478390649
+          }
+        ],
+        "device": "cuda:0",
+        "startup_seconds": 1.4431393602862954,
+        "wall_seconds": 12.894655940588564,
+        "worker_id": 0
+      },
+      {
+        "chunks": [
+          {
+            "bucket_index": 0,
+            "estimated_cost": 34472.0,
+            "schedule": {
+              "batches": [
+                {
+                  "active_refill": false,
+                  "baseline_allocated_bytes": 74264064,
+                  "baseline_reserved_bytes": 94371840,
+                  "mean_active_occupancy": 0.56884765625,
+                  "memory_budget_bytes": 71459707289,
+                  "model_evaluations": 256,
+                  "peak_allocated_bytes": 2346340352,
+                  "peak_reserved_bytes": 2757754880,
+                  "resident_capacity": 16,
+                  "system_count": 16,
+                  "system_evaluations": 2330,
+                  "throughput": 165.1513048297407,
+                  "wall_seconds": 14.10827484773472
+                }
+              ],
+              "buckets": [
+                {
+                  "cache_hit": true,
+                  "homogeneous_atom_count": true,
+                  "mean_atom_count": 92.0,
+                  "mean_dof_squared": 81225.0,
+                  "mean_edge_count": 1777.5,
+                  "selected_active_refill": false,
+                  "selected_capacity_source": "memory_extrapolated",
+                  "selected_resident_capacity": 32,
+                  "selected_throughput": 180.1593616683563,
+                  "system_count": 16
+                }
+              ],
+              "cache_enabled": true,
+              "cache_path": "runs/process_worker_autoscheduler/mace_h92_policy.json",
+              "controller_seconds": 5.4498668760061264e-05,
+              "decision": "online_autotune",
+              "fingerprint": "d215dcbe1b244545781d2f0f1b3dd9588bc33eb8b82719f521b54cebc437ce74",
+              "fingerprint_fields": {
+                "calculator_type": "batch_mlip.models.mace.MACEBatchCalculator",
+                "cell_filter_type": "batch_mlip.optimization.cell_filters.FrechetCellFilter",
+                "cutoff": 4.5,
+                "dtype": "torch.float64",
+                "force_mode": null,
+                "graph_mode": "rebuild",
+                "hardware": {
+                  "device_type": "cuda",
+                  "gpu_compute_capability": [
+                    9,
+                    0
+                  ],
+                  "gpu_name": "NVIDIA H100 80GB HBM3",
+                  "gpu_total_memory": 85017886720
+                },
+                "model_type": "mace.modules.models.ScaleShiftMACE",
+                "neighbor_backend": "auto",
+                "optimizer_type": "batch_mlip.optimization.registry.BatchedBFGS",
+                "parameter_count": 694320,
+                "schema_version": 1,
+                "skin": 0.0,
+                "torch_version": "2.9.1+cu128",
+                "variable_cell": true
+              },
+              "mps_requires_external_dispatch": false,
+              "policy": "auto",
+              "profiling_seconds": 0.010059204883873463,
+              "recommended_worker_mode": "tensor"
+            },
+            "system_count": 16,
+            "wall_seconds": 14.146335144992918
+          }
+        ],
+        "device": "cuda:1",
+        "startup_seconds": 1.4337987629696727,
+        "wall_seconds": 14.146947801113129,
+        "worker_id": 1
+      }
+    ]
+  },
+  "schema_version": 1,
+  "status": "complete",
+  "systems_per_second": 0.9394794257533691,
+  "wall_time_s": 34.061416485346854,
+  "workload_id": "OPT-H92-R32-v1",
+  "workload_manifest": "benchmarks/workloads/manifests/OPT-H92-R32-v1.json",
+  "workload_manifest_sha256": "2a3adeff1ebee394655734f0a613426d0f7243aea2e8056a4cae34ee20ca1cfa"
+}

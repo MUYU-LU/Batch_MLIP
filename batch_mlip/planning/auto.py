@@ -12,7 +12,7 @@ from collections.abc import Mapping, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import torch
 from ase import Atoms
@@ -54,6 +54,9 @@ class AutoSchedulerConfig:
     refill_min_pending_factor: float = 2.0
     refill_min_capacity: int = 8
     multi_gpu_cold_start_jobs: int = 32
+    multi_gpu_worker_backend: Literal["auto", "process", "thread"] = "auto"
+    multi_gpu_process_cpu_threads: int = 1
+    multi_gpu_process_min_chunks_per_device: int = 8
 
     def __post_init__(self) -> None:
         _positive_int("initial_batch_size", self.initial_batch_size)
@@ -65,11 +68,23 @@ class AutoSchedulerConfig:
             self.multi_gpu_cold_start_jobs,
         )
         _positive_int(
+            "multi_gpu_process_cpu_threads",
+            self.multi_gpu_process_cpu_threads,
+        )
+        _positive_int(
+            "multi_gpu_process_min_chunks_per_device",
+            self.multi_gpu_process_min_chunks_per_device,
+        )
+        _positive_int(
             "near_frontier_growth_factor",
             self.near_frontier_growth_factor,
         )
         if self.growth_factor < 2:
             raise ValueError("growth_factor must be at least 2")
+        if self.multi_gpu_worker_backend not in ("auto", "process", "thread"):
+            raise ValueError(
+                "multi_gpu_worker_backend must be 'auto', 'process', or 'thread'"
+            )
         if not math.isfinite(self.max_cost_ratio) or self.max_cost_ratio < 1.0:
             raise ValueError("max_cost_ratio must be at least 1")
         if (

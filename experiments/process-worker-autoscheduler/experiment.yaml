@@ -1,0 +1,105 @@
+id: process-worker-autoscheduler
+date: 2026-07-26
+baseline_commit: b5d468c
+description: >-
+  Integrate persistent spawn-isolated GPU workers into the plug-and-play
+  scheduling API without changing optimizer or calculator semantics.
+hypothesis: >-
+  One persistent process per GPU will remove the measured same-process
+  Python/CPU graph contention and raise four-GPU AtomBit H92-R256 parallel
+  optimization-phase efficiency from 57% to at least 70%, while returning
+  every production job exactly once in input order.
+mechanism:
+  - one_spawn_process_and_cuda_context_per_gpu
+  - one_persistent_calculator_and_optimizer_per_worker
+  - shared_pending_chunk_queue
+  - CPU_offload_before_interprocess_result_transfer
+  - explicit_thread_fallback_for_nonserializable_custom_adapters
+invariants:
+  - every_input_index_executes_exactly_once
+  - output_order_matches_input_order
+  - optimizer_and_stopping_criteria_are_unchanged
+  - calculator_precision_and_graph_settings_are_unchanged
+  - child_processes_are_joined_or_terminated_on_failure
+environment:
+  host: 210.45.70.177:2204
+  gpu: H100_80GB
+  atombit_env: /public/home/lmy/.conda/envs/lmy
+  mace_env: /public/home/lmy/.conda/envs/MACE_clean
+commands:
+  - name: tests
+    command: [python, -m, pytest, -q]
+  - name: process-unit-tests
+    command:
+      - python
+      - -m
+      - pytest
+      - -q
+      - tests/test_multi_gpu_execution.py
+      - tests/test_calculator_api.py
+  - name: atombit-process-benchmark
+    command:
+      - python
+      - benchmarks/benchmark_online_autoscheduler.py
+      - --model
+      - atombit
+      - --workload-size
+      - "256"
+      - --devices
+      - cuda:0,cuda:1,cuda:2,cuda:3
+      - --worker-backend
+      - process
+      - --output
+      - runs/process_worker_autoscheduler/atombit_h92_r256_process.json
+validation:
+  models: [atombit_smooth_rms_fp32, mace_off_small]
+  workloads:
+    - OPT-H92-R32-v1
+    - OPT-H92-R256-v1
+    - XATMOV88-R256
+  worker_backends: [thread, process]
+  gpu_counts: [1, 4]
+  repeats: 1
+metrics:
+  - optimization_wall_seconds
+  - end_to_end_wall_seconds
+  - systems_per_second
+  - per_worker_wall_seconds
+  - worker_startup_seconds
+  - parallel_efficiency
+  - peak_allocated_bytes_per_gpu
+  - peak_reserved_bytes_per_gpu
+  - converged_jobs
+gates:
+  no_duplicate_or_missing_jobs: true
+  process_thread_convergence_flags_match: true
+  atombit_four_gpu_parallel_efficiency_min: 0.70
+  child_process_leaks: 0
+result:
+  status: conditional_success
+  all_jobs_converged: true
+  duplicate_or_missing_jobs: 0
+  child_process_leaks: 0
+  atombit_h92_r256:
+    thread_end_to_end_seconds: 36.4695
+    process_end_to_end_seconds: 37.4110
+    thread_worker_run_seconds: 35.4917
+    process_worker_run_seconds: 24.0208
+    steady_worker_speedup: 1.4775
+    process_startup_seconds: 11.7883
+    process_parallel_efficiency_vs_warm_single_gpu: 0.8434
+  mace_h92_r32:
+    thread_end_to_end_seconds: 17.4440
+    process_end_to_end_seconds: 34.0614
+    thread_worker_run_seconds: 17.1721
+    process_worker_run_seconds: 14.1574
+    steady_worker_speedup: 1.2129
+    process_startup_seconds: 17.8788
+  decision: >-
+    Retain process isolation for long queues, but use threads automatically
+    for fewer than eight chunks per GPU until workers persist across calls.
+collect_json:
+  - runs/process_worker_autoscheduler/atombit_h92_r256_process.json
+  - runs/process_worker_autoscheduler/atombit_h92_r256_thread_final.json
+  - runs/process_worker_autoscheduler/mace_h92_r32_process.json
+  - runs/process_worker_autoscheduler/mace_h92_r32_thread_final.json

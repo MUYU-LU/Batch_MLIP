@@ -22,10 +22,15 @@ from .dynamics.integrators import (
 )
 from .execution import (
     MultiGPUExecution,
+    MultiGPUTaskExecution,
     ParallelWorkerError,
+    TaskResult,
+    TaskWorker,
+    TaskWorkerResult,
     WorkerResult,
     WorkerShard,
     balance_work,
+    run_parallel_task_workers,
     run_parallel_workers,
 )
 from .interfaces.api import evaluate, molecular_dynamics, relax
@@ -178,6 +183,7 @@ __all__ = [
     "GraphData",
     "JSONLReporter",
     "MACEBatchCalculator",
+    "MultiGPUTaskExecution",
     "MemoryCoefficients",
     "OptimizationPilot",
     "OnlineCapacityController",
@@ -195,6 +201,9 @@ __all__ = [
     "RunTelemetry",
     "SystemProfile",
     "TaskAwarePolicy",
+    "TaskResult",
+    "TaskWorker",
+    "TaskWorkerResult",
     "ScheduledRelaxationBatch",
     "TorchStateCheckpointReporter",
     "TaskProfile",
@@ -232,6 +241,7 @@ __all__ = [
     "relax",
     "relax_ase",
     "run_parallel_workers",
+    "run_parallel_task_workers",
 ]
 
 __version__ = "0.2.0"

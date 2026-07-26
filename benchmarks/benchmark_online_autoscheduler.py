@@ -66,6 +66,14 @@ def main() -> None:
         "--devices",
         help="comma-separated devices for automatic multi-GPU execution",
     )
+    parser.add_argument(
+        "--worker-backend",
+        choices=("auto", "process", "thread"),
+        default="auto",
+        help="multi-GPU execution backend",
+    )
+    parser.add_argument("--worker-cpu-threads", type=int, default=1)
+    parser.add_argument("--process-min-chunks-per-device", type=int, default=8)
     parser.add_argument("--fmax", type=float, default=0.05)
     parser.add_argument("--max-steps", type=int)
     parser.add_argument("--max-batch-size", type=int, default=256)
@@ -171,6 +179,11 @@ def main() -> None:
         growth_factor=args.growth_factor,
         max_batch_size=args.max_batch_size,
         memory_safety_fraction=args.memory_safety_fraction,
+        multi_gpu_worker_backend=args.worker_backend,
+        multi_gpu_process_cpu_threads=args.worker_cpu_threads,
+        multi_gpu_process_min_chunks_per_device=(
+            args.process_min_chunks_per_device
+        ),
     )
 
     gc.collect()
@@ -215,6 +228,11 @@ def main() -> None:
             "initial_batch_size": args.initial_batch_size,
             "growth_factor": args.growth_factor,
             "memory_safety_fraction": args.memory_safety_fraction,
+            "multi_gpu_worker_backend": args.worker_backend,
+            "multi_gpu_process_cpu_threads": args.worker_cpu_threads,
+            "multi_gpu_process_min_chunks_per_device": (
+                args.process_min_chunks_per_device
+            ),
             "deterministic_algorithms": args.deterministic,
         },
         "schedule": schedule,

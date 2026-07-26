@@ -277,6 +277,7 @@ def test_multi_device_auto_relaxation_cold_tunes_then_steals_pending_work(
         max_batch_size=4,
         refill_min_capacity=4,
         multi_gpu_cold_start_jobs=2,
+        multi_gpu_worker_backend="process",
     )
 
     result = relax(
@@ -297,6 +298,8 @@ def test_multi_device_auto_relaxation_cold_tunes_then_steals_pending_work(
     assert schedule["gpu_count"] == 2
     assert schedule["active_gpu_count"] == 2
     assert schedule["pending_work_stealing"]
+    assert schedule["worker_backend"] == "process"
+    assert schedule["worker_backend_fallback_reason"] is None
     assert sum(
         record["system_count"] for record in schedule["cold_start"]
     ) == 2
@@ -324,6 +327,64 @@ def test_multi_device_auto_relaxation_cold_tunes_then_steals_pending_work(
         for worker in warm_schedule["workers"]
         for chunk in worker["chunks"]
     ) == len(systems)
+
+
+def test_multi_device_auto_relaxation_accepts_explicit_thread_backend(tmp_path):
+    systems = [
+        Atoms("H", positions=[[0.2 + 0.05 * index, 0.0, 0.0]])
+        for index in range(4)
+    ]
+    config = AutoSchedulerConfig(
+        cache_path=tmp_path / "thread-auto.json",
+        max_batch_size=2,
+        multi_gpu_cold_start_jobs=1,
+        multi_gpu_worker_backend="thread",
+    )
+
+    result = relax(
+        systems,
+        QuadraticBatchCalculator(),
+        scheduling="auto",
+        devices=["cpu:0", "cpu:1"],
+        auto_config=config,
+        fmax=1e-5,
+        max_steps=500,
+        dt_start=0.05,
+        dt_max=0.5,
+    )
+
+    schedule = result.metadata["scheduling"]
+    assert bool(result.converged.all())
+    assert schedule["worker_backend"] == "thread"
+    assert schedule["worker_backend_fallback_reason"] is None
+
+
+def test_multi_device_auto_uses_threads_for_one_wave_per_device(tmp_path):
+    systems = [
+        Atoms("H", positions=[[0.2 + 0.05 * index, 0.0, 0.0]])
+        for index in range(4)
+    ]
+    config = AutoSchedulerConfig(
+        cache_path=tmp_path / "one-wave-auto.json",
+        max_batch_size=2,
+        multi_gpu_cold_start_jobs=1,
+    )
+
+    result = relax(
+        systems,
+        QuadraticBatchCalculator(),
+        scheduling="auto",
+        devices=["cpu:0", "cpu:1"],
+        auto_config=config,
+        fmax=1e-5,
+        max_steps=500,
+        dt_start=0.05,
+        dt_max=0.5,
+    )
+
+    schedule = result.metadata["scheduling"]
+    assert schedule["worker_backend"] == "thread"
+    assert "8 pending chunks" in schedule["worker_backend_fallback_reason"]
 
 
 def test_scheduled_relaxation_reassembles_results_on_calculator_device():

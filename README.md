@@ -526,9 +526,15 @@ structures or scientific results.
 `AutoSchedulerConfig` exposes safety and cache controls for advanced use.
 Multiple homogeneous GPUs share the learned policy and pull compatible chunks
 from one pending queue. Cold calibration runs once on the primary device, and
-active optimizer states never migrate between GPUs. The current workers use
-threads so custom calculator objects need not be serialized; process-isolated
-workers and in-process MPS dispatch remain future execution layers.
+active optimizer states never migrate between GPUs. Automatic execution uses
+threads for short queues. When at least eight pending chunks per active device
+can amortize spawn startup, it uses one isolated persistent process per GPU;
+each process keeps its calculator and optimizer alive while pulling later
+chunks. Override this conservative rule with
+`AutoSchedulerConfig(multi_gpu_worker_backend="process" | "thread")`.
+Non-serializable custom adapters fall back to threads during preflight, before
+any production job starts. In-process MPS dispatch remains a future execution
+layer.
 
 For frozen experiments, `BatchPlanner` still provides explicitly calibrated
 memory-safe queues without coupling planning to a particular MLIP or optimizer:

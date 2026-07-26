@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import os
+import pickle
 from pathlib import Path
 from typing import Any
 
@@ -200,6 +201,28 @@ def test_mace_cached_tensor_state_matches_atomic_data(
     torch.testing.assert_close(cached_again.energy, cached.energy)
     torch.testing.assert_close(cached_again.forces, cached.forces)
     torch.testing.assert_close(cached_again.stress, cached.stress)
+
+
+def test_mace_cpu_worker_template_is_pickleable(
+    mace_systems: list[Any],
+    mace_calculator: MACEBatchCalculator,
+) -> None:
+    template = mace_calculator.clone_to("cpu")
+    restored = pickle.loads(pickle.dumps(template))
+    expected = template(
+        template.create_state(mace_systems[:1]),
+        compute_stress=True,
+    )
+    actual = restored(
+        restored.create_state(mace_systems[:1]),
+        compute_stress=True,
+    )
+
+    assert restored.device == torch.device("cpu")
+    assert restored.graph_mode == template.graph_mode
+    torch.testing.assert_close(actual.energy, expected.energy)
+    torch.testing.assert_close(actual.forces, expected.forces)
+    torch.testing.assert_close(actual.stress, expected.stress)
 
 
 def test_mace_cached_b1_bfgs_matches_ase(

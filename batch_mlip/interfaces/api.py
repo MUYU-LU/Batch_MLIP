@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import copy
 import math
+import pickle
+import sys
 import time
 from collections.abc import Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor
@@ -23,6 +25,7 @@ from ..core.types import (
     RelaxationResult,
 )
 from ..dynamics.integrators import batched_langevin_baoab, batched_velocity_verlet
+from ..execution import TaskWorker, run_parallel_task_workers
 from ..optimization.registry import BatchOptimizer, create_optimizer
 from ..planning.auto import (
     AutoBatchAction,
@@ -636,6 +639,73 @@ class _PendingAutoChunk:
     bucket_index: int
 
 
+@dataclass
+class _ProcessAutoWorkerRunner:
+    """Persistent child-owned calculator and optimizer for planned chunks."""
+
+    systems: list[Atoms]
+    calculator: BatchCalculator
+    optimizer: BatchOptimizer
+    config: AutoSchedulerConfig
+    optimizer_kwargs: dict[str, Any]
+
+    def __call__(self, chunk: _PendingAutoChunk) -> RelaxationResult:
+        result = relax(
+            [self.systems[index] for index in chunk.indices],
+            self.calculator,
+            optimizer=self.optimizer,
+            scheduling="auto",
+            auto_config=self.config,
+            **self.optimizer_kwargs,
+        )
+        if result.state.device.type == "cuda":
+            device = result.state.device
+            torch.cuda.synchronize(device)
+            result = _offload_relaxation_result(result)
+            _empty_device_cache(device)
+        return result
+
+
+@dataclass
+class _ProcessAutoWorkerPreparer:
+    """Serializable factory that materializes model state inside each child."""
+
+    systems: list[Atoms]
+    calculator_template: BatchCalculator
+    optimizer_factory: type[Any] | None
+    optimizer_options: dict[str, Any] | None
+    optimizer_template: BatchOptimizer | None
+    config: AutoSchedulerConfig
+    optimizer_kwargs: dict[str, Any]
+
+    def __call__(self, worker: TaskWorker) -> _ProcessAutoWorkerRunner:
+        torch.set_num_threads(self.config.multi_gpu_process_cpu_threads)
+        device = torch.device(worker.device)
+        if device.type == "cuda":
+            torch.cuda.set_device(device)
+        calculator = self.calculator_template.clone_to(device)
+        if self.optimizer_factory is not None:
+            optimizer = self.optimizer_factory(**(self.optimizer_options or {}))
+        elif self.optimizer_template is not None:
+            optimizer = _clone_optimizer(self.optimizer_template)
+        else:  # pragma: no cover - construction guarantees one representation
+            raise RuntimeError("process optimizer representation is missing")
+        compute_stress = self.optimizer_kwargs.get("cell_filter") is not None
+        warm_state = calculator.create_state([self.systems[0]])
+        calculator(warm_state, compute_stress=compute_stress)
+        if device.type == "cuda":
+            torch.cuda.synchronize(device)
+            torch.cuda.empty_cache()
+            torch.cuda.reset_peak_memory_stats(device)
+        return _ProcessAutoWorkerRunner(
+            systems=self.systems,
+            calculator=calculator,
+            optimizer=optimizer,
+            config=self.config,
+            optimizer_kwargs=self.optimizer_kwargs,
+        )
+
+
 def _profile_cost_for_dispatch(profile: SystemProfile) -> float:
     return max(
         1.0,
@@ -662,6 +732,48 @@ def _clone_optimizer(optimizer: BatchOptimizer) -> BatchOptimizer:
     if isinstance(options, Mapping):
         return type(optimizer)(**dict(options))
     return copy.deepcopy(optimizer)
+
+
+def _prepare_process_workers(
+    systems: list[Atoms],
+    calculator: BatchCalculator,
+    optimizer: BatchOptimizer,
+    config: AutoSchedulerConfig,
+    optimizer_kwargs: dict[str, Any],
+) -> tuple[_ProcessAutoWorkerPreparer | None, str | None]:
+    """Build and pickle-check a CPU template before production work starts."""
+
+    main_module = sys.modules.get("__main__")
+    main_file = getattr(main_module, "__file__", None)
+    if not main_file:
+        return None, "spawn requires a file-backed __main__ module"
+    try:
+        calculator_template = calculator.clone_to("cpu")
+        model = getattr(calculator_template, "model", None)
+        if isinstance(model, torch.nn.Module):
+            model.share_memory()
+        optimizer_options = getattr(optimizer, "options", None)
+        if isinstance(optimizer_options, Mapping):
+            optimizer_factory: type[Any] | None = type(optimizer)
+            serialized_options: dict[str, Any] | None = dict(optimizer_options)
+            optimizer_template: BatchOptimizer | None = None
+        else:
+            optimizer_factory = None
+            serialized_options = None
+            optimizer_template = optimizer
+        preparer = _ProcessAutoWorkerPreparer(
+            systems=systems,
+            calculator_template=calculator_template,
+            optimizer_factory=optimizer_factory,
+            optimizer_options=serialized_options,
+            optimizer_template=optimizer_template,
+            config=config,
+            optimizer_kwargs=optimizer_kwargs,
+        )
+        pickle.dumps(preparer)
+    except Exception as error:
+        return None, f"{type(error).__name__}: {error}"
+    return preparer, None
 
 
 def _execute_multi_device_auto_relaxation(
@@ -728,6 +840,7 @@ def _execute_multi_device_auto_relaxation(
     )
     serial = 0
     planned_chunks = []
+    execution_chunks: list[_PendingAutoChunk] = []
     for bucket_index, bucket in enumerate(plan.buckets):
         pending = [
             index
@@ -766,6 +879,7 @@ def _execute_multi_device_auto_relaxation(
                 bucket_index=bucket_index,
             )
             pending_queue.put((-cost, serial, chunk))
+            execution_chunks.append(chunk)
             planned_chunks.append(
                 {
                     "bucket_index": bucket_index,
@@ -777,82 +891,168 @@ def _execute_multi_device_auto_relaxation(
             serial += 1
 
     worker_count = min(len(devices), len(planned_chunks))
-    clone_started = time.perf_counter()
-    worker_calculators = []
-    worker_optimizers = []
-    for device in devices[:worker_count]:
-        worker_calculators.append(
-            calculator
-            if device == calculator.device
-            else calculator.clone_to(device)
-        )
-        worker_optimizers.append(_clone_optimizer(optimizer))
-    clone_seconds = time.perf_counter() - clone_started
     worker_records: list[dict[str, Any]] = []
-    result_lock = Lock()
-
-    def run_worker(
-        worker_id: int,
-        worker_calculator: BatchCalculator,
-        worker_optimizer: BatchOptimizer,
-    ) -> dict[str, Any]:
-        worker_started = time.perf_counter()
-        completed = []
-        while True:
-            try:
-                _, _, chunk = pending_queue.get_nowait()
-            except Empty:
-                break
-            chunk_started = time.perf_counter()
-            try:
-                chunk_result = relax(
-                    [systems[index] for index in chunk.indices],
-                    worker_calculator,
-                    optimizer=worker_optimizer,
-                    scheduling="auto",
-                    auto_config=config,
-                    **optimizer_kwargs,
-                )
-                if chunk_result.state.device.type == "cuda":
-                    result_device = chunk_result.state.device
-                    chunk_result = _offload_relaxation_result(chunk_result)
-                    _empty_device_cache(result_device)
-                with result_lock:
-                    indexed_results.append((chunk.indices, chunk_result))
-                completed.append(
-                    {
-                        "bucket_index": chunk.bucket_index,
-                        "system_count": len(chunk.indices),
-                        "estimated_cost": chunk.estimated_cost,
-                        "wall_seconds": time.perf_counter() - chunk_started,
-                        "schedule": chunk_result.metadata["scheduling"],
-                    }
-                )
-            finally:
-                pending_queue.task_done()
-        return {
-            "worker_id": worker_id,
-            "device": str(worker_calculator.device),
-            "wall_seconds": time.perf_counter() - worker_started,
-            "chunks": completed,
-        }
+    requested_backend = config.multi_gpu_worker_backend
+    selected_backend = "thread"
+    fallback_reason = None
+    process_preparer = None
+    preparation_started = time.perf_counter()
+    process_has_enough_work = len(planned_chunks) >= (
+        config.multi_gpu_process_min_chunks_per_device * worker_count
+    )
+    if (
+        planned_chunks
+        and requested_backend == "auto"
+        and not process_has_enough_work
+    ):
+        fallback_reason = (
+            "process workers require at least "
+            f"{config.multi_gpu_process_min_chunks_per_device} pending chunks "
+            "per active device to amortize spawn startup"
+        )
+    elif planned_chunks and requested_backend != "thread":
+        process_preparer, fallback_reason = _prepare_process_workers(
+            systems,
+            calculator,
+            optimizer,
+            config,
+            optimizer_kwargs,
+        )
+        if process_preparer is not None:
+            selected_backend = "process"
+        elif requested_backend == "process":
+            raise TypeError(
+                "process multi-GPU workers require a serializable calculator "
+                f"and optimizer: {fallback_reason}"
+            )
+    preparation_seconds = time.perf_counter() - preparation_started
 
     parallel_started = time.perf_counter()
     if planned_chunks:
-        with ThreadPoolExecutor(
-            max_workers=worker_count,
-            thread_name_prefix="batch-mlip-gpu",
-        ) as pool:
-            futures = [
-                pool.submit(
-                    run_worker,
-                    worker_id,
-                    worker_calculators[worker_id],
-                    worker_optimizers[worker_id],
+        if selected_backend == "process":
+            if process_preparer is None:  # pragma: no cover - narrowed above
+                raise RuntimeError("process worker preparation was not initialized")
+            execution = run_parallel_task_workers(
+                execution_chunks,
+                [chunk.estimated_cost for chunk in execution_chunks],
+                [str(device) for device in devices[:worker_count]],
+                process_preparer,
+            )
+            task_results = {
+                task.task_index: task for task in execution.task_results
+            }
+            for task_index, task_result in task_results.items():
+                chunk = execution_chunks[task_index]
+                indexed_results.append((chunk.indices, task_result.payload))
+            for worker_result in execution.worker_results:
+                completed = []
+                for task_index in worker_result.task_indices:
+                    chunk = execution_chunks[task_index]
+                    task_result = task_results[task_index]
+                    completed.append(
+                        {
+                            "bucket_index": chunk.bucket_index,
+                            "system_count": len(chunk.indices),
+                            "estimated_cost": chunk.estimated_cost,
+                            "wall_seconds": task_result.run_seconds,
+                            "schedule": task_result.payload.metadata["scheduling"],
+                        }
+                    )
+                worker_records.append(
+                    {
+                        "worker_id": worker_result.worker.worker_id,
+                        "device": worker_result.worker.device,
+                        "startup_seconds": worker_result.startup_seconds,
+                        "wall_seconds": worker_result.run_seconds,
+                        "chunks": completed,
+                    }
                 )
-                for worker_id in range(worker_count)
-            ]
-            worker_records.extend(future.result() for future in futures)
+            worker_startup_wall_seconds = execution.startup_wall_seconds
+            worker_run_wall_seconds = execution.run_wall_seconds
+            process_end_to_end_seconds = execution.end_to_end_wall_seconds
+        else:
+            clone_started = time.perf_counter()
+            worker_calculators = []
+            worker_optimizers = []
+            for device in devices[:worker_count]:
+                worker_calculators.append(
+                    calculator
+                    if device == calculator.device
+                    else calculator.clone_to(device)
+                )
+                worker_optimizers.append(_clone_optimizer(optimizer))
+            preparation_seconds += time.perf_counter() - clone_started
+            result_lock = Lock()
+
+            def run_worker(
+                worker_id: int,
+                worker_calculator: BatchCalculator,
+                worker_optimizer: BatchOptimizer,
+            ) -> dict[str, Any]:
+                worker_started = time.perf_counter()
+                completed = []
+                while True:
+                    try:
+                        _, _, chunk = pending_queue.get_nowait()
+                    except Empty:
+                        break
+                    chunk_started = time.perf_counter()
+                    try:
+                        chunk_result = relax(
+                            [systems[index] for index in chunk.indices],
+                            worker_calculator,
+                            optimizer=worker_optimizer,
+                            scheduling="auto",
+                            auto_config=config,
+                            **optimizer_kwargs,
+                        )
+                        if chunk_result.state.device.type == "cuda":
+                            result_device = chunk_result.state.device
+                            chunk_result = _offload_relaxation_result(chunk_result)
+                            _empty_device_cache(result_device)
+                        with result_lock:
+                            indexed_results.append((chunk.indices, chunk_result))
+                        completed.append(
+                            {
+                                "bucket_index": chunk.bucket_index,
+                                "system_count": len(chunk.indices),
+                                "estimated_cost": chunk.estimated_cost,
+                                "wall_seconds": time.perf_counter() - chunk_started,
+                                "schedule": chunk_result.metadata["scheduling"],
+                            }
+                        )
+                    finally:
+                        pending_queue.task_done()
+                return {
+                    "worker_id": worker_id,
+                    "device": str(worker_calculator.device),
+                    "startup_seconds": 0.0,
+                    "wall_seconds": time.perf_counter() - worker_started,
+                    "chunks": completed,
+                }
+
+            thread_run_started = time.perf_counter()
+            with ThreadPoolExecutor(
+                max_workers=worker_count,
+                thread_name_prefix="batch-mlip-gpu",
+            ) as pool:
+                futures = [
+                    pool.submit(
+                        run_worker,
+                        worker_id,
+                        worker_calculators[worker_id],
+                        worker_optimizers[worker_id],
+                    )
+                    for worker_id in range(worker_count)
+                ]
+                worker_records.extend(future.result() for future in futures)
+            worker_startup_wall_seconds = 0.0
+            worker_run_wall_seconds = time.perf_counter() - thread_run_started
+            process_end_to_end_seconds = None
+    else:
+        worker_startup_wall_seconds = 0.0
+        worker_run_wall_seconds = 0.0
+        process_end_to_end_seconds = None
     parallel_seconds = time.perf_counter() - parallel_started
     executed = [
         index for indices, _ in indexed_results for index in indices
@@ -875,7 +1075,13 @@ def _execute_multi_device_auto_relaxation(
         "fingerprint": plan.fingerprint,
         "cache_path": str(scheduler.cache.path),
         "profiling_seconds": plan.profiling_seconds,
-        "calculator_clone_seconds": clone_seconds,
+        "worker_backend_requested": requested_backend,
+        "worker_backend": selected_backend,
+        "worker_backend_fallback_reason": fallback_reason,
+        "worker_preparation_seconds": preparation_seconds,
+        "worker_startup_wall_seconds": worker_startup_wall_seconds,
+        "worker_run_wall_seconds": worker_run_wall_seconds,
+        "worker_process_end_to_end_seconds": process_end_to_end_seconds,
         "cold_start": cold_records,
         "planned_chunks": planned_chunks,
         "workers": sorted(

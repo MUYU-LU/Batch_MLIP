@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "status": "conditional_success",
+  "baseline_commit": "b5d468c",
+  "models": {
+    "atombit_h92_r256_4gpu": {
+      "thread_end_to_end_seconds": 36.46951665682718,
+      "thread_worker_run_seconds": 35.49165242072195,
+      "thread_peak_reserved_bytes": 18394120192,
+      "process_end_to_end_seconds": 37.411015471909195,
+      "process_startup_seconds": 11.788306186906993,
+      "process_worker_run_seconds": 24.020770785864443,
+      "process_peak_reserved_bytes": 18360565760,
+      "steady_worker_speedup": 1.477540114641442,
+      "converged_thread": 256,
+      "converged_process": 256
+    },
+    "mace_h92_r32_2gpu": {
+      "thread_end_to_end_seconds": 17.44399232091382,
+      "thread_worker_run_seconds": 17.172146201133728,
+      "thread_peak_reserved_bytes": 3238002688,
+      "process_end_to_end_seconds": 34.061416485346854,
+      "process_startup_seconds": 17.878817425109446,
+      "process_worker_run_seconds": 14.15741887781769,
+      "process_peak_reserved_bytes": 3204448256,
+      "steady_worker_speedup": 1.2129432878502742,
+      "converged_thread": 32,
+      "converged_process": 32
+    }
+  },
+  "decision": {
+    "automatic_minimum_chunks_per_device": 8,
+    "short_queue_backend": "thread",
+    "long_queue_backend": "process",
+    "next_mechanism": "cross_call_persistent_worker_service"
+  }
+}

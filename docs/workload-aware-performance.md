@@ -379,6 +379,9 @@ hashes, and B1 diagnostic are in
 
 ## Execution order
 
-Stages 0-3, topology-preserving compaction, and the conditional MACE tensor
-cache are complete. The next experiment is independent-process multi-GPU
-sharding using the selected single-GPU policies.
+Stages 0-4, topology-preserving compaction, the conditional MACE tensor cache,
+and public process-worker integration are complete. Process isolation improves
+the measured steady worker phase but spawn startup loses on short queues, so
+automatic execution retains threads below the validated amortization boundary.
+The next mechanism experiment is the `torch.compile`/CUDA-graph audit on stable
+MD and fixed-resident optimization shapes.

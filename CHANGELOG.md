@@ -2,6 +2,13 @@
 
 ## 2026-07-26
 
+- Add spawn-isolated multi-GPU task workers to the plug-and-play relaxation API,
+  with persistent per-worker calculators, deterministic first-wave assignment,
+  pending-chunk stealing, CPU result offload, and child-lifetime handshakes.
+- Add a serializable MACE adapter reconstruction path and explicit
+  `auto`/`process`/`thread` worker controls. Auto retains threads for fewer than
+  eight chunks per GPU because measured process startup outweighs the steady
+  worker speedup on short pools.
 - Add plug-and-play `scheduling="auto"` without a user-authored planner or
   pilot, using production-only cold-start capacity ramping and a persistent
   hardware/model/optimizer policy cache.

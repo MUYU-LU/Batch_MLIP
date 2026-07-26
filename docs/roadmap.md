@@ -22,7 +22,7 @@
 - Frechet/log-strain variable-cell FIRE.
 - NPT dynamics.
 - General constraints and RATTLE.
-- Multi-GPU sharding.
+- Persistent cross-call multi-GPU worker service.
 - Replica and ensemble workflows.
 
 ## P3 — model/science experiments

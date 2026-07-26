@@ -155,6 +155,22 @@ class MACEBatchCalculator(BatchCalculator):
         self.energy_units_to_eV = float(energy_units_to_eV)
         self.length_units_to_A = float(length_units_to_A)
 
+    def __getstate__(self) -> dict[str, Any]:
+        """Serialize adapter state without imported module objects."""
+
+        state = dict(self.__dict__)
+        state.pop("_data", None)
+        state.pop("_torch_geometric", None)
+        return state
+
+    def __setstate__(self, state: dict[str, Any]) -> None:
+        """Restore optional MACE modules inside a spawned worker."""
+
+        self.__dict__.update(state)
+        data, torch_geometric, _, _ = _mace_imports()
+        self._data = data
+        self._torch_geometric = torch_geometric
+
     def create_state(
         self,
         systems: Sequence[Atoms],
