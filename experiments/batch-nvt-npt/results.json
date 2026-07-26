@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "status": "passed_with_precision_caveat",
+  "baseline_commit": "b559025",
+  "correctness": {
+    "focused_tests": "14 passed",
+    "full_tests": "227 passed, 10 skipped",
+    "remote_mps_tests": "6 passed",
+    "ruff": "passed",
+    "ase_isotropic_mtk_b1": "passed",
+    "batch_vs_independent": "passed",
+    "nvt_exact_restart": "passed",
+    "npt_exact_restart": "passed",
+    "nvt_temperature_statistics": "passed",
+    "npt_timestep_refinement": "passed",
+    "unsupported_state_rejection": "passed"
+  },
+  "b32_vs_four_worker_mps": [
+    {
+      "model": "AtomBit",
+      "atoms_per_replica": 46,
+      "ensemble": "nvt",
+      "batch_replica_steps_per_second": 726.13,
+      "mps_replica_steps_per_second": 250.07,
+      "batch_speedup_vs_mps": 2.90,
+      "batch_peak_allocated_GB": 2.34,
+      "mps_peak_nvidia_smi_GB": 5.08
+    },
+    {
+      "model": "AtomBit",
+      "atoms_per_replica": 46,
+      "ensemble": "npt",
+      "batch_replica_steps_per_second": 626.60,
+      "mps_replica_steps_per_second": 121.99,
+      "batch_speedup_vs_mps": 5.14,
+      "batch_peak_allocated_GB": 2.34,
+      "mps_peak_nvidia_smi_GB": 5.10
+    },
+    {
+      "model": "MACE-OFF-Small",
+      "atoms_per_replica": 46,
+      "ensemble": "nvt",
+      "batch_replica_steps_per_second": 876.83,
+      "mps_replica_steps_per_second": 188.00,
+      "batch_speedup_vs_mps": 4.66,
+      "batch_peak_allocated_GB": 2.32,
+      "mps_peak_nvidia_smi_GB": 5.10
+    },
+    {
+      "model": "MACE-OFF-Small",
+      "atoms_per_replica": 46,
+      "ensemble": "npt",
+      "batch_replica_steps_per_second": 750.00,
+      "mps_replica_steps_per_second": 179.59,
+      "batch_speedup_vs_mps": 4.18,
+      "batch_peak_allocated_GB": 2.32,
+      "mps_peak_nvidia_smi_GB": 5.10
+    },
+    {
+      "model": "AtomBit",
+      "atoms_per_replica": 276,
+      "ensemble": "nvt",
+      "batch_replica_steps_per_second": 263.03,
+      "mps_replica_steps_per_second": 167.16,
+      "batch_speedup_vs_mps": 1.57,
+      "batch_peak_allocated_GB": 12.18,
+      "mps_peak_nvidia_smi_GB": 7.59
+    },
+    {
+      "model": "AtomBit",
+      "atoms_per_replica": 276,
+      "ensemble": "npt",
+      "batch_replica_steps_per_second": 241.51,
+      "mps_replica_steps_per_second": 79.12,
+      "batch_speedup_vs_mps": 3.05,
+      "batch_peak_allocated_GB": 12.19,
+      "mps_peak_nvidia_smi_GB": 7.59
+    },
+    {
+      "model": "MACE-OFF-Small",
+      "atoms_per_replica": 276,
+      "ensemble": "nvt",
+      "batch_replica_steps_per_second": 278.87,
+      "mps_replica_steps_per_second": 161.53,
+      "batch_speedup_vs_mps": 1.73,
+      "batch_peak_allocated_GB": 13.45,
+      "mps_peak_nvidia_smi_GB": 6.99
+    },
+    {
+      "model": "MACE-OFF-Small",
+      "atoms_per_replica": 276,
+      "ensemble": "npt",
+      "batch_replica_steps_per_second": 272.06,
+      "mps_replica_steps_per_second": 155.71,
+      "batch_speedup_vs_mps": 1.75,
+      "batch_peak_allocated_GB": 13.45,
+      "mps_peak_nvidia_smi_GB": 6.99
+    }
+  ],
+  "mps_comparability": {
+    "npt": "ASE and batch both use isotropic MTK with matched thermodynamic parameters.",
+    "nvt": "Ensemble and parameters are matched; ASE uses its Langevin propagator while batch uses BAOAB, so trajectory-level identity is not claimed.",
+    "lifecycle": "Both exclude model startup and use 20 warm-up plus 100 measured steps on the same signed pool."
+  },
+  "capacity": [
+    {
+      "model": "AtomBit",
+      "workload": "H46-B256",
+      "nvt_replica_steps_per_second": 964.75,
+      "npt_replica_steps_per_second": 934.59,
+      "peak_allocated_GB": 18.20,
+      "peak_reserved_GB_max": 21.01
+    },
+    {
+      "model": "MACE-OFF-Small",
+      "workload": "H46-B256",
+      "nvt_replica_steps_per_second": 994.93,
+      "npt_replica_steps_per_second": 1042.04,
+      "peak_allocated_GB": 18.04,
+      "peak_reserved_GB_max": 19.40
+    },
+    {
+      "model": "AtomBit",
+      "workload": "H276-B128",
+      "nvt_replica_steps_per_second": 280.09,
+      "npt_replica_steps_per_second": 273.68,
+      "peak_allocated_GB": 48.51,
+      "peak_reserved_GB_max": 81.89
+    },
+    {
+      "model": "MACE-OFF-Small",
+      "workload": "H276-B128",
+      "nvt_replica_steps_per_second": 306.32,
+      "npt_replica_steps_per_second": 299.73,
+      "peak_allocated_GB": 53.57,
+      "peak_reserved_GB_max": 67.43
+    }
+  ],
+  "precision": {
+    "horizon_fs": 50.0,
+    "atombit_float32_max_abs_npt_conserved_drift_eV_per_atom": 0.003992,
+    "mace_float64_max_abs_npt_conserved_drift_eV_per_atom": 0.0001511,
+    "interpretation": "Engineering trajectories are finite, but long production NPT requires model- and timestep-specific drift validation."
+  }
+}

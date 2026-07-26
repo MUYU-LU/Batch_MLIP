@@ -98,6 +98,10 @@ class MDResult:
     kinetic_energy: torch.Tensor
     temperature: torch.Tensor
     initial_total_energy: torch.Tensor | None = None
+    integrator_state: Any | None = None
+    model_evaluations: int = 0
+    graph_evaluations: int = 0
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def structures(self) -> list[Any]:

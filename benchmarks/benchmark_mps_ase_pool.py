@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Benchmark ASE optimization, evaluation, or NVE with CUDA MPS workers."""
+"""Benchmark ASE optimization, evaluation, or MD with CUDA MPS workers."""
 
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--mlip", choices=("atombit", "mace"), default="atombit")
     parser.add_argument(
         "--task",
-        choices=("optimization", "evaluation", "nve"),
+        choices=("optimization", "evaluation", "nve", "nvt", "npt"),
         default="optimization",
     )
     parser.add_argument("--atom-count", type=int)
@@ -87,13 +87,13 @@ def parse_args() -> argparse.Namespace:
     if args.task == "optimization" and args.optimizer is None:
         parser.error("--optimizer is required for optimization")
     if args.task != "optimization" and args.workload_manifest is None:
-        parser.error("evaluation and NVE require --workload-manifest")
-    if args.task == "nve" and (
+        parser.error("evaluation and MD require --workload-manifest")
+    if args.task in ("nve", "nvt", "npt") and (
         (args.warmup_steps is not None and args.warmup_steps < 0)
         or (args.measured_steps is not None and args.measured_steps <= 0)
         or (args.timestep_fs is not None and args.timestep_fs <= 0.0)
     ):
-        parser.error("NVE steps must be non-negative/positive and timestep positive")
+        parser.error("MD steps must be non-negative/positive and timestep positive")
     if args.workload_manifest is None and args.atom_count is None:
         parser.error("--atom-count is required without --workload-manifest")
     if args.mlip == "atombit" and args.checkpoint is None:
@@ -121,9 +121,9 @@ def aggregate_throughput(
 ) -> tuple[float, str]:
     """Return the task-appropriate MPS pool throughput."""
 
-    if task == "nve":
+    if task in ("nve", "nvt", "npt"):
         if measured_steps is None or measured_steps <= 0:
-            raise ValueError("NVE throughput requires positive measured steps")
+            raise ValueError("MD throughput requires positive measured steps")
         return (
             pool_size * measured_steps / elapsed_seconds,
             "replica_steps_per_second",
@@ -165,6 +165,8 @@ def _worker_impl(
     from ase import units
     from ase.calculators.calculator import all_changes
     from ase.io import read
+    from ase.md.langevin import Langevin
+    from ase.md.nose_hoover_chain import IsotropicMTKNPT
     from ase.md.verlet import VelocityVerlet
 
     benchmark_dir = Path(__file__).resolve().parent
@@ -346,9 +348,9 @@ def _worker_impl(
     warmup_steps = None
     measured_steps = None
     timestep_fs = None
-    if args.task == "nve":
+    if args.task in ("nve", "nvt", "npt"):
         if args.workload_manifest is None:
-            raise RuntimeError("NVE requires a signed workload")
+            raise RuntimeError("MD requires a signed workload")
         warmup_steps = (
             int(args.warmup_steps)
             if args.warmup_steps is not None
@@ -382,17 +384,39 @@ def _worker_impl(
         )
         systems = initial_state.to_ase(evaluation=None, wrap=False)
         dynamics = []
-        for atoms, name in zip(systems, names, strict=True):
+        for atoms, name, job in zip(systems, names, jobs, strict=True):
             atoms.info["benchmark_source"] = name
             atoms.calc = ase_calculator
-            dynamics.append(
-                VelocityVerlet(
+            if args.task == "nve":
+                dynamics_item = VelocityVerlet(
                     atoms,
                     timestep=timestep_fs * units.fs,
                     logfile=None,
                     trajectory=None,
                 )
-            )
+            elif args.task == "nvt":
+                dynamics_item = Langevin(
+                    atoms,
+                    timestep=timestep_fs * units.fs,
+                    temperature_K=300.0,
+                    friction=0.01 / units.fs,
+                    fixcm=False,
+                    rng=np.random.RandomState(int(job.random_seed) + 1),
+                    logfile=None,
+                    trajectory=None,
+                )
+            else:
+                dynamics_item = IsotropicMTKNPT(
+                    atoms,
+                    timestep=timestep_fs * units.fs,
+                    temperature_K=300.0,
+                    pressure_au=0.0,
+                    tdamp=50.0 * units.fs,
+                    pdamp=500.0 * units.fs,
+                    logfile=None,
+                    trajectory=None,
+                )
+            dynamics.append(dynamics_item)
         for dynamics_item in dynamics:
             dynamics_item.run(warmup_steps)
         synchronize(device)
@@ -400,7 +424,7 @@ def _worker_impl(
             float(atoms.get_total_energy()) for atoms in systems
         ]
 
-        def execute_nve():
+        def execute_md():
             calls_before = ase_calculator.calculate_calls
             for dynamics_item in dynamics:
                 dynamics_item.run(measured_steps)
@@ -424,7 +448,11 @@ def _worker_impl(
                         "final_total_energy_eV": final_energy,
                         "energy_drift_eV_per_atom": (
                             (final_energy - initial_energy) / len(atoms)
+                            if args.task == "nve"
+                            else None
                         ),
+                        "temperature_K": float(atoms.get_temperature()),
+                        "volume_A3": float(atoms.get_volume()),
                         "position_rms_A": float(
                             np.sqrt(np.mean(np.square(positions)))
                         ),
@@ -452,7 +480,7 @@ def _worker_impl(
     elif args.task == "evaluation":
         execute = execute_evaluation
     else:
-        execute = execute_nve
+        execute = execute_md
 
     synchronize(device)
     torch.cuda.reset_peak_memory_stats(device)
@@ -705,6 +733,13 @@ def main() -> None:
             "warmup_steps": resolved_md_parameters["warmup_steps"],
             "measured_steps": measured_steps,
             "timestep_fs": resolved_md_parameters["timestep_fs"],
+            "temperature_K": (
+                300.0 if args.task in ("nvt", "npt") else None
+            ),
+            "friction_per_fs": 0.01 if args.task == "nvt" else None,
+            "pressure_eV_per_A3": 0.0 if args.task == "npt" else None,
+            "thermostat_damping_fs": 50.0 if args.task == "npt" else None,
+            "barostat_damping_fs": 500.0 if args.task == "npt" else None,
         },
         "timing": {
             "wall_seconds": elapsed,

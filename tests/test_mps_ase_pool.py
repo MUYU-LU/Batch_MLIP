@@ -11,9 +11,10 @@ from benchmarks.benchmark_mps_ase_pool import (
 )
 
 
-def test_nve_mps_throughput_counts_replica_steps():
+@pytest.mark.parametrize("task", ["nve", "nvt", "npt"])
+def test_md_mps_throughput_counts_replica_steps(task):
     throughput, unit = aggregate_throughput(
-        task="nve",
+        task=task,
         pool_size=32,
         elapsed_seconds=16.0,
         measured_steps=1000,

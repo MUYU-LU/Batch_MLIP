@@ -5,7 +5,7 @@ Every run configuration uses `schema_version: 1`.
 ## Top level
 
 ```yaml
-task: relax | nve | nvt_langevin
+task: relax | nve | nvt_langevin | npt_mtk
 input: path/to/input.extxyz
 output: path/to/final.extxyz
 runtime: {...}
@@ -88,6 +88,33 @@ Add:
 ```
 
 Scalars can be replaced by length-`B` sequences for time step, temperature, and friction.
+
+## Isotropic MTK NPT
+
+```yaml
+md:
+  timestep_fs: 0.5
+  n_steps: 10000
+  initialize_velocities: true
+  initial_temperature_K: 300
+  initialization_seed: 1234
+  temperature_K: 300
+  pressure_GPa: 0.0
+  thermostat_damping_fs: 50.0
+  barostat_damping_fs: 500.0
+  thermostat_chain_length: 3
+  barostat_chain_length: 3
+  thermostat_substeps: 1
+  barostat_substeps: 1
+  callback_interval: 10
+```
+
+Set `task: npt_mtk`. Pressure may instead be supplied as
+`pressure_eV_per_A3`; do not set both units. Time step, temperature, pressure,
+and both damping times accept scalars or length-`B` sequences. The implemented
+Martyna-Tobias-Klein cell degree of freedom scales each fully periodic cell
+isotropically. It does not change cell shape and rejects partial or nonperiodic
+systems.
 
 ## Reporting
 

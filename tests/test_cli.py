@@ -103,3 +103,56 @@ def test_yaml_cli_accepts_optional_frechet_cell_filter(tmp_path: Path):
     assert output_file.exists()
     assert summary["converged"] == [True]
     assert summary["max_stress"] is not None
+
+
+def test_yaml_cli_runs_isotropic_mtk_npt(tmp_path: Path):
+    input_file = tmp_path / "periodic.extxyz"
+    output_file = tmp_path / "npt.extxyz"
+    write(
+        input_file,
+        [
+            Atoms(
+                "H2",
+                positions=[[0.5, 0.5, 0.5], [1.7, 1.6, 1.5]],
+                cell=[4.0, 4.0, 4.0],
+                pbc=True,
+            ),
+            Atoms(
+                "H2",
+                positions=[[0.6, 0.5, 0.4], [1.8, 1.5, 1.6]],
+                cell=[4.2, 4.2, 4.2],
+                pbc=True,
+            ),
+        ],
+    )
+    config = {
+        "task": "npt_mtk",
+        "input": str(input_file),
+        "output": str(output_file),
+        "runtime": {"device": "cpu", "dtype": "float64", "skin": 0.2},
+        "model": {
+            "factory": "batch_mlip.toy_models:build_pair_harmonic_model",
+            "kwargs": {"k": 2.0, "r0": 1.4, "cutoff": 3.0},
+            "cutoff": 3.0,
+            "force_mode": "autograd",
+        },
+        "md": {
+            "timestep_fs": [0.2, 0.25],
+            "n_steps": 3,
+            "temperature_K": [250.0, 300.0],
+            "pressure_GPa": [0.0, 0.1],
+            "thermostat_damping_fs": 20.0,
+            "barostat_damping_fs": 100.0,
+            "initialization_seed": 42,
+        },
+    }
+    config_path = tmp_path / "npt.yaml"
+    config_path.write_text(yaml.safe_dump(config), encoding="utf-8")
+
+    summary = run_config(config_path)
+
+    assert output_file.exists()
+    assert summary["steps"] == 3
+    assert summary["model_evaluations"] == 4
+    assert summary["integrator"]["ensemble"] == "npt_mtk_isotropic"
+    assert len(summary["integrator"]["final_volume_A3"]) == 2

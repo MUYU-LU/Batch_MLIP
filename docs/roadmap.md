@@ -4,7 +4,7 @@
 
 - Validate real checkpoints against the existing ASE calculator.
 - Add finite-difference force and stress utilities to the CLI.
-- Add exact restart/resume for optimizer and thermostat internal state.
+- Add exact restart/resume for optimizer internal state.
 - Add dataset-level failure summaries and NaN/overflow guards.
 
 ## P1 — throughput
@@ -20,7 +20,7 @@
 ## P2 — broader simulation capability
 
 - Frechet/log-strain variable-cell FIRE.
-- NPT dynamics.
+- Fully anisotropic MTK NPT dynamics.
 - General constraints and RATTLE.
 - Persistent cross-call multi-GPU worker service.
 - Replica and ensemble workflows.

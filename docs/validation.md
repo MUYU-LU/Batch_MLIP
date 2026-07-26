@@ -63,6 +63,16 @@ Energy oscillation that shrinks quadratically with time step is expected for vel
 
 Check the temperature distribution over a sufficiently long equilibrated trajectory, not only the final value. Small systems have large temperature fluctuations. Verify that the friction value is interpreted in fs⁻¹.
 
+## NPT validation
+
+For isotropic MTK NPT, validate B1 positions, momenta, cells, thermostat and
+barostat chain variables, and extended conserved energy against ASE in
+float64. Check batched-versus-independent replicas, exact restart, positive
+finite volume, pressure/temperature statistics after equilibration, and
+decreasing extended-energy drift as the timestep is refined. A short finite
+trajectory is an engineering gate, not evidence that a timestep is suitable
+for phase-transition production.
+
 ## Direct-force head
 
 Compare direct and autograd forces on a held-out set. For NVE, test energy drift with both. A low force MAE does not guarantee a conservative vector field.

@@ -1,0 +1,67 @@
+id: batch-nvt-npt
+date: 2026-07-27
+baseline_commit: b559025
+hypothesis: >-
+  Keeping independent thermostat, isotropic MTK barostat, atomic, and cell
+  states in batched tensors will reproduce the corresponding single-system
+  dynamics while amortizing MLIP graph and model execution across replicas.
+mechanism: >-
+  Retain the existing Langevin BAOAB NVT splitter and add a vectorized
+  isotropic Martyna-Tobias-Klein NPT splitter. Each graph owns its thermostat
+  chain, barostat chain, logarithmic volume coordinate, and volume momentum;
+  atoms remain concatenated and the calculator evaluates forces and stress for
+  all replicas together.
+scope:
+  nvt:
+    algorithm: Langevin BAOAB
+    cell: fixed
+  npt:
+    algorithm: isotropic MTK with Nose-Hoover chains
+    cell: isotropic volume fluctuation, fixed cell shape
+  models: [deterministic-reference, AtomBit, MACE-OFF-Small]
+  structure_groups: [H46, H276]
+  pool_sizes: [1, 32, 128, 256]
+  capacity_points:
+    H46: 256
+    H276: 128
+correctness_gates:
+  - NVT restart from saved RNG state is bitwise equivalent to uninterrupted CPU
+    execution.
+  - Long NVT temperature means agree with targets within statistical error.
+  - NPT B1 positions, momenta, cells, chain variables, and conserved energy
+    agree with ASE IsotropicMTKNPT in float64.
+  - Batched NPT agrees with independent B1 runs using the same initial states.
+  - NPT cells retain positive finite volume and finite forces/stress.
+  - NPT extended-energy drift decreases with timestep refinement.
+  - NPT rejects FixAtoms, non-3D periodicity, and nonpositive target
+    temperature or damping.
+  - NPT restart is equivalent to uninterrupted execution.
+performance_measurement:
+  warmup_steps: 20
+  measured_steps: 100
+  repeats: 1
+  primary_metrics:
+    - replica_steps_per_second
+    - atoms_steps_per_second
+    - peak_allocated_GiB
+    - peak_reserved_GiB
+  supporting_metrics:
+    - model_evaluations
+    - neighbor_rebuilds
+    - temperature_mean_K
+    - pressure_mean_eV_per_A3
+    - volume_mean_A3
+comparisons:
+  - batched tensor NVT/NPT
+  - independent B1 ASE reference
+  - four ASE jobs per GPU under CUDA MPS where lifecycle timing is matched
+decision_gates:
+  - Expose NPT publicly only after all B1, batch, restart, and drift gates pass.
+  - Report NVT and NPT throughput separately; NPT stress work is not equivalent
+    to fixed-cell NVT work.
+  - Do not claim anisotropic or flexible-shape NPT from isotropic validation.
+limitations:
+  - One timing session does not provide a confidence interval.
+  - Initial NPT scope excludes constraints and partial periodicity.
+  - Production phase-transition studies require substantially longer
+    thermostat/barostat equilibration than this engineering benchmark.

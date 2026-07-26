@@ -10,7 +10,7 @@ The engine concatenates independent atomic systems into one heterogeneous graph 
 - Compatibility copies of the uploaded model under the original `src.*` namespace.
 - Exact source snapshots under `original_uploads/`.
 - Fixed/variable-cell batched FIRE and full BFGS, plus steepest descent.
-- Fixed-cell NVE velocity-Verlet and NVT Langevin BAOAB.
+- Fixed-cell NVE velocity-Verlet and NVT Langevin BAOAB, plus isotropic MTK NPT.
 - Heterogeneous atom counts, cells, PBC flags, and per-system MD parameters.
 - Autograd or direct forces, E0 offsets, and strain-gradient stress evaluation.
 - `FixAtoms` support.
@@ -84,6 +84,7 @@ The included tests check:
 - `FixAtoms` behavior;
 - NVE energy drift;
 - per-system Langevin parameters;
+- ASE-parity, restart, drift, and batching checks for isotropic MTK NPT;
 - the uploaded `src.model.AtomBitModel` running with `num_graphs > 1`;
 - the YAML CLI.
 
@@ -209,6 +210,17 @@ trajectory_end = molecular_dynamics(
     ensemble="nve",
     timestep_fs=0.5,
     n_steps=100,
+)
+npt_end = molecular_dynamics(
+    relaxed.structures,
+    calculator,
+    ensemble="npt_mtk",
+    timestep_fs=0.5,
+    n_steps=100,
+    temperature_K=300.0,
+    pressure_eV_per_A3=0.0,
+    thermostat_damping_fs=50.0,
+    barostat_damping_fs=500.0,
 )
 ```
 
@@ -807,14 +819,14 @@ Implemented:
 - independent fixed-cell and optional Frechet variable-cell systems;
 - heterogeneous sizes and cells;
 - FIRE, full BFGS, BFGSLineSearch/QuasiNewton, and gradient descent;
-- NVE/NVT fixed-cell MD;
+- NVE/NVT fixed-cell MD and isotropic MTK NPT;
 - `FixAtoms` for fixed-cell optimization and MD;
 - per-system time steps, temperatures, friction, and FIRE parameters;
 - finite-difference-validated strain-gradient stress calculation.
 
 Not yet implemented:
 
-- NPT dynamics (the public ensemble slot is reserved but raises explicitly);
+- anisotropic or partially periodic NPT cell dynamics;
 - SHAKE/RATTLE or general ASE constraints;
 - GPU-native periodic neighbour lists;
 - multi-GPU sharding.

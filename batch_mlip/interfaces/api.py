@@ -26,6 +26,7 @@ from ..core.types import (
     RelaxationResult,
 )
 from ..dynamics.integrators import batched_langevin_baoab, batched_velocity_verlet
+from ..dynamics.mtk import batched_isotropic_mtk
 from ..execution import (
     CudaAllocatorPlan,
     TaskWorker,
@@ -1245,7 +1246,7 @@ def molecular_dynamics(
     ] = "nve",
     **md_kwargs: Any,
 ) -> MDResult:
-    """Run fixed-cell batch MD with the same calculator used for relaxation."""
+    """Run batched MD with the same calculator used for relaxation."""
 
     state = calculator.create_state(_normalize_systems(systems))
     if ensemble == "nve":
@@ -1253,7 +1254,5 @@ def molecular_dynamics(
     if ensemble in ("nvt", "nvt_langevin"):
         return batched_langevin_baoab(state, calculator, **md_kwargs)
     if ensemble in ("npt", "npt_mtk"):
-        raise NotImplementedError(
-            "the NPT API slot is reserved; no validated batch barostat is implemented"
-        )
+        return batched_isotropic_mtk(state, calculator, **md_kwargs)
     raise ValueError(f"unsupported ensemble {ensemble!r}")

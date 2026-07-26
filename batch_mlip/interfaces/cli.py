@@ -21,9 +21,10 @@ from ..dynamics.integrators import (
     batched_velocity_verlet,
     initialize_maxwell_boltzmann,
 )
+from ..dynamics.mtk import batched_isotropic_mtk
 from ..models.loaders import build_model, infer_cutoff, load_e0, parse_dtype
 from ..models.potential import AtomBitBatchCalculator
-from ..optimization.cell_filters import FrechetCellFilter
+from ..optimization.cell_filters import GPA_TO_EV_PER_A3, FrechetCellFilter
 from ..optimization.registry import create_optimizer
 from .config import load_yaml, required
 from .reporting import build_reporter
@@ -126,6 +127,16 @@ def _summary_base(config: Mapping[str, Any], state, model, input_file: Path) -> 
     }
 
 
+def _json_value(value: Any) -> Any:
+    if isinstance(value, torch.Tensor):
+        return value.detach().cpu().tolist()
+    if isinstance(value, Mapping):
+        return {str(key): _json_value(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_value(item) for item in value]
+    return value
+
+
 def run_config(config_path: str | Path) -> dict[str, Any]:
     config = load_yaml(config_path)
     task = str(required(config, "task", "config")).lower()
@@ -178,7 +189,7 @@ def run_config(config_path: str | Path) -> dict[str, Any]:
             "graph_evaluations": result.graph_evaluations,
             "active_batch_sizes": list(result.active_batch_sizes),
         }
-    elif task in ("nve", "nvt_langevin", "nvt"):
+    elif task in ("nve", "nvt_langevin", "nvt", "npt", "npt_mtk"):
         options = _as_mapping(config.get("md"), "md")
         initialize = bool(options.pop("initialize_velocities", True))
         initial_temperature = options.pop(
@@ -201,8 +212,26 @@ def run_config(config_path: str | Path) -> dict[str, Any]:
             result = batched_velocity_verlet(
                 state, potential, callback=reporter, **options
             )
-        else:
+        elif task in ("nvt_langevin", "nvt"):
             result = batched_langevin_baoab(
+                state, potential, callback=reporter, **options
+            )
+        else:
+            pressure_gpa = options.pop("pressure_GPa", None)
+            if pressure_gpa is not None:
+                if "pressure_eV_per_A3" in options:
+                    raise ValueError(
+                        "set only one of pressure_GPa and pressure_eV_per_A3"
+                    )
+                options["pressure_eV_per_A3"] = (
+                    torch.as_tensor(
+                        pressure_gpa,
+                        device=state.device,
+                        dtype=state.dtype,
+                    )
+                    * GPA_TO_EV_PER_A3
+                )
+            result = batched_isotropic_mtk(
                 state, potential, callback=reporter, **options
             )
         evaluation = result.evaluation
@@ -216,9 +245,14 @@ def run_config(config_path: str | Path) -> dict[str, Any]:
         result_summary = {
             "kinetic_energy": result.kinetic_energy.detach().cpu().tolist(),
             "temperature": result.temperature.detach().cpu().tolist(),
+            "model_evaluations": result.model_evaluations,
+            "graph_evaluations": result.graph_evaluations,
+            "integrator": _json_value(result.metadata),
         }
     else:
-        raise ValueError("task must be one of: relax, nve, nvt_langevin")
+        raise ValueError(
+            "task must be one of: relax, nve, nvt_langevin, npt_mtk"
+        )
 
     _write_final(output, state, evaluation, extras)
     elapsed = time.perf_counter() - started

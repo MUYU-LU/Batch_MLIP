@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from dataclasses import dataclass
 
 import torch
 
@@ -15,6 +16,35 @@ from ..core.state import (
     AseGraphBatch,
 )
 from ..core.types import MDResult, StepCallback
+
+
+@dataclass
+class LangevinBAOABState:
+    """Restartable random-number state for Langevin BAOAB."""
+
+    generator_state: torch.Tensor
+    steps: int = 0
+
+    def state_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": 1,
+            "kind": "langevin_baoab",
+            "generator_state": self.generator_state.detach().cpu(),
+            "steps": self.steps,
+        }
+
+    @classmethod
+    def from_state_dict(cls, values: dict[str, object]) -> LangevinBAOABState:
+        if values.get("schema_version") != 1:
+            raise ValueError("unsupported Langevin BAOAB state schema")
+        if values.get("kind") != "langevin_baoab":
+            raise ValueError("state payload is not Langevin BAOAB")
+        return cls(
+            generator_state=torch.as_tensor(
+                values["generator_state"], device="cpu", dtype=torch.uint8
+            ),
+            steps=int(values["steps"]),
+        )
 
 
 def initialize_maxwell_boltzmann(
@@ -222,6 +252,7 @@ def batched_langevin_baoab(
     temperature_K: float | Sequence[float] | torch.Tensor,
     friction_per_fs: float | Sequence[float] | torch.Tensor = 0.01,
     seed: int | None = None,
+    integrator_state: LangevinBAOABState | None = None,
     remove_com_each_step: bool = False,
     callback: StepCallback | None = None,
     callback_interval: int = 1,
@@ -264,10 +295,20 @@ def batched_langevin_baoab(
     if bool((friction < 0.0).any()):
         raise ValueError("friction must be non-negative")
 
-    generator = None
-    if seed is not None:
-        generator = torch.Generator(device=state.device)
-        generator.manual_seed(seed)
+    if integrator_state is not None and seed is not None:
+        raise ValueError("seed cannot be supplied when resuming integrator_state")
+    generator = torch.Generator(device=state.device)
+    if integrator_state is None:
+        if seed is None:
+            generator.seed()
+        else:
+            generator.manual_seed(seed)
+        langevin_state = LangevinBAOABState(
+            generator_state=generator.get_state().cpu(),
+        )
+    else:
+        generator.set_state(integrator_state.generator_state.cpu())
+        langevin_state = integrator_state
 
     dt_atom = dt_system[state.system_idx].unsqueeze(-1)
     c1_system = torch.exp(-friction * dt_system)
@@ -341,6 +382,7 @@ def batched_langevin_baoab(
             state.velocities + 0.5 * dt_atom * new_acceleration
         ).detach()
         state.zero_fixed_motion_()
+        langevin_state.steps += 1
 
         if callback is not None and step % callback_interval == 0:
             callback(
@@ -361,4 +403,11 @@ def batched_langevin_baoab(
         steps=n_steps,
         kinetic_energy=state.kinetic_energy(),
         temperature=state.temperature(com_removed=remove_com_each_step),
+        integrator_state=LangevinBAOABState(
+            generator_state=generator.get_state().cpu(),
+            steps=langevin_state.steps,
+        ),
+        model_evaluations=n_steps + 1,
+        graph_evaluations=n_steps + 1,
+        metadata={"ensemble": "nvt_langevin_baoab"},
     )
