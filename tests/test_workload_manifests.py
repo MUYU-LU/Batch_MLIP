@@ -16,6 +16,7 @@ from batch_mlip.workloads import (
     build_robustness_workloads,
     normalized_structure_sha256,
     read_workload_manifest,
+    repeat_workload_manifest,
     topology_key,
     write_workload_jobs_csv,
     write_workload_manifest,
@@ -98,6 +99,27 @@ def test_manifest_rejects_tampering_and_noncontiguous_order(tmp_path):
             jobs=(_job(1),),
             metadata={},
         )
+
+
+def test_repeat_manifest_preserves_jobs_and_reseals_identity():
+    source = _manifest()
+
+    repeated = repeat_workload_manifest(
+        source,
+        repeat_count=3,
+        workload_id="TEST-R6-v1",
+    )
+
+    repeated.verify()
+    assert len(repeated.jobs) == 6
+    assert [job.order for job in repeated.jobs] == list(range(6))
+    assert len({job.system_id for job in repeated.jobs}) == 6
+    assert [job.source_path for job in repeated.jobs] == [
+        job.source_path for job in source.jobs
+    ] * 3
+    assert repeated.metadata["base_manifest_sha256"] == source.manifest_sha256
+    assert repeated.metadata["pool_repeat_count"] == 3
+    assert repeated.manifest_sha256 != source.manifest_sha256
 
 
 def test_task_profile_summarizes_cost_and_reference_variation():

@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "scope": {
+    "pool_size_per_family": 1024,
+    "family_count": 4,
+    "total_current_policy_jobs": 4096,
+    "gpu_count": 4,
+    "gpu": "NVIDIA H100 80GB HBM3",
+    "resident_batch_limit": 128,
+    "optimizer": "FIRE",
+    "variable_cell": true,
+    "max_steps": 500,
+    "timing_repeats": 1
+  },
+  "current_policy": [
+    {
+      "workload": "GUFJOG44",
+      "atoms_per_structure": [44],
+      "total_atoms": 45056,
+      "policy": "bucket_balanced_sharding",
+      "resident_chunks": 9,
+      "execution_chunks": 36,
+      "wall_seconds": 187.9316511610523,
+      "systems_per_second": 5.448789459751301,
+      "atoms_per_second": 239.74673622905723,
+      "peak_reserved_gib": 3.546875,
+      "converged": 736,
+      "completed_without_oom": true,
+      "legacy_comparison": "schedule-equivalent branch; not rerun"
+    },
+    {
+      "workload": "XAFPAY172",
+      "atoms_per_structure": [172],
+      "total_atoms": 176128,
+      "policy": "bucket_balanced_sharding",
+      "resident_chunks": 8,
+      "execution_chunks": 32,
+      "wall_seconds": 90.24113926710561,
+      "systems_per_second": 11.347374471515177,
+      "atoms_per_second": 1951.7484091006104,
+      "peak_reserved_gib": 12.388671875,
+      "converged": 1024,
+      "completed_without_oom": true,
+      "legacy_comparison": "schedule-equivalent branch; not rerun"
+    },
+    {
+      "workload": "ROFB296",
+      "atoms_per_structure": [296],
+      "total_atoms": 303104,
+      "policy": "minimum_parts_for_device_occupancy",
+      "resident_chunks": 9,
+      "execution_chunks": 9,
+      "wall_seconds": 428.7793215448037,
+      "systems_per_second": 2.3881748688596707,
+      "atoms_per_second": 706.8997611824625,
+      "peak_reserved_gib": 55.654296875,
+      "converged": 1008,
+      "completed_without_oom": true
+    },
+    {
+      "workload": "ROFA-MIX",
+      "atoms_per_structure": [74, 148, 222, 296],
+      "total_atoms": 189440,
+      "policy": "bucket_balanced_sharding",
+      "resident_chunks": 9,
+      "execution_chunks": 36,
+      "wall_seconds": 78.87593619897962,
+      "systems_per_second": 12.982413259942353,
+      "atoms_per_second": 2401.7464530893353,
+      "peak_reserved_gib": 11.94140625,
+      "converged": 1024,
+      "completed_without_oom": true,
+      "legacy_comparison": "schedule-equivalent branch; not rerun"
+    }
+  ],
+  "rofb_legacy_comparison": {
+    "legacy": {
+      "execution_chunks": 36,
+      "wall_seconds": 439.9259928627871,
+      "systems_per_second": 2.3276642358329247,
+      "peak_reserved_gib": 13.896484375,
+      "converged": 1000
+    },
+    "resident_packing": {
+      "execution_chunks": 9,
+      "wall_seconds": 428.7793215448037,
+      "systems_per_second": 2.3881748688596707,
+      "peak_reserved_gib": 55.654296875,
+      "converged": 1008
+    },
+    "speedup": 1.02599628936821,
+    "wall_time_reduction_percent": 2.5337605640092438,
+    "reserved_memory_ratio": 4.005,
+    "convergence_mask_equal": false
+  },
+  "conclusions": {
+    "all_current_policy_runs_completed_without_oom": true,
+    "maximum_peak_reserved_gib": 55.654296875,
+    "maximum_fraction_of_79_647_gib": 0.6987628314574066,
+    "exact_job_coverage_passed": true,
+    "convergence_mask_gate_passed": false,
+    "reason": "ROFB batch grouping changed marginal FIRE trajectories at the common 500-step cap; resident packing converged eight more jobs.",
+    "policy_change_justified": false,
+    "interpretation": "R1024 dispatch and memory planning are robust. Resident packing is strongly workload-dependent and gives only a modest ROFB speed benefit for four times the reserved memory."
+  }
+}

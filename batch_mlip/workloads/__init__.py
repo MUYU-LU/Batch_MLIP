@@ -21,6 +21,7 @@ from .schema import (
     WorkloadJob,
     WorkloadManifest,
     read_workload_manifest,
+    repeat_workload_manifest,
     write_workload_jobs_csv,
     write_workload_manifest,
 )
@@ -41,6 +42,7 @@ __all__ = [
     "execute_workload",
     "materialize_workload",
     "read_workload_manifest",
+    "repeat_workload_manifest",
     "topology_key",
     "write_workload_jobs_csv",
     "write_workload_manifest",

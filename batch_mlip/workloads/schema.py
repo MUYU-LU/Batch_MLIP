@@ -284,6 +284,43 @@ def read_workload_manifest(path: str | Path) -> WorkloadManifest:
     return WorkloadManifest.from_dict(json.loads(Path(path).read_text(encoding="utf-8")))
 
 
+def repeat_workload_manifest(
+    manifest: WorkloadManifest,
+    *,
+    repeat_count: int,
+    workload_id: str,
+) -> WorkloadManifest:
+    """Repeat a sealed closed-pool workload with new deterministic job IDs."""
+
+    manifest.verify()
+    if repeat_count <= 0:
+        raise ValueError("repeat_count must be positive")
+    if not workload_id:
+        raise ValueError("workload_id must not be empty")
+    jobs = tuple(
+        replace(
+            job,
+            system_id=f"{workload_id}:{order:04d}",
+            order=order,
+        )
+        for order, job in enumerate(manifest.jobs * repeat_count)
+    )
+    metadata = {
+        **manifest.metadata,
+        "base_workload_id": manifest.workload_id,
+        "base_manifest_sha256": manifest.manifest_sha256,
+        "base_job_count": len(manifest.jobs),
+        "pool_repeat_count": repeat_count,
+    }
+    return replace(
+        manifest,
+        workload_id=workload_id,
+        jobs=jobs,
+        metadata=metadata,
+        manifest_sha256="",
+    ).seal()
+
+
 def write_workload_jobs_csv(path: str | Path, manifest: WorkloadManifest) -> None:
     """Write a flat, human-auditable projection of a signed JSON manifest."""
 

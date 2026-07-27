@@ -1,0 +1,47 @@
+id: resident-packing-r1024-robustness
+date: 2026-07-28
+baseline_commit: f3f8029c1b9d4327d68e3c2b554d14a05573d9b0
+implementation_commit: 3f7529c969f9ad5f9bca2c9e031e0ab45dec7091
+hypothesis: >-
+  The task-aware multi-GPU split policy retains its homogeneous throughput
+  benefit and avoids heterogeneous stragglers when the closed optimization
+  pool grows from 256 to 1024 jobs across independent crystal families.
+dataset:
+  root: /public/home/lmy/Batch_imple_project/test_set
+  source_pool_size: 256
+  repeat_count: 4
+  derived_pool_size: 1024
+  families:
+    - GUFJOG44
+    - XAFPAY172
+    - ROFB296
+    - ROFA-MIX
+configuration:
+  mlip: AtomBit smooth_rms fp32
+  optimizer: FIRE
+  variable_cell: true
+  devices: [cuda:0, cuda:1, cuda:2, cuda:3]
+  resident_batch_limit: 128
+  fmax_eV_per_A: 0.05
+  max_steps: 500
+  deterministic_algorithms: true
+  cublas_workspace_config: ":4096:8"
+  cpu_threads_per_process: 1
+  timing_repeats: 1
+comparisons:
+  - legacy_every_chunk_every_gpu
+  - task_aware_resident_packing
+gates:
+  exact_job_coverage: 1024
+  convergence_mask_match: true
+  peak_memory_fraction_max: 0.85
+  heterogeneous_wall_time_regression_max: 0.05
+  report_unconverged_at_step_cap: true
+results:
+  summary: results/summary.json
+  manifest: results/manifest.json
+  completed_without_oom: 4
+  total_current_policy_jobs: 4096
+  rofb_speedup_vs_legacy: 1.02599628936821
+  convergence_mask_gate: failed_rofb_current_1008_legacy_1000
+status: completed_with_failed_convergence_mask_gate
