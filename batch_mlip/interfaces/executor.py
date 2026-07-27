@@ -36,6 +36,7 @@ from .api import (
     _normalize_devices,
     _normalize_systems,
     _offload_relaxation_result,
+    _parallel_deterministic_chunk_policy,
     _parallel_deterministic_chunks,
     relax,
 )
@@ -493,6 +494,18 @@ class BatchExecutor:
                 "peak_reserved_bytes": probe.peak_reserved_bytes,
                 "model_bytes_per_work": probe.model_bytes_per_work,
             },
+            "parallel_chunk_policy": _parallel_deterministic_chunk_policy(plan),
+            "resident_plan_chunk_count": len(plan.chunks),
+            "execution_chunk_count": len(pending_chunks),
+            "resident_plan_chunks": [
+                {
+                    "bucket_index": chunk.bucket_index,
+                    "system_count": len(chunk.system_indices),
+                    "predicted_peak_bytes": chunk.predicted_peak_bytes,
+                    "estimated_cost": chunk.estimated_cost,
+                }
+                for chunk in plan.chunks
+            ],
             "planned_chunks": [
                 {
                     "bucket_index": chunk.bucket_index,

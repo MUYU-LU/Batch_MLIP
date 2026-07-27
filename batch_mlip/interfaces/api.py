@@ -1096,39 +1096,113 @@ def _parallel_deterministic_chunks(
     *,
     device_count: int,
 ) -> list[_PendingAutoChunk]:
-    """Split safe batches so one large batch does not leave GPUs idle."""
+    """Expose safe batches using the workload's deterministic split policy."""
 
+    if device_count <= 0:
+        raise ValueError("device_count must be positive")
     profiles = {profile.index: profile for profile in plan.workload.profiles}
+    system_costs = {
+        index: (
+            profile_model_work(profile) + math.sqrt(profile.dof_squared)
+        )
+        for index, profile in profiles.items()
+    }
+    if _parallel_deterministic_chunk_policy(plan) == "bucket_balanced_sharding":
+        pending = []
+        for chunk in plan.chunks:
+            part_count = min(device_count, len(chunk.system_indices))
+            for part_index in range(part_count):
+                indices = chunk.system_indices[part_index::part_count]
+                if indices:
+                    pending.append(
+                        _PendingAutoChunk(
+                            indices=indices,
+                            estimated_cost=sum(
+                                system_costs[index] for index in indices
+                            ),
+                            bucket_index=chunk.bucket_index,
+                            predicted_peak_bytes=chunk.predicted_peak_bytes,
+                        )
+                    )
+        return sorted(
+            pending,
+            key=lambda chunk: (-chunk.estimated_cost, chunk.indices),
+        )
+
+    system_count = sum(len(chunk.system_indices) for chunk in plan.chunks)
+    target_part_count = max(
+        len(plan.chunks),
+        min(device_count, system_count),
+    )
+    part_counts = [1] * len(plan.chunks)
+    for _ in range(target_part_count - len(plan.chunks)):
+        candidates = [
+            chunk_index
+            for chunk_index, chunk in enumerate(plan.chunks)
+            if part_counts[chunk_index] < len(chunk.system_indices)
+        ]
+        if not candidates:  # pragma: no cover - target is bounded by system count
+            break
+        selected = min(
+            candidates,
+            key=lambda chunk_index: (
+                -plan.chunks[chunk_index].estimated_cost
+                / part_counts[chunk_index],
+                chunk_index,
+            ),
+        )
+        part_counts[selected] += 1
+
     pending = []
-    for chunk in plan.chunks:
-        part_count = min(device_count, len(chunk.system_indices))
-        for part_index in range(part_count):
-            indices = chunk.system_indices[part_index::part_count]
-            if not indices:
-                continue
-            predicted = chunk.predicted_peak_bytes
-            if predicted is not None:
-                baseline = plan.probe.baseline_allocated_bytes or 0
-                incremental = max(0, predicted - baseline)
-                predicted = baseline + math.ceil(
-                    incremental * len(indices) / len(chunk.system_indices)
+    for chunk, part_count in zip(plan.chunks, part_counts, strict=True):
+        if part_count == 1:
+            partitions = [chunk.system_indices]
+        else:
+            bins: list[list[int]] = [[] for _ in range(part_count)]
+            bin_costs = [0.0] * part_count
+            ordered_indices = sorted(
+                chunk.system_indices,
+                key=lambda index: (-system_costs[index], index),
+            )
+            for index in ordered_indices:
+                part_index = min(
+                    range(part_count),
+                    key=lambda candidate: (bin_costs[candidate], candidate),
                 )
+                bins[part_index].append(index)
+                bin_costs[part_index] += system_costs[index]
+            partitions = [
+                tuple(sorted(indices)) for indices in bins if indices
+            ]
+        for indices in partitions:
             pending.append(
                 _PendingAutoChunk(
                     indices=indices,
                     estimated_cost=sum(
-                        profile_model_work(profiles[index])
-                        + math.sqrt(profiles[index].dof_squared)
-                        for index in indices
+                        system_costs[index] for index in indices
                     ),
                     bucket_index=chunk.bucket_index,
-                    predicted_peak_bytes=predicted,
+                    # A subset cannot exceed its memory-safe parent. Retaining
+                    # the parent estimate avoids unsafe linear scaling for
+                    # heterogeneous structures and allocator overhead.
+                    predicted_peak_bytes=chunk.predicted_peak_bytes,
                 )
             )
     return sorted(
         pending,
         key=lambda chunk: (-chunk.estimated_cost, chunk.indices),
     )
+
+
+def _parallel_deterministic_chunk_policy(
+    plan: DeterministicRelaxationPlan,
+) -> str:
+    """Keep heterogeneous workload buckets distributed across every GPU."""
+
+    bucket_count = len({chunk.bucket_index for chunk in plan.chunks})
+    if bucket_count > 1:
+        return "bucket_balanced_sharding"
+    return "minimum_parts_for_device_occupancy"
 
 
 def _execute_multi_device_deterministic_relaxation(
@@ -1387,6 +1461,18 @@ def _execute_multi_device_deterministic_relaxation(
             "peak_reserved_bytes": probe.peak_reserved_bytes,
             "model_bytes_per_work": probe.model_bytes_per_work,
         },
+        "parallel_chunk_policy": _parallel_deterministic_chunk_policy(plan),
+        "resident_plan_chunk_count": len(plan.chunks),
+        "execution_chunk_count": len(chunks),
+        "resident_plan_chunks": [
+            {
+                "bucket_index": chunk.bucket_index,
+                "system_count": len(chunk.system_indices),
+                "predicted_peak_bytes": chunk.predicted_peak_bytes,
+                "estimated_cost": chunk.estimated_cost,
+            }
+            for chunk in plan.chunks
+        ],
         "planned_chunks": [
             {
                 "bucket_index": chunk.bucket_index,

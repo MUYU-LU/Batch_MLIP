@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "baseline_commit": "f3f8029c1b9d4327d68e3c2b554d14a05573d9b0",
+  "hardware": {
+    "gpu_count": 4,
+    "gpu": "NVIDIA H100 80GB HBM3",
+    "cpu_threads_per_process": 1
+  },
+  "configuration": {
+    "mlip": "AtomBit smooth_rms fp32",
+    "optimizer": "FIRE",
+    "variable_cell": true,
+    "resident_batch_limit": 128,
+    "fmax_eV_per_A": 0.05,
+    "max_steps": 500,
+    "deterministic_algorithms": true,
+    "timing_repeats": 1
+  },
+  "homogeneous_h46_r256": {
+    "selected_policy": "minimum_parts_for_device_occupancy",
+    "legacy": {
+      "wall_seconds": 47.79810355976224,
+      "systems_per_second": 5.355861026576541,
+      "execution_chunk_sizes": [32, 32, 32, 32, 32, 32, 32, 32],
+      "peak_reserved_gib": 2.62890625,
+      "converged": 240
+    },
+    "resident_packing": {
+      "wall_seconds": 35.97529685171321,
+      "systems_per_second": 7.115994096037843,
+      "execution_chunk_sizes": [64, 64, 64, 64],
+      "peak_reserved_gib": 5.185546875,
+      "converged": 240
+    },
+    "speedup": 1.3286368075510684,
+    "wall_time_reduction_percent": 24.734886590776362,
+    "convergence_mask_equal": true
+  },
+  "heterogeneous_xafpay_r256": {
+    "selected_policy": "bucket_balanced_sharding",
+    "legacy": {
+      "wall_seconds": 34.86684346711263,
+      "systems_per_second": 7.3422189835299045,
+      "execution_chunk_sizes": [32, 32, 32, 32, 24, 24, 24, 24, 8, 8, 8, 8],
+      "peak_reserved_gib": 10.126953125,
+      "converged": 256
+    },
+    "unconditional_resident_packing_rejected": {
+      "wall_seconds": 34.33895596768707,
+      "systems_per_second": 7.455089789010935,
+      "execution_chunk_sizes": [96, 64, 64, 32],
+      "peak_reserved_gib": 20.908203125,
+      "slowest_worker_seconds": 24.715379148256034,
+      "fastest_worker_seconds": 10.406531746964902,
+      "reason": "Cross-bucket straggler imbalance for only 1.5 percent throughput gain."
+    },
+    "final_policy": {
+      "wall_seconds": 34.48520512925461,
+      "systems_per_second": 7.423473313859722,
+      "execution_chunk_sizes": [32, 32, 32, 32, 24, 24, 24, 24, 8, 8, 8, 8],
+      "peak_reserved_gib": 10.126953125,
+      "converged": 256
+    },
+    "final_policy_speedup": 1.0110667266274798,
+    "final_policy_regression_percent": -1.0945594722906107
+  },
+  "h46_final_state_validation": {
+    "scope": "240 structures converged under both policies",
+    "convergence_mask_equal": true,
+    "positions_A": {
+      "max_absolute": 0.028376221656799316,
+      "rmse": 0.0014320331997104878
+    },
+    "cells_A": {
+      "max_absolute": 0.015053749084472656,
+      "rmse": 0.0009265634326745567
+    },
+    "energies_eV": {
+      "max_absolute": 0.010457038879394531,
+      "rmse": 0.0018227688994736238
+    },
+    "forces_eV_per_A": {
+      "max_absolute": 0.07357969880104065,
+      "rmse": 0.0020164597914727155
+    },
+    "limitation": "Sixteen jobs remained unconverged at the common 500-step cap and are excluded from final-state error statistics."
+  },
+  "acceptance": {
+    "homogeneous_throughput_gate_passed": true,
+    "heterogeneous_regression_gate_passed": true,
+    "memory_fraction_gate_passed": true,
+    "coverage_tests_passed": true,
+    "oom_retry_implemented": false
+  }
+}

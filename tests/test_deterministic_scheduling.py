@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
 import torch
 from ase import Atoms
 
@@ -16,7 +18,10 @@ from batch_mlip import (
     plan_deterministic_relaxation,
     relax,
 )
-from batch_mlip.interfaces.api import _reserved_incremental_bytes
+from batch_mlip.interfaces.api import (
+    _parallel_deterministic_chunks,
+    _reserved_incremental_bytes,
+)
 
 
 class QuadraticCalculator(BatchCalculator):
@@ -112,6 +117,101 @@ def test_probe_incremental_memory_uses_reserved_device_occupancy():
     ) == 300
 
 
+def test_parallel_chunks_preserve_full_batches_when_devices_are_occupied():
+    config = AutoSchedulerConfig(max_batch_size=2)
+    probe = DeterministicMemoryProbe(
+        memory_budget_bytes=None,
+        baseline_allocated_bytes=None,
+        peak_allocated_bytes=None,
+        peak_reserved_bytes=None,
+        probe_indices=(),
+        probe_model_work=0,
+        model_bytes_per_work=0.0,
+    )
+    plan = plan_deterministic_relaxation(
+        _workload(8),
+        probe,
+        BatchedFIRE(),
+        {},
+        torch.float64,
+        config,
+    )
+
+    chunks = _parallel_deterministic_chunks(plan, device_count=2)
+
+    assert len(plan.chunks) == 4
+    assert [len(chunk.indices) for chunk in chunks] == [2, 2, 2, 2]
+    assert sorted(
+        index for chunk in chunks for index in chunk.indices
+    ) == list(range(8))
+
+
+def test_parallel_chunks_add_only_minimum_parts_for_idle_devices():
+    config = AutoSchedulerConfig(max_batch_size=4)
+    probe = DeterministicMemoryProbe(
+        memory_budget_bytes=None,
+        baseline_allocated_bytes=None,
+        peak_allocated_bytes=None,
+        peak_reserved_bytes=None,
+        probe_indices=(),
+        probe_model_work=0,
+        model_bytes_per_work=0.0,
+    )
+    plan = plan_deterministic_relaxation(
+        _workload(8),
+        probe,
+        BatchedFIRE(),
+        {},
+        torch.float64,
+        config,
+    )
+
+    chunks = _parallel_deterministic_chunks(plan, device_count=4)
+
+    assert len(plan.chunks) == 2
+    assert len(chunks) == 4
+    assert [len(chunk.indices) for chunk in chunks] == [2, 2, 2, 2]
+    assert sorted(
+        index for chunk in chunks for index in chunk.indices
+    ) == list(range(8))
+
+
+def test_parallel_chunks_shard_each_heterogeneous_bucket_across_devices():
+    config = AutoSchedulerConfig(max_batch_size=4)
+    probe = DeterministicMemoryProbe(
+        memory_budget_bytes=None,
+        baseline_allocated_bytes=None,
+        peak_allocated_bytes=None,
+        peak_reserved_bytes=None,
+        probe_indices=(),
+        probe_model_work=0,
+        model_bytes_per_work=0.0,
+    )
+    homogeneous = plan_deterministic_relaxation(
+        _workload(8),
+        probe,
+        BatchedFIRE(),
+        {},
+        torch.float64,
+        config,
+    )
+    plan = replace(
+        homogeneous,
+        chunks=(
+            homogeneous.chunks[0],
+            replace(homogeneous.chunks[1], bucket_index=1),
+        ),
+    )
+
+    chunks = _parallel_deterministic_chunks(plan, device_count=4)
+
+    assert len(chunks) == 8
+    assert [len(chunk.indices) for chunk in chunks] == [1] * 8
+    assert sorted(
+        index for chunk in chunks for index in chunk.indices
+    ) == list(range(8))
+
+
 def test_dense_bfgs_allowance_changes_deterministic_capacity():
     config = AutoSchedulerConfig(
         memory_budget_bytes=2_000,
@@ -201,6 +301,11 @@ def test_multi_device_auto_shards_deterministic_chunks_without_autotuning():
     assert schedule["decision"] == "deterministic_memory_plan_multi_gpu"
     assert schedule["active_gpu_count"] == 2
     assert schedule["worker_backend"] == "thread"
+    assert schedule["parallel_chunk_policy"] == (
+        "minimum_parts_for_device_occupancy"
+    )
+    assert schedule["resident_plan_chunk_count"] == 1
+    assert schedule["execution_chunk_count"] == 2
     assert len(schedule["planned_chunks"]) == 2
     assert sum(
         chunk["system_count"] for chunk in schedule["planned_chunks"]

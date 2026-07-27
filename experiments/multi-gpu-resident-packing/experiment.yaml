@@ -1,0 +1,43 @@
+id: multi-gpu-resident-packing
+date: 2026-07-28
+baseline_commit: f3f8029c1b9d4327d68e3c2b554d14a05573d9b0
+description: >-
+  Preserve memory-safe resident chunks for homogeneous workloads and split
+  only enough chunks to expose at least one task per assigned device. Retain
+  bucket-balanced sharding for heterogeneous workloads.
+hypothesis: >-
+  Homogeneous workloads benefit from larger resident batches, while
+  heterogeneous workloads require every workload bucket to be distributed
+  across GPUs to avoid optimization-time stragglers.
+mechanism: >-
+  Use the minimum total chunk parts required to occupy the requested devices
+  for one-bucket workloads. For multi-bucket workloads, shard each safe chunk
+  across the devices so each worker receives work from every bucket.
+fairness:
+  gpu: NVIDIA H100 80GB HBM3
+  cpu_threads_per_process: 1
+  timing_repeats: 1
+  deterministic_algorithms: true
+  same_signed_jobs: true
+  same_model_optimizer_precision: true
+  same_convergence_settings: true
+gates:
+  no_duplicated_or_omitted_jobs: true
+  convergence_match: true
+  final_state_match: existing_optimizer_specific_tolerances
+  peak_memory_fraction_max: 0.85
+  homogeneous_throughput_improvement_min: 0.05
+  heterogeneous_regression_max: 0.05
+oom_retry:
+  status: design_gated
+  requirement: >-
+    A worker must return a typed recoverable OOM result while preserving
+    completed-task records; the current fatal-exception protocol cannot safely
+    retry without losing partial progress.
+results:
+  summary: results/summary.json
+  manifest: results/manifest.json
+  homogeneous_speedup: 1.3286368075510684
+  heterogeneous_final_policy_speedup: 1.0110667266274798
+  unconditional_heterogeneous_candidate: rejected_straggler_imbalance
+status: completed
