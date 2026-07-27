@@ -36,6 +36,17 @@ def _costs(manifest: WorkloadManifest) -> dict[str, float]:
     }
 
 
+def worker_capacities(job_count: int, worker_count: int = 16) -> list[int]:
+    """Distribute jobs exactly across fixed MPS worker slots."""
+
+    if job_count <= 0 or worker_count <= 0:
+        raise ValueError("job and worker counts must be positive")
+    base, remainder = divmod(job_count, worker_count)
+    return [
+        base + int(index < remainder) for index in range(worker_count)
+    ]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, required=True)
@@ -43,9 +54,9 @@ def main() -> None:
     args = parser.parse_args()
 
     source = read_workload_manifest(args.input)
-    if len(source.jobs) != 3000:
-        parser.error("the four-GPU MPS protocol requires exactly 3000 jobs")
-    capacities = [188] * 8 + [187] * 8
+    if len(source.jobs) < 16:
+        parser.error("the four-GPU MPS protocol requires at least 16 jobs")
+    capacities = worker_capacities(len(source.jobs))
     bins = [[] for _ in capacities]
     totals = [0.0] * len(capacities)
     costs = _costs(source)
@@ -94,7 +105,9 @@ def main() -> None:
                 "base_workload_id": source.workload_id,
                 "base_manifest_sha256": source.manifest_sha256,
                 "mps_gpu_index": gpu_index,
-                "mps_worker_job_counts": [188, 188, 187, 187],
+                "mps_worker_job_counts": [
+                    capacities[index] for index in bin_indices
+                ],
                 "mps_sharding": "capacity-constrained LPT on normalized edge and dense-BFGS costs",
             },
             manifest_sha256="",

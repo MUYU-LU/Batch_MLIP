@@ -1,0 +1,116 @@
+id: heldout-auto-vs-mps
+date: 2026-07-28
+baseline_commit: b73e3ea891f55133d997c8359df4c65b06151660
+hypothesis: >-
+  The frozen automatic scheduler is faster than four ASE CUDA MPS workers per
+  GPU on distinct held-out molecular-crystal pools without exceeding the
+  configured memory ceiling or reducing the converged-job count.
+workloads:
+  dataset: /public/home/lmy/Batch_imple_project/test_set
+  calibration_families_excluded:
+    [GUFJOG, SOXLEX, XATMOV, OBEQIX, rof-a, rof-b]
+  heldout_families:
+    - {family: AXOSOW, atom_counts: [64]}
+    - {family: BOQQUT, atom_counts: [88, 176]}
+    - {family: XAFPAY, atom_counts: [86, 172]}
+    - {family: WICZUF, atom_counts: [132]}
+  preflight_exclusion:
+    family: XIFZOF
+    atom_counts: [400]
+    reason: >-
+      Contains silicon (Z=14), which is absent from the frozen AtomBit
+      checkpoint atom_types_map. Rejected before timing.
+  selection_seed: 20260728
+  candidate_structures_per_family: 512
+  selected_structures_per_family: 256
+  pools:
+    - {id: OPT-HOLDOUT-MIX-R256-v1, jobs_per_family: 64}
+    - {id: OPT-HOLDOUT-MIX-R1024-v1, jobs_per_family: 256}
+  synthetic_repetition: false
+configuration:
+  mlip: AtomBit smooth_rms fp32
+  optimizer: BFGS
+  optimizer_dtype: float64
+  variable_cell: FrechetCellFilter
+  cutoff_A: 6.0
+  skin_A_batch: 0.5
+  fmax_eV_per_A: 0.05
+  max_steps: 500
+  alpha_eV_per_A2: 70.0
+  max_step_A: 0.2
+  deterministic_algorithms: true
+  gpu_count: 4
+methods:
+  automatic:
+    api: BatchExecutor
+    capacity_overrides: none
+    memory_safety_fraction: 0.85
+    memory_growth_margin: 1.10
+    target_chunks_per_device: 2
+  mps:
+    api: ASE BFGS
+    workers_per_gpu: 4
+    total_workers: 16
+    sharding: >-
+      Capacity-constrained LPT using normalized edge count and dense BFGS
+      dimension cost; no measured runtime is used.
+fairness:
+  timing_repeats: 1
+  cpu_threads_per_process: 1
+  identical_signed_structures: true
+  identical_checkpoint: true
+  identical_optimizer_and_convergence_settings: true
+metrics:
+  - production_wall_seconds
+  - method_wall_seconds
+  - systems_per_second
+  - atoms_per_second
+  - peak_device_memory_bytes
+  - converged_count
+  - convergence_step_distribution
+  - model_evaluations
+gates:
+  no_oom: true
+  same_job_coverage: true
+  automatic_peak_memory_fraction_max: 0.85
+  automatic_convergence_not_below_mps: true
+  automatic_production_faster_than_mps: true
+results:
+  summary: results/summary.json
+  R256:
+    automatic_production_seconds: 33.20757104596123
+    automatic_api_seconds: 42.92600162932649
+    automatic_external_process_seconds: 193.080039083
+    mps_production_seconds: 97.47822152590379
+    mps_external_process_seconds: 131.69919326
+    production_speedup_over_mps: 2.9354216058436853
+    api_speedup_over_mps_production: 2.2708432610995364
+    external_process_speedup_over_mps: 0.6820963673173175
+    automatic_conservative_peak_fraction: 0.13310413406615432
+    converged: {automatic: 256, mps: 256}
+  R1024:
+    automatic_production_seconds: 91.04718056879938
+    automatic_api_seconds: 102.7699430831708
+    automatic_external_process_seconds: 298.880819886
+    mps_production_seconds: 308.3298679399304
+    mps_external_process_seconds: 341.654249545
+    production_speedup_over_mps: 3.386484523888605
+    api_speedup_over_mps_production: 3.0001949859055754
+    external_process_speedup_over_mps: 1.143111992517
+    automatic_conservative_peak_fraction: 0.5771628111341509
+    converged: {automatic: 1024, mps: 1024}
+conclusion: >-
+  The frozen scheduler generalizes to held-out families: all primary
+  correctness, memory, production, and API gates pass. Automatic production is
+  2.94x faster at R256 and 3.39x faster at R1024. Whole-process R256 is 1.47x
+  slower than MPS because BatchExecutor shutdown adds approximately 120
+  seconds after the measured API call; R1024 amortizes this defect and remains
+  1.14x faster end to end.
+limitations:
+  - One deterministic timing trial per point, as requested.
+  - AtomBit smooth-rms fp32, variable-cell BFGS, and H100 GPUs only.
+  - MPS device memory is nvidia-smi sampled, while automatic memory is a
+    conservative sum of parent-probe and worker PyTorch reserved memory.
+  - XIFZOF was rejected during preflight because the checkpoint does not
+    support silicon; no XIFZOF timing result was produced.
+status: complete

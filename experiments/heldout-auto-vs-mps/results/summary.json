@@ -1,0 +1,345 @@
+{
+  "all_external_process_gates_pass": false,
+  "all_primary_gates_pass": true,
+  "cases": [
+    {
+      "convergence": {
+        "automatic": 256,
+        "automatic_steps": {
+          "max": 432,
+          "mean": 92.23828125,
+          "min": 9,
+          "p50": 82,
+          "p95": 201
+        },
+        "families": {
+          "AXOSOW": {
+            "automatic_converged": 64,
+            "automatic_steps": {
+              "max": 282,
+              "mean": 82.84375,
+              "min": 9,
+              "p50": 77,
+              "p95": 175
+            },
+            "jobs": 64,
+            "mps_converged": 64,
+            "mps_steps": {
+              "max": 280,
+              "mean": 85.25,
+              "min": 9,
+              "p50": 78,
+              "p95": 184
+            }
+          },
+          "BOQQUT": {
+            "automatic_converged": 64,
+            "automatic_steps": {
+              "max": 267,
+              "mean": 85.921875,
+              "min": 22,
+              "p50": 79,
+              "p95": 165
+            },
+            "jobs": 64,
+            "mps_converged": 64,
+            "mps_steps": {
+              "max": 268,
+              "mean": 87.40625,
+              "min": 22,
+              "p50": 81,
+              "p95": 191
+            }
+          },
+          "WICZUF": {
+            "automatic_converged": 64,
+            "automatic_steps": {
+              "max": 432,
+              "mean": 116.921875,
+              "min": 20,
+              "p50": 110,
+              "p95": 269
+            },
+            "jobs": 64,
+            "mps_converged": 64,
+            "mps_steps": {
+              "max": 323,
+              "mean": 109.046875,
+              "min": 20,
+              "p50": 102,
+              "p95": 237
+            }
+          },
+          "XAFPAY": {
+            "automatic_converged": 64,
+            "automatic_steps": {
+              "max": 193,
+              "mean": 83.265625,
+              "min": 28,
+              "p50": 79,
+              "p95": 158
+            },
+            "jobs": 64,
+            "mps_converged": 64,
+            "mps_steps": {
+              "max": 193,
+              "mean": 84.484375,
+              "min": 28,
+              "p50": 81,
+              "p95": 163
+            }
+          }
+        },
+        "mps": 256,
+        "mps_steps": {
+          "max": 323,
+          "mean": 91.546875,
+          "min": 9,
+          "p50": 83,
+          "p95": 191
+        }
+      },
+      "coverage": {
+        "automatic_job_count": 256,
+        "base_unique_sources": 256,
+        "mps_job_count": 256,
+        "mps_unique_sources": 256,
+        "same_source_multiset": true
+      },
+      "execution": {
+        "automatic_batch_sizes": [
+          34,
+          33,
+          33,
+          33,
+          39,
+          39,
+          38,
+          7
+        ],
+        "automatic_execution_chunks": 8,
+        "automatic_model_evaluations": 2031,
+        "automatic_resident_chunks": 3,
+        "mps_model_evaluations": 23692
+      },
+      "gates": {
+        "automatic_api_faster_than_mps_production": true,
+        "automatic_convergence_not_below_mps": true,
+        "automatic_external_process_faster_than_mps": false,
+        "automatic_memory_at_most_85_percent": true,
+        "automatic_production_faster_than_mps": true,
+        "same_job_coverage": true
+      },
+      "jobs": 256,
+      "manifest_sha256": "a3a76ce39992f2bd64bb211ff99053b7515bafd0168ce15c5750ce83a1dc06eb",
+      "memory": {
+        "automatic_conservative_peak_bytes": 11316232192,
+        "automatic_conservative_peak_fraction": 0.13310413406615432,
+        "automatic_parent_probe_peak_reserved_bytes": 1948254208,
+        "automatic_worker_peak_reserved_bytes": 9367977984,
+        "gpu_total_bytes": 85017886720,
+        "mps_peak_sampled_device_bytes": 7570718720
+      },
+      "pool_size": 256,
+      "raw_sha256": {
+        "automatic": "e6cd6acdc6fdb0831abcdb31b522001ec50f491c797289e75f723d4c005a907a",
+        "mps_gpu_0": "94120ce7f335785cbcafb65cc9ecb25a2688646eac8be4dfe9e4226cfd6333e4",
+        "mps_gpu_1": "68b08ea67cdd5b67c02bddc37723d46e58603d529865e161eb30987b3668f7fe",
+        "mps_gpu_2": "4b47282292bdd00c12f4b5833504666e067fbd0273928117d347e335a2db9a06",
+        "mps_gpu_3": "89464278bffbeb36f0e521262619d533b8fcc05ad6642ad8476e1c1537d8855c"
+      },
+      "speedup_over_mps": {
+        "automatic_api": 2.2708432610995364,
+        "automatic_external_process": 0.6820963673173175,
+        "automatic_production": 2.9354216058436853
+      },
+      "throughput": {
+        "automatic_api_atoms_per_second": 691.3292380748021,
+        "automatic_api_systems_per_second": 5.963751346109629,
+        "automatic_production_atoms_per_second": 893.6516301938094,
+        "automatic_production_systems_per_second": 7.709085366276291,
+        "mps_production_atoms_per_second": 304.437232598811,
+        "mps_production_systems_per_second": 2.626227643391819
+      },
+      "timing_seconds": {
+        "automatic_api": 42.92600162932649,
+        "automatic_external_process": 193.080039083,
+        "automatic_production": 33.20757104596123,
+        "mps_external_process": 131.69919326,
+        "mps_production": 97.47822152590379
+      },
+      "total_atoms": 29676
+    },
+    {
+      "convergence": {
+        "automatic": 1024,
+        "automatic_steps": {
+          "max": 464,
+          "mean": 91.951171875,
+          "min": 9,
+          "p50": 79,
+          "p95": 200
+        },
+        "families": {
+          "AXOSOW": {
+            "automatic_converged": 256,
+            "automatic_steps": {
+              "max": 424,
+              "mean": 92.484375,
+              "min": 9,
+              "p50": 77,
+              "p95": 191
+            },
+            "jobs": 256,
+            "mps_converged": 256,
+            "mps_steps": {
+              "max": 434,
+              "mean": 92.21484375,
+              "min": 9,
+              "p50": 76,
+              "p95": 192
+            }
+          },
+          "BOQQUT": {
+            "automatic_converged": 256,
+            "automatic_steps": {
+              "max": 268,
+              "mean": 84.015625,
+              "min": 21,
+              "p50": 76,
+              "p95": 178
+            },
+            "jobs": 256,
+            "mps_converged": 256,
+            "mps_steps": {
+              "max": 268,
+              "mean": 82.1328125,
+              "min": 21,
+              "p50": 76,
+              "p95": 173
+            }
+          },
+          "WICZUF": {
+            "automatic_converged": 256,
+            "automatic_steps": {
+              "max": 464,
+              "mean": 105.1875,
+              "min": 20,
+              "p50": 90,
+              "p95": 287
+            },
+            "jobs": 256,
+            "mps_converged": 256,
+            "mps_steps": {
+              "max": 446,
+              "mean": 102.9140625,
+              "min": 20,
+              "p50": 90,
+              "p95": 286
+            }
+          },
+          "XAFPAY": {
+            "automatic_converged": 256,
+            "automatic_steps": {
+              "max": 305,
+              "mean": 86.1171875,
+              "min": 27,
+              "p50": 81,
+              "p95": 172
+            },
+            "jobs": 256,
+            "mps_converged": 256,
+            "mps_steps": {
+              "max": 230,
+              "mean": 85.55078125,
+              "min": 27,
+              "p50": 83,
+              "p95": 166
+            }
+          }
+        },
+        "mps": 1024,
+        "mps_steps": {
+          "max": 446,
+          "mean": 90.703125,
+          "min": 9,
+          "p50": 79,
+          "p95": 195
+        }
+      },
+      "coverage": {
+        "automatic_job_count": 1024,
+        "base_unique_sources": 1024,
+        "mps_job_count": 1024,
+        "mps_unique_sources": 1024,
+        "same_source_multiset": true
+      },
+      "execution": {
+        "automatic_batch_sizes": [
+          256,
+          177,
+          164,
+          83,
+          82,
+          111,
+          111,
+          40
+        ],
+        "automatic_execution_chunks": 8,
+        "automatic_model_evaluations": 2677,
+        "automatic_resident_chunks": 6,
+        "mps_model_evaluations": 93904
+      },
+      "gates": {
+        "automatic_api_faster_than_mps_production": true,
+        "automatic_convergence_not_below_mps": true,
+        "automatic_external_process_faster_than_mps": true,
+        "automatic_memory_at_most_85_percent": true,
+        "automatic_production_faster_than_mps": true,
+        "same_job_coverage": true
+      },
+      "jobs": 1024,
+      "manifest_sha256": "f739fabb4aa3a4a57d471e80979092021a1238344934dfd2940c86a26a7bfd2f",
+      "memory": {
+        "automatic_conservative_peak_bytes": 49069162496,
+        "automatic_conservative_peak_fraction": 0.5771628111341509,
+        "automatic_parent_probe_peak_reserved_bytes": 2178940928,
+        "automatic_worker_peak_reserved_bytes": 46890221568,
+        "gpu_total_bytes": 85017886720,
+        "mps_peak_sampled_device_bytes": 7629438976
+      },
+      "pool_size": 1024,
+      "raw_sha256": {
+        "automatic": "89ec2cb5692e6d3f93c90885386973ad6a88fbef97fe63ba2e90aaa7e2a0fe36",
+        "mps_gpu_0": "3bc77ff2625b7fbba9bd3fa4cfea498e57b6d7bfd38f660d84d693420e654850",
+        "mps_gpu_1": "de76de9687559c55012f58edb6bdcbe1c104307a45be1454c13f76b551fc3e6e",
+        "mps_gpu_2": "162de744b72a795596b679caa020f2dfff2e0f0ead8f975113b9fdbb49826e17",
+        "mps_gpu_3": "fa4f126559023e63e625e1e6710b79b7cc38190506d27deb562e46eaa4b67a6f"
+      },
+      "speedup_over_mps": {
+        "automatic_api": 3.0001949859055754,
+        "automatic_external_process": 1.143111992517,
+        "automatic_production": 3.386484523888605
+      },
+      "throughput": {
+        "automatic_api_atoms_per_second": 1182.8361129053324,
+        "automatic_api_systems_per_second": 9.964002793806024,
+        "automatic_production_atoms_per_second": 1335.1319529125205,
+        "automatic_production_systems_per_second": 11.246916089029458,
+        "mps_production_atoms_per_second": 394.2530797038535,
+        "mps_production_systems_per_second": 3.3211184075086044
+      },
+      "timing_seconds": {
+        "automatic_api": 102.7699430831708,
+        "automatic_external_process": 298.880819886,
+        "automatic_production": 91.04718056879938,
+        "mps_external_process": 341.654249545,
+        "mps_production": 308.3298679399304
+      },
+      "total_atoms": 121560
+    }
+  ],
+  "comparison": "frozen automatic BatchExecutor versus four ASE CUDA MPS workers per GPU",
+  "schema_version": 1,
+  "status": "complete"
+}
