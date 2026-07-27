@@ -137,7 +137,11 @@ def test_parallel_chunks_preserve_full_batches_when_devices_are_occupied():
         config,
     )
 
-    chunks = _parallel_deterministic_chunks(plan, device_count=2)
+    chunks = _parallel_deterministic_chunks(
+        plan,
+        device_count=2,
+        target_chunks_per_device=2,
+    )
 
     assert len(plan.chunks) == 4
     assert [len(chunk.indices) for chunk in chunks] == [2, 2, 2, 2]
@@ -166,7 +170,11 @@ def test_parallel_chunks_add_only_minimum_parts_for_idle_devices():
         config,
     )
 
-    chunks = _parallel_deterministic_chunks(plan, device_count=4)
+    chunks = _parallel_deterministic_chunks(
+        plan,
+        device_count=4,
+        target_chunks_per_device=1,
+    )
 
     assert len(plan.chunks) == 2
     assert len(chunks) == 4
@@ -203,7 +211,11 @@ def test_parallel_chunks_split_only_enough_to_occupy_devices():
         ),
     )
 
-    chunks = _parallel_deterministic_chunks(plan, device_count=4)
+    chunks = _parallel_deterministic_chunks(
+        plan,
+        device_count=4,
+        target_chunks_per_device=1,
+    )
 
     assert len(chunks) == 4
     assert [len(chunk.indices) for chunk in chunks] == [2] * 4
@@ -239,7 +251,11 @@ def test_parallel_chunks_preserve_heterogeneous_resident_batches():
         ),
     )
 
-    chunks = _parallel_deterministic_chunks(plan, device_count=4)
+    chunks = _parallel_deterministic_chunks(
+        plan,
+        device_count=4,
+        target_chunks_per_device=1,
+    )
 
     assert len(chunks) == 4
     assert [len(chunk.indices) for chunk in chunks] == [2] * 4
@@ -341,8 +357,8 @@ def test_multi_device_auto_shards_deterministic_chunks_without_autotuning():
         "minimum_parts_for_device_occupancy"
     )
     assert schedule["resident_plan_chunk_count"] == 1
-    assert schedule["execution_chunk_count"] == 2
-    assert len(schedule["planned_chunks"]) == 2
+    assert schedule["execution_chunk_count"] == 4
+    assert len(schedule["planned_chunks"]) == 4
     assert sum(
         chunk["system_count"] for chunk in schedule["planned_chunks"]
     ) == len(systems)

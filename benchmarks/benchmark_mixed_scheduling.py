@@ -46,10 +46,16 @@ from batch_mlip import (  # noqa: E402
 from batch_mlip.workloads import read_workload_manifest  # noqa: E402
 
 
-def load_signed_systems(manifest_path: Path, dataset_dir: Path):
+def load_signed_systems(
+    manifest_path: Path,
+    dataset_dir: Path,
+    *,
+    job_limit: int | None = None,
+):
     manifest = read_workload_manifest(manifest_path)
     systems = []
-    for job in manifest.jobs:
+    jobs = manifest.jobs if job_limit is None else manifest.jobs[:job_limit]
+    for job in jobs:
         atoms = read(dataset_dir / job.source_path, index=job.frame_index)
         atoms.info["benchmark_source"] = job.system_id
         atoms.info["benchmark_source_path"] = job.source_path

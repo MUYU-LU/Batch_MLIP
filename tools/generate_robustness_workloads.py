@@ -35,6 +35,9 @@ def main() -> None:
         default=Path("runs/robustness/workloads"),
     )
     parser.add_argument("--seed", type=int, default=20260725)
+    parser.add_argument("--candidate-count", type=int, default=256)
+    parser.add_argument("--unique-structures", type=int, default=32)
+    parser.add_argument("--pool-size", type=int, default=256)
     parser.add_argument(
         "--skip-defaults",
         action="store_true",
@@ -45,13 +48,24 @@ def main() -> None:
         action="append",
         default=[],
         metavar="LABEL:FAMILY:ATOM_COUNT",
-        help="add a homogeneous family using the same signed R256 protocol",
+        help="add a homogeneous family using the configured signed protocol",
     )
     args = parser.parse_args()
+    if (
+        args.candidate_count <= 0
+        or args.unique_structures <= 0
+        or args.pool_size <= 0
+    ):
+        parser.error("candidate, unique-structure, and pool counts must be positive")
+    if args.unique_structures > args.candidate_count:
+        parser.error("unique structures cannot exceed candidate count")
 
     inputs = RobustnessWorkloadInputs(
         dataset_dir=args.dataset_dir,
         seed=args.seed,
+        candidate_count=args.candidate_count,
+        unique_structures=args.unique_structures,
+        pool_size=args.pool_size,
     )
     manifests = {} if args.skip_defaults else build_robustness_workloads(inputs)
     for specification in args.additional_family:
@@ -79,8 +93,9 @@ def main() -> None:
         "dataset_dir": str(args.dataset_dir),
         "selection_seed": args.seed,
         "selection": (
-            "32 unique structures selected from 256 deterministic candidates "
-            "uniformly across 6 A directed-edge density"
+            f"{args.unique_structures} unique structures selected from "
+            f"{args.candidate_count} deterministic candidates uniformly "
+            "across 6 A directed-edge density"
         ),
         "workloads": {},
     }

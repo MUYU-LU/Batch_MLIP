@@ -131,6 +131,16 @@ def main() -> None:
         help="Use unmodified AutoSchedulerConfig capacity defaults.",
     )
     parser.add_argument(
+        "--memory-growth-margin",
+        type=float,
+        help="Override the analytical memory-growth margin for calibration.",
+    )
+    parser.add_argument(
+        "--target-chunks-per-device",
+        type=int,
+        help="Override the pending work-stealing depth for calibration.",
+    )
+    parser.add_argument(
         "--cold-start-jobs",
         type=int,
         default=AutoSchedulerConfig().multi_gpu_cold_start_jobs,
@@ -165,6 +175,16 @@ def main() -> None:
         parser.error("job limit must be positive")
     if args.cold_start_jobs <= 0:
         parser.error("cold-start jobs must be positive")
+    if (
+        args.target_chunks_per_device is not None
+        and args.target_chunks_per_device <= 0
+    ):
+        parser.error("target chunks per device must be positive")
+    if (
+        args.memory_growth_margin is not None
+        and args.memory_growth_margin < 1.0
+    ):
+        parser.error("memory-growth margin must be at least one")
     if args.clear_cache:
         args.cache_path.unlink(missing_ok=True)
 
@@ -195,9 +215,8 @@ def main() -> None:
     manifest, systems = load_signed_systems(
         args.workload_manifest,
         args.dataset_dir,
+        job_limit=args.job_limit,
     )
-    if args.job_limit is not None:
-        systems = systems[: args.job_limit]
     jobs = len(systems)
     atoms = sum(len(system) for system in systems)
     primary_device = torch.device(devices[0])
@@ -245,6 +264,12 @@ def main() -> None:
                 "initial_batch_size": args.resident_batch_size,
                 "max_batch_size": args.resident_batch_size,
             }
+        )
+    if args.memory_growth_margin is not None:
+        config_options["memory_growth_margin"] = args.memory_growth_margin
+    if args.target_chunks_per_device is not None:
+        config_options["multi_gpu_target_chunks_per_device"] = (
+            args.target_chunks_per_device
         )
     config = AutoSchedulerConfig(
         **config_options,
@@ -345,6 +370,10 @@ def main() -> None:
             None if args.automatic_capacity else args.resident_batch_size
         ),
         "automatic_capacity": args.automatic_capacity,
+        "memory_growth_margin_override": args.memory_growth_margin,
+        "target_chunks_per_device_override": (
+            args.target_chunks_per_device
+        ),
         "cold_start_jobs": args.cold_start_jobs,
         "fmax_eV_per_A": args.fmax,
         "max_steps": max_steps,

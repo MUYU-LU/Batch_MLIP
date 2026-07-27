@@ -410,6 +410,9 @@ class BatchExecutor:
         pending_chunks = _parallel_deterministic_chunks(
             plan,
             device_count=len(self.devices),
+            target_chunks_per_device=(
+                config.multi_gpu_target_chunks_per_device
+            ),
         )
         planning_seconds = time.perf_counter() - planning_started
 
@@ -497,6 +500,12 @@ class BatchExecutor:
             "parallel_chunk_policy": _parallel_deterministic_chunk_policy(
                 plan,
                 device_count=len(self.devices),
+                target_chunks_per_device=(
+                    config.multi_gpu_target_chunks_per_device
+                ),
+            ),
+            "target_chunks_per_device": (
+                config.multi_gpu_target_chunks_per_device
             ),
             "resident_plan_chunk_count": len(plan.chunks),
             "execution_chunk_count": len(pending_chunks),

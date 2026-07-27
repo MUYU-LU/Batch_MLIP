@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "status": "complete",
+  "dataset_root": "/public/home/lmy/Batch_imple_project/test_set",
+  "families": [
+    "GUFJOG44",
+    "SOXLEX48",
+    "XATMOV88",
+    "OBEQIX220",
+    "ROFA-MIX",
+    "ROFB296"
+  ],
+  "synthetic_repetition": false,
+  "family_jobs": 512,
+  "mixed_jobs": 3072,
+  "full_relaxation_jobs": 768,
+  "memory_calibration": {
+    "baseline_margin": 1.25,
+    "selected_margin": 1.1,
+    "selected_margin_family_reserved_to_budget": {
+      "GUFJOG44": 0.32787114929204175,
+      "SOXLEX48": 0.30002195490368994,
+      "XATMOV88": 0.8060042975258127,
+      "OBEQIX220": 0.7797508062268057,
+      "ROFA-MIX": 0.7368849824438627,
+      "ROFB296": 0.7733863265356998
+    },
+    "selected_margin_worst_reserved_to_budget": 0.8060042975258127,
+    "mixed_3072_reserved_to_budget": 0.8057302826951125
+  },
+  "work_stealing_calibration": {
+    "selected_target_chunks_per_device": 2,
+    "points": [
+      {
+        "target_chunks_per_device": 1,
+        "execution_chunks": 4,
+        "api_wall_seconds": 98.5669371150434,
+        "production_wall_seconds": 88.17466941615567,
+        "peak_reserved_gib": 50.849609375,
+        "model_evaluations": 958,
+        "converged": 768
+      },
+      {
+        "target_chunks_per_device": 2,
+        "execution_chunks": 8,
+        "api_wall_seconds": 68.50489739188924,
+        "production_wall_seconds": 58.173227954190224,
+        "peak_reserved_gib": 18.9765625,
+        "model_evaluations": 1781,
+        "converged": 768
+      },
+      {
+        "target_chunks_per_device": 3,
+        "execution_chunks": 12,
+        "api_wall_seconds": 77.41823227517307,
+        "production_wall_seconds": 67.58332033501938,
+        "peak_reserved_gib": 13.09765625,
+        "model_evaluations": 2732,
+        "converged": 768
+      }
+    ],
+    "depth_two_production_speedup_over_depth_one": 1.5157259192422798,
+    "depth_two_production_speedup_over_depth_three": 1.16175984575309
+  }
+}

@@ -1095,11 +1095,14 @@ def _parallel_deterministic_chunks(
     plan: DeterministicRelaxationPlan,
     *,
     device_count: int,
+    target_chunks_per_device: int,
 ) -> list[_PendingAutoChunk]:
-    """Expose per-device safe batches without unnecessarily subdividing them."""
+    """Expose safe batches with enough tasks to absorb convergence tails."""
 
     if device_count <= 0:
         raise ValueError("device_count must be positive")
+    if target_chunks_per_device <= 0:
+        raise ValueError("target_chunks_per_device must be positive")
     profiles = {profile.index: profile for profile in plan.workload.profiles}
     system_costs = {
         index: (
@@ -1110,7 +1113,7 @@ def _parallel_deterministic_chunks(
     system_count = sum(len(chunk.system_indices) for chunk in plan.chunks)
     target_part_count = max(
         len(plan.chunks),
-        min(device_count, system_count),
+        min(device_count * target_chunks_per_device, system_count),
     )
     part_counts = [1] * len(plan.chunks)
     for _ in range(target_part_count - len(plan.chunks)):
@@ -1176,13 +1179,20 @@ def _parallel_deterministic_chunk_policy(
     plan: DeterministicRelaxationPlan,
     *,
     device_count: int,
+    target_chunks_per_device: int,
 ) -> str:
     """Describe whether memory-safe chunks require extra device subdivision."""
 
     system_count = sum(len(chunk.system_indices) for chunk in plan.chunks)
-    required_parts = min(device_count, system_count)
-    if len(plan.chunks) >= required_parts:
+    occupancy_parts = min(device_count, system_count)
+    target_parts = min(
+        device_count * target_chunks_per_device,
+        system_count,
+    )
+    if len(plan.chunks) >= target_parts:
         return "resident_chunks_work_stealing"
+    if len(plan.chunks) >= occupancy_parts:
+        return "minimum_parts_for_work_stealing"
     return "minimum_parts_for_device_occupancy"
 
 
@@ -1222,6 +1232,7 @@ def _execute_multi_device_deterministic_relaxation(
     chunks = _parallel_deterministic_chunks(
         plan,
         device_count=len(devices),
+        target_chunks_per_device=config.multi_gpu_target_chunks_per_device,
     )
     worker_count = min(len(devices), len(chunks))
     worker_devices = devices[:worker_count]
@@ -1445,6 +1456,12 @@ def _execute_multi_device_deterministic_relaxation(
         "parallel_chunk_policy": _parallel_deterministic_chunk_policy(
             plan,
             device_count=len(devices),
+            target_chunks_per_device=(
+                config.multi_gpu_target_chunks_per_device
+            ),
+        ),
+        "target_chunks_per_device": (
+            config.multi_gpu_target_chunks_per_device
         ),
         "resident_plan_chunk_count": len(plan.chunks),
         "execution_chunk_count": len(chunks),

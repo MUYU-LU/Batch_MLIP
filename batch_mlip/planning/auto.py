@@ -44,7 +44,7 @@ class AutoSchedulerConfig:
     max_cost_ratio: float = 2.0
     min_throughput_improvement: float = 0.05
     memory_safety_fraction: float = 0.85
-    memory_growth_margin: float = 1.25
+    memory_growth_margin: float = 1.10
     memory_probe_batch_size: int = 4
     memory_budget_bytes: int | None = None
     dense_optimizer_tensor_multiplier: float = 16.0
@@ -60,6 +60,7 @@ class AutoSchedulerConfig:
     multi_gpu_worker_backend: Literal["auto", "process", "thread"] = "auto"
     multi_gpu_process_cpu_threads: int = 1
     multi_gpu_process_min_chunks_per_device: int = 8
+    multi_gpu_target_chunks_per_device: int = 2
     cuda_allocator_policy: Literal[
         "auto", "native", "expandable_segments"
     ] = "auto"
@@ -81,6 +82,10 @@ class AutoSchedulerConfig:
         _positive_int(
             "multi_gpu_process_min_chunks_per_device",
             self.multi_gpu_process_min_chunks_per_device,
+        )
+        _positive_int(
+            "multi_gpu_target_chunks_per_device",
+            self.multi_gpu_target_chunks_per_device,
         )
         _positive_int(
             "near_frontier_growth_factor",

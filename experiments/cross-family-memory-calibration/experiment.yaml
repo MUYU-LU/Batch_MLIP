@@ -1,0 +1,105 @@
+id: cross-family-memory-calibration
+date: 2026-07-27
+baseline_commit: 77fae4a5cb47f55391682d77904b01064c9a61b8
+hypothesis: >-
+  The resident-chunk work-stealing rule remains memory-safe across independent
+  crystal families, and the ratio of observed to predicted peak memory is
+  sufficiently consistent that a generic safety coefficient can be retained
+  or recalibrated without using T2-specific parameters.
+dataset:
+  root: /public/home/lmy/Batch_imple_project/test_set
+  selection_seed: 20260727
+  synthetic_repetition: false
+  distinct_structures_per_family: 512
+  families:
+    - label: GUFJOG44
+      source: GUFJOG
+      atom_counts: [44]
+    - label: SOXLEX48
+      source: SOXLEX
+      atom_counts: [48]
+    - label: XATMOV88
+      source: XATMOV
+      atom_counts: [88]
+    - label: OBEQIX220
+      source: OBEQIX
+      atom_counts: [220]
+    - label: ROFA-MIX
+      source: rof-a
+      atom_counts: [74, 148, 222, 296]
+    - label: ROFB296
+      source: rof-b
+      atom_counts: [296]
+configuration:
+  mlip: AtomBit smooth_rms fp32
+  optimizer: BFGS
+  optimizer_dtype: float64
+  linear_algebra_backend: auto
+  variable_cell: FrechetCellFilter
+  cutoff_A: 6.0
+  skin_A: 0.5
+  neighbor_backend: auto
+  fmax_eV_per_A: 0.05
+  alpha_eV_per_A2: 70.0
+  max_step_A: 0.2
+  deterministic_algorithms: true
+scheduler:
+  capacity_overrides: none
+  memory_fraction: 0.85
+  baseline_memory_growth_margin: 1.25
+  selected_memory_growth_margin: 1.10
+  max_batch_size: 256
+  selected_target_chunks_per_device: 2
+  optimization_pilot_runs: 0
+  active_compaction: true
+  active_refill: false
+phases:
+  - name: family_memory
+    jobs_per_family: 512
+    max_steps: 1
+    devices_per_family: 1
+    concurrent_families: 6
+    purpose: isolate predicted and observed memory by family
+  - name: mixed_memory
+    jobs: 3072
+    max_steps: 1
+    devices: [cuda:0, cuda:1, cuda:2, cuda:3]
+    purpose: validate multi-GPU heterogeneous dispatch
+  - name: mixed_full_relaxation
+    jobs: 768
+    selection: first 128 signed jobs per family in round-robin mixed manifest
+    max_steps: 500
+    devices: [cuda:0, cuda:1, cuda:2, cuda:3]
+    purpose: validate sustained execution and convergence
+metrics:
+  - predicted_peak_bytes
+  - peak_allocated_bytes
+  - peak_reserved_bytes
+  - predicted_to_reserved_ratio
+  - wall_seconds
+  - systems_per_second
+  - execution_batch_sizes
+  - convergence
+decision:
+  memory_growth_margin: >-
+    Select 1.10: all six independent families remained below 80.6 percent of
+    the planner's 85 percent device-memory budget.
+  work_stealing_depth: >-
+    Select two chunks per GPU: on the identical 768-job mixed relaxation,
+    production time was 88.17 seconds at depth one, 58.17 seconds at depth
+    two, and 67.58 seconds at depth three.
+limitations:
+  - One timing trial per point, as requested; no uncertainty interval.
+  - Calibration covers AtomBit BFGS on H100 GPUs, not MACE or other hardware.
+  - All 768 jobs converged at every depth, but this experiment does not claim
+    bitwise-identical final tensors across different batch partitions.
+artifacts:
+  signed_manifest_hashes: workloads/index.json
+  family_profiles: workloads/profiles
+  raw_results: results
+  generated_manifests: >-
+    Retained on the compute host under this experiment path and reproducible
+    with tools/generate_robustness_workloads.py; omitted from Git to avoid
+    approximately 28 MB of duplicate JSON and CSV.
+timing_repeats: 1
+status: complete

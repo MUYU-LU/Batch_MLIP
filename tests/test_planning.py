@@ -26,6 +26,20 @@ from batch_mlip import (
 )
 
 
+def test_auto_scheduler_uses_cross_family_calibrated_defaults():
+    config = AutoSchedulerConfig()
+
+    assert config.memory_safety_fraction == 0.85
+    assert config.memory_growth_margin == 1.10
+    assert config.multi_gpu_target_chunks_per_device == 2
+
+    with pytest.raises(
+        ValueError,
+        match="multi_gpu_target_chunks_per_device must be a positive integer",
+    ):
+        AutoSchedulerConfig(multi_gpu_target_chunks_per_device=0)
+
+
 def test_memory_calibration_recovers_synthetic_peak_model():
     expected = MemoryCoefficients(
         fixed_bytes=1_000_000.0,
