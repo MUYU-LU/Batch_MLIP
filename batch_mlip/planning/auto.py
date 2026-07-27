@@ -34,7 +34,7 @@ def _positive_int(name: str, value: int) -> None:
 
 @dataclass(frozen=True)
 class AutoSchedulerConfig:
-    """Controls internal autotuning; normal users can keep every default."""
+    """Controls deterministic scheduling and explicit experimental autotuning."""
 
     cache_path: str | Path | None = None
     cache_enabled: bool = True
@@ -45,6 +45,9 @@ class AutoSchedulerConfig:
     min_throughput_improvement: float = 0.05
     memory_safety_fraction: float = 0.85
     memory_growth_margin: float = 1.25
+    memory_probe_batch_size: int = 4
+    memory_budget_bytes: int | None = None
+    dense_optimizer_tensor_multiplier: float = 16.0
     near_frontier_budget_fraction: float = 0.20
     near_frontier_growth_factor: int = 2
     stop_growth_budget_fraction: float = 0.65
@@ -65,6 +68,7 @@ class AutoSchedulerConfig:
         _positive_int("initial_batch_size", self.initial_batch_size)
         _positive_int("growth_factor", self.growth_factor)
         _positive_int("max_batch_size", self.max_batch_size)
+        _positive_int("memory_probe_batch_size", self.memory_probe_batch_size)
         _positive_int("refill_min_capacity", self.refill_min_capacity)
         _positive_int(
             "multi_gpu_cold_start_jobs",
@@ -114,6 +118,15 @@ class AutoSchedulerConfig:
             or self.memory_growth_margin < 1.0
         ):
             raise ValueError("memory_growth_margin must be at least one")
+        if self.memory_budget_bytes is not None:
+            _positive_int("memory_budget_bytes", self.memory_budget_bytes)
+        if (
+            not math.isfinite(self.dense_optimizer_tensor_multiplier)
+            or self.dense_optimizer_tensor_multiplier < 1.0
+        ):
+            raise ValueError(
+                "dense_optimizer_tensor_multiplier must be at least one"
+            )
         if (
             not math.isfinite(self.near_frontier_budget_fraction)
             or not 0.0 < self.near_frontier_budget_fraction < 1.0

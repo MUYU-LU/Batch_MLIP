@@ -79,7 +79,7 @@ class _ExecutorWorkerRunner:
             task.systems,
             self.calculator,
             optimizer=task.optimizer.create(),
-            scheduling="auto",
+            scheduling="autotune",
             auto_config=task.config,
             **task.optimizer_kwargs,
         )

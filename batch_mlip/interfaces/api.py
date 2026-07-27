@@ -39,6 +39,15 @@ from ..planning.auto import (
     AutoBatchObservation,
     AutoScheduler,
     AutoSchedulerConfig,
+    profile_auto_workload,
+)
+from ..planning.deterministic import (
+    DeterministicMemoryProbe,
+    DeterministicRelaxationChunk,
+    DeterministicRelaxationPlan,
+    plan_deterministic_relaxation,
+    profile_model_work,
+    select_probe_indices,
 )
 from ..planning.execution import (
     RelaxationSchedule,
@@ -79,7 +88,7 @@ def relax(
     calculator: BatchCalculator,
     *,
     optimizer: str | BatchOptimizer = "fire",
-    scheduling: Literal["single_batch", "auto"] = "single_batch",
+    scheduling: Literal["single_batch", "auto", "autotune"] | None = None,
     planner: BatchPlanner | None = None,
     pilot: OptimizationPilot | None = None,
     policy: TaskAwarePolicy | None = None,
@@ -90,9 +99,10 @@ def relax(
 ) -> RelaxationResult:
     """Relax structures directly or through an automatic execution schedule.
 
-    With no planner or pilot, ``scheduling="auto"`` profiles and tunes
-    production chunks internally. Supplying a planner retains the explicit
-    reproducible scheduling paths used by controlled experiments.
+    With no planner or pilot, ``scheduling="auto"`` profiles the workload and
+    packs production chunks to a deterministic memory budget. The experimental
+    timing-based controller remains available as ``scheduling="autotune"``.
+    Supplying a planner retains the explicit reproducible scheduling paths.
     """
 
     resolved = create_optimizer(optimizer) if isinstance(optimizer, str) else optimizer
@@ -102,11 +112,13 @@ def relax(
         )
     normalized = _normalize_systems(systems)
     resolved_devices = _normalize_devices(devices)
-    if resolved_devices and scheduling != "auto":
-        raise ValueError("devices are only used with scheduling='auto'")
+    if scheduling is None:
+        scheduling = "auto" if resolved_devices else "single_batch"
+    if resolved_devices and scheduling not in ("auto", "autotune"):
+        raise ValueError("devices are only used with automatic scheduling")
     if resolved_devices and resolved_devices[0] != calculator.device:
         calculator = calculator.clone_to(resolved_devices[0])
-    if scheduling == "auto":
+    if scheduling in ("auto", "autotune"):
         if calculator.cutoff is None:
             raise ValueError("automatic scheduling requires a calculator cutoff")
         if optimizer_kwargs.get("refill_batch_size") is not None:
@@ -114,6 +126,7 @@ def relax(
                 "automatic scheduling controls refill_batch_size; do not set it"
             )
         capabilities = resolved.capabilities()
+        config = auto_config or AutoSchedulerConfig()
         if resolved_devices:
             if planner is not None or pilot is not None or policy is not None:
                 raise ValueError(
@@ -124,14 +137,22 @@ def relax(
                 raise ValueError(
                     "multi-GPU automatic scheduling profiles the workload internally"
                 )
-            config = auto_config or AutoSchedulerConfig()
-            if not config.cache_enabled:
+            if scheduling == "autotune" and not config.cache_enabled:
                 raise ValueError(
                     "multi-GPU cold-start coordination requires the policy cache"
                 )
             options = dict(optimizer_kwargs)
             if getattr(capabilities, "active_compaction", False):
                 options.setdefault("active_compaction", True)
+            if scheduling == "auto":
+                return _execute_multi_device_deterministic_relaxation(
+                    normalized,
+                    calculator,
+                    resolved,
+                    resolved_devices,
+                    config,
+                    options,
+                )
             return _execute_multi_device_auto_relaxation(
                 normalized,
                 calculator,
@@ -152,6 +173,14 @@ def relax(
             options = dict(optimizer_kwargs)
             if getattr(capabilities, "active_compaction", False):
                 options.setdefault("active_compaction", True)
+            if scheduling == "auto":
+                return _execute_deterministic_relaxation(
+                    normalized,
+                    calculator,
+                    resolved,
+                    config,
+                    options,
+                )
             scheduler = AutoScheduler(
                 calculator,
                 resolved,
@@ -165,6 +194,10 @@ def relax(
                 resolved,
                 scheduler,
                 options,
+            )
+        if scheduling == "autotune":
+            raise ValueError(
+                "scheduling='autotune' does not accept an explicit planner"
             )
         if auto_config is not None:
             raise ValueError(
@@ -480,6 +513,212 @@ def _execute_relaxation_schedule(
     return result
 
 
+def _device_memory_budget(
+    device: torch.device,
+    config: AutoSchedulerConfig,
+) -> int | None:
+    if config.memory_budget_bytes is not None:
+        return config.memory_budget_bytes
+    if device.type != "cuda":
+        return None
+    with torch.cuda.device(device):
+        free_bytes, total_bytes = torch.cuda.mem_get_info(device)
+        current_allocated = torch.cuda.memory_allocated(device)
+    return min(
+        int(total_bytes * config.memory_safety_fraction),
+        current_allocated + int(free_bytes * config.memory_safety_fraction),
+    )
+
+
+def _measure_representative_memory(
+    systems: list[Atoms],
+    calculator: BatchCalculator,
+    optimizer_kwargs: dict[str, Any],
+    workload: Any,
+    config: AutoSchedulerConfig,
+) -> DeterministicMemoryProbe:
+    """Measure one representative forward; never run an optimizer trial."""
+
+    device = calculator.device
+    probe_indices = select_probe_indices(
+        workload,
+        probe_batch_size=config.memory_probe_batch_size,
+    )
+    probe_work = sum(
+        profile_model_work(workload.profiles[index]) for index in probe_indices
+    )
+    memory_budget = _device_memory_budget(device, config)
+    if device.type != "cuda":
+        return DeterministicMemoryProbe(
+            memory_budget_bytes=memory_budget,
+            baseline_allocated_bytes=0,
+            peak_allocated_bytes=None,
+            peak_reserved_bytes=None,
+            probe_indices=(),
+            probe_model_work=0,
+            model_bytes_per_work=0.0,
+        )
+
+    compute_stress = optimizer_kwargs.get("cell_filter") is not None
+    with torch.cuda.device(device):
+        torch.cuda.synchronize(device)
+        torch.cuda.empty_cache()
+        baseline_allocated = torch.cuda.memory_allocated(device)
+        torch.cuda.reset_peak_memory_stats(device)
+        probe_state = calculator.create_state(
+            [systems[index] for index in probe_indices]
+        )
+        probe_evaluation = calculator(
+            probe_state,
+            compute_stress=compute_stress,
+        )
+        torch.cuda.synchronize(device)
+        peak_allocated = torch.cuda.max_memory_allocated(device)
+        peak_reserved = torch.cuda.max_memory_reserved(device)
+    if memory_budget is not None and peak_allocated > memory_budget:
+        raise MemoryError(
+            "the representative model forward exceeds the configured "
+            f"{memory_budget}-byte device budget"
+        )
+    incremental = max(1, peak_allocated - baseline_allocated)
+    model_bytes_per_work = incremental / max(1, probe_work)
+    del probe_evaluation, probe_state
+    _empty_device_cache(device)
+    return DeterministicMemoryProbe(
+        memory_budget_bytes=memory_budget,
+        baseline_allocated_bytes=baseline_allocated,
+        peak_allocated_bytes=peak_allocated,
+        peak_reserved_bytes=peak_reserved,
+        probe_indices=probe_indices,
+        probe_model_work=probe_work,
+        model_bytes_per_work=model_bytes_per_work,
+    )
+
+
+def _deterministic_batch_metadata(
+    chunk: DeterministicRelaxationChunk,
+    result: RelaxationResult,
+    *,
+    wall_seconds: float,
+    peak_allocated_bytes: int | None,
+    peak_reserved_bytes: int | None,
+) -> dict[str, Any]:
+    return {
+        "bucket_index": chunk.bucket_index,
+        "system_count": len(chunk.system_indices),
+        "resident_capacity": len(chunk.system_indices),
+        "active_refill": False,
+        "predicted_peak_bytes": chunk.predicted_peak_bytes,
+        "peak_allocated_bytes": peak_allocated_bytes,
+        "peak_reserved_bytes": peak_reserved_bytes,
+        "wall_seconds": wall_seconds,
+        "model_evaluations": result.model_evaluations,
+    }
+
+
+def _execute_deterministic_relaxation(
+    systems: list[Atoms],
+    calculator: BatchCalculator,
+    optimizer: BatchOptimizer,
+    config: AutoSchedulerConfig,
+    optimizer_kwargs: dict[str, Any],
+) -> RelaxationResult:
+    """Execute a deterministic active-drain schedule on one device."""
+
+    total_started = time.perf_counter()
+    workload = profile_auto_workload(
+        systems,
+        calculator,
+        optimizer,
+        optimizer_kwargs,
+        config,
+    )
+    probe = _measure_representative_memory(
+        systems,
+        calculator,
+        optimizer_kwargs,
+        workload,
+        config,
+    )
+    plan = plan_deterministic_relaxation(
+        workload,
+        probe,
+        optimizer,
+        optimizer_kwargs,
+        calculator.dtype,
+        config,
+    )
+    indexed_results: list[tuple[tuple[int, ...], RelaxationResult]] = []
+    batch_metadata = []
+    for chunk in plan.chunks:
+        device = calculator.device
+        if device.type == "cuda":
+            torch.cuda.synchronize(device)
+            torch.cuda.reset_peak_memory_stats(device)
+        started = time.perf_counter()
+        result = _run_optimizer(
+            [systems[index] for index in chunk.system_indices],
+            calculator,
+            optimizer,
+            optimizer_kwargs,
+        )
+        if device.type == "cuda":
+            torch.cuda.synchronize(device)
+            peak_allocated = torch.cuda.max_memory_allocated(device)
+            peak_reserved = torch.cuda.max_memory_reserved(device)
+        else:
+            peak_allocated = None
+            peak_reserved = None
+        wall_seconds = time.perf_counter() - started
+        batch_metadata.append(
+            _deterministic_batch_metadata(
+                chunk,
+                result,
+                wall_seconds=wall_seconds,
+                peak_allocated_bytes=peak_allocated,
+                peak_reserved_bytes=peak_reserved,
+            )
+        )
+        if len(plan.chunks) > 1 and result.state.device.type == "cuda":
+            result = _offload_relaxation_result(result)
+            _empty_device_cache(device)
+        indexed_results.append((chunk.system_indices, result))
+    result = (
+        indexed_results[0][1]
+        if len(indexed_results) == 1
+        else _combine_relaxation_results(
+            indexed_results,
+            workload_size=len(systems),
+            calculator=calculator,
+        )
+    )
+    result.metadata["scheduling"] = {
+        "policy": "auto",
+        "decision": "deterministic_memory_plan",
+        "memory_fraction": plan.memory_fraction,
+        "memory_growth_margin": plan.memory_growth_margin,
+        "memory_budget_bytes": probe.memory_budget_bytes,
+        "profiling_seconds": workload.profiling_seconds,
+        "probe": {
+            "system_count": len(probe.probe_indices),
+            "system_indices": list(probe.probe_indices),
+            "model_forward_count": 1 if probe.probe_indices else 0,
+            "baseline_allocated_bytes": probe.baseline_allocated_bytes,
+            "peak_allocated_bytes": probe.peak_allocated_bytes,
+            "peak_reserved_bytes": probe.peak_reserved_bytes,
+            "model_bytes_per_work": probe.model_bytes_per_work,
+        },
+        "batches": batch_metadata,
+        "active_compaction": bool(
+            optimizer_kwargs.get("active_compaction", False)
+        ),
+        "active_refill": False,
+        "mps": False,
+        "total_seconds": time.perf_counter() - total_started,
+    }
+    return result
+
+
 def _timed_online_batch(
     systems: list[Atoms],
     calculator: BatchCalculator,
@@ -644,6 +883,7 @@ class _PendingAutoChunk:
     indices: tuple[int, ...]
     estimated_cost: float
     bucket_index: int
+    predicted_peak_bytes: int | None = None
 
 
 @dataclass
@@ -656,18 +896,32 @@ class _ProcessAutoWorkerRunner:
     config: AutoSchedulerConfig
     optimizer_kwargs: dict[str, Any]
     allocator_metadata: dict[str, Any]
+    worker_scheduling: Literal["single_batch", "auto", "autotune"] = "autotune"
 
     def __call__(self, chunk: _PendingAutoChunk) -> RelaxationResult:
+        device = self.calculator.device
+        if device.type == "cuda":
+            torch.cuda.synchronize(device)
+            torch.cuda.reset_peak_memory_stats(device)
         result = relax(
             [self.systems[index] for index in chunk.indices],
             self.calculator,
             optimizer=self.optimizer,
-            scheduling="auto",
-            auto_config=self.config,
+            scheduling=self.worker_scheduling,
+            auto_config=(
+                self.config if self.worker_scheduling != "single_batch" else None
+            ),
             **self.optimizer_kwargs,
         )
+        if device.type == "cuda":
+            torch.cuda.synchronize(device)
+            result.metadata["worker_peak_allocated_bytes"] = (
+                torch.cuda.max_memory_allocated(device)
+            )
+            result.metadata["worker_peak_reserved_bytes"] = (
+                torch.cuda.max_memory_reserved(device)
+            )
         if result.state.device.type == "cuda":
-            device = result.state.device
             torch.cuda.synchronize(device)
             result = _offload_relaxation_result(result)
             _empty_device_cache(device)
@@ -687,6 +941,7 @@ class _ProcessAutoWorkerPreparer:
     config: AutoSchedulerConfig
     optimizer_kwargs: dict[str, Any]
     allocator_plan: CudaAllocatorPlan
+    worker_scheduling: Literal["single_batch", "auto", "autotune"] = "autotune"
 
     def __call__(self, worker: TaskWorker) -> _ProcessAutoWorkerRunner:
         torch.set_num_threads(self.config.multi_gpu_process_cpu_threads)
@@ -734,6 +989,7 @@ class _ProcessAutoWorkerPreparer:
             config=self.config,
             optimizer_kwargs=self.optimizer_kwargs,
             allocator_metadata=allocator_metadata,
+            worker_scheduling=self.worker_scheduling,
         )
 
 
@@ -772,6 +1028,10 @@ def _prepare_process_workers(
     config: AutoSchedulerConfig,
     optimizer_kwargs: dict[str, Any],
     allocator_plan: CudaAllocatorPlan,
+    *,
+    worker_scheduling: Literal[
+        "single_batch", "auto", "autotune"
+    ] = "autotune",
 ) -> tuple[_ProcessAutoWorkerPreparer | None, str | None]:
     """Build and pickle-check a CPU template before production work starts."""
 
@@ -802,11 +1062,336 @@ def _prepare_process_workers(
             config=config,
             optimizer_kwargs=optimizer_kwargs,
             allocator_plan=allocator_plan,
+            worker_scheduling=worker_scheduling,
         )
         pickle.dumps(preparer)
     except Exception as error:
         return None, f"{type(error).__name__}: {error}"
     return preparer, None
+
+
+def _parallel_deterministic_chunks(
+    plan: DeterministicRelaxationPlan,
+    *,
+    device_count: int,
+) -> list[_PendingAutoChunk]:
+    """Split safe batches so one large batch does not leave GPUs idle."""
+
+    profiles = {profile.index: profile for profile in plan.workload.profiles}
+    pending = []
+    for chunk in plan.chunks:
+        part_count = min(device_count, len(chunk.system_indices))
+        for part_index in range(part_count):
+            indices = chunk.system_indices[part_index::part_count]
+            if not indices:
+                continue
+            predicted = chunk.predicted_peak_bytes
+            if predicted is not None:
+                baseline = plan.probe.baseline_allocated_bytes or 0
+                incremental = max(0, predicted - baseline)
+                predicted = baseline + math.ceil(
+                    incremental * len(indices) / len(chunk.system_indices)
+                )
+            pending.append(
+                _PendingAutoChunk(
+                    indices=indices,
+                    estimated_cost=sum(
+                        profile_model_work(profiles[index])
+                        + math.sqrt(profiles[index].dof_squared)
+                        for index in indices
+                    ),
+                    bucket_index=chunk.bucket_index,
+                    predicted_peak_bytes=predicted,
+                )
+            )
+    return sorted(
+        pending,
+        key=lambda chunk: (-chunk.estimated_cost, chunk.indices),
+    )
+
+
+def _execute_multi_device_deterministic_relaxation(
+    systems: list[Atoms],
+    calculator: BatchCalculator,
+    optimizer: BatchOptimizer,
+    devices: tuple[torch.device, ...],
+    config: AutoSchedulerConfig,
+    optimizer_kwargs: dict[str, Any],
+) -> RelaxationResult:
+    """Plan once, then execute memory-safe active-drain chunks across GPUs."""
+
+    total_started = time.perf_counter()
+    workload = profile_auto_workload(
+        systems,
+        calculator,
+        optimizer,
+        optimizer_kwargs,
+        config,
+    )
+    probe = _measure_representative_memory(
+        systems,
+        calculator,
+        optimizer_kwargs,
+        workload,
+        config,
+    )
+    plan = plan_deterministic_relaxation(
+        workload,
+        probe,
+        optimizer,
+        optimizer_kwargs,
+        calculator.dtype,
+        config,
+    )
+    chunks = _parallel_deterministic_chunks(
+        plan,
+        device_count=len(devices),
+    )
+    worker_count = min(len(devices), len(chunks))
+    worker_devices = devices[:worker_count]
+    allocator_plan = select_cuda_allocator(
+        calculator,
+        optimizer,
+        variable_cell=optimizer_kwargs.get("cell_filter") is not None,
+        policy=config.cuda_allocator_policy,
+    )
+    has_cuda_workers = any(device.type == "cuda" for device in worker_devices)
+    requested_backend = config.multi_gpu_worker_backend
+    process_has_enough_work = len(chunks) >= (
+        config.multi_gpu_process_min_chunks_per_device * worker_count
+    )
+    allocator_requires_process = (
+        has_cuda_workers
+        and allocator_plan.selected_policy == "expandable_segments"
+    )
+    selected_backend = "thread"
+    fallback_reason = None
+    process_preparer = None
+    preparation_started = time.perf_counter()
+    if requested_backend == "process" or (
+        requested_backend == "auto"
+        and (process_has_enough_work or allocator_requires_process)
+    ):
+        process_preparer, fallback_reason = _prepare_process_workers(
+            systems,
+            calculator,
+            optimizer,
+            config,
+            optimizer_kwargs,
+            allocator_plan,
+            worker_scheduling="single_batch",
+        )
+        if process_preparer is not None:
+            selected_backend = "process"
+        elif requested_backend == "process":
+            raise TypeError(
+                "process multi-GPU workers require a serializable calculator "
+                f"and optimizer: {fallback_reason}"
+            )
+    elif requested_backend == "auto":
+        fallback_reason = (
+            "process workers require at least "
+            f"{config.multi_gpu_process_min_chunks_per_device} chunks per "
+            "active device to amortize startup"
+        )
+    preparation_seconds = time.perf_counter() - preparation_started
+
+    indexed_results: list[tuple[tuple[int, ...], RelaxationResult]] = []
+    worker_records: list[dict[str, Any]] = []
+    execution_started = time.perf_counter()
+    if selected_backend == "process":
+        if process_preparer is None:  # pragma: no cover - narrowed above
+            raise RuntimeError("process worker preparation is missing")
+        execution = run_parallel_task_workers(
+            chunks,
+            [chunk.estimated_cost for chunk in chunks],
+            [str(device) for device in worker_devices],
+            process_preparer,
+            worker_environment=(
+                allocator_plan.environment() if has_cuda_workers else None
+            ),
+        )
+        task_results = {
+            task.task_index: task for task in execution.task_results
+        }
+        for task_index, task in task_results.items():
+            chunk = chunks[task_index]
+            indexed_results.append((chunk.indices, task.payload))
+        for worker_result in execution.worker_results:
+            completed = []
+            for task_index in worker_result.task_indices:
+                chunk = chunks[task_index]
+                task = task_results[task_index]
+                completed.append(
+                    {
+                        "bucket_index": chunk.bucket_index,
+                        "system_count": len(chunk.indices),
+                        "resident_capacity": len(chunk.indices),
+                        "predicted_peak_bytes": chunk.predicted_peak_bytes,
+                        "peak_allocated_bytes": task.payload.metadata.get(
+                            "worker_peak_allocated_bytes"
+                        ),
+                        "peak_reserved_bytes": task.payload.metadata.get(
+                            "worker_peak_reserved_bytes"
+                        ),
+                        "wall_seconds": task.run_seconds,
+                    }
+                )
+            worker_records.append(
+                {
+                    "worker_id": worker_result.worker.worker_id,
+                    "device": worker_result.worker.device,
+                    "startup_seconds": worker_result.startup_seconds,
+                    "wall_seconds": worker_result.run_seconds,
+                    "chunks": completed,
+                }
+            )
+        worker_startup_seconds = execution.startup_wall_seconds
+        worker_run_seconds = execution.run_wall_seconds
+    else:
+        queue: PriorityQueue[tuple[float, int, _PendingAutoChunk]] = PriorityQueue()
+        for serial, chunk in enumerate(chunks):
+            queue.put((-chunk.estimated_cost, serial, chunk))
+        worker_calculators = [
+            calculator
+            if device == calculator.device
+            else calculator.clone_to(device)
+            for device in worker_devices
+        ]
+        worker_optimizers = [_clone_optimizer(optimizer) for _ in worker_devices]
+        result_lock = Lock()
+
+        def run_worker(
+            worker_id: int,
+            worker_calculator: BatchCalculator,
+            worker_optimizer: BatchOptimizer,
+        ) -> dict[str, Any]:
+            worker_started = time.perf_counter()
+            completed = []
+            while True:
+                try:
+                    _, _, chunk = queue.get_nowait()
+                except Empty:
+                    break
+                chunk_started = time.perf_counter()
+                device = worker_calculator.device
+                try:
+                    if device.type == "cuda":
+                        torch.cuda.synchronize(device)
+                        torch.cuda.reset_peak_memory_stats(device)
+                    chunk_result = _run_optimizer(
+                        [systems[index] for index in chunk.indices],
+                        worker_calculator,
+                        worker_optimizer,
+                        optimizer_kwargs,
+                    )
+                    if device.type == "cuda":
+                        torch.cuda.synchronize(device)
+                        peak_allocated = torch.cuda.max_memory_allocated(device)
+                        peak_reserved = torch.cuda.max_memory_reserved(device)
+                    else:
+                        peak_allocated = None
+                        peak_reserved = None
+                    wall_seconds = time.perf_counter() - chunk_started
+                    if chunk_result.state.device.type == "cuda":
+                        chunk_result = _offload_relaxation_result(chunk_result)
+                        _empty_device_cache(device)
+                    with result_lock:
+                        indexed_results.append((chunk.indices, chunk_result))
+                    completed.append(
+                        {
+                            "bucket_index": chunk.bucket_index,
+                            "system_count": len(chunk.indices),
+                            "resident_capacity": len(chunk.indices),
+                            "predicted_peak_bytes": chunk.predicted_peak_bytes,
+                            "peak_allocated_bytes": peak_allocated,
+                            "peak_reserved_bytes": peak_reserved,
+                            "wall_seconds": wall_seconds,
+                        }
+                    )
+                finally:
+                    queue.task_done()
+            return {
+                "worker_id": worker_id,
+                "device": str(device),
+                "startup_seconds": 0.0,
+                "wall_seconds": time.perf_counter() - worker_started,
+                "chunks": completed,
+            }
+
+        with ThreadPoolExecutor(
+            max_workers=worker_count,
+            thread_name_prefix="batch-mlip-gpu",
+        ) as pool:
+            futures = [
+                pool.submit(
+                    run_worker,
+                    worker_id,
+                    worker_calculators[worker_id],
+                    worker_optimizers[worker_id],
+                )
+                for worker_id in range(worker_count)
+            ]
+            worker_records.extend(future.result() for future in futures)
+        worker_startup_seconds = 0.0
+        worker_run_seconds = time.perf_counter() - execution_started
+
+    executed = [index for indices, _ in indexed_results for index in indices]
+    if sorted(executed) != list(range(len(systems))):
+        raise RuntimeError(
+            "deterministic multi-GPU scheduling duplicated or omitted systems"
+        )
+    result = _combine_relaxation_results(
+        indexed_results,
+        workload_size=len(systems),
+        calculator=calculator,
+    )
+    result.metadata["scheduling"] = {
+        "policy": "auto",
+        "decision": "deterministic_memory_plan_multi_gpu",
+        "devices": [str(device) for device in devices],
+        "gpu_count": len(devices),
+        "active_gpu_count": worker_count,
+        "memory_fraction": plan.memory_fraction,
+        "memory_growth_margin": plan.memory_growth_margin,
+        "memory_budget_bytes_per_gpu": probe.memory_budget_bytes,
+        "profiling_seconds": workload.profiling_seconds,
+        "probe": {
+            "device": str(calculator.device),
+            "system_count": len(probe.probe_indices),
+            "system_indices": list(probe.probe_indices),
+            "model_forward_count": 1 if probe.probe_indices else 0,
+            "baseline_allocated_bytes": probe.baseline_allocated_bytes,
+            "peak_allocated_bytes": probe.peak_allocated_bytes,
+            "peak_reserved_bytes": probe.peak_reserved_bytes,
+            "model_bytes_per_work": probe.model_bytes_per_work,
+        },
+        "planned_chunks": [
+            {
+                "bucket_index": chunk.bucket_index,
+                "system_count": len(chunk.indices),
+                "predicted_peak_bytes": chunk.predicted_peak_bytes,
+                "estimated_cost": chunk.estimated_cost,
+            }
+            for chunk in chunks
+        ],
+        "worker_backend_requested": requested_backend,
+        "worker_backend": selected_backend,
+        "worker_backend_fallback_reason": fallback_reason,
+        "worker_preparation_seconds": preparation_seconds,
+        "worker_startup_wall_seconds": worker_startup_seconds,
+        "worker_run_wall_seconds": worker_run_seconds,
+        "workers": sorted(worker_records, key=lambda record: record["worker_id"]),
+        "pending_work_stealing": True,
+        "active_compaction": bool(
+            optimizer_kwargs.get("active_compaction", False)
+        ),
+        "active_refill": False,
+        "mps": False,
+        "allocator": allocator_plan.metadata(),
+        "total_seconds": time.perf_counter() - total_started,
+    }
+    return result
 
 
 def _execute_multi_device_auto_relaxation(
@@ -1126,7 +1711,7 @@ def _execute_multi_device_auto_relaxation(
                             [systems[index] for index in chunk.indices],
                             worker_calculator,
                             optimizer=worker_optimizer,
-                            scheduling="auto",
+                            scheduling="autotune",
                             auto_config=config,
                             **optimizer_kwargs,
                         )

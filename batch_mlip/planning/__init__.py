@@ -13,6 +13,15 @@ from .auto import (
     execution_fingerprint,
     profile_auto_workload,
 )
+from .deterministic import (
+    DeterministicMemoryProbe,
+    DeterministicRelaxationChunk,
+    DeterministicRelaxationPlan,
+    optimizer_dof_bytes,
+    plan_deterministic_relaxation,
+    profile_model_work,
+    select_probe_indices,
+)
 from .execution import (
     RelaxationSchedule,
     ScheduledRelaxationBatch,
@@ -47,6 +56,9 @@ __all__ = [
     "BatchPlanner",
     "BatchTimingPoint",
     "CalibrationObservation",
+    "DeterministicMemoryProbe",
+    "DeterministicRelaxationChunk",
+    "DeterministicRelaxationPlan",
     "CachedAutoPolicy",
     "MemoryCoefficients",
     "OptimizationPilot",
@@ -60,6 +72,10 @@ __all__ = [
     "fit_memory_coefficients",
     "execution_fingerprint",
     "plan_relaxation_execution",
+    "plan_deterministic_relaxation",
     "plan_task_aware_relaxation",
     "profile_auto_workload",
+    "profile_model_work",
+    "optimizer_dof_bytes",
+    "select_probe_indices",
 ]

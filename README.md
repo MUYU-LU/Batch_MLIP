@@ -610,7 +610,6 @@ result = relax(
     structures,
     calculator,
     optimizer="bfgs",
-    scheduling="auto",
     devices=["cuda:0", "cuda:1", "cuda:2", "cuda:3"],  # optional
     cell_filter=FrechetCellFilter(),
     fmax=0.05,
@@ -618,34 +617,43 @@ result = relax(
 print(result.metadata["scheduling"])
 ```
 
-The first matching workload is a cold start. The runtime profiles atoms, edges,
-and optimizer dimensions, then increases the capacity of subsequent production
-chunks. Every calibration structure remains part of the returned result; no
-job is repeated only for tuning. Capacity growth uses both allocated and
-reserved CUDA memory, slows near the allocator frontier, and stops at 65% of
-the configured safety budget. Active refill is admitted only after capacity
-growth stops, observed occupancy is below 65%, and at least two resident
-batches remain pending.
+Passing `devices` activates deterministic automatic scheduling, so the
+`scheduling` argument is optional in this plug-and-play form. Use
+`scheduling="single_batch"` without `devices` only for an explicitly unmanaged
+resident batch.
 
-The selected policy is stored in
-`~/.cache/batch_mlip/autoscheduler-v1.json` and reused only for compatible
-calculator, model architecture, precision, optimizer, cell mode, GPU, atom,
-and edge regimes. Override the location with
-`BATCH_MLIP_AUTOSCHEDULER_CACHE`. The cache contains performance decisions, not
-structures or scientific results.
+The runtime profiles atoms, candidate edges, and optimizer dimensions once,
+then performs one representative model forward containing up to four of the
+largest structures. It combines the measured model/graph peak with an explicit
+`D²` allowance for dense BFGS state and packs largest-cost-first chunks within
+85% of available GPU memory. The prediction also carries a 1.25 memory-growth
+margin. This is not an optimization pilot: no structure is relaxed twice and
+no batch-size timing sweep is run.
 
-`AutoSchedulerConfig` exposes safety and cache controls for advanced use.
-Multiple homogeneous GPUs share the learned policy and pull compatible chunks
-from one pending queue. Cold calibration runs once on the primary device, and
-active optimizer states never migrate between GPUs. Automatic execution uses
-threads for short queues. When at least eight pending chunks per active device
-can amortize spawn startup, it uses one isolated persistent process per GPU;
-each process keeps its calculator and optimizer alive while pulling later
-chunks. Override this conservative rule with
+Automatic optimization uses active compaction and active drain. It does not
+select refill or CUDA MPS because the measured advantages of those mechanisms
+were workload-dependent. Every productive chunk reports its predicted peak,
+actual allocated peak, actual reserved peak, and resident count in
+`result.metadata["scheduling"]`.
+
+`AutoSchedulerConfig` exposes the 0.85 memory fraction, safety margin, probe
+size, and absolute-budget test override. Multiple homogeneous GPUs share the
+same plan and pull memory-safe chunks from one largest-work-first queue. Active
+optimizer states never migrate between GPUs. Automatic execution uses threads
+for short queues. When at least eight pending chunks per active device can
+amortize spawn startup, it uses one isolated persistent process per GPU; each
+process keeps its calculator and optimizer alive while pulling later chunks.
+Override this conservative rule with
 `AutoSchedulerConfig(multi_gpu_worker_backend="process" | "thread")`.
 Non-serializable custom adapters fall back to threads during preflight, before
 any production job starts. In-process MPS dispatch remains a future execution
 layer.
+
+The former production-learning controller is retained only for controlled
+experiments as `scheduling="autotune"`. That explicit mode grows capacities
+from completed production chunks and stores compatible decisions in
+`~/.cache/batch_mlip/autoscheduler-v1.json`; it is not used by
+`scheduling="auto"`.
 
 For frozen experiments, `BatchPlanner` still provides explicitly calibrated
 memory-safe queues without coupling planning to a particular MLIP or optimizer:

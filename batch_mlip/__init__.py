@@ -91,6 +91,9 @@ from .planning import (
     BatchTimingPoint,
     CachedAutoPolicy,
     CalibrationObservation,
+    DeterministicMemoryProbe,
+    DeterministicRelaxationChunk,
+    DeterministicRelaxationPlan,
     MemoryCoefficients,
     OnlineCapacityController,
     OptimizationPilot,
@@ -102,9 +105,13 @@ from .planning import (
     TaskAwarePolicy,
     execution_fingerprint,
     fit_memory_coefficients,
+    optimizer_dof_bytes,
+    plan_deterministic_relaxation,
     plan_relaxation_execution,
     plan_task_aware_relaxation,
     profile_auto_workload,
+    profile_model_work,
+    select_probe_indices,
 )
 from .profiling import RunTelemetry, RuntimeProfiler
 from .workloads import (
@@ -188,6 +195,9 @@ __all__ = [
     "CachedAutoPolicy",
     "CudaAllocatorPlan",
     "CudaAllocatorPolicy",
+    "DeterministicMemoryProbe",
+    "DeterministicRelaxationChunk",
+    "DeterministicRelaxationPlan",
     "EvaluationResult",
     "ExtXYZReporter",
     "FIREConfig",
@@ -250,15 +260,19 @@ __all__ = [
     "max_force_per_system",
     "materialize_workload",
     "molecular_dynamics",
+    "optimizer_dof_bytes",
+    "plan_deterministic_relaxation",
     "plan_relaxation_execution",
     "plan_task_aware_relaxation",
     "profile_auto_workload",
+    "profile_model_work",
     "register_optimizer",
     "relax",
     "relax_ase",
     "run_parallel_workers",
     "run_parallel_task_workers",
     "select_cuda_allocator",
+    "select_probe_indices",
 ]
 
 __version__ = "0.2.0"

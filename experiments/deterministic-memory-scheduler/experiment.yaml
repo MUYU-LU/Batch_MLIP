@@ -1,0 +1,83 @@
+id: deterministic-memory-scheduler
+date: 2026-07-27
+baseline_commit: 12d3dc6
+description: >-
+  Replace production online batch-size timing sweeps with a deterministic,
+  workload-profiled relaxation scheduler bounded to 85 percent of GPU memory.
+hypothesis: >-
+  One representative model-forward memory probe plus atom-, edge-, and
+  optimizer-D2-aware packing, coupled to fresh-process allocator selection
+  where required, can keep peak allocated and reserved GPU memory below 85
+  percent while eliminating repeated trial optimization and preserving
+  convergence and output order.
+mechanism:
+  - one_static_neighbor_profile_per_input_structure
+  - one_representative_model_forward_per_device_plan
+  - explicit_dense_optimizer_D2_memory_allowance
+  - largest_cost_first_memory_packing
+  - active_compaction_without_automatic_refill
+  - completed_chunk_CPU_offload
+invariants:
+  - optimizer_choice_and_stopping_criteria_are_unchanged
+  - every_input_index_executes_exactly_once
+  - output_order_matches_input_order
+  - no_timing_sweep_or_trial_optimization
+  - no_automatic_refill_or_MPS
+  - peak_allocated_memory_below_budget
+environment:
+  host: 210.45.70.177:2204
+  gpu: H100_80GB
+  atombit_env: /public/home/lmy/.conda/envs/lmy
+  mace_env: /public/home/lmy/.conda/envs/MACE_clean
+policy:
+  memory_fraction: 0.85
+  memory_growth_margin: 1.25
+  representative_probe_systems: 4
+  max_batch_size: 256
+  max_cost_ratio: 2.0
+  active_compaction: true
+  active_refill: false
+  mps: false
+validation:
+  models: [atombit_smooth_rms_fp32, mace_off_small]
+  workloads:
+    - OPT-H46-R256-v1
+    - OPT-H184-R256-v1
+    - OPT-H276-R256-v1
+    - XATMOV88-R256
+    - OBEQIX220-R256
+  optimizers: [fire, bfgs]
+  gpu_counts: [1, 4]
+  repeats: 1
+metrics:
+  - end_to_end_wall_seconds
+  - systems_per_second
+  - atoms_per_second
+  - model_forward_seconds
+  - neighbor_list_seconds
+  - peak_allocated_bytes_per_gpu
+  - peak_reserved_bytes_per_gpu
+  - planned_batch_size_distribution
+  - converged_jobs
+gates:
+  peak_allocated_fraction_max: 0.85
+  peak_reserved_fraction_max_for_isolated_worker: 0.85
+  no_duplicate_or_missing_jobs: true
+  deterministic_plan_for_identical_inputs: true
+  batch_vs_single_equivalence: true
+  convergence_flags_match_single_batch: true
+result:
+  status: implementation_validated
+  short_memory_matrix_passed: true
+  full_convergence_workload: OPT-RB-XATMOV88-R256-v1
+  full_converged_jobs: 256
+  full_total_jobs: 256
+  isolated_worker_peak_allocated_GiB: 40.5518
+  isolated_worker_peak_reserved_GiB: 45.5586
+  isolated_worker_budget_GiB: 66.4482
+  native_in_process_peak_reserved_GiB: 74.5039
+  decision: >-
+    Use deterministic active-drain planning by default. Require the explicit
+    devices route for fresh-process allocator application in AtomBit
+    variable-cell BFGS; retain native in-process execution as a documented
+    compatibility path that cannot guarantee the reserved-memory cap.

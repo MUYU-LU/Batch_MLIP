@@ -213,7 +213,7 @@ def test_task_aware_relaxation_executes_selected_tensor_schedule():
     ]
 
 
-def test_online_auto_relaxation_needs_no_explicit_planner_or_pilot(tmp_path):
+def test_explicit_autotune_retains_online_controller_and_cache(tmp_path):
     systems = [
         Atoms("H", positions=[[0.2 + 0.05 * index, 0.0, 0.0]])
         for index in range(8)
@@ -229,7 +229,7 @@ def test_online_auto_relaxation_needs_no_explicit_planner_or_pilot(tmp_path):
     cold = relax(
         systems,
         QuadraticBatchCalculator(),
-        scheduling="auto",
+        scheduling="autotune",
         auto_config=config,
         fmax=1e-5,
         max_steps=500,
@@ -239,7 +239,7 @@ def test_online_auto_relaxation_needs_no_explicit_planner_or_pilot(tmp_path):
     warm = relax(
         systems,
         QuadraticBatchCalculator(),
-        scheduling="auto",
+        scheduling="autotune",
         auto_config=config,
         fmax=1e-5,
         max_steps=500,
@@ -263,7 +263,7 @@ def test_online_auto_relaxation_needs_no_explicit_planner_or_pilot(tmp_path):
     assert config.resolved_cache_path().exists()
 
 
-def test_multi_device_auto_relaxation_cold_tunes_then_steals_pending_work(
+def test_multi_device_autotune_cold_tunes_then_steals_pending_work(
     tmp_path,
 ):
     systems = [
@@ -283,7 +283,7 @@ def test_multi_device_auto_relaxation_cold_tunes_then_steals_pending_work(
     result = relax(
         systems,
         QuadraticBatchCalculator(),
-        scheduling="auto",
+        scheduling="autotune",
         devices=["cpu:0", "cpu:1"],
         auto_config=config,
         fmax=1e-5,
@@ -317,7 +317,7 @@ def test_multi_device_auto_relaxation_cold_tunes_then_steals_pending_work(
     warm = relax(
         systems,
         QuadraticBatchCalculator(),
-        scheduling="auto",
+        scheduling="autotune",
         devices=["cpu:0", "cpu:1"],
         auto_config=config,
         fmax=1e-5,
@@ -334,7 +334,7 @@ def test_multi_device_auto_relaxation_cold_tunes_then_steals_pending_work(
     ) == len(systems)
 
 
-def test_single_explicit_device_can_use_process_worker(tmp_path):
+def test_single_explicit_device_can_use_autotune_process_worker(tmp_path):
     systems = [
         Atoms("H", positions=[[0.2 + 0.05 * index, 0.0, 0.0]])
         for index in range(4)
@@ -349,7 +349,7 @@ def test_single_explicit_device_can_use_process_worker(tmp_path):
     result = relax(
         systems,
         QuadraticBatchCalculator(),
-        scheduling="auto",
+        scheduling="autotune",
         devices=["cpu:0"],
         auto_config=config,
         fmax=1e-5,
@@ -367,7 +367,7 @@ def test_single_explicit_device_can_use_process_worker(tmp_path):
     assert not schedule["allocator"]["applied_to_workers"]
 
 
-def test_multi_device_auto_relaxation_accepts_explicit_thread_backend(tmp_path):
+def test_multi_device_autotune_accepts_explicit_thread_backend(tmp_path):
     systems = [
         Atoms("H", positions=[[0.2 + 0.05 * index, 0.0, 0.0]])
         for index in range(4)
@@ -382,7 +382,7 @@ def test_multi_device_auto_relaxation_accepts_explicit_thread_backend(tmp_path):
     result = relax(
         systems,
         QuadraticBatchCalculator(),
-        scheduling="auto",
+        scheduling="autotune",
         devices=["cpu:0", "cpu:1"],
         auto_config=config,
         fmax=1e-5,
@@ -397,7 +397,7 @@ def test_multi_device_auto_relaxation_accepts_explicit_thread_backend(tmp_path):
     assert schedule["worker_backend_fallback_reason"] is None
 
 
-def test_multi_device_auto_uses_threads_for_one_wave_per_device(tmp_path):
+def test_multi_device_autotune_uses_threads_for_one_wave_per_device(tmp_path):
     systems = [
         Atoms("H", positions=[[0.2 + 0.05 * index, 0.0, 0.0]])
         for index in range(4)
@@ -411,7 +411,7 @@ def test_multi_device_auto_uses_threads_for_one_wave_per_device(tmp_path):
     result = relax(
         systems,
         QuadraticBatchCalculator(),
-        scheduling="auto",
+        scheduling="autotune",
         devices=["cpu:0", "cpu:1"],
         auto_config=config,
         fmax=1e-5,

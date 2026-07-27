@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "status": "implementation_validated",
+  "memory_fraction": 0.85,
+  "memory_growth_margin": 1.25,
+  "repeats": 1,
+  "short_memory_matrix": [
+    {
+      "workload": "OPT-H184-R256-v1",
+      "mlip": "AtomBit",
+      "optimizer": "BFGS",
+      "steps": 2,
+      "batch_sizes": [152, 104],
+      "budget_bytes": 71348264345,
+      "max_predicted_bytes": 70990746720,
+      "max_allocated_bytes": 49834926592,
+      "max_reserved_bytes": 57334038528,
+      "wall_seconds": 3.985577281098813
+    },
+    {
+      "workload": "OPT-H184-R256-v1",
+      "mlip": "MACE-OFF-Small",
+      "optimizer": "BFGS",
+      "steps": 2,
+      "batch_sizes": [191, 65],
+      "budget_bytes": 71317325721,
+      "max_predicted_bytes": 71081038615,
+      "max_allocated_bytes": 54698679296,
+      "max_reserved_bytes": 64055410688,
+      "wall_seconds": 6.006170995067805
+    },
+    {
+      "workload": "OPT-H276-R256-v1",
+      "mlip": "AtomBit",
+      "optimizer": "FIRE",
+      "steps": 2,
+      "batch_sizes": [136, 120],
+      "budget_bytes": 71348264345,
+      "max_predicted_bytes": 70970080032,
+      "max_allocated_bytes": 55829740544,
+      "max_reserved_bytes": 61624811520,
+      "wall_seconds": 4.525363510008901
+    },
+    {
+      "workload": "OPT-RB-XATMOV88-R256-v1",
+      "mlip": "AtomBit",
+      "optimizer": "BFGS",
+      "steps": 2,
+      "batch_sizes": [256],
+      "budget_bytes": 71348264345,
+      "max_predicted_bytes": 59029767688,
+      "max_allocated_bytes": 43535913984,
+      "max_reserved_bytes": 50054823936,
+      "wall_seconds": 2.573305082973093
+    },
+    {
+      "workload": "OPT-RB-OBEQIX220-R256-v1",
+      "mlip": "AtomBit",
+      "optimizer": "BFGS",
+      "steps": 2,
+      "batch_sizes": [133, 123],
+      "budget_bytes": 71348264345,
+      "max_predicted_bytes": 71295475739,
+      "max_allocated_bytes": 48634630656,
+      "max_reserved_bytes": 55874420736,
+      "wall_seconds": 3.913349387701601
+    },
+    {
+      "workload": "OPT-H184-R256-v1",
+      "mlip": "AtomBit",
+      "optimizer": "BFGS",
+      "steps": 2,
+      "devices": 2,
+      "worker_backend": "thread",
+      "batch_sizes": [76, 52, 76, 52],
+      "budget_bytes_per_gpu": 71348264345,
+      "max_predicted_bytes_per_gpu": 35530148912,
+      "max_allocated_bytes_per_gpu": 24985956864,
+      "max_reserved_bytes_per_gpu": 28777119744,
+      "wall_seconds": 2.9272813531570137
+    }
+  ],
+  "full_convergence": {
+    "workload": "OPT-RB-XATMOV88-R256-v1",
+    "mlip": "AtomBit",
+    "optimizer": "BFGS",
+    "jobs": 256,
+    "converged": 256,
+    "batch_sizes": [256],
+    "budget_bytes": 71348264345,
+    "isolated_worker": {
+      "allocator": "expandable_segments",
+      "max_allocated_bytes": 43542224896,
+      "max_reserved_bytes": 48918151168,
+      "wall_seconds": 22.61208242783323
+    },
+    "native_in_process_negative_control": {
+      "max_allocated_bytes": 43546750976,
+      "max_reserved_bytes": 79997911040,
+      "wall_seconds": 17.00575280794874,
+      "reserved_memory_gate_passed": false
+    }
+  },
+  "conclusion": {
+    "allocation_budget_passed": true,
+    "isolated_worker_reserved_budget_passed": true,
+    "native_in_process_reserved_budget_passed": false,
+    "timing_sweep_count": 0,
+    "optimizer_trial_count": 0,
+    "automatic_refill": false,
+    "automatic_mps": false
+  }
+}

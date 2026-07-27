@@ -41,7 +41,10 @@ def schedule_batches(schedule: dict[str, object]) -> list[dict[str, object]]:
         batches.extend(schedule_batches(record["schedule"]))
     for worker in schedule.get("workers", []):
         for chunk in worker["chunks"]:
-            batches.extend(schedule_batches(chunk["schedule"]))
+            if "schedule" in chunk:
+                batches.extend(schedule_batches(chunk["schedule"]))
+            else:
+                batches.append(chunk)
     return batches
 
 
@@ -54,7 +57,8 @@ def schedule_cache_hits(schedule: dict[str, object]) -> list[bool]:
         hits.extend(schedule_cache_hits(record["schedule"]))
     for worker in schedule.get("workers", []):
         for chunk in worker["chunks"]:
-            hits.extend(schedule_cache_hits(chunk["schedule"]))
+            if "schedule" in chunk:
+                hits.extend(schedule_cache_hits(chunk["schedule"]))
     return hits
 
 
@@ -67,6 +71,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mlip", choices=("atombit", "mace"), required=True)
     parser.add_argument("--optimizer", choices=("bfgs", "fire"), required=True)
+    parser.add_argument(
+        "--scheduling",
+        choices=("auto", "autotune"),
+        default="autotune",
+    )
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument(
         "--devices",
@@ -210,7 +219,7 @@ def main() -> None:
         systems,
         calculator,
         optimizer=args.optimizer,
-        scheduling="auto",
+        scheduling=args.scheduling,
         auto_config=config,
         devices=devices,
         **options,
@@ -232,6 +241,7 @@ def main() -> None:
         "status": "complete",
         "mlip": args.mlip,
         "optimizer": args.optimizer,
+        "scheduling": args.scheduling,
         "workload_id": manifest.workload_id,
         "workload_manifest": str(args.workload_manifest),
         "workload_manifest_sha256": manifest.manifest_sha256,
@@ -299,7 +309,7 @@ def main() -> None:
                     batch["system_count"] for batch in measured_batches
                 ],
                 "resident_capacities": [
-                    batch["resident_capacity"]
+                    batch.get("resident_capacity", batch["system_count"])
                     for batch in measured_batches
                 ],
                 "peak_reserved_GiB": output["peak_reserved_bytes"] / 2**30,
