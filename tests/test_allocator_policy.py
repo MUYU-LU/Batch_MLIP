@@ -12,7 +12,7 @@ from batch_mlip import (
 )
 
 
-def test_auto_allocator_targets_only_measured_atombit_variable_cell_bfgs():
+def test_auto_allocator_targets_measured_atombit_variable_cell_optimizers():
     calculator = object.__new__(AtomBitBatchCalculator)
 
     selected = select_cuda_allocator(
@@ -34,7 +34,7 @@ def test_auto_allocator_targets_only_measured_atombit_variable_cell_bfgs():
     assert selected.selected_policy == "expandable_segments"
     assert set(selected.environment().values()) == {"expandable_segments:True"}
     assert fixed_cell.selected_policy == "native"
-    assert fire.selected_policy == "native"
+    assert fire.selected_policy == "expandable_segments"
 
 
 def test_auto_allocator_keeps_mace_native():

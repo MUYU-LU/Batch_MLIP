@@ -1,0 +1,140 @@
+id: offline-throughput-policy
+date: 2026-07-27
+baseline_commit: 78da8ef
+description: >-
+  Consolidate fair full-optimization throughput curves into a shipped,
+  descriptor-based resident-capacity policy with non-T2 held-out validation.
+hypothesis: >-
+  A policy stratified by MLIP and optimizer and indexed by continuous atom,
+  edge, and D2 workload descriptors can select the smallest resident capacity
+  within 5 percent of the measured throughput maximum while respecting the
+  85-percent GPU-memory limit on held-out molecular-crystal families.
+fairness:
+  pool_size: 256
+  gpu: NVIDIA H100 80GB HBM3
+  process_count_per_gpu: 1
+  cpu_threads_per_process: 1
+  timing_repeats: 1
+  warmup_excluded: true
+  deterministic_algorithms: true
+  method: active_drain
+  active_compaction: true
+  refill: false
+  mps: false
+  variable_cell: FrechetCellFilter
+  fmax_eV_per_A: 0.05
+  skin_A: 0.5
+  optimizer:
+    fire:
+      max_steps: 2000
+    bfgs:
+      max_steps: 500
+      optimizer_dtype: float64
+      alpha_eV_per_A2: 70.0
+      max_step_A: 0.2
+      linear_algebra_backend: auto
+  precision:
+    atombit:
+      model: float32
+      checkpoint_sha256: b27c372cb2c2848ae1e54a9ffd7a2aa0b0401d9cc0ed922e3be250ff63e44486
+    mace:
+      model: float64
+      foundation_model: MACE-OFF-Small
+  required_match:
+    - workload_manifest_sha256
+    - ordered_signed_jobs
+    - mlip
+    - optimizer
+    - model_identity
+    - model_precision
+    - optimizer_precision
+    - cutoff
+    - skin
+    - cell_filter
+    - fmax
+    - max_steps
+    - deterministic_algorithms
+    - gpu_name
+    - gpu_total_memory
+    - timing_scope
+  rejected_evidence:
+    - extrapolated_pool_timing
+    - active_refill
+    - masked_noncompacted_batches
+    - ASE_or_MPS_timing
+    - incomplete_convergence
+    - mixed_checkpoint_or_precision
+    - peak_memory_above_85_percent
+matrix:
+  fitting_workloads:
+    - OPT-H46-R256-v1
+    - OPT-H92-R256-v1
+    - OPT-H184-R256-v1
+    - OPT-H276-R256-v1
+    - OPT-RB-GUFJOG44-R256-v1
+    - OPT-RB-XATMOV88-R256-v1
+    - OPT-RB-OBEQIX220-R256-v1
+    - OPT-RB-ROFA-MIX-R256-v1
+    - OPT-RB-SOXLEX48-R256-v1
+    - OPT-RB-ROFB296-R256-v1
+  held_out_workloads:
+    - OPT-RB-AXOSOW64-R256-v1
+    - OPT-RB-BOQWIN116-R256-v1
+    - OPT-RB-XAFPAY172-R256-v1
+  mlips: [atombit, mace]
+  optimizers: [fire, bfgs]
+  first_stage_capacities: [64, 128, 256]
+  resolving_capacity: 192
+selection:
+  throughput_relative_band: 0.05
+  rule: smallest valid capacity within 5 percent of fastest valid throughput
+  memory_fraction_limit: 0.85
+held_out_gates:
+  predicted_capacity_memory_safe: true
+  predicted_throughput_fraction_min: 0.95
+  all_jobs_converged: true
+result:
+  status: completed_static_policy_rejected
+  artifact: results.json
+  decision: retain_deterministic_85_percent_memory_planner
+  evidence:
+    workloads: 13
+    non_T2_systems: 9
+    curves: 52
+    capacity_points: 208
+    valid_capacity_points: 152
+    stage2_heldout_cases_passed: 6
+    stage2_heldout_cases_total: 12
+    largest_memory_safe_cases_passed: 48
+    largest_memory_safe_cases_eligible: 48
+    curves_without_any_valid_capacity: 4
+  allocator_resolution:
+    policy: >-
+      expandable_segments for AtomBit variable-cell FIRE and BFGS;
+      native for unmeasured combinations
+    matched_diagnostic_points: 6
+  runtime_resolution:
+    policy: >-
+      one representative model forward followed by deterministic
+      85-percent-memory packing; no optimization pilot, refill, MPS, or
+      static nearest-family throughput cap
+  validation:
+    ruff: passed
+    pytest: 234 passed, 8 skipped
+    pytest_seconds: 113.37
+    skipped_scope: opt-in MACE integration tests
+  limitations:
+    - one timing run per point at the user's request; no sampling uncertainty
+    - validated on NVIDIA H100 80GB, AtomBit smooth-rms, and MACE-OFF-Small
+    - static throughput prediction was rejected outside measured curves
+    - four FIRE curves had no capacity passing both convergence and memory gates
+  stage1:
+    status: needs_resolution
+    fit_workloads: 4
+    held_out_workloads: 6
+    held_out_cases_passed: 19
+    held_out_cases_total: 24
+    artifact: stage1-results.json
+    resolution: >-
+      Promote stage-1 held-out workloads to calibration and validate the
+      unchanged descriptor-distance rule on three unmeasured families.

@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT))
 from batch_mlip import TaskProfile  # noqa: E402
 from batch_mlip.workloads import (  # noqa: E402
     RobustnessWorkloadInputs,
+    build_robustness_family_workload,
     build_robustness_workloads,
     topology_key,
     write_workload_jobs_csv,
@@ -34,14 +35,41 @@ def main() -> None:
         default=Path("runs/robustness/workloads"),
     )
     parser.add_argument("--seed", type=int, default=20260725)
+    parser.add_argument(
+        "--skip-defaults",
+        action="store_true",
+        help="generate only workloads supplied with --additional-family",
+    )
+    parser.add_argument(
+        "--additional-family",
+        action="append",
+        default=[],
+        metavar="LABEL:FAMILY:ATOM_COUNT",
+        help="add a homogeneous family using the same signed R256 protocol",
+    )
     args = parser.parse_args()
 
-    manifests = build_robustness_workloads(
-        RobustnessWorkloadInputs(
-            dataset_dir=args.dataset_dir,
-            seed=args.seed,
-        )
+    inputs = RobustnessWorkloadInputs(
+        dataset_dir=args.dataset_dir,
+        seed=args.seed,
     )
+    manifests = {} if args.skip_defaults else build_robustness_workloads(inputs)
+    for specification in args.additional_family:
+        try:
+            label, family, atom_count_text = specification.split(":")
+            atom_count = int(atom_count_text)
+        except ValueError as error:
+            parser.error("--additional-family must be LABEL:FAMILY:ATOM_COUNT")
+            raise AssertionError from error
+        manifest = build_robustness_family_workload(
+            inputs,
+            label=label,
+            family=family,
+            expected_atom_counts={atom_count},
+        )
+        if manifest.workload_id in manifests:
+            parser.error(f"duplicate workload {manifest.workload_id}")
+        manifests[manifest.workload_id] = manifest
     manifest_dir = args.output_dir / "manifests"
     profile_dir = args.output_dir / "profiles"
     active_key = topology_key(6.0, 0.0)

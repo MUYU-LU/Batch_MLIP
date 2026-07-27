@@ -276,7 +276,9 @@ def main() -> None:
             runtime_profile = None
         status = "passed"
         error = None
-    except torch.OutOfMemoryError as exc:
+    except (torch.OutOfMemoryError, RuntimeError) as exc:
+        if "out of memory" not in str(exc).lower():
+            raise
         output = {}
         elapsed = None
         runtime_profile = None
@@ -306,6 +308,27 @@ def main() -> None:
         "linear_algebra_backend": args.linear_algebra_backend,
         "deterministic_algorithms": args.deterministic,
         "cpu_threads": args.cpu_threads,
+        "execution_contract": {
+            "model_dtype": str(batch_calculator.dtype),
+            "optimizer_dtype": (
+                "torch.float64"
+                if args.optimizer in ("bfgs", "bfgslinesearch")
+                else str(batch_calculator.dtype)
+            ),
+            "cutoff_A": batch_calculator.cutoff,
+            "skin_A": batch_calculator.skin,
+            "cell_filter": (
+                "FrechetCellFilter"
+                if args.method == "ase"
+                else "BatchedFrechetCellFilter"
+            ),
+            "active_compaction": args.method in ("active", "refill"),
+            "timing_scope": "optimizer_only_after_one_model_warmup",
+            "cuda_allocator_config": (
+                os.environ.get("PYTORCH_ALLOC_CONF")
+                or os.environ.get("PYTORCH_CUDA_ALLOC_CONF")
+            ),
+        },
         "runtime_profile": runtime_profile,
         "timing_seconds": elapsed,
         "systems_per_second": (None if elapsed is None else len(systems) / elapsed),

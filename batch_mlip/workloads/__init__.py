@@ -3,6 +3,7 @@
 from .generator import (
     RobustnessWorkloadInputs,
     T2WorkloadInputs,
+    build_robustness_family_workload,
     build_robustness_workloads,
     build_t2_workloads,
     build_task_aware_holdout_workloads,
@@ -32,6 +33,7 @@ __all__ = [
     "WorkloadManifest",
     "WorkloadExecutionResult",
     "WorkloadRunSpec",
+    "build_robustness_family_workload",
     "build_robustness_workloads",
     "build_task_aware_holdout_workloads",
     "build_t2_workloads",

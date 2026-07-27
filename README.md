@@ -236,9 +236,8 @@ process per GPU with `BatchExecutor`:
 from batch_mlip import AutoSchedulerConfig, BatchExecutor
 
 config = AutoSchedulerConfig(
-    cache_path="runs/batch-policy.json",
-    initial_batch_size=128,
-    max_batch_size=128,
+    memory_safety_fraction=0.85,
+    max_batch_size=256,
 )
 with BatchExecutor(
     calculator,
@@ -261,10 +260,13 @@ with BatchExecutor(
     )
 ```
 
-The first call starts and warms the worker generation. Compatible later calls
-reuse the same worker PIDs and model instances. A change that requires an
-incompatible CUDA allocator policy closes that generation and starts a new one;
-leaving the context releases all worker processes and GPU reservations.
+Each call profiles atoms and candidate edges, performs one representative model
+forward, and packs deterministic chunks to at most 85% of device memory. It
+does not run trial optimizations or require a timing-policy cache. The first
+call starts and warms the worker generation; compatible later calls reuse the
+same worker PIDs and model instances. A change that requires an incompatible
+CUDA allocator policy closes that generation and starts a new one. Leaving the
+context releases all worker processes and GPU reservations.
 
 Internal phase timing is opt-in and does not change calculator or optimizer
 signatures:
@@ -520,7 +522,7 @@ measured 50% and 75% thresholds did not produce a reproducible speedup, so the
 default remains `None`.
 
 The automatic process launcher selects expandable CUDA allocator segments for
-AtomBit variable-cell BFGS with changing graph sizes:
+AtomBit variable-cell FIRE and BFGS with changing graph sizes:
 
 ```python
 from batch_mlip import AutoSchedulerConfig, FrechetCellFilter, relax
@@ -528,7 +530,7 @@ from batch_mlip import AutoSchedulerConfig, FrechetCellFilter, relax
 result = relax(
     structures,
     calculator,
-    optimizer="bfgs",
+    optimizer="fire",  # BFGS uses the same measured allocator rule
     scheduling="auto",
     devices=["cuda:0"],  # add more devices for one process per GPU
     auto_config=AutoSchedulerConfig(),
@@ -542,7 +544,7 @@ The launcher installs the allocator before each spawned worker initializes
 CUDA and reports the selected policy, reason, effective environment, and
 reported backend. It sets both compatibility variables because the validated
 PyTorch 2.9.1 environment responds only to the deprecated spelling. MACE,
-FIRE, fixed-cell BFGS, and combinations without matched evidence remain on the
+fixed-cell optimization, and optimizers without matched evidence remain on the
 native allocator. Override the conservative rule with
 `AutoSchedulerConfig(cuda_allocator_policy="native" | "expandable_segments")`.
 
@@ -556,8 +558,11 @@ PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
 python your_relaxation.py
 ```
 
-The manual experiment reduced measured H46 B128 peak reserve from `78.15 GiB`
-to `10.07 GiB` without slowing the calculation. MACE did not benefit.
+Matched variable-cell FIRE diagnostics reduced peak reserve from
+`77.4-78.2 GiB` to `28.9-35.3 GiB` at B64/B128 on BOQWIN116, XAFPAY172, and
+ROFB296 without a throughput regression. Larger safe points reached B256 for
+BOQWIN/XAFPAY and B128 for ROFB. MACE did not benefit in the prior matched
+screening.
 
 BFGS also accepts the experimental `refill_storage="arena"` mode for
 heterogeneous residents. It alternates between two reusable compact graph
@@ -654,6 +659,16 @@ experiments as `scheduling="autotune"`. That explicit mode grows capacities
 from completed production chunks and stores compatible decisions in
 `~/.cache/batch_mlip/autoscheduler-v1.json`; it is not used by
 `scheduling="auto"`.
+
+An offline nearest-workload capacity table was also rejected rather than
+shipped. The controlled matrix contains 208 full-optimization points across 13
+signed workloads, AtomBit/MACE, FIRE/BFGS, and B64/B128/B192/B256. The static
+descriptor rule passed only 6 of 12 cases on the second independent holdout.
+By contrast, the largest measured capacity satisfying convergence and the 85%
+memory gate remained within 5% of peak throughput on all 48 eligible curves.
+This supports the automatic memory probe and deterministic packing rule above;
+it does not support extrapolating a throughput knee from a chemically similar
+family.
 
 For frozen experiments, `BatchPlanner` still provides explicitly calibrated
 memory-safe queues without coupling planning to a particular MLIP or optimizer:

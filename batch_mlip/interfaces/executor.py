@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import copy
-import math
 import os
 import pickle
 import sys
@@ -29,13 +28,15 @@ from ..optimization.registry import (
     _validate_capabilities,
     create_optimizer,
 )
-from ..planning.auto import AutoScheduler, AutoSchedulerConfig
-from ..planning.memory import SystemProfile
+from ..planning.auto import AutoSchedulerConfig, profile_auto_workload
+from ..planning.deterministic import plan_deterministic_relaxation
 from .api import (
     _combine_relaxation_results,
+    _measure_representative_memory,
     _normalize_devices,
     _normalize_systems,
     _offload_relaxation_result,
+    _parallel_deterministic_chunks,
     relax,
 )
 
@@ -65,7 +66,6 @@ class _OptimizerSpec:
 class _ExecutorRelaxTask:
     systems: tuple[Atoms, ...]
     optimizer: _OptimizerSpec
-    config: AutoSchedulerConfig
     optimizer_kwargs: dict[str, Any]
 
 
@@ -79,8 +79,7 @@ class _ExecutorWorkerRunner:
             task.systems,
             self.calculator,
             optimizer=task.optimizer.create(),
-            scheduling="autotune",
-            auto_config=task.config,
+            scheduling="single_batch",
             **task.optimizer_kwargs,
         )
         if result.state.device.type == "cuda":
@@ -147,24 +146,6 @@ class _ExecutorChunk:
     bucket_index: int
 
 
-def _dispatch_cost(profile: SystemProfile) -> float:
-    return max(
-        1.0,
-        profile.atom_count
-        + profile.edge_count
-        + math.sqrt(profile.dof_squared),
-    )
-
-
-def _uniform_sample(indices: tuple[int, ...], count: int) -> tuple[int, ...]:
-    if count >= len(indices):
-        return indices
-    return tuple(
-        indices[position * len(indices) // count]
-        for position in range(count)
-    )
-
-
 def _worker_records(
     execution: PersistentTaskExecution | None,
     chunks: Sequence[_ExecutorChunk],
@@ -188,7 +169,10 @@ def _worker_records(
                     "system_count": len(chunk.indices),
                     "estimated_cost": chunk.cost,
                     "wall_seconds": task_result.run_seconds,
-                    "schedule": task_result.payload.metadata["scheduling"],
+                    "schedule": task_result.payload.metadata.get(
+                        "scheduling",
+                        {"decision": "single_batch"},
+                    ),
                 }
             )
         records.append(
@@ -355,10 +339,6 @@ class BatchExecutor:
                 "optimizer must be a registered name or implement BatchOptimizer"
             )
         config = auto_config or self.auto_config
-        if not config.cache_enabled:
-            raise ValueError(
-                "BatchExecutor cold-start coordination requires the policy cache"
-            )
         if config.multi_gpu_worker_backend == "thread":
             raise ValueError(
                 "BatchExecutor owns process workers and does not accept "
@@ -379,6 +359,36 @@ class BatchExecutor:
             variable_cell=options.get("cell_filter") is not None,
             policy=config.cuda_allocator_policy,
         )
+
+        planning_started = time.perf_counter()
+        workload = profile_auto_workload(
+            normalized,
+            self.calculator,
+            resolved,
+            options,
+            config,
+        )
+        probe = _measure_representative_memory(
+            normalized,
+            self.calculator,
+            options,
+            workload,
+            config,
+        )
+        plan = plan_deterministic_relaxation(
+            workload,
+            probe,
+            resolved,
+            options,
+            self.calculator.dtype,
+            config,
+        )
+        pending_chunks = _parallel_deterministic_chunks(
+            plan,
+            device_count=len(self.devices),
+        )
+        planning_seconds = time.perf_counter() - planning_started
+
         restarted, startup_seconds = self._ensure_pool(
             allocator_plan=allocator_plan,
             config=config,
@@ -389,109 +399,26 @@ class BatchExecutor:
             raise RuntimeError("persistent worker pool did not start")
         self._relaxation_calls += 1
 
-        planning_started = time.perf_counter()
-        scheduler = AutoScheduler(
-            self.calculator,
-            resolved,
-            options,
-            config=config,
-            supports_refill=getattr(capabilities, "active_refill", False),
-        )
-        plan = scheduler.plan(normalized)
-        planning_seconds = time.perf_counter() - planning_started
         optimizer_spec = _OptimizerSpec.from_optimizer(resolved)
         indexed_results: list[
             tuple[tuple[int, ...], RelaxationResult]
         ] = []
-        cold_indices: set[int] = set()
-        cold_chunks: list[_ExecutorChunk] = []
-        cold_tasks: list[_ExecutorRelaxTask] = []
-        for bucket_index, bucket in enumerate(plan.buckets):
-            controller = scheduler.controller(plan, bucket)
-            if controller.cache_hit:
-                continue
-            indices = _uniform_sample(
-                bucket.system_indices,
-                config.multi_gpu_cold_start_jobs,
+        production_chunks = [
+            _ExecutorChunk(
+                indices=chunk.indices,
+                cost=chunk.estimated_cost,
+                bucket_index=chunk.bucket_index,
             )
-            cold_indices.update(indices)
-            cold_chunks.append(
-                _ExecutorChunk(
-                    indices=indices,
-                    cost=sum(
-                        _dispatch_cost(plan.profiles[index])
-                        for index in indices
-                    ),
-                    bucket_index=bucket_index,
-                )
+            for chunk in pending_chunks
+        ]
+        production_tasks = [
+            _ExecutorRelaxTask(
+                systems=tuple(normalized[index] for index in chunk.indices),
+                optimizer=optimizer_spec,
+                optimizer_kwargs=options,
             )
-            cold_tasks.append(
-                _ExecutorRelaxTask(
-                    systems=tuple(normalized[index] for index in indices),
-                    optimizer=optimizer_spec,
-                    config=config,
-                    optimizer_kwargs=options,
-                )
-            )
-        cold_execution = (
-            self._pool.execute(
-                cold_tasks,
-                [chunk.cost for chunk in cold_chunks],
-            )
-            if cold_tasks
-            else None
-        )
-        if cold_execution is not None:
-            for chunk, task_result in zip(
-                cold_chunks,
-                cold_execution.task_results,
-                strict=True,
-            ):
-                indexed_results.append((chunk.indices, task_result.payload))
-
-        by_index = {profile.index: profile for profile in plan.profiles}
-        production_chunks: list[_ExecutorChunk] = []
-        production_tasks: list[_ExecutorRelaxTask] = []
-        for bucket_index, bucket in enumerate(plan.buckets):
-            pending = [
-                index
-                for index in bucket.system_indices
-                if index not in cold_indices
-            ]
-            if not pending:
-                continue
-            policy = scheduler.cache.find(plan.fingerprint, bucket, config)
-            if policy is None:
-                raise RuntimeError(
-                    "persistent cold-start scheduling did not produce a policy"
-                )
-            per_gpu_share = math.ceil(len(pending) / len(self.devices))
-            capacity = max(
-                1,
-                min(
-                    policy.resident_capacity,
-                    per_gpu_share,
-                    config.max_batch_size,
-                ),
-            )
-            for start in range(0, len(pending), capacity):
-                indices = tuple(pending[start : start + capacity])
-                chunk = _ExecutorChunk(
-                    indices=indices,
-                    cost=sum(
-                        _dispatch_cost(by_index[index]) for index in indices
-                    ),
-                    bucket_index=bucket_index,
-                )
-                production_chunks.append(chunk)
-                production_tasks.append(
-                    _ExecutorRelaxTask(
-                        systems=tuple(normalized[index] for index in indices),
-                        optimizer=optimizer_spec,
-                        config=config,
-                        optimizer_kwargs=options,
-                    )
-                )
+            for chunk in production_chunks
+        ]
         production_execution = (
             self._pool.execute(
                 production_tasks,
@@ -524,13 +451,34 @@ class BatchExecutor:
         reassembly_seconds = time.perf_counter() - reassembly_started
         result.metadata["scheduling"] = {
             "policy": "auto",
-            "decision": "persistent_batch_executor",
+            "decision": "persistent_deterministic_memory_plan",
             "devices": [str(device) for device in self.devices],
             "gpu_count": len(self.devices),
-            "fingerprint": plan.fingerprint,
-            "cache_path": str(scheduler.cache.path),
-            "profiling_seconds": plan.profiling_seconds,
+            "fingerprint": workload.fingerprint,
+            "memory_fraction": plan.memory_fraction,
+            "memory_growth_margin": plan.memory_growth_margin,
+            "memory_budget_bytes_per_gpu": probe.memory_budget_bytes,
+            "profiling_seconds": workload.profiling_seconds,
             "planning_seconds": planning_seconds,
+            "probe": {
+                "device": str(self.calculator.device),
+                "system_count": len(probe.probe_indices),
+                "system_indices": list(probe.probe_indices),
+                "model_forward_count": 1 if probe.probe_indices else 0,
+                "baseline_allocated_bytes": probe.baseline_allocated_bytes,
+                "peak_allocated_bytes": probe.peak_allocated_bytes,
+                "peak_reserved_bytes": probe.peak_reserved_bytes,
+                "model_bytes_per_work": probe.model_bytes_per_work,
+            },
+            "planned_chunks": [
+                {
+                    "bucket_index": chunk.bucket_index,
+                    "system_count": len(chunk.indices),
+                    "predicted_peak_bytes": chunk.predicted_peak_bytes,
+                    "estimated_cost": chunk.estimated_cost,
+                }
+                for chunk in pending_chunks
+            ],
             "reassembly_seconds": reassembly_seconds,
             "executor_call": self._relaxation_calls,
             "worker_generation": self._generation,
@@ -544,17 +492,12 @@ class BatchExecutor:
                 **allocator_plan.metadata(),
                 "applied_to_workers": self.devices[0].type == "cuda",
             },
-            "cold_start_run_seconds": (
-                0.0
-                if cold_execution is None
-                else cold_execution.run_wall_seconds
-            ),
+            "optimization_pilot_runs": 0,
             "production_run_seconds": (
                 0.0
                 if production_execution is None
                 else production_execution.run_wall_seconds
             ),
-            "cold_start": _worker_records(cold_execution, cold_chunks),
             "workers": _worker_records(
                 production_execution,
                 production_chunks,

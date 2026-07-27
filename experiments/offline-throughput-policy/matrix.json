@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "pool_size": 256,
+  "capacities": [64, 128, 192, 256],
+  "workloads": [
+    {
+      "workload_id": "OPT-H46-R256-v1",
+      "split": "fit",
+      "manifest": "benchmarks/workloads/manifests/OPT-H46-R256-v1.json",
+      "dataset_dir": "data/T2_test/structures"
+    },
+    {
+      "workload_id": "OPT-H92-R256-v1",
+      "split": "fit",
+      "manifest": "benchmarks/workloads/manifests/OPT-H92-R256-v1.json",
+      "dataset_dir": "data/T2_test/structures"
+    },
+    {
+      "workload_id": "OPT-H184-R256-v1",
+      "split": "fit",
+      "manifest": "benchmarks/workloads/manifests/OPT-H184-R256-v1.json",
+      "dataset_dir": "data/T2_test/structures"
+    },
+    {
+      "workload_id": "OPT-H276-R256-v1",
+      "split": "fit",
+      "manifest": "benchmarks/workloads/manifests/OPT-H276-R256-v1.json",
+      "dataset_dir": "data/T2_test/structures"
+    },
+    {
+      "workload_id": "OPT-RB-GUFJOG44-R256-v1",
+      "split": "fit",
+      "evidence_prefix": "heldout",
+      "manifest": "benchmarks/workloads/manifests/OPT-RB-GUFJOG44-R256-v1.json",
+      "dataset_dir": "/public/home/lmy/Batch_imple_project/test_set"
+    },
+    {
+      "workload_id": "OPT-RB-XATMOV88-R256-v1",
+      "split": "fit",
+      "evidence_prefix": "heldout",
+      "manifest": "benchmarks/workloads/manifests/OPT-RB-XATMOV88-R256-v1.json",
+      "dataset_dir": "/public/home/lmy/Batch_imple_project/test_set"
+    },
+    {
+      "workload_id": "OPT-RB-OBEQIX220-R256-v1",
+      "split": "fit",
+      "evidence_prefix": "heldout",
+      "manifest": "benchmarks/workloads/manifests/OPT-RB-OBEQIX220-R256-v1.json",
+      "dataset_dir": "/public/home/lmy/Batch_imple_project/test_set"
+    },
+    {
+      "workload_id": "OPT-RB-ROFA-MIX-R256-v1",
+      "split": "fit",
+      "evidence_prefix": "heldout",
+      "manifest": "benchmarks/workloads/manifests/OPT-RB-ROFA-MIX-R256-v1.json",
+      "dataset_dir": "/public/home/lmy/Batch_imple_project/test_set"
+    },
+    {
+      "workload_id": "OPT-RB-SOXLEX48-R256-v1",
+      "split": "fit",
+      "evidence_prefix": "heldout",
+      "manifest": "benchmarks/workloads/manifests/OPT-RB-SOXLEX48-R256-v1.json",
+      "dataset_dir": "/public/home/lmy/Batch_imple_project/test_set"
+    },
+    {
+      "workload_id": "OPT-RB-ROFB296-R256-v1",
+      "split": "fit",
+      "evidence_prefix": "heldout",
+      "manifest": "benchmarks/workloads/manifests/OPT-RB-ROFB296-R256-v1.json",
+      "dataset_dir": "/public/home/lmy/Batch_imple_project/test_set"
+    },
+    {
+      "workload_id": "OPT-RB-AXOSOW64-R256-v1",
+      "split": "heldout",
+      "manifest": "benchmarks/workloads/manifests/OPT-RB-AXOSOW64-R256-v1.json",
+      "dataset_dir": "/public/home/lmy/Batch_imple_project/test_set"
+    },
+    {
+      "workload_id": "OPT-RB-BOQWIN116-R256-v1",
+      "split": "heldout",
+      "manifest": "benchmarks/workloads/manifests/OPT-RB-BOQWIN116-R256-v1.json",
+      "dataset_dir": "/public/home/lmy/Batch_imple_project/test_set"
+    },
+    {
+      "workload_id": "OPT-RB-XAFPAY172-R256-v1",
+      "split": "heldout",
+      "manifest": "benchmarks/workloads/manifests/OPT-RB-XAFPAY172-R256-v1.json",
+      "dataset_dir": "/public/home/lmy/Batch_imple_project/test_set"
+    }
+  ],
+  "mlips": ["atombit", "mace"],
+  "optimizers": {
+    "fire": {
+      "max_steps": 2000
+    },
+    "bfgs": {
+      "max_steps": 500
+    }
+  }
+}

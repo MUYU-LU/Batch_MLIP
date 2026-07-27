@@ -12,6 +12,7 @@ from batch_mlip.workloads import (
     TaskProfile,
     WorkloadJob,
     WorkloadManifest,
+    build_robustness_family_workload,
     build_robustness_workloads,
     normalized_structure_sha256,
     read_workload_manifest,
@@ -182,6 +183,12 @@ def test_cross_family_robustness_workloads_are_deterministic_and_balanced(
     )
     first = build_robustness_workloads(inputs)
     second = build_robustness_workloads(inputs)
+    single = build_robustness_family_workload(
+        inputs,
+        label="GUFJOG44",
+        family="GUFJOG",
+        expected_atom_counts={44},
+    )
 
     assert first.keys() == second.keys()
     assert {
@@ -189,6 +196,10 @@ def test_cross_family_robustness_workloads_are_deterministic_and_balanced(
     } == {
         key: value.manifest_sha256 for key, value in second.items()
     }
+    assert (
+        single.manifest_sha256
+        == first["OPT-RB-GUFJOG44-R8-v1"].manifest_sha256
+    )
     rof_a = first["OPT-RB-ROFA-MIX-R8-v1"]
     assert [job.atom_count for job in rof_a.jobs] == [
         74,

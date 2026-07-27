@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 from ..models.potential import AtomBitBatchCalculator
-from ..optimization.registry import BatchedBFGS, BatchOptimizer
+from ..optimization.registry import BatchedBFGS, BatchedFIRE, BatchOptimizer
 
 CudaAllocatorPolicy = Literal["auto", "native", "expandable_segments"]
 
@@ -51,9 +51,10 @@ def select_cuda_allocator(
 ) -> CudaAllocatorPlan:
     """Choose only allocator modes supported by measured evidence.
 
-    Expandable segments are currently automatic only for AtomBit variable-cell
-    BFGS. Other combinations remain native until a matched benchmark supports a
-    broader rule. Explicit policies are useful for controlled experiments.
+    Expandable segments are automatic for measured AtomBit variable-cell FIRE
+    and BFGS workloads. Other combinations remain native until a matched
+    benchmark supports a broader rule. Explicit policies remain available for
+    controlled experiments.
     """
 
     if policy not in ("auto", "native", "expandable_segments"):
@@ -75,14 +76,14 @@ def select_cuda_allocator(
         )
     if (
         isinstance(calculator, AtomBitBatchCalculator)
-        and isinstance(optimizer, BatchedBFGS)
+        and isinstance(optimizer, (BatchedBFGS, BatchedFIRE))
         and variable_cell
     ):
         return CudaAllocatorPlan(
             requested_policy=policy,
             selected_policy="expandable_segments",
             reason=(
-                "measured AtomBit variable-cell BFGS allocator-fragmentation "
+                "measured AtomBit variable-cell FIRE/BFGS fragmentation "
                 "policy"
             ),
         )

@@ -117,8 +117,9 @@ def test_batch_executor_reuses_workers_and_restores_input_order(tmp_path):
         assert second.metadata["scheduling"]["worker_startup_seconds_this_call"] == 0
         assert second.metadata["scheduling"]["executor_call"] == 2
         assert second.metadata["scheduling"]["decision"] == (
-            "persistent_batch_executor"
+            "persistent_deterministic_memory_plan"
         )
+        assert second.metadata["scheduling"]["optimization_pilot_runs"] == 0
         assert [
             atoms.get_chemical_formula() for atoms in second.structures
         ] == ["H", "H2", "He", "Li2"]
@@ -186,7 +187,7 @@ def test_batch_executor_reuses_native_generation_across_optimizers(tmp_path):
         assert bfgs.metadata["scheduling"]["worker_generation"] == 1
 
 
-def test_batch_executor_small_pilot_dispatches_remaining_work_to_all_workers(
+def test_batch_executor_deterministic_plan_dispatches_work_to_all_workers(
     tmp_path,
 ):
     systems = [
@@ -218,11 +219,6 @@ def test_batch_executor_small_pilot_dispatches_remaining_work_to_all_workers(
         )
 
     schedule = result.metadata["scheduling"]
-    cold_chunks = [
-        chunk
-        for worker in schedule["cold_start"]
-        for chunk in worker["chunks"]
-    ]
     production_workers = {
         worker["worker_id"]
         for worker in schedule["workers"]
@@ -233,13 +229,16 @@ def test_batch_executor_small_pilot_dispatches_remaining_work_to_all_workers(
         for worker in schedule["workers"]
         for chunk in worker["chunks"]
     )
-    assert sum(chunk["system_count"] for chunk in cold_chunks) == 1
-    assert production_systems == 3
+    assert schedule["optimization_pilot_runs"] == 0
+    assert sum(
+        chunk["system_count"] for chunk in schedule["planned_chunks"]
+    ) == 4
+    assert production_systems == 4
     assert production_workers == {0, 1}
     assert bool(result.converged.all())
 
 
-def test_batch_executor_validates_configuration_before_starting(tmp_path):
+def test_batch_executor_does_not_require_timing_policy_cache(tmp_path):
     systems = _systems()
     executor = BatchExecutor(
         ExecutorQuadraticCalculator(),
@@ -250,9 +249,16 @@ def test_batch_executor_validates_configuration_before_starting(tmp_path):
         ),
     )
     try:
-        with pytest.raises(ValueError, match="policy cache"):
-            executor.relax(systems)
-        assert not executor.started
+        result = executor.relax(
+            systems,
+            fmax=1e-4,
+            max_steps=500,
+            dt_start=0.05,
+            dt_max=0.5,
+        )
+        assert bool(result.converged.all())
+        assert executor.started
+        assert result.metadata["scheduling"]["optimization_pilot_runs"] == 0
     finally:
         executor.close()
 

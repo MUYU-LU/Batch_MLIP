@@ -230,6 +230,7 @@ def _robustness_records(
     family: str,
     expected_atom_counts: set[int],
     balanced_atom_counts: bool = False,
+    filter_mixed_atom_counts: bool = False,
 ) -> list[_StructureRecord]:
     family_dir = inputs.dataset_dir / family
     paths = sorted(
@@ -261,6 +262,36 @@ def _robustness_records(
         return records
 
     if not balanced_atom_counts:
+        if filter_mixed_atom_counts:
+            records = []
+            ranked_paths = _deterministic_candidates(
+                paths,
+                count=len(paths),
+                seed=inputs.seed,
+                scope=family,
+            )
+            for path in ranked_paths:
+                record = _structure_record(
+                    path,
+                    relative_path=path.relative_to(inputs.dataset_dir).as_posix(),
+                    cutoffs=inputs.cutoffs_A,
+                    skins=inputs.skins_A,
+                )
+                if len(record.atoms) not in expected_atom_counts:
+                    continue
+                records.append(record)
+                if len(records) == inputs.candidate_count:
+                    break
+            if len(records) < inputs.candidate_count:
+                raise ValueError(
+                    f"{family} provides {len(records)} matching structures, "
+                    f"fewer than requested {inputs.candidate_count}"
+                )
+            return _density_stratified_records(
+                records,
+                count=inputs.unique_structures,
+                edge_key=edge_key,
+            )
         candidates = _deterministic_candidates(
             paths,
             count=inputs.candidate_count,
@@ -301,6 +332,55 @@ def _robustness_records(
             )
         )
     return selected
+
+
+def build_robustness_family_workload(
+    inputs: RobustnessWorkloadInputs,
+    *,
+    label: str,
+    family: str,
+    expected_atom_counts: set[int],
+    balanced_atom_counts: bool = False,
+) -> WorkloadManifest:
+    """Build one signed R256-style family workload with the suite protocol."""
+
+    if not label or not family or not expected_atom_counts:
+        raise ValueError("label, family, and expected_atom_counts are required")
+    if inputs.pool_size % inputs.unique_structures:
+        raise ValueError("pool size must divide evenly by unique structures")
+    selected = _robustness_records(
+        inputs,
+        family=family,
+        expected_atom_counts=expected_atom_counts,
+        balanced_atom_counts=balanced_atom_counts,
+        filter_mixed_atom_counts=True,
+    )
+    workload_id = f"OPT-RB-{label}-R{inputs.pool_size}-v1"
+    return _manifest(
+        workload_id,
+        _repeat_records(selected, pool_size=inputs.pool_size),
+        inputs=inputs,
+        metadata={
+            "source_family": family,
+            "selection_seed": inputs.seed,
+            "candidate_count": inputs.candidate_count,
+            "unique_structures": inputs.unique_structures,
+            "repetitions": inputs.pool_size // inputs.unique_structures,
+            "selection": (
+                "balanced by atom count then uniform across 6 A edge-density rank"
+                if balanced_atom_counts
+                else "uniform across 6 A edge-density rank"
+            ),
+            "atom_count_strata": sorted(expected_atom_counts),
+            "active_edge_key": topology_key(
+                inputs.cutoffs_A[0],
+                inputs.skins_A[0],
+            ),
+            "cutoffs_A": list(inputs.cutoffs_A),
+            "skins_A": list(inputs.skins_A),
+            "claim_role": "positive_control",
+        },
+    )
 
 
 def build_robustness_workloads(
@@ -482,7 +562,9 @@ def build_t2_workloads(
 ) -> dict[str, WorkloadManifest]:
     """Build the initial controlled manifests from the fixed T2 selection."""
 
-    selection = json.loads(inputs.selection_manifest.read_text(encoding="utf-8"))
+    selection = json.loads(
+        inputs.selection_manifest.read_text(encoding="utf-8")
+    )
     selected_names = {
         atom_count: selection["samples"][str(atom_count)][:32] for atom_count in (46, 276)
     }
@@ -668,9 +750,7 @@ def build_task_aware_holdout_workloads(
 
     if any(size <= 0 or size % 32 for size in pool_sizes):
         raise ValueError("holdout pool sizes must be positive multiples of 32")
-    selection = json.loads(
-        inputs.selection_manifest.read_text(encoding="utf-8")
-    )
+    selection = json.loads(inputs.selection_manifest.read_text(encoding="utf-8"))
     atom_counts = (46, 92, 184, 276)
     selected_names = {
         atom_count: selection["samples"][str(atom_count)][:32]
