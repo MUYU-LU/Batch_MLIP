@@ -277,7 +277,7 @@ def _normalize_devices(
 ) -> tuple[torch.device, ...]:
     if devices is None:
         return ()
-    if isinstance(devices, (str, torch.device)):
+    if isinstance(devices, str | torch.device):
         normalized = (torch.device(devices),)
     else:
         normalized = tuple(torch.device(device) for device in devices)
@@ -1096,7 +1096,7 @@ def _parallel_deterministic_chunks(
     *,
     device_count: int,
 ) -> list[_PendingAutoChunk]:
-    """Expose safe batches using the workload's deterministic split policy."""
+    """Expose per-device safe batches without unnecessarily subdividing them."""
 
     if device_count <= 0:
         raise ValueError("device_count must be positive")
@@ -1107,28 +1107,6 @@ def _parallel_deterministic_chunks(
         )
         for index, profile in profiles.items()
     }
-    if _parallel_deterministic_chunk_policy(plan) == "bucket_balanced_sharding":
-        pending = []
-        for chunk in plan.chunks:
-            part_count = min(device_count, len(chunk.system_indices))
-            for part_index in range(part_count):
-                indices = chunk.system_indices[part_index::part_count]
-                if indices:
-                    pending.append(
-                        _PendingAutoChunk(
-                            indices=indices,
-                            estimated_cost=sum(
-                                system_costs[index] for index in indices
-                            ),
-                            bucket_index=chunk.bucket_index,
-                            predicted_peak_bytes=chunk.predicted_peak_bytes,
-                        )
-                    )
-        return sorted(
-            pending,
-            key=lambda chunk: (-chunk.estimated_cost, chunk.indices),
-        )
-
     system_count = sum(len(chunk.system_indices) for chunk in plan.chunks)
     target_part_count = max(
         len(plan.chunks),
@@ -1196,12 +1174,15 @@ def _parallel_deterministic_chunks(
 
 def _parallel_deterministic_chunk_policy(
     plan: DeterministicRelaxationPlan,
+    *,
+    device_count: int,
 ) -> str:
-    """Keep heterogeneous workload buckets distributed across every GPU."""
+    """Describe whether memory-safe chunks require extra device subdivision."""
 
-    bucket_count = len({chunk.bucket_index for chunk in plan.chunks})
-    if bucket_count > 1:
-        return "bucket_balanced_sharding"
+    system_count = sum(len(chunk.system_indices) for chunk in plan.chunks)
+    required_parts = min(device_count, system_count)
+    if len(plan.chunks) >= required_parts:
+        return "resident_chunks_work_stealing"
     return "minimum_parts_for_device_occupancy"
 
 
@@ -1461,7 +1442,10 @@ def _execute_multi_device_deterministic_relaxation(
             "peak_reserved_bytes": probe.peak_reserved_bytes,
             "model_bytes_per_work": probe.model_bytes_per_work,
         },
-        "parallel_chunk_policy": _parallel_deterministic_chunk_policy(plan),
+        "parallel_chunk_policy": _parallel_deterministic_chunk_policy(
+            plan,
+            device_count=len(devices),
+        ),
         "resident_plan_chunk_count": len(plan.chunks),
         "execution_chunk_count": len(chunks),
         "resident_plan_chunks": [

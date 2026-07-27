@@ -192,6 +192,7 @@ def test_persistent_task_pool_reuses_workers_and_preserves_call_order():
 
 
 def test_persistent_task_pool_uses_scalable_tensor_sharing():
+    parent_strategy = torch_mp.get_sharing_strategy()
     with PersistentTaskPool(
         ["cpu:0"],
         SharingStrategyPreparer(),
@@ -201,6 +202,7 @@ def test_persistent_task_pool_uses_scalable_tensor_sharing():
         execution = pool.execute([1], [1.0])
 
     assert execution.task_results[0].payload == (1, "file_system")
+    assert torch_mp.get_sharing_strategy() == parent_strategy
 
 
 def test_persistent_task_pool_failure_breaks_generation():

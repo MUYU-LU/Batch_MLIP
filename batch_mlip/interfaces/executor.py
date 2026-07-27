@@ -494,7 +494,10 @@ class BatchExecutor:
                 "peak_reserved_bytes": probe.peak_reserved_bytes,
                 "model_bytes_per_work": probe.model_bytes_per_work,
             },
-            "parallel_chunk_policy": _parallel_deterministic_chunk_policy(plan),
+            "parallel_chunk_policy": _parallel_deterministic_chunk_policy(
+                plan,
+                device_count=len(self.devices),
+            ),
             "resident_plan_chunk_count": len(plan.chunks),
             "execution_chunk_count": len(pending_chunks),
             "resident_plan_chunks": [

@@ -176,7 +176,7 @@ def test_parallel_chunks_add_only_minimum_parts_for_idle_devices():
     ) == list(range(8))
 
 
-def test_parallel_chunks_shard_each_heterogeneous_bucket_across_devices():
+def test_parallel_chunks_split_only_enough_to_occupy_devices():
     config = AutoSchedulerConfig(max_batch_size=4)
     probe = DeterministicMemoryProbe(
         memory_budget_bytes=None,
@@ -205,8 +205,44 @@ def test_parallel_chunks_shard_each_heterogeneous_bucket_across_devices():
 
     chunks = _parallel_deterministic_chunks(plan, device_count=4)
 
-    assert len(chunks) == 8
-    assert [len(chunk.indices) for chunk in chunks] == [1] * 8
+    assert len(chunks) == 4
+    assert [len(chunk.indices) for chunk in chunks] == [2] * 4
+    assert sorted(
+        index for chunk in chunks for index in chunk.indices
+    ) == list(range(8))
+
+
+def test_parallel_chunks_preserve_heterogeneous_resident_batches():
+    config = AutoSchedulerConfig(max_batch_size=2)
+    probe = DeterministicMemoryProbe(
+        memory_budget_bytes=None,
+        baseline_allocated_bytes=None,
+        peak_allocated_bytes=None,
+        peak_reserved_bytes=None,
+        probe_indices=(),
+        probe_model_work=0,
+        model_bytes_per_work=0.0,
+    )
+    homogeneous = plan_deterministic_relaxation(
+        _workload(8),
+        probe,
+        BatchedFIRE(),
+        {},
+        torch.float64,
+        config,
+    )
+    plan = replace(
+        homogeneous,
+        chunks=tuple(
+            replace(chunk, bucket_index=index % 2)
+            for index, chunk in enumerate(homogeneous.chunks)
+        ),
+    )
+
+    chunks = _parallel_deterministic_chunks(plan, device_count=4)
+
+    assert len(chunks) == 4
+    assert [len(chunk.indices) for chunk in chunks] == [2] * 4
     assert sorted(
         index for chunk in chunks for index in chunk.indices
     ) == list(range(8))

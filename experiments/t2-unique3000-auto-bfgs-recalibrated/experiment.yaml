@@ -1,0 +1,86 @@
+id: t2-unique3000-auto-bfgs-recalibrated
+date: 2026-07-27
+baseline_commit: 685d526afbf22c49c4762e2e11aabc054f1f192a
+hypothesis: >-
+  Preserving per-device memory-safe resident chunks when enough chunks
+  already exist to occupy every GPU reduces unnecessary multi-GPU
+  subdivision, increases GPU memory utilization, and improves 3,000-system
+  variable-cell AtomBit BFGS throughput without changing convergence.
+workload:
+  manifest: ../t2-unique3000-auto-bfgs-vs-mps/workloads/OPT-T2-UNIQUE-R3000-v1.json
+  manifest_sha256: c40cf6aca93e66f3f95e5b218bf8e3f089b1a251c9cdc850dca12d12e2bc0a2f
+  structures: 3000
+  atoms: 472328
+configuration:
+  mlip: AtomBit smooth_rms fp32
+  optimizer: BFGS
+  optimizer_dtype: float64
+  linear_algebra_backend: auto
+  variable_cell: FrechetCellFilter
+  cutoff_A: 6.0
+  skin_A: 0.5
+  neighbor_backend: auto
+  fmax_eV_per_A: 0.05
+  max_steps: 500
+  alpha_eV_per_A2: 70.0
+  max_step_A: 0.2
+  gpu_count: 4
+  deterministic_algorithms: true
+scheduler:
+  capacity_overrides: none
+  memory_fraction: 0.85
+  memory_growth_margin: 1.25
+  max_batch_size: 256
+  optimization_pilot_runs: 0
+  active_compaction: true
+  active_refill: false
+change:
+  previous: split every resident chunk across every GPU for multi-bucket workloads
+  recalibrated: >-
+    preserve resident chunks when their count is at least the active device
+    count; otherwise split the largest chunks only enough to occupy devices
+baseline:
+  production_wall_seconds: 395.94742009881884
+  api_wall_seconds: 413.04927881387994
+  systems_per_second_api: 7.2630558964171446
+  peak_allocated_GiB_per_gpu_max: 11.214253425598145
+  peak_reserved_GiB_per_gpu_max: 12.609375
+  resident_plan_chunks: 19
+  execution_chunks: 76
+  converged: 2999
+results:
+  production_wall_seconds: 311.1046380279586
+  api_wall_seconds: 328.2697982029058
+  session_wall_seconds: 330.21161737525836
+  systems_per_second_production: 9.643057779583453
+  systems_per_second_api: 9.138824273275604
+  atoms_per_second_production: 1518.2287316383643
+  atoms_per_second_api: 1438.8408637825733
+  peak_allocated_GiB_per_gpu_max: 43.66720676422119
+  peak_reserved_GiB_per_gpu_max: 49.107421875
+  resident_plan_chunks: 19
+  execution_chunks: 19
+  execution_batch_size_min: 29
+  execution_batch_size_max: 256
+  model_evaluations: 6539
+  graph_evaluations: 353178
+  converged: 2999
+comparison:
+  production_speedup_vs_previous_auto: 1.272714616563304
+  api_speedup_vs_previous_auto: 1.2582615917610895
+  production_speedup_vs_mps: 4.731944742929075
+  model_call_reduction_vs_previous_auto: 0.6993701439014298
+  same_nonconverged_source: structures/Aven12_2_880_z1.cif
+conclusion: >-
+  Supported. Preserving already memory-safe resident chunks raises peak
+  reserved memory from 12.61 to 49.11 GiB, reduces production time from
+  395.95 to 311.10 seconds, and preserves the 2,999-of-3,000 convergence
+  result. The remaining gap to the 66.15 GiB safety budget is consistent
+  with the configured 1.25 growth margin, so no workload-specific memory
+  coefficient was changed.
+limitations:
+  - Single deterministic timing trial, as requested.
+  - AtomBit smooth_rms fp32 and variable-cell BFGS only.
+  - Larger batches change floating-point reduction order, so final-state hashes differ.
+timing_repeats: 1
+status: complete

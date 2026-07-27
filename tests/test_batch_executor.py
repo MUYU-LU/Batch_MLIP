@@ -231,7 +231,7 @@ def test_batch_executor_deterministic_plan_dispatches_work_to_all_workers(
     )
     assert schedule["optimization_pilot_runs"] == 0
     assert schedule["parallel_chunk_policy"] == (
-        "minimum_parts_for_device_occupancy"
+        "resident_chunks_work_stealing"
     )
     assert schedule["resident_plan_chunk_count"] == 2
     assert schedule["execution_chunk_count"] == 2

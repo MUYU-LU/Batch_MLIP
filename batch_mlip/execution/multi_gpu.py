@@ -686,7 +686,6 @@ class PersistentTaskPool:
         self._call_id = 0
 
         context = mp.get_context(start_method)
-        _use_scalable_tensor_sharing()
         self._task_queues = tuple(
             context.Queue() for _ in self._workers
         )

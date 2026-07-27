@@ -1,0 +1,64 @@
+{
+  "baseline": {
+    "api_wall_seconds": 413.04927881387994,
+    "converged": 2999,
+    "execution_chunks": 76,
+    "model_evaluations": 21751,
+    "peak_allocated_bytes_per_gpu_max": 12041212928,
+    "peak_reserved_bytes_per_gpu_max": 13539213312,
+    "production_wall_seconds": 395.94742009881884
+  },
+  "comparison": {
+    "api_speedup_vs_previous_auto": 1.2582615917610895,
+    "model_call_reduction_vs_previous_auto": 0.6993701439014298,
+    "production_speedup_vs_mps": 4.731944742929075,
+    "production_speedup_vs_previous_auto": 1.272714616563304,
+    "same_converged_count": true,
+    "same_nonconverged_source": "structures/Aven12_2_880_z1.cif"
+  },
+  "recalibrated": {
+    "api_wall_seconds": 328.2697982029058,
+    "atoms_per_second_api": 1438.8408637825733,
+    "atoms_per_second_production": 1518.2287316383643,
+    "converged": 2999,
+    "execution_batch_sizes": [
+      116,
+      129,
+      137,
+      143,
+      148,
+      153,
+      158,
+      163,
+      168,
+      175,
+      256,
+      184,
+      96,
+      116,
+      256,
+      214,
+      105,
+      254,
+      29
+    ],
+    "execution_chunks": 19,
+    "graph_evaluations": 353178,
+    "memory_budget_bytes_per_gpu": 71032135065,
+    "model_evaluations": 6539,
+    "parallel_chunk_policy": "resident_chunks_work_stealing",
+    "peak_allocated_bytes_per_gpu_max": 46887306240,
+    "peak_reserved_bytes_per_gpu_max": 52728692736,
+    "production_wall_seconds": 311.1046380279586,
+    "resident_plan_chunks": 19,
+    "session_wall_seconds": 330.21161737525836,
+    "systems_per_second_api": 9.138824273275604,
+    "systems_per_second_production": 9.643057779583453
+  },
+  "schema_version": 1,
+  "workload": {
+    "atoms": 472328,
+    "manifest_sha256": "c40cf6aca93e66f3f95e5b218bf8e3f089b1a251c9cdc850dca12d12e2bc0a2f",
+    "structures": 3000
+  }
+}
