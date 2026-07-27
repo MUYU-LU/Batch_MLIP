@@ -235,6 +235,18 @@ def test_batch_executor_deterministic_plan_dispatches_work_to_all_workers(
     ) == 4
     assert production_systems == 4
     assert production_workers == {0, 1}
+    assert all(
+        "peak_allocated_bytes" in chunk
+        and "peak_reserved_bytes" in chunk
+        for worker in schedule["workers"]
+        for chunk in worker["chunks"]
+    )
+    assert all(
+        chunk["peak_allocated_bytes"] is None
+        and chunk["peak_reserved_bytes"] is None
+        for worker in schedule["workers"]
+        for chunk in worker["chunks"]
+    )
     assert bool(result.converged.all())
 
 

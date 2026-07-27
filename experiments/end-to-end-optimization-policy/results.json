@@ -1,0 +1,1312 @@
+{
+  "cases": [
+    {
+      "case_id": "AXOSOW-R64-atombit-fire",
+      "convergence": {
+        "all_jobs_converged": false,
+        "automatic": 62,
+        "manual": 62,
+        "match": true,
+        "mps": 62
+      },
+      "family": "AXOSOW",
+      "gates": {
+        "convergence_match": true,
+        "memory_at_most_85_percent": true,
+        "production_faster_than_mps": true,
+        "production_within_5_percent_of_manual": true,
+        "total_api_faster_than_mps": true
+      },
+      "jobs": 64,
+      "memory": {
+        "conservative_device_peak_bound_bytes": 11739856896,
+        "conservative_device_peak_fraction": 0.13808690557863823,
+        "gpu_total_bytes": 85017886720,
+        "manual_peak_reserved_bytes": 10752098304,
+        "mps_peak_device_bytes": 5026873344,
+        "parent_probe_peak_reserved_bytes": 1029701632,
+        "worker_peak_allocated_bytes": 9576073728,
+        "worker_peak_reserved_bytes": 10710155264
+      },
+      "mlip": "atombit",
+      "optimizer": "fire",
+      "pool_size": 64,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/auto_atombit_fire_AXOSOW_R64_G1.json",
+          "sha256": "f41baabc05fe09610eb4896e07b0d501dd50c23acc892f201e45e23238497c44"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_atombit_fire_AXOSOW_R64_G1.json",
+          "sha256": "8ea8a42253fc09cf028e8f3f8e2c346344991cf09a0fb4c51821c642d5db6247"
+        },
+        "mps": {
+          "path": "experiments/end-to-end-optimization-policy/raw/mps_atombit_fire_AXOSOW_R64_G1.json",
+          "sha256": "c210726c9313fba46d0627e79e645f9b2a93c66ee54618b66193be5fd070dd9f"
+        }
+      },
+      "selected_chunks": [
+        58,
+        6
+      ],
+      "throughput": {
+        "automatic_production_fraction_of_manual": 1.0890897467922798,
+        "automatic_production_speedup_over_mps": 3.072823036288083,
+        "automatic_production_systems_per_second": 0.5901297341393826,
+        "automatic_total_fraction_of_manual": 1.0170643270538158,
+        "automatic_total_speedup_over_mps": 2.869606203494887,
+        "automatic_total_systems_per_second": 0.5511023335723253,
+        "manual_systems_per_second": 0.5418559268210033,
+        "mps_systems_per_second": 0.1920480701850794
+      },
+      "timing_seconds": {
+        "ase_cuda_mps_4": 333.2498990399763,
+        "automatic_production": 108.45072921691462,
+        "automatic_total_api": 116.13088187295943,
+        "manual_active_drain": 118.11257722228765,
+        "planning": 0.22562363697215915,
+        "worker_startup": 7.327325432095677
+      }
+    },
+    {
+      "case_id": "AXOSOW-R64-atombit-bfgs",
+      "convergence": {
+        "all_jobs_converged": true,
+        "automatic": 64,
+        "manual": 64,
+        "match": true,
+        "mps": 64
+      },
+      "family": "AXOSOW",
+      "gates": {
+        "convergence_match": true,
+        "memory_at_most_85_percent": true,
+        "production_faster_than_mps": true,
+        "production_within_5_percent_of_manual": true,
+        "total_api_faster_than_mps": true
+      },
+      "jobs": 64,
+      "memory": {
+        "conservative_device_peak_bound_bytes": 11823742976,
+        "conservative_device_peak_fraction": 0.13907359300685285,
+        "gpu_total_bytes": 85017886720,
+        "manual_peak_reserved_bytes": 10942939136,
+        "mps_peak_device_bytes": 5408555008,
+        "parent_probe_peak_reserved_bytes": 1029701632,
+        "worker_peak_allocated_bytes": 10039244288,
+        "worker_peak_reserved_bytes": 10794041344
+      },
+      "mlip": "atombit",
+      "optimizer": "bfgs",
+      "pool_size": 64,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/auto_atombit_bfgs_AXOSOW_R64_G1.json",
+          "sha256": "de36f9e727ea02f69294b1390a7f2410de4aaa0d9d896916420e13cdd5f05360"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_atombit_bfgs_AXOSOW_R64_G1.json",
+          "sha256": "7ae45731058b1f718ff055735d218f58a844331642d9fca1a1d58d0f0044fa90"
+        },
+        "mps": {
+          "path": "experiments/end-to-end-optimization-policy/raw/mps_atombit_bfgs_AXOSOW_R64_G1.json",
+          "sha256": "3eaa8d1567d2fba207e61e8107022af339e530661b52887a3c30d4315d144b40"
+        }
+      },
+      "selected_chunks": [
+        64
+      ],
+      "throughput": {
+        "automatic_production_fraction_of_manual": 1.0051558525410373,
+        "automatic_production_speedup_over_mps": 2.651653942701742,
+        "automatic_production_systems_per_second": 2.633674017708199,
+        "automatic_total_fraction_of_manual": 0.785208557545114,
+        "automatic_total_speedup_over_mps": 2.071421424044928,
+        "automatic_total_systems_per_second": 2.0573758499846875,
+        "manual_systems_per_second": 2.620164834189904,
+        "mps_systems_per_second": 0.993219354643531
+      },
+      "timing_seconds": {
+        "ase_cuda_mps_4": 64.43692392902449,
+        "automatic_production": 24.300653600133955,
+        "automatic_total_api": 31.10758785298094,
+        "manual_active_drain": 24.425944186747074,
+        "planning": 0.22861958295106888,
+        "worker_startup": 6.458776145707816
+      }
+    },
+    {
+      "case_id": "AXOSOW-R64-mace-fire",
+      "convergence": {
+        "all_jobs_converged": true,
+        "automatic": 64,
+        "manual": 64,
+        "match": true,
+        "mps": 64
+      },
+      "family": "AXOSOW",
+      "gates": {
+        "convergence_match": true,
+        "memory_at_most_85_percent": true,
+        "production_faster_than_mps": true,
+        "production_within_5_percent_of_manual": true,
+        "total_api_faster_than_mps": true
+      },
+      "jobs": 64,
+      "memory": {
+        "conservative_device_peak_bound_bytes": 6687817728,
+        "conservative_device_peak_fraction": 0.0786636552144118,
+        "gpu_total_bytes": 85017886720,
+        "manual_peak_reserved_bytes": 8216641536,
+        "mps_peak_device_bytes": 4582277120,
+        "parent_probe_peak_reserved_bytes": 580911104,
+        "worker_peak_allocated_bytes": 5796980224,
+        "worker_peak_reserved_bytes": 6106906624
+      },
+      "mlip": "mace",
+      "optimizer": "fire",
+      "pool_size": 64,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/auto_mace_fire_AXOSOW_R64_G1.json",
+          "sha256": "13159750ae98361378272a578c2221f8169d99fe30a0a09a45dd77cefc927321"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_mace_fire_AXOSOW_R64_G1.json",
+          "sha256": "06950fd3141da2745847553b953f734c9a461bae8cfd477be5aad2ad088a12c2"
+        },
+        "mps": {
+          "path": "experiments/end-to-end-optimization-policy/raw/mps_mace_fire_AXOSOW_R64_G1.json",
+          "sha256": "3849df11d56f1d4ee1aaadedea3f880f1e13b8aea5a4f2d04404d1b15783f4ab"
+        }
+      },
+      "selected_chunks": [
+        56,
+        8
+      ],
+      "throughput": {
+        "automatic_production_fraction_of_manual": 1.0514437191856354,
+        "automatic_production_speedup_over_mps": 1.691731356799273,
+        "automatic_production_systems_per_second": 1.0489292860049566,
+        "automatic_total_fraction_of_manual": 0.7132647861032121,
+        "automatic_total_speedup_over_mps": 1.1476148293378055,
+        "automatic_total_systems_per_second": 0.711559077455129,
+        "manual_systems_per_second": 0.9976085898514604,
+        "mps_systems_per_second": 0.6200330104358371
+      },
+      "timing_seconds": {
+        "ase_cuda_mps_4": 103.22031072992831,
+        "automatic_production": 61.01459922408685,
+        "automatic_total_api": 89.94333995273337,
+        "manual_active_drain": 64.15341713279486,
+        "planning": 1.5697072171606123,
+        "worker_startup": 26.794373868964612
+      }
+    },
+    {
+      "case_id": "AXOSOW-R64-mace-bfgs",
+      "convergence": {
+        "all_jobs_converged": true,
+        "automatic": 64,
+        "manual": 64,
+        "match": true,
+        "mps": 64
+      },
+      "family": "AXOSOW",
+      "gates": {
+        "convergence_match": true,
+        "memory_at_most_85_percent": true,
+        "production_faster_than_mps": true,
+        "production_within_5_percent_of_manual": true,
+        "total_api_faster_than_mps": true
+      },
+      "jobs": 64,
+      "memory": {
+        "conservative_device_peak_bound_bytes": 8799649792,
+        "conservative_device_peak_fraction": 0.10350351121971525,
+        "gpu_total_bytes": 85017886720,
+        "manual_peak_reserved_bytes": 8218738688,
+        "mps_peak_device_bytes": 4685037568,
+        "parent_probe_peak_reserved_bytes": 580911104,
+        "worker_peak_allocated_bytes": 6535025152,
+        "worker_peak_reserved_bytes": 8218738688
+      },
+      "mlip": "mace",
+      "optimizer": "bfgs",
+      "pool_size": 64,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/auto_mace_bfgs_AXOSOW_R64_G1.json",
+          "sha256": "82152f35593705c15536b2ff03de10d67026fd33421e7f20d815de278b700009"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_mace_bfgs_AXOSOW_R64_G1.json",
+          "sha256": "9f14aa2e87b8ec01fdf4d8207889efd0f1c0be34092c43047446a2c656d4174d"
+        },
+        "mps": {
+          "path": "experiments/end-to-end-optimization-policy/raw/mps_mace_bfgs_AXOSOW_R64_G1.json",
+          "sha256": "cefde818f0d0698cb9c263b2657a00ed7686b7f3dfd2a52327d9eb6d3e3399f1"
+        }
+      },
+      "selected_chunks": [
+        64
+      ],
+      "throughput": {
+        "automatic_production_fraction_of_manual": 0.9722807332865602,
+        "automatic_production_speedup_over_mps": 2.8346621122200197,
+        "automatic_production_systems_per_second": 4.261946436235423,
+        "automatic_total_fraction_of_manual": 0.383659334856438,
+        "automatic_total_speedup_over_mps": 1.1185499653386082,
+        "automatic_total_systems_per_second": 1.681752480472042,
+        "manual_systems_per_second": 4.383452525927303,
+        "mps_systems_per_second": 1.5035112713654601
+      },
+      "timing_seconds": {
+        "ase_cuda_mps_4": 42.56702375225723,
+        "automatic_production": 15.01661293907091,
+        "automatic_total_api": 38.05554071906954,
+        "manual_active_drain": 14.600363439880311,
+        "planning": 0.9225547579117119,
+        "worker_startup": 21.956026796717197
+      }
+    },
+    {
+      "case_id": "AXOSOW-R256-atombit-fire",
+      "convergence": {
+        "all_jobs_converged": false,
+        "automatic": 248,
+        "manual": 248,
+        "match": true,
+        "mps": 248
+      },
+      "family": "AXOSOW",
+      "gates": {
+        "convergence_match": true,
+        "memory_at_most_85_percent": true,
+        "production_faster_than_mps": true,
+        "production_within_5_percent_of_manual": true,
+        "total_api_faster_than_mps": true
+      },
+      "jobs": 256,
+      "memory": {
+        "conservative_device_peak_bound_bytes": 43880808448,
+        "conservative_device_peak_fraction": 0.5161361936990757,
+        "gpu_total_bytes": 85017886720,
+        "manual_peak_reserved_bytes": 22416457728,
+        "mps_peak_device_bytes": 5226102784,
+        "parent_probe_peak_reserved_bytes": 1067450368,
+        "worker_peak_allocated_bytes": 38095556608,
+        "worker_peak_reserved_bytes": 42813358080
+      },
+      "mlip": "atombit",
+      "optimizer": "fire",
+      "pool_size": 256,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/auto_atombit_fire_AXOSOW_R256_G1.json",
+          "sha256": "b288f76c936c1bfb89a292e4749dbf695b9c9f06a26fc16df143953327551c30"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_atombit_fire_AXOSOW_R256_G1.json",
+          "sha256": "927e3c6c3efe9ced7444c16eea4c1d9466c2d4695b3d5d17a4992221867e5bcc"
+        },
+        "mps": {
+          "path": "experiments/end-to-end-optimization-policy/raw/mps_atombit_fire_AXOSOW_R256_G1.json",
+          "sha256": "50d231d7d7e9ff2c1cffffb23f5b544153aa3e22c8886bf0f329196c90df8e00"
+        }
+      },
+      "selected_chunks": [
+        232,
+        24
+      ],
+      "throughput": {
+        "automatic_production_fraction_of_manual": 1.2347536017173142,
+        "automatic_production_speedup_over_mps": 3.5444986924319917,
+        "automatic_production_systems_per_second": 0.8473978200324586,
+        "automatic_total_fraction_of_manual": 1.1992557226135359,
+        "automatic_total_speedup_over_mps": 3.442598049346233,
+        "automatic_total_systems_per_second": 0.8230360159231362,
+        "manual_systems_per_second": 0.6862890044247572,
+        "mps_systems_per_second": 0.23907409582115896
+      },
+      "timing_seconds": {
+        "ase_cuda_mps_4": 1070.7977337348275,
+        "automatic_production": 302.101320003625,
+        "automatic_total_api": 311.0434963321313,
+        "manual_active_drain": 373.02069295803085,
+        "planning": 0.628877145703882,
+        "worker_startup": 8.166881002951413
+      }
+    },
+    {
+      "case_id": "AXOSOW-R256-atombit-bfgs",
+      "convergence": {
+        "all_jobs_converged": true,
+        "automatic": 256,
+        "manual": 256,
+        "match": true,
+        "mps": 256
+      },
+      "family": "AXOSOW",
+      "gates": {
+        "convergence_match": true,
+        "memory_at_most_85_percent": true,
+        "production_faster_than_mps": true,
+        "production_within_5_percent_of_manual": true,
+        "total_api_faster_than_mps": true
+      },
+      "jobs": 256,
+      "memory": {
+        "conservative_device_peak_bound_bytes": 45942308864,
+        "conservative_device_peak_fraction": 0.5403840372474504,
+        "gpu_total_bytes": 85017886720,
+        "manual_peak_reserved_bytes": 44958744576,
+        "mps_peak_device_bytes": 5412749312,
+        "parent_probe_peak_reserved_bytes": 1067450368,
+        "worker_peak_allocated_bytes": 39947928064,
+        "worker_peak_reserved_bytes": 44874858496
+      },
+      "mlip": "atombit",
+      "optimizer": "bfgs",
+      "pool_size": 256,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/auto_atombit_bfgs_AXOSOW_R256_G1.json",
+          "sha256": "71d5b122c3bdaf38b6587319d97b3a226640301bf7b9a13442fbc09dc32c5a43"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_atombit_bfgs_AXOSOW_R256_G1.json",
+          "sha256": "0273527abe4837322fb99e26c29a1393b59c0a88db10dabc3681051f886c3f35"
+        },
+        "mps": {
+          "path": "experiments/end-to-end-optimization-policy/raw/mps_atombit_bfgs_AXOSOW_R256_G1.json",
+          "sha256": "db89d81f21180b317498bf533349c0f828f65de5e2248ca17113bb2ffb85cef8"
+        }
+      },
+      "selected_chunks": [
+        256
+      ],
+      "throughput": {
+        "automatic_production_fraction_of_manual": 1.0276598366416279,
+        "automatic_production_speedup_over_mps": 3.403169985947692,
+        "automatic_production_systems_per_second": 3.546621105094354,
+        "automatic_total_fraction_of_manual": 0.9143433207496351,
+        "automatic_total_speedup_over_mps": 3.02791413566941,
+        "automatic_total_systems_per_second": 3.15554739326022,
+        "manual_systems_per_second": 3.4511625137405795,
+        "mps_systems_per_second": 1.0421522050732104
+      },
+      "timing_seconds": {
+        "ase_cuda_mps_4": 245.6455004881136,
+        "automatic_production": 72.181378392037,
+        "automatic_total_api": 81.12697040988132,
+        "manual_active_drain": 74.17790352692828,
+        "planning": 0.6429071137681603,
+        "worker_startup": 8.134942890610546
+      }
+    },
+    {
+      "case_id": "AXOSOW-R256-mace-fire",
+      "convergence": {
+        "all_jobs_converged": true,
+        "automatic": 256,
+        "manual": 256,
+        "match": true,
+        "mps": 256
+      },
+      "family": "AXOSOW",
+      "gates": {
+        "convergence_match": true,
+        "memory_at_most_85_percent": true,
+        "production_faster_than_mps": true,
+        "production_within_5_percent_of_manual": true,
+        "total_api_faster_than_mps": true
+      },
+      "jobs": 256,
+      "memory": {
+        "conservative_device_peak_bound_bytes": 31660703744,
+        "conservative_device_peak_fraction": 0.3724005025939087,
+        "gpu_total_bytes": 85017886720,
+        "manual_peak_reserved_bytes": 32556187648,
+        "mps_peak_device_bytes": 4672454656,
+        "parent_probe_peak_reserved_bytes": 591396864,
+        "worker_peak_allocated_bytes": 22937088512,
+        "worker_peak_reserved_bytes": 31069306880
+      },
+      "mlip": "mace",
+      "optimizer": "fire",
+      "pool_size": 256,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/auto_mace_fire_AXOSOW_R256_G1.json",
+          "sha256": "ee04b7136e77abaf44a3b896deb6d9e6c47dc74d1dd502c730b7b34d057e4da8"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_mace_fire_AXOSOW_R256_G1.json",
+          "sha256": "4158e96477be663bdbaf6649bdb5e23fcf52537d46a7281fb7e3a11c4f0d695f"
+        },
+        "mps": {
+          "path": "experiments/end-to-end-optimization-policy/raw/mps_mace_fire_AXOSOW_R256_G1.json",
+          "sha256": "f260fd49bf052851c0d629b3a6d219f2e22576b9240ee975357edf947da254f3"
+        }
+      },
+      "selected_chunks": [
+        224,
+        32
+      ],
+      "throughput": {
+        "automatic_production_fraction_of_manual": 1.0803424436676363,
+        "automatic_production_speedup_over_mps": 3.6163590398096477,
+        "automatic_production_systems_per_second": 2.357772724120165,
+        "automatic_total_fraction_of_manual": 0.9887722928968665,
+        "automatic_total_speedup_over_mps": 3.309835358862347,
+        "automatic_total_systems_per_second": 2.1579271981979105,
+        "manual_systems_per_second": 2.1824308930377687,
+        "mps_systems_per_second": 0.6519741812594663
+      },
+      "timing_seconds": {
+        "ase_cuda_mps_4": 392.6535856151022,
+        "automatic_production": 108.57704704999924,
+        "automatic_total_api": 118.6323617468588,
+        "manual_active_drain": 117.3003923362121,
+        "planning": 0.4629322229884565,
+        "worker_startup": 9.425111516844481
+      }
+    },
+    {
+      "case_id": "AXOSOW-R256-mace-bfgs",
+      "convergence": {
+        "all_jobs_converged": true,
+        "automatic": 256,
+        "manual": 256,
+        "match": true,
+        "mps": 256
+      },
+      "family": "AXOSOW",
+      "gates": {
+        "convergence_match": true,
+        "memory_at_most_85_percent": true,
+        "production_faster_than_mps": true,
+        "production_within_5_percent_of_manual": false,
+        "total_api_faster_than_mps": true
+      },
+      "jobs": 256,
+      "memory": {
+        "conservative_device_peak_bound_bytes": 33149681664,
+        "conservative_device_peak_fraction": 0.3899142044447185,
+        "gpu_total_bytes": 85017886720,
+        "manual_peak_reserved_bytes": 32556187648,
+        "mps_peak_device_bytes": 4781506560,
+        "parent_probe_peak_reserved_bytes": 591396864,
+        "worker_peak_allocated_bytes": 25898913280,
+        "worker_peak_reserved_bytes": 32558284800
+      },
+      "mlip": "mace",
+      "optimizer": "bfgs",
+      "pool_size": 256,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/auto_mace_bfgs_AXOSOW_R256_G1.json",
+          "sha256": "672392b6879ebb0aea0480cbdac4b0f05f2a00829f6a0161b2f508099dcc3fbc"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_mace_bfgs_AXOSOW_R256_G1.json",
+          "sha256": "f4dbd5ccd81324aed8ac42df6b2639e949a80a16b5bfa96c968289709c21f7f5"
+        },
+        "mps": {
+          "path": "experiments/end-to-end-optimization-policy/raw/mps_mace_bfgs_AXOSOW_R256_G1.json",
+          "sha256": "c5d653dcad501dbaf099bcfd50412a383a11b159af136f96187339e0b40574d9"
+        }
+      },
+      "selected_chunks": [
+        256
+      ],
+      "throughput": {
+        "automatic_production_fraction_of_manual": 0.8782062083744193,
+        "automatic_production_speedup_over_mps": 3.3699208012777313,
+        "automatic_production_systems_per_second": 5.877091854557985,
+        "automatic_total_fraction_of_manual": 0.710509152880053,
+        "automatic_total_speedup_over_mps": 2.7264206868005716,
+        "automatic_total_systems_per_second": 4.754837206980835,
+        "manual_systems_per_second": 6.692154756496907,
+        "mps_systems_per_second": 1.7439851560694366
+      },
+      "timing_seconds": {
+        "ase_cuda_mps_4": 146.79024022025988,
+        "automatic_production": 43.55895846709609,
+        "automatic_total_api": 53.83990846714005,
+        "manual_active_drain": 38.25374775612727,
+        "planning": 0.46276632929220796,
+        "worker_startup": 9.65082652401179
+      }
+    },
+    {
+      "case_id": "XAFPAY-R64-atombit-fire",
+      "convergence": {
+        "all_jobs_converged": true,
+        "automatic": 64,
+        "manual": 64,
+        "match": true,
+        "mps": 64
+      },
+      "family": "XAFPAY",
+      "gates": {
+        "convergence_match": true,
+        "memory_at_most_85_percent": true,
+        "production_faster_than_mps": true,
+        "production_within_5_percent_of_manual": false,
+        "total_api_faster_than_mps": true
+      },
+      "jobs": 64,
+      "memory": {
+        "conservative_device_peak_bound_bytes": 15057551360,
+        "conservative_device_peak_fraction": 0.17711039336452705,
+        "gpu_total_bytes": 85017886720,
+        "manual_peak_reserved_bytes": 18253611008,
+        "mps_peak_device_bytes": 7038042112,
+        "parent_probe_peak_reserved_bytes": 1897922560,
+        "worker_peak_allocated_bytes": 11682629632,
+        "worker_peak_reserved_bytes": 13159628800
+      },
+      "mlip": "atombit",
+      "optimizer": "fire",
+      "pool_size": 64,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/auto_atombit_fire_XAFPAY_R64_G1.json",
+          "sha256": "afd28f7b5b107dac8374f1edabe7ff123297985d9f75fe20bc689c006efea14c"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_atombit_fire_XAFPAY_R64_G1.json",
+          "sha256": "98685850ed581c656f68a83ae8f98a8729461ea26f300a7a0900d100c5b2e145"
+        },
+        "mps": {
+          "path": "experiments/end-to-end-optimization-policy/raw/mps_atombit_fire_XAFPAY_R64_G1.json",
+          "sha256": "2ba498a7626a52170e2d9b399c85efc5907f9582b36dadb4988facdd2ba0a042"
+        }
+      },
+      "selected_chunks": [
+        40,
+        24
+      ],
+      "throughput": {
+        "automatic_production_fraction_of_manual": 0.9261443505117075,
+        "automatic_production_speedup_over_mps": 2.403408246170787,
+        "automatic_production_systems_per_second": 3.006803618175434,
+        "automatic_total_fraction_of_manual": 0.70592231273539,
+        "automatic_total_speedup_over_mps": 1.8319169216405453,
+        "automatic_total_systems_per_second": 2.2918347047204812,
+        "manual_systems_per_second": 3.2465820436243376,
+        "mps_systems_per_second": 1.2510582099258427
+      },
+      "timing_seconds": {
+        "ase_cuda_mps_4": 51.15669238427654,
+        "automatic_production": 21.28506152285263,
+        "automatic_total_api": 27.925225090701133,
+        "manual_active_drain": 19.713039479684085,
+        "planning": 0.3279897291213274,
+        "worker_startup": 6.196421003900468
+      }
+    },
+    {
+      "case_id": "XAFPAY-R64-atombit-bfgs",
+      "convergence": {
+        "all_jobs_converged": true,
+        "automatic": 64,
+        "manual": 64,
+        "match": true,
+        "mps": 64
+      },
+      "family": "XAFPAY",
+      "gates": {
+        "convergence_match": true,
+        "memory_at_most_85_percent": true,
+        "production_faster_than_mps": true,
+        "production_within_5_percent_of_manual": true,
+        "total_api_faster_than_mps": true
+      },
+      "jobs": 64,
+      "memory": {
+        "conservative_device_peak_bound_bytes": 21034434560,
+        "conservative_device_peak_fraction": 0.2474118726248198,
+        "gpu_total_bytes": 85017886720,
+        "manual_peak_reserved_bytes": 19134414848,
+        "mps_peak_device_bytes": 6385827840,
+        "parent_probe_peak_reserved_bytes": 1897922560,
+        "worker_peak_allocated_bytes": 17027213312,
+        "worker_peak_reserved_bytes": 19136512000
+      },
+      "mlip": "atombit",
+      "optimizer": "bfgs",
+      "pool_size": 64,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/auto_atombit_bfgs_XAFPAY_R64_G1.json",
+          "sha256": "2735cea000f34015debedf3819e5aad87a372ad3847373de4226065cf3f77ce1"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_atombit_bfgs_XAFPAY_R64_G1.json",
+          "sha256": "9dc56b3aac88eae410ece729abf509ca6c560cdde02014826f80ee9b9899e8f2"
+        },
+        "mps": {
+          "path": "experiments/end-to-end-optimization-policy/raw/mps_atombit_bfgs_XAFPAY_R64_G1.json",
+          "sha256": "053acdfe1e3d776e7a184e92a1bb84d38dd4d6a38c92ac7f8ac9b39003cbddfd"
+        }
+      },
+      "selected_chunks": [
+        64
+      ],
+      "throughput": {
+        "automatic_production_fraction_of_manual": 1.024327473990483,
+        "automatic_production_speedup_over_mps": 3.9764816639608966,
+        "automatic_production_systems_per_second": 2.797519493902076,
+        "automatic_total_fraction_of_manual": 0.8009505914716872,
+        "automatic_total_speedup_over_mps": 3.1093233576154087,
+        "automatic_total_systems_per_second": 2.1874595285093963,
+        "manual_systems_per_second": 2.7310792348503066,
+        "mps_systems_per_second": 0.7035162564073087
+      },
+      "timing_seconds": {
+        "ase_cuda_mps_4": 90.97160075139254,
+        "automatic_production": 22.87740984093398,
+        "automatic_total_api": 29.25768416095525,
+        "manual_active_drain": 23.433959433808923,
+        "planning": 0.40792866703122854,
+        "worker_startup": 5.8030784712173045
+      }
+    },
+    {
+      "case_id": "XAFPAY-R64-mace-fire",
+      "convergence": {
+        "all_jobs_converged": true,
+        "automatic": 64,
+        "manual": 64,
+        "match": true,
+        "mps": 64
+      },
+      "family": "XAFPAY",
+      "gates": {
+        "convergence_match": true,
+        "memory_at_most_85_percent": true,
+        "production_faster_than_mps": true,
+        "production_within_5_percent_of_manual": true,
+        "total_api_faster_than_mps": true
+      },
+      "jobs": 64,
+      "memory": {
+        "conservative_device_peak_bound_bytes": 21615345664,
+        "conservative_device_peak_fraction": 0.25424468306520615,
+        "gpu_total_bytes": 85017886720,
+        "manual_peak_reserved_bytes": 20367540224,
+        "mps_peak_device_bytes": 5557452800,
+        "parent_probe_peak_reserved_bytes": 1247805440,
+        "worker_peak_allocated_bytes": 16805027840,
+        "worker_peak_reserved_bytes": 20367540224
+      },
+      "mlip": "mace",
+      "optimizer": "fire",
+      "pool_size": 64,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/auto_mace_fire_XAFPAY_R64_G1.json",
+          "sha256": "3ff56e4a276f07f74a504958e14113dd043c4d0f2dd695c92d7636b63fe033af"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_mace_fire_XAFPAY_R64_G1.json",
+          "sha256": "89b51fb44b917d6c7cfcc6f13c598283c4479225a3fae357f19c5bc39c27bb38"
+        },
+        "mps": {
+          "path": "experiments/end-to-end-optimization-policy/raw/mps_mace_fire_XAFPAY_R64_G1.json",
+          "sha256": "fff3311dae41bfe8264326a87f3ce5f21ebf6e90b537ffd0d7d649167e6d3860"
+        }
+      },
+      "selected_chunks": [
+        64
+      ],
+      "throughput": {
+        "automatic_production_fraction_of_manual": 1.0868312695143238,
+        "automatic_production_speedup_over_mps": 1.6382128115071526,
+        "automatic_production_systems_per_second": 1.359900893901481,
+        "automatic_total_fraction_of_manual": 0.8146219777467831,
+        "automatic_total_speedup_over_mps": 1.2279037215007975,
+        "automatic_total_systems_per_second": 1.0192981990890742,
+        "manual_systems_per_second": 1.251253006834432,
+        "mps_systems_per_second": 0.8301124764433839
+      },
+      "timing_seconds": {
+        "ase_cuda_mps_4": 77.09798589488491,
+        "automatic_production": 47.06225305609405,
+        "automatic_total_api": 62.78829890722409,
+        "manual_active_drain": 51.14872823515907,
+        "planning": 0.6748787527903914,
+        "worker_startup": 14.90899081993848
+      }
+    },
+    {
+      "case_id": "XAFPAY-R64-mace-bfgs",
+      "convergence": {
+        "all_jobs_converged": true,
+        "automatic": 64,
+        "manual": 64,
+        "match": true,
+        "mps": 64
+      },
+      "family": "XAFPAY",
+      "gates": {
+        "convergence_match": true,
+        "memory_at_most_85_percent": true,
+        "production_faster_than_mps": true,
+        "production_within_5_percent_of_manual": true,
+        "total_api_faster_than_mps": true
+      },
+      "jobs": 64,
+      "memory": {
+        "conservative_device_peak_bound_bytes": 22565355520,
+        "conservative_device_peak_fraction": 0.2654189181897369,
+        "gpu_total_bytes": 85017886720,
+        "manual_peak_reserved_bytes": 21317550080,
+        "mps_peak_device_bytes": 5335154688,
+        "parent_probe_peak_reserved_bytes": 1247805440,
+        "worker_peak_allocated_bytes": 16954148352,
+        "worker_peak_reserved_bytes": 21317550080
+      },
+      "mlip": "mace",
+      "optimizer": "bfgs",
+      "pool_size": 64,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/auto_mace_bfgs_XAFPAY_R64_G1.json",
+          "sha256": "10e90332e7fb53afc589736ed37569f1792cda0a5fec4f12cf30dabfc571022b"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_mace_bfgs_XAFPAY_R64_G1.json",
+          "sha256": "a2ec02dd66f98be5568eff145e30e18cb0457d972d9d12fbb04cbeb57bd2036e"
+        },
+        "mps": {
+          "path": "experiments/end-to-end-optimization-policy/raw/mps_mace_bfgs_XAFPAY_R64_G1.json",
+          "sha256": "e43b80c39593c69dfc5cc37994f5624eaec2746e7f2b1d2059cc438437f8690c"
+        }
+      },
+      "selected_chunks": [
+        64
+      ],
+      "throughput": {
+        "automatic_production_fraction_of_manual": 1.0527647889092229,
+        "automatic_production_speedup_over_mps": 3.6951697836912167,
+        "automatic_production_systems_per_second": 2.1298487038993126,
+        "automatic_total_fraction_of_manual": 0.6947864117812658,
+        "automatic_total_speedup_over_mps": 2.438677453862634,
+        "automatic_total_systems_per_second": 1.40562256090689,
+        "manual_systems_per_second": 2.0231002464530223,
+        "mps_systems_per_second": 0.5763872375498109
+      },
+      "timing_seconds": {
+        "ase_cuda_mps_4": 111.03646269487217,
+        "automatic_production": 30.04908277420327,
+        "automatic_total_api": 45.53142627328634,
+        "manual_active_drain": 31.63461628369987,
+        "planning": 0.6119634537026286,
+        "worker_startup": 14.724768497981131
+      }
+    },
+    {
+      "case_id": "XAFPAY-R256-atombit-fire",
+      "convergence": {
+        "all_jobs_converged": true,
+        "automatic": 256,
+        "manual": 256,
+        "match": true,
+        "mps": 256
+      },
+      "family": "XAFPAY",
+      "gates": {
+        "convergence_match": true,
+        "memory_at_most_85_percent": true,
+        "production_faster_than_mps": true,
+        "production_within_5_percent_of_manual": true,
+        "total_api_faster_than_mps": true
+      },
+      "jobs": 256,
+      "memory": {
+        "conservative_device_peak_bound_bytes": 52393148416,
+        "conservative_device_peak_fraction": 0.6162603004771559,
+        "gpu_total_bytes": 85017886720,
+        "manual_peak_reserved_bytes": 18255708160,
+        "mps_peak_device_bytes": 7323254784,
+        "parent_probe_peak_reserved_bytes": 2109734912,
+        "worker_peak_allocated_bytes": 46521779200,
+        "worker_peak_reserved_bytes": 50283413504
+      },
+      "mlip": "atombit",
+      "optimizer": "fire",
+      "pool_size": 256,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/auto_atombit_fire_XAFPAY_R256_G1.json",
+          "sha256": "1e02b8eeb8caecc99779464a85d0ff1bd424897158b44f0399cf61075910b7db"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_atombit_fire_XAFPAY_R256_G1.json",
+          "sha256": "f94c003982e08f2506eea5e596a2240ae3ff3a2a7e0c607206ff21f685a677b6"
+        },
+        "mps": {
+          "path": "experiments/end-to-end-optimization-policy/raw/mps_atombit_fire_XAFPAY_R256_G1.json",
+          "sha256": "16b7a3628133a3d8d8418a8702e7d4ff51950f8fea48c39445dcf4b6b9fc8788"
+        }
+      },
+      "selected_chunks": [
+        160,
+        96
+      ],
+      "throughput": {
+        "automatic_production_fraction_of_manual": 1.2161854492022288,
+        "automatic_production_speedup_over_mps": 2.9658418337224304,
+        "automatic_production_systems_per_second": 4.010480426077951,
+        "automatic_total_fraction_of_manual": 1.1317981522429215,
+        "automatic_total_speedup_over_mps": 2.7600513634279165,
+        "automatic_total_systems_per_second": 3.732205757616057,
+        "manual_systems_per_second": 3.297589548295182,
+        "mps_systems_per_second": 1.3522232981131004
+      },
+      "timing_seconds": {
+        "ase_cuda_mps_4": 189.31784443976358,
+        "automatic_production": 63.83275139192119,
+        "automatic_total_api": 68.59214540291578,
+        "manual_active_drain": 77.63246342539787,
+        "planning": 0.7130331806838512,
+        "worker_startup": 3.880419204942882
+      }
+    },
+    {
+      "case_id": "XAFPAY-R256-atombit-bfgs",
+      "convergence": {
+        "all_jobs_converged": true,
+        "automatic": 256,
+        "manual": 256,
+        "match": true,
+        "mps": 256
+      },
+      "family": "XAFPAY",
+      "gates": {
+        "convergence_match": true,
+        "memory_at_most_85_percent": true,
+        "production_faster_than_mps": true,
+        "production_within_5_percent_of_manual": true,
+        "total_api_faster_than_mps": true
+      },
+      "jobs": 256,
+      "memory": {
+        "conservative_device_peak_bound_bytes": 55354327040,
+        "conservative_device_peak_fraction": 0.6510903666931325,
+        "gpu_total_bytes": 85017886720,
+        "manual_peak_reserved_bytes": 38224789504,
+        "mps_peak_device_bytes": 8751415296,
+        "parent_probe_peak_reserved_bytes": 2109734912,
+        "worker_peak_allocated_bytes": 47396958208,
+        "worker_peak_reserved_bytes": 53244592128
+      },
+      "mlip": "atombit",
+      "optimizer": "bfgs",
+      "pool_size": 256,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/auto_atombit_bfgs_XAFPAY_R256_G1.json",
+          "sha256": "a5c1f90a3c11e5220be7528799094581ae845e6fcd6d1e76ed6c058f431f205c"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_atombit_bfgs_XAFPAY_R256_G1.json",
+          "sha256": "7fdfa4397c35876248aae6a46ec37a547c54bb2758907c49a9b19b9c2101da75"
+        },
+        "mps": {
+          "path": "experiments/end-to-end-optimization-policy/raw/mps_atombit_bfgs_XAFPAY_R256_G1.json",
+          "sha256": "0b1aababf2f02e5b874e3f4a0886a196e3b42c552e7ce145c46d8db0899894ff"
+        }
+      },
+      "selected_chunks": [
+        162,
+        94
+      ],
+      "throughput": {
+        "automatic_production_fraction_of_manual": 1.1218810317966401,
+        "automatic_production_speedup_over_mps": 4.72693596717059,
+        "automatic_production_systems_per_second": 3.608717403692986,
+        "automatic_total_fraction_of_manual": 1.0489885412875237,
+        "automatic_total_speedup_over_mps": 4.419810589917006,
+        "automatic_total_systems_per_second": 3.3742465537156807,
+        "manual_systems_per_second": 3.216666742206875,
+        "mps_systems_per_second": 0.7634369132046994
+      },
+      "timing_seconds": {
+        "ase_cuda_mps_4": 335.3256773049943,
+        "automatic_production": 70.93933144723997,
+        "automatic_total_api": 75.86878905398771,
+        "manual_active_drain": 79.58549035899341,
+        "planning": 0.7517512650229037,
+        "worker_startup": 4.017430855892599
+      }
+    },
+    {
+      "case_id": "XAFPAY-R256-mace-fire",
+      "convergence": {
+        "all_jobs_converged": true,
+        "automatic": 256,
+        "manual": 256,
+        "match": true,
+        "mps": 256
+      },
+      "family": "XAFPAY",
+      "gates": {
+        "convergence_match": true,
+        "memory_at_most_85_percent": true,
+        "production_faster_than_mps": true,
+        "production_within_5_percent_of_manual": true,
+        "total_api_faster_than_mps": true
+      },
+      "jobs": 256,
+      "memory": {
+        "conservative_device_peak_bound_bytes": 70231523328,
+        "conservative_device_peak_fraction": 0.826079382086998,
+        "gpu_total_bytes": 85017886720,
+        "manual_peak_reserved_bytes": 40602959872,
+        "mps_peak_device_bytes": 5972688896,
+        "parent_probe_peak_reserved_bytes": 1426063360,
+        "worker_peak_allocated_bytes": 56515825152,
+        "worker_peak_reserved_bytes": 68805459968
+      },
+      "mlip": "mace",
+      "optimizer": "fire",
+      "pool_size": 256,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/auto_mace_fire_XAFPAY_R256_G1.json",
+          "sha256": "361440740f97ebbe577cc1fc754bd5066ab32657ad96bb28649d0ddddc4a72ed"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_mace_fire_XAFPAY_R256_G1.json",
+          "sha256": "4251d411f1155126a2ec203adabb3a045aa010daa764057fd0a43eed3ed06ce1"
+        },
+        "mps": {
+          "path": "experiments/end-to-end-optimization-policy/raw/mps_mace_fire_XAFPAY_R256_G1.json",
+          "sha256": "b51765cb50b74de409e40ac2f068149226b8402fc8b01240abbffb48925679e8"
+        }
+      },
+      "selected_chunks": [
+        215,
+        41
+      ],
+      "throughput": {
+        "automatic_production_fraction_of_manual": 1.2353918900065248,
+        "automatic_production_speedup_over_mps": 2.2990345967732253,
+        "automatic_production_systems_per_second": 2.0779638178972695,
+        "automatic_total_fraction_of_manual": 1.141145916772394,
+        "automatic_total_speedup_over_mps": 2.1236451071508795,
+        "automatic_total_systems_per_second": 1.919439446847688,
+        "manual_systems_per_second": 1.6820280549893318,
+        "mps_systems_per_second": 0.9038419086053613
+      },
+      "timing_seconds": {
+        "ase_cuda_mps_4": 283.23537287069485,
+        "automatic_production": 123.19752528658137,
+        "automatic_total_api": 133.3722720039077,
+        "manual_active_drain": 152.19722360791638,
+        "planning": 0.5187452468089759,
+        "worker_startup": 9.480974333826452
+      }
+    },
+    {
+      "case_id": "XAFPAY-R256-mace-bfgs",
+      "convergence": {
+        "all_jobs_converged": true,
+        "automatic": 256,
+        "manual": 256,
+        "match": true,
+        "mps": 256
+      },
+      "family": "XAFPAY",
+      "gates": {
+        "convergence_match": true,
+        "memory_at_most_85_percent": true,
+        "production_faster_than_mps": true,
+        "production_within_5_percent_of_manual": true,
+        "total_api_faster_than_mps": true
+      },
+      "jobs": 256,
+      "memory": {
+        "conservative_device_peak_bound_bytes": 64416120832,
+        "conservative_device_peak_fraction": 0.7576772761260185,
+        "gpu_total_bytes": 85017886720,
+        "manual_peak_reserved_bytes": 42496688128,
+        "mps_peak_device_bytes": 7449083904,
+        "parent_probe_peak_reserved_bytes": 1426063360,
+        "worker_peak_allocated_bytes": 49772702720,
+        "worker_peak_reserved_bytes": 62990057472
+      },
+      "mlip": "mace",
+      "optimizer": "bfgs",
+      "pool_size": 256,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/auto_mace_bfgs_XAFPAY_R256_G1.json",
+          "sha256": "8b74d9511098affb36bca9b74e30480dd46abd63f93782514454aed3ebd6754f"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_mace_bfgs_XAFPAY_R256_G1.json",
+          "sha256": "7c5084b2d7f6d8801240d9679684c48a3f9fc8232268eb6263cb0257ced82ea3"
+        },
+        "mps": {
+          "path": "experiments/end-to-end-optimization-policy/raw/mps_mace_bfgs_XAFPAY_R256_G1.json",
+          "sha256": "330c59a46841332ccf82c283af39cb402d1df853fb2cf3a69f3af12b6ce4c02c"
+        }
+      },
+      "selected_chunks": [
+        187,
+        69
+      ],
+      "throughput": {
+        "automatic_production_fraction_of_manual": 1.072112702564945,
+        "automatic_production_speedup_over_mps": 3.6412805107278285,
+        "automatic_production_systems_per_second": 2.521099828503816,
+        "automatic_total_fraction_of_manual": 0.9665954021141933,
+        "automatic_total_speedup_over_mps": 3.2829057906478183,
+        "automatic_total_systems_per_second": 2.2729732580097393,
+        "manual_systems_per_second": 2.351525005227793,
+        "mps_systems_per_second": 0.6923662763899209
+      },
+      "timing_seconds": {
+        "ase_cuda_mps_4": 369.746489292942,
+        "automatic_production": 101.5429841792211,
+        "automatic_total_api": 112.62780989520252,
+        "manual_active_drain": 108.8655231948942,
+        "planning": 0.5202453332021832,
+        "worker_startup": 10.386800362262875
+      }
+    }
+  ],
+  "correctness_cases": [
+    {
+      "case_id": "AXOSOW-R64-atombit-fire",
+      "convergence_flags_match": true,
+      "interpretation": "scheduler/reassembly agreement",
+      "jobs": 64,
+      "jobs_above_1_meV_per_atom": 0,
+      "max_cell_rmsd_A": 0.004951859453788402,
+      "max_energy_error_eV_per_atom": 0.00014124810695648193,
+      "max_position_rmsd_A": 0.005919320884005544,
+      "median_energy_error_eV_per_atom": 7.82310962677002e-08,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/correctness/auto_atombit_fire_AXOSOW_R64.json",
+          "sha256": "bbe5450cc868f60b9d4898351333e6edee010caecc633188767818eb4495fafd"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_atombit_fire_AXOSOW_R64_G1.json",
+          "sha256": "8ea8a42253fc09cf028e8f3f8e2c346344991cf09a0fb4c51821c642d5db6247"
+        }
+      },
+      "step_mismatches": 24,
+      "strict_1_meV_per_atom_gate": true
+    },
+    {
+      "case_id": "AXOSOW-R64-atombit-bfgs",
+      "convergence_flags_match": true,
+      "interpretation": "long-run full-BFGS local-minimum sensitivity; fixed-step equations were validated separately",
+      "jobs": 64,
+      "jobs_above_1_meV_per_atom": 20,
+      "max_cell_rmsd_A": 0.8178405406244629,
+      "max_energy_error_eV_per_atom": 0.02977888286113739,
+      "max_position_rmsd_A": 1.0833327438307734,
+      "median_energy_error_eV_per_atom": 4.6737492084503174e-05,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/correctness/auto_atombit_bfgs_AXOSOW_R64.json",
+          "sha256": "84105e52a3f12e5bcff02ee3aa8a4d90f29a332f0ee5c628c6e8de78cff48a80"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_atombit_bfgs_AXOSOW_R64_G1.json",
+          "sha256": "7ae45731058b1f718ff055735d218f58a844331642d9fca1a1d58d0f0044fa90"
+        }
+      },
+      "step_mismatches": 52,
+      "strict_1_meV_per_atom_gate": false
+    },
+    {
+      "case_id": "AXOSOW-R64-mace-fire",
+      "convergence_flags_match": true,
+      "interpretation": "scheduler/reassembly agreement",
+      "jobs": 64,
+      "jobs_above_1_meV_per_atom": 0,
+      "max_cell_rmsd_A": 0.0022221087600526497,
+      "max_energy_error_eV_per_atom": 9.080958557206031e-05,
+      "max_position_rmsd_A": 0.0036431497591022438,
+      "median_energy_error_eV_per_atom": 3.410605131648481e-13,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/correctness/auto_mace_fire_AXOSOW_R64.json",
+          "sha256": "0940f00b1b5dfa6e3ff442a27f52a428e0e511a1c07e635fcea03a6e38157f33"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_mace_fire_AXOSOW_R64_G1.json",
+          "sha256": "06950fd3141da2745847553b953f734c9a461bae8cfd477be5aad2ad088a12c2"
+        }
+      },
+      "step_mismatches": 4,
+      "strict_1_meV_per_atom_gate": true
+    },
+    {
+      "case_id": "AXOSOW-R64-mace-bfgs",
+      "convergence_flags_match": true,
+      "interpretation": "long-run full-BFGS local-minimum sensitivity; fixed-step equations were validated separately",
+      "jobs": 64,
+      "jobs_above_1_meV_per_atom": 6,
+      "max_cell_rmsd_A": 0.40681093882288205,
+      "max_energy_error_eV_per_atom": 0.012719415164269776,
+      "max_position_rmsd_A": 0.7258012505279409,
+      "median_energy_error_eV_per_atom": 2.9199105711086304e-07,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/correctness/auto_mace_bfgs_AXOSOW_R64.json",
+          "sha256": "2c7a11ddc6d7c3a4a99aad39a18ccb857c3af90e0dab5c8a3f50b6efa0c6a87f"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_mace_bfgs_AXOSOW_R64_G1.json",
+          "sha256": "9f14aa2e87b8ec01fdf4d8207889efd0f1c0be34092c43047446a2c656d4174d"
+        }
+      },
+      "step_mismatches": 25,
+      "strict_1_meV_per_atom_gate": false
+    },
+    {
+      "case_id": "XAFPAY-R64-atombit-fire",
+      "convergence_flags_match": true,
+      "interpretation": "scheduler/reassembly agreement",
+      "jobs": 64,
+      "jobs_above_1_meV_per_atom": 0,
+      "max_cell_rmsd_A": 1.9217986536287234e-06,
+      "max_energy_error_eV_per_atom": 3.992125045421512e-07,
+      "max_position_rmsd_A": 2.2133271112126157e-05,
+      "median_energy_error_eV_per_atom": 4.990156306776889e-08,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/correctness/auto_atombit_fire_XAFPAY_R64.json",
+          "sha256": "a34812b36758479bf57eaef3307d22355c66953a2837d136bdff098f3c359ba4"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_atombit_fire_XAFPAY_R64_G1.json",
+          "sha256": "98685850ed581c656f68a83ae8f98a8729461ea26f300a7a0900d100c5b2e145"
+        }
+      },
+      "step_mismatches": 2,
+      "strict_1_meV_per_atom_gate": true
+    },
+    {
+      "case_id": "XAFPAY-R64-atombit-bfgs",
+      "convergence_flags_match": true,
+      "interpretation": "long-run full-BFGS local-minimum sensitivity; fixed-step equations were validated separately",
+      "jobs": 64,
+      "jobs_above_1_meV_per_atom": 0,
+      "max_cell_rmsd_A": 0.015186005040602961,
+      "max_energy_error_eV_per_atom": 0.0006942194561625636,
+      "max_position_rmsd_A": 0.093047378885391,
+      "median_energy_error_eV_per_atom": 3.9921250454215113e-07,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/correctness/auto_atombit_bfgs_XAFPAY_R64.json",
+          "sha256": "577f0d7d661d42b3a9c530e2c4618415db734df45abc35abd38c9f807177334d"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_atombit_bfgs_XAFPAY_R64_G1.json",
+          "sha256": "9dc56b3aac88eae410ece729abf509ca6c560cdde02014826f80ee9b9899e8f2"
+        }
+      },
+      "step_mismatches": 19,
+      "strict_1_meV_per_atom_gate": true
+    },
+    {
+      "case_id": "XAFPAY-R64-mace-fire",
+      "convergence_flags_match": true,
+      "interpretation": "scheduler/reassembly agreement",
+      "jobs": 64,
+      "jobs_above_1_meV_per_atom": 0,
+      "max_cell_rmsd_A": 1.362663774328721e-10,
+      "max_energy_error_eV_per_atom": 8.629624147054762e-12,
+      "max_position_rmsd_A": 2.8071569908814485e-10,
+      "median_energy_error_eV_per_atom": 2.70733306574267e-12,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/correctness/auto_mace_fire_XAFPAY_R64.json",
+          "sha256": "948c0e807e4833b3af353619641d85ec41752abd267b8d81cc7659ccbda9bbbf"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_mace_fire_XAFPAY_R64_G1.json",
+          "sha256": "89b51fb44b917d6c7cfcc6f13c598283c4479225a3fae357f19c5bc39c27bb38"
+        }
+      },
+      "step_mismatches": 0,
+      "strict_1_meV_per_atom_gate": true
+    },
+    {
+      "case_id": "XAFPAY-R64-mace-bfgs",
+      "convergence_flags_match": true,
+      "interpretation": "long-run full-BFGS local-minimum sensitivity; fixed-step equations were validated separately",
+      "jobs": 64,
+      "jobs_above_1_meV_per_atom": 0,
+      "max_cell_rmsd_A": 0.008392286193282396,
+      "max_energy_error_eV_per_atom": 0.00013548127432397113,
+      "max_position_rmsd_A": 0.02971064796082895,
+      "median_energy_error_eV_per_atom": 1.0223168849966727e-07,
+      "raw": {
+        "automatic": {
+          "path": "experiments/end-to-end-optimization-policy/raw/correctness/auto_mace_bfgs_XAFPAY_R64.json",
+          "sha256": "d849e0e8a38fb9f0febe33bdc3e985be096379f542b5fdd8d9fc1613bcf13385"
+        },
+        "manual": {
+          "path": "experiments/end-to-end-optimization-policy/raw/manual_mace_bfgs_XAFPAY_R64_G1.json",
+          "sha256": "a2ec02dd66f98be5568eff145e30e18cb0457d972d9d12fbb04cbeb57bd2036e"
+        }
+      },
+      "step_mismatches": 12,
+      "strict_1_meV_per_atom_gate": true
+    }
+  ],
+  "experiment": "end-to-end-optimization-policy",
+  "schema_version": 1,
+  "summary": {
+    "all_jobs_converged": 14,
+    "cases": 16,
+    "convergence_match": 16,
+    "failed_manual_throughput_cases": [
+      "AXOSOW-R256-mace-bfgs",
+      "XAFPAY-R64-atombit-fire"
+    ],
+    "geometric_mean": {
+      "automatic_production_fraction_of_manual": 1.0626226635050018,
+      "automatic_production_speedup_over_mps": 2.981550789599511,
+      "automatic_total_speedup_over_mps": 2.3773612815092746
+    },
+    "incomplete_convergence_cases": [
+      "AXOSOW-R64-atombit-fire",
+      "AXOSOW-R256-atombit-fire"
+    ],
+    "maximum_conservative_memory_fraction": 0.826079382086998,
+    "memory_safe": 16,
+    "planning_seconds": {
+      "maximum": 1.5697072171606123,
+      "median": 0.5661043934524059
+    },
+    "production_faster_than_mps": 16,
+    "production_within_5_percent_of_manual": 14,
+    "schema_version": 1,
+    "status": "stage_1_complete_stage_2_blocked",
+    "strict_numerical_cases_passed": 6,
+    "strict_numerical_cases_total": 8,
+    "strict_numerical_failures": [
+      "AXOSOW-R64-atombit-bfgs",
+      "AXOSOW-R64-mace-bfgs"
+    ],
+    "total_api_faster_than_mps": 16,
+    "worker_startup_seconds": {
+      "maximum": 26.794373868964612,
+      "median": 8.795996259897947
+    }
+  }
+}

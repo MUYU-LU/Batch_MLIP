@@ -1,0 +1,129 @@
+id: end-to-end-optimization-policy
+date: 2026-07-27
+baseline_commit: 0704b0e42fa82f5a92de189914a13e9361827275
+description: >-
+  Validate the plug-and-play deterministic 85-percent-memory optimization
+  policy against a directly measured manual active-drain oracle and ASE CUDA
+  MPS with four workers per GPU.
+hypothesis: >-
+  Without optimization pilot runs, BatchExecutor selects memory-safe chunks
+  whose execution throughput is within 5 percent of the matched manual
+  active-drain oracle and exceeds four-worker ASE CUDA MPS on independent
+  non-T2 molecular-crystal pools.
+mechanism: >-
+  One representative model forward estimates memory, deterministic
+  atom-and-edge bucketing packs chunks to 85 percent of H100 memory, and
+  persistent child-owned calculators execute active-compacted chunks without
+  duplicated or omitted jobs.
+workloads:
+  stage_1:
+    gpu_count: 1
+    pool_sizes: [64, 256]
+    manifests:
+      - benchmarks/workloads/manifests/OPT-RB-AXOSOW64-R256-v1.json
+      - benchmarks/workloads/manifests/OPT-RB-XAFPAY172-R256-v1.json
+    mlips: [atombit, mace]
+    optimizers: [fire, bfgs]
+    methods: [automatic, manual_active_drain, ase_cuda_mps_4]
+  stage_2:
+    condition: run only after stage_1 correctness and memory gates pass
+    gpu_count: 4
+    pool_sizes: [64, 256]
+    representative_workloads: [smallest_stage_1, largest_stage_1]
+    mlips: [atombit, mace]
+    optimizers: [fire, bfgs]
+    methods: [automatic, manual_active_drain, ase_cuda_mps_4_per_gpu]
+fairness:
+  gpu: NVIDIA H100 80GB HBM3
+  cpu_threads_per_process: 1
+  timing_repeats: 1
+  warmup_excluded: true
+  deterministic_algorithms: true
+  variable_cell: FrechetCellFilter
+  fmax_eV_per_A: 0.05
+  active_compaction: true
+  refill: false
+  model:
+    atombit:
+      dtype: float32
+      cutoff_A: 6.0
+      skin_A: 0.5
+    mace:
+      dtype: float64
+      model: MACE-OFF-Small
+      cutoff_A: 5.0
+      skin_A: 0.5
+  optimizer:
+    fire:
+      max_steps: 2000
+    bfgs:
+      max_steps: 500
+      optimizer_dtype: float64
+      alpha_eV_per_A2: 70.0
+      max_step_A: 0.2
+metrics:
+  primary:
+    - execution_wall_seconds
+    - systems_per_second
+    - peak_allocated_bytes
+    - peak_reserved_or_device_bytes
+  automatic_overhead:
+    - profiling_seconds
+    - planning_seconds
+    - worker_startup_seconds
+    - total_api_wall_seconds
+  correctness:
+    - converged_count
+    - converged_steps
+    - model_evaluations
+    - graph_evaluations
+    - final_energy
+    - final_force
+    - final_cell
+gates:
+  no_oom: true
+  no_duplicated_or_omitted_jobs: true
+  peak_memory_fraction_max: 0.85
+  automatic_throughput_fraction_of_manual_min: 0.95
+  numerical_agreement: optimizer_and_model_specific_existing_tolerances
+  convergence_match: true
+result:
+  status: stage_1_complete_stage_2_blocked
+  hypothesis: partially_rejected
+  artifact: results.json
+  stage_1_cases: 16
+  production_within_5_percent_of_manual: 14
+  production_faster_than_mps: 16
+  total_api_faster_than_mps: 16
+  memory_safe: 16
+  convergence_match: 16
+  all_jobs_converged: 14
+  strict_numerical_cases_passed: 6
+  strict_numerical_cases_total: 8
+  geometric_mean:
+    automatic_production_fraction_of_manual: 1.0626
+    automatic_production_speedup_over_mps: 2.9816
+    automatic_total_speedup_over_mps: 2.3774
+  maximum_conservative_memory_fraction: 0.8261
+  memory_correction: >-
+    The initial allocated-memory calibration admitted unsafe MACE chunks.
+    Calibrating model work from peak reserved device memory reduced XAFPAY
+    MACE R256 chunks to 215+41 for FIRE and 187+69 for BFGS.
+  stage_2_decision: >-
+    Do not run the four-GPU matrix because two manual-throughput gates and two
+    long-run BFGS final-state gates failed.
+  validation:
+    pytest: 235 passed, 8 skipped
+    pytest_seconds: 103.85
+    skipped_scope: opt-in MACE integration tests
+    ruff_changed_files: passed
+    ruff_repository: >-
+      blocked by a pre-existing import-order finding in
+      benchmarks/summarize_smooth_optimizer_frontier.py
+limitations:
+  - one timing run per case at the user's request; no uncertainty estimate
+  - AXOSOW AtomBit FIRE reaches the 2000-step cap for 2/64 unique-prefix jobs
+  - full BFGS can select different minima across separate GPU processes even
+    when deterministic algorithms are requested; fixed-step equations were
+    validated in the existing BFGS experiments
+  - validated on NVIDIA H100 80GB, AtomBit smooth-rms, and MACE-OFF-Small

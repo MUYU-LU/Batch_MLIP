@@ -530,6 +530,20 @@ def _device_memory_budget(
     )
 
 
+def _reserved_incremental_bytes(
+    *,
+    baseline_allocated: int,
+    peak_allocated: int,
+    peak_reserved: int,
+) -> int:
+    """Return probe growth on the device-occupancy memory basis."""
+
+    return max(
+        1,
+        max(peak_allocated, peak_reserved) - baseline_allocated,
+    )
+
+
 def _measure_representative_memory(
     systems: list[Atoms],
     calculator: BatchCalculator,
@@ -575,12 +589,19 @@ def _measure_representative_memory(
         torch.cuda.synchronize(device)
         peak_allocated = torch.cuda.max_memory_allocated(device)
         peak_reserved = torch.cuda.max_memory_reserved(device)
-    if memory_budget is not None and peak_allocated > memory_budget:
+    if memory_budget is not None and peak_reserved > memory_budget:
         raise MemoryError(
             "the representative model forward exceeds the configured "
             f"{memory_budget}-byte device budget"
         )
-    incremental = max(1, peak_allocated - baseline_allocated)
+    # The production limit applies to device occupancy, not just live tensors.
+    # Calibrating from reserved memory includes allocator fragmentation and
+    # segment granularity observed by the representative forward.
+    incremental = _reserved_incremental_bytes(
+        baseline_allocated=baseline_allocated,
+        peak_allocated=peak_allocated,
+        peak_reserved=peak_reserved,
+    )
     model_bytes_per_work = incremental / max(1, probe_work)
     del probe_evaluation, probe_state
     _empty_device_cache(device)

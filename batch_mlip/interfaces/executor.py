@@ -75,6 +75,10 @@ class _ExecutorWorkerRunner:
     allocator_metadata: dict[str, Any]
 
     def __call__(self, task: _ExecutorRelaxTask) -> RelaxationResult:
+        device = self.calculator.device
+        if device.type == "cuda":
+            torch.cuda.synchronize(device)
+            torch.cuda.reset_peak_memory_stats(device)
         result = relax(
             task.systems,
             self.calculator,
@@ -82,12 +86,21 @@ class _ExecutorWorkerRunner:
             scheduling="single_batch",
             **task.optimizer_kwargs,
         )
+        if device.type == "cuda":
+            torch.cuda.synchronize(device)
+            peak_allocated = torch.cuda.max_memory_allocated(device)
+            peak_reserved = torch.cuda.max_memory_reserved(device)
+        else:
+            peak_allocated = None
+            peak_reserved = None
         if result.state.device.type == "cuda":
             torch.cuda.synchronize(result.state.device)
             result = _offload_relaxation_result(result)
         result.metadata["executor_worker"] = {
             **self.allocator_metadata,
             "pid": os.getpid(),
+            "peak_allocated_bytes": peak_allocated,
+            "peak_reserved_bytes": peak_reserved,
         }
         return result
 
@@ -162,13 +175,23 @@ def _worker_records(
         for task_index in worker_result.task_indices:
             chunk = chunks[task_index]
             task_result = task_results[task_index]
-            allocator = task_result.payload.metadata.get("executor_worker")
+            worker_metadata = task_result.payload.metadata.get(
+                "executor_worker",
+                {},
+            )
+            allocator = worker_metadata
             completed.append(
                 {
                     "bucket_index": chunk.bucket_index,
                     "system_count": len(chunk.indices),
                     "estimated_cost": chunk.cost,
                     "wall_seconds": task_result.run_seconds,
+                    "peak_allocated_bytes": worker_metadata.get(
+                        "peak_allocated_bytes"
+                    ),
+                    "peak_reserved_bytes": worker_metadata.get(
+                        "peak_reserved_bytes"
+                    ),
                     "schedule": task_result.payload.metadata.get(
                         "scheduling",
                         {"decision": "single_batch"},

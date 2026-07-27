@@ -16,6 +16,7 @@ from batch_mlip import (
     plan_deterministic_relaxation,
     relax,
 )
+from batch_mlip.interfaces.api import _reserved_incremental_bytes
 
 
 class QuadraticCalculator(BatchCalculator):
@@ -96,6 +97,19 @@ def test_deterministic_planner_respects_absolute_memory_budget():
     assert sorted(
         index for chunk in plan.chunks for index in chunk.system_indices
     ) == [0, 1, 2]
+
+
+def test_probe_incremental_memory_uses_reserved_device_occupancy():
+    assert _reserved_incremental_bytes(
+        baseline_allocated=100,
+        peak_allocated=400,
+        peak_reserved=700,
+    ) == 600
+    assert _reserved_incremental_bytes(
+        baseline_allocated=100,
+        peak_allocated=400,
+        peak_reserved=350,
+    ) == 300
 
 
 def test_dense_bfgs_allowance_changes_deterministic_capacity():

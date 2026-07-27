@@ -46,6 +46,13 @@ def _schedule_batches(schedule: dict[str, Any]) -> list[dict[str, Any]]:
     return batches
 
 
+def _worker_chunks(schedule: dict[str, Any]) -> list[dict[str, Any]]:
+    chunks = []
+    for worker in schedule.get("workers", ()):
+        chunks.extend(worker.get("chunks", ()))
+    return chunks
+
+
 def _tensor_sha256(tensor: torch.Tensor) -> str:
     values = tensor.detach().cpu().contiguous().numpy()
     return hashlib.sha256(values.tobytes()).hexdigest()
@@ -61,16 +68,18 @@ def _result_record(
 ) -> dict[str, Any]:
     schedule = result.metadata["scheduling"]
     batches = _schedule_batches(schedule)
+    worker_chunks = _worker_chunks(schedule)
+    memory_records = [*batches, *worker_chunks]
     record = {
         "wall_time_s": wall_seconds,
         "systems_per_s": jobs / wall_seconds,
         "atoms_per_s": atoms / wall_seconds,
         "peak_allocated_bytes": max(
-            (batch.get("peak_allocated_bytes") or 0 for batch in batches),
+            (batch.get("peak_allocated_bytes") or 0 for batch in memory_records),
             default=0,
         ),
         "peak_reserved_bytes": max(
-            (batch.get("peak_reserved_bytes") or 0 for batch in batches),
+            (batch.get("peak_reserved_bytes") or 0 for batch in memory_records),
             default=0,
         ),
         "converged": int(result.converged.sum().item()),
@@ -110,6 +119,11 @@ def main() -> None:
     )
     parser.add_argument("--devices", required=True)
     parser.add_argument("--calls", type=int, default=3)
+    parser.add_argument(
+        "--job-limit",
+        type=int,
+        help="Run the first N signed jobs; omit to run the complete workload.",
+    )
     parser.add_argument("--resident-batch-size", type=int, default=128)
     parser.add_argument(
         "--cold-start-jobs",
@@ -142,6 +156,8 @@ def main() -> None:
     args = parser.parse_args()
     if args.calls <= 0 or args.resident_batch_size <= 0:
         parser.error("calls and resident batch size must be positive")
+    if args.job_limit is not None and args.job_limit <= 0:
+        parser.error("job limit must be positive")
     if args.cold_start_jobs <= 0:
         parser.error("cold-start jobs must be positive")
     if args.clear_cache:
@@ -175,6 +191,8 @@ def main() -> None:
         args.workload_manifest,
         args.dataset_dir,
     )
+    if args.job_limit is not None:
+        systems = systems[: args.job_limit]
     jobs = len(systems)
     atoms = sum(len(system) for system in systems)
     primary_device = torch.device(devices[0])
@@ -304,6 +322,8 @@ def main() -> None:
         "workload_manifest": str(args.workload_manifest),
         "workload_manifest_sha256": manifest.manifest_sha256,
         "jobs": jobs,
+        "workload_jobs": len(manifest.jobs),
+        "job_limit": args.job_limit,
         "atoms": atoms,
         "devices": devices,
         "gpu_count": len(devices),
