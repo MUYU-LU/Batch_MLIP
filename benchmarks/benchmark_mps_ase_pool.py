@@ -82,8 +82,6 @@ def parse_args() -> argparse.Namespace:
         parser.error("pool size, worker count, and CPU thread count must be positive")
     if args.worker_start_interval < 0:
         parser.error("worker start interval must be non-negative")
-    if args.pool_size % args.workers:
-        parser.error("pool size must be divisible by worker count")
     if args.task == "optimization" and args.optimizer is None:
         parser.error("--optimizer is required for optimization")
     if args.task != "optimization" and args.workload_manifest is None:
@@ -149,6 +147,23 @@ def consistent_worker_parameters(
     return resolved
 
 
+def worker_bounds(
+    pool_size: int,
+    worker_count: int,
+    worker_id: int,
+) -> tuple[int, int]:
+    """Return contiguous balanced bounds when jobs do not divide evenly."""
+
+    if pool_size <= 0 or worker_count <= 0:
+        raise ValueError("pool size and worker count must be positive")
+    if not 0 <= worker_id < worker_count:
+        raise ValueError("worker_id is outside the worker range")
+    base, remainder = divmod(pool_size, worker_count)
+    size = base + int(worker_id < remainder)
+    start = worker_id * base + min(worker_id, remainder)
+    return start, start + size
+
+
 def _worker_impl(
     worker_id: int,
     args: argparse.Namespace,
@@ -180,8 +195,8 @@ def _worker_impl(
     torch.use_deterministic_algorithms(args.deterministic)
     torch.set_num_threads(args.cpu_threads_per_worker)
     torch.set_num_interop_threads(1)
-    shard_size = args.pool_size // args.workers
-    start = worker_id * shard_size
+    start, stop = worker_bounds(args.pool_size, args.workers, worker_id)
+    shard_size = stop - start
     systems = []
     if args.workload_manifest is not None:
         workload = read_workload_manifest(args.workload_manifest)
@@ -190,7 +205,7 @@ def _worker_impl(
                 f"pool size {args.pool_size} exceeds signed workload "
                 f"size {len(workload.jobs)}"
             )
-        jobs = workload.jobs[start : start + shard_size]
+        jobs = workload.jobs[start:stop]
         names = [job.system_id for job in jobs]
         for job in jobs:
             atoms = read(
@@ -208,7 +223,7 @@ def _worker_impl(
             base_names[index % len(base_names)]
             for index in range(args.pool_size)
         ]
-        names = global_names[start : start + shard_size]
+        names = global_names[start:stop]
         for name in names:
             atoms = read(args.dataset_dir / name)
             if len(atoms) != args.atom_count:
@@ -706,7 +721,11 @@ def main() -> None:
         "atom_count": args.atom_count,
         "pool_size": args.pool_size,
         "workers": args.workers,
-        "systems_per_worker": args.pool_size // args.workers,
+        "systems_per_worker": [
+            worker_bounds(args.pool_size, args.workers, worker_id)[1]
+            - worker_bounds(args.pool_size, args.workers, worker_id)[0]
+            for worker_id in range(args.workers)
+        ],
         "mps": {
             "cuda_visible_devices": os.environ.get("CUDA_VISIBLE_DEVICES"),
             "pipe_directory": os.environ["CUDA_MPS_PIPE_DIRECTORY"],

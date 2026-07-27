@@ -4,6 +4,7 @@ import os
 from dataclasses import dataclass
 
 import pytest
+import torch.multiprocessing as torch_mp
 
 from batch_mlip import (
     ParallelWorkerError,
@@ -59,6 +60,19 @@ class EnvironmentTaskPreparer:
         return EnvironmentTaskRunner(
             tuple(os.environ.get(name) for name in self.names)
         )
+
+
+@dataclass(frozen=True)
+class SharingStrategyRunner:
+    def __call__(self, value):
+        return value, torch_mp.get_sharing_strategy()
+
+
+@dataclass(frozen=True)
+class SharingStrategyPreparer:
+    def __call__(self, worker):
+        del worker
+        return SharingStrategyRunner()
 
 
 def test_balance_work_is_deterministic_and_cost_balanced():
@@ -175,6 +189,18 @@ def test_persistent_task_pool_reuses_workers_and_preserves_call_order():
         ) == list(range(5))
 
     assert pool.closed
+
+
+def test_persistent_task_pool_uses_scalable_tensor_sharing():
+    with PersistentTaskPool(
+        ["cpu:0"],
+        SharingStrategyPreparer(),
+        startup_timeout_seconds=30.0,
+        run_timeout_seconds=30.0,
+    ) as pool:
+        execution = pool.execute([1], [1.0])
+
+    assert execution.task_results[0].payload == (1, "file_system")
 
 
 def test_persistent_task_pool_failure_breaks_generation():

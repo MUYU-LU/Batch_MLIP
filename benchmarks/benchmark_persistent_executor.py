@@ -126,6 +126,11 @@ def main() -> None:
     )
     parser.add_argument("--resident-batch-size", type=int, default=128)
     parser.add_argument(
+        "--automatic-capacity",
+        action="store_true",
+        help="Use unmodified AutoSchedulerConfig capacity defaults.",
+    )
+    parser.add_argument(
         "--cold-start-jobs",
         type=int,
         default=AutoSchedulerConfig().multi_gpu_cold_start_jobs,
@@ -228,13 +233,21 @@ def main() -> None:
         compute_stress=True,
     )
     synchronize(primary_device)
+    config_options: dict[str, Any] = {
+        "cache_path": args.cache_path,
+        "multi_gpu_cold_start_jobs": args.cold_start_jobs,
+        "multi_gpu_worker_backend": "process",
+        "multi_gpu_process_cpu_threads": 1,
+    }
+    if not args.automatic_capacity:
+        config_options.update(
+            {
+                "initial_batch_size": args.resident_batch_size,
+                "max_batch_size": args.resident_batch_size,
+            }
+        )
     config = AutoSchedulerConfig(
-        cache_path=args.cache_path,
-        initial_batch_size=args.resident_batch_size,
-        max_batch_size=args.resident_batch_size,
-        multi_gpu_cold_start_jobs=args.cold_start_jobs,
-        multi_gpu_worker_backend="process",
-        multi_gpu_process_cpu_threads=1,
+        **config_options,
     )
 
     def optimizer_options(name: str) -> dict[str, Any]:
@@ -328,7 +341,10 @@ def main() -> None:
         "devices": devices,
         "gpu_count": len(devices),
         "calls": args.calls,
-        "resident_batch_size": args.resident_batch_size,
+        "resident_batch_size": (
+            None if args.automatic_capacity else args.resident_batch_size
+        ),
+        "automatic_capacity": args.automatic_capacity,
         "cold_start_jobs": args.cold_start_jobs,
         "fmax_eV_per_A": args.fmax,
         "max_steps": max_steps,

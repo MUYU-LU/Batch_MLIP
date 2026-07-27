@@ -8,7 +8,9 @@ from benchmarks.benchmark_mps_ase_pool import (
     aggregate_throughput,
     consistent_worker_parameters,
     parse_args,
+    worker_bounds,
 )
+from benchmarks.run_mps_four_gpu import terminal_summary
 
 
 @pytest.mark.parametrize("task", ["nve", "nvt", "npt"])
@@ -35,6 +37,30 @@ def test_mps_worker_parameters_must_match():
             workers,
             ("warmup_steps", "measured_steps", "timestep_fs"),
         )
+
+
+def test_worker_bounds_cover_uneven_pool_exactly():
+    bounds = [worker_bounds(10, 4, worker_id) for worker_id in range(4)]
+
+    assert bounds == [(0, 3), (3, 6), (6, 8), (8, 10)]
+    assert [
+        index
+        for start, stop in bounds
+        for index in range(start, stop)
+    ] == list(range(10))
+
+
+def test_four_gpu_terminal_summary_excludes_full_worker_records():
+    aggregate = {
+        "jobs": 3000,
+        "systems_per_second": 2.0,
+        "gpu_results": [{"records": [{"positions_A": [1.0]}]}],
+    }
+
+    assert terminal_summary(aggregate) == {
+        "jobs": 3000,
+        "systems_per_second": 2.0,
+    }
 
 
 def test_evaluation_accepts_signed_manifest_without_optimizer(

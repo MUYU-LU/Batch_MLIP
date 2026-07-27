@@ -15,6 +15,8 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, Protocol
 
+import torch.multiprocessing as torch_mp
+
 
 @dataclass(frozen=True)
 class WorkerShard:
@@ -143,6 +145,12 @@ def _install_worker_environment(
             os.environ.pop(name, None)
         else:
             os.environ[name] = value
+
+
+def _use_scalable_tensor_sharing() -> None:
+    """Avoid exhausting child-owned file descriptors for large result pools."""
+
+    torch_mp.set_sharing_strategy("file_system")
 
 
 def balance_work(
@@ -298,6 +306,11 @@ def _persistent_task_worker_entry(
 ) -> None:
     startup_started = time.perf_counter()
     try:
+        _use_scalable_tensor_sharing()
+        # The parent receives every task before requesting shutdown. Avoid
+        # waiting again on the child queue feeder while file-system tensor
+        # handles are being released.
+        result_queue.cancel_join_thread()
         _install_worker_environment(worker_environment)
         runner = prepare(worker)
         ready_queue.put(
@@ -673,6 +686,7 @@ class PersistentTaskPool:
         self._call_id = 0
 
         context = mp.get_context(start_method)
+        _use_scalable_tensor_sharing()
         self._task_queues = tuple(
             context.Queue() for _ in self._workers
         )

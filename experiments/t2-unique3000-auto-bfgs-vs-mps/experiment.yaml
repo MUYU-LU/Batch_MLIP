@@ -1,0 +1,94 @@
+id: t2-unique3000-auto-bfgs-vs-mps
+date: 2026-07-27
+baseline_commit: ce3cb1f5738e90807ac587d2044ec0f673d8114c
+hypothesis: >-
+  For 3,000 distinct mixed-size T2 structures, the unmodified automatic
+  BatchExecutor policy completes variable-cell AtomBit BFGS faster than
+  four ASE BFGS processes per GPU under CUDA MPS, while covering the same
+  signed structures and preserving the convergence criterion.
+dataset:
+  archive: /public/home/lmy/Batch_imple_project/T2_test.tgz
+  available_cifs: 6000
+  selected_cifs: 3000
+  selection: lowest seeded SHA-256 filename ranks
+  selection_seed: 20260728
+  synthetic_repetition: false
+configuration:
+  mlip: AtomBit smooth_rms fp32
+  optimizer: BFGS
+  optimizer_dtype: float64
+  linear_algebra_backend: auto
+  variable_cell: FrechetCellFilter
+  fmax_eV_per_A: 0.05
+  max_steps: 500
+  alpha_eV_per_A2: 70.0
+  max_step_A: 0.2
+  gpu_count: 4
+  deterministic_algorithms: true
+methods:
+  automatic:
+    api: BatchExecutor
+    capacity_overrides: none
+    auto_config: library_defaults_except_process_execution_controls
+  mps:
+    ase_workers_per_gpu: 4
+    total_workers: 16
+fairness:
+  timing_repeats: 1
+  cpu_threads_per_process: 1
+  same_signed_jobs: true
+  same_checkpoint: true
+  same_optimizer_and_convergence_settings: true
+  mps_sharding: >-
+    capacity-constrained LPT using only signed atom and edge metadata;
+    no measured runtimes
+timing:
+  automatic_production: worker execution only
+  automatic_api: planning, worker startup, production, and reassembly
+  mps_production: maximum synchronized harness wall time across four GPUs
+  mps_session: daemon startup, model/data setup, production, and shutdown
+results:
+  automatic:
+    production_wall_seconds: 395.94742009881884
+    api_wall_seconds: 413.04927881387994
+    systems_per_second_api: 7.2630558964171446
+    atoms_per_second_api: 1143.5148884809723
+    converged: 2999
+    model_evaluations: 21751
+    graph_evaluations: 354736
+    peak_allocated_GiB_per_gpu_max: 11.214253425598145
+    peak_reserved_GiB_per_gpu_max: 12.609375
+    execution_chunks: 76
+    optimization_pilot_runs: 0
+  mps:
+    production_wall_seconds: 1472.1299564172514
+    session_wall_seconds: 1551.4317693938501
+    systems_per_second: 2.03786356423393
+    atoms_per_second: 320.84667385582793
+    converged: 2999
+    model_evaluations: 352483
+    peak_sampled_device_GiB_per_gpu:
+      - 6.7197265625
+      - 8.8193359375
+      - 8.3505859375
+      - 7.0732421875
+  speedup:
+    production_vs_production: 3.7179935559369057
+    automatic_api_vs_mps_production: 3.5640540534162106
+  coverage:
+    distinct_sources: 3000
+    duplicated_sources: 0
+    same_source_set: true
+    same_nonconverged_source: structures/Aven12_2_880_z1.cif
+conclusion: >-
+  Supported. The untuned automatic scheduler is 3.72x faster in production
+  and 3.56x faster including its planning, worker startup, and reassembly.
+  Both methods converge the same 2,999 jobs. The automatic scheduler uses
+  more peak GPU memory, but its observed 12.61 GiB reserved maximum remains
+  far below the configured 85 percent H100 budget, showing that the offline
+  memory model remains conservative for this mixed workload.
+limitations:
+  - Single deterministic timing trial, as requested.
+  - AtomBit smooth_rms fp32 and variable-cell BFGS only.
+  - MPS memory is sampled device usage; automatic memory is PyTorch allocator telemetry.
+status: complete
