@@ -120,6 +120,7 @@ def main() -> None:
         default="repack",
     )
     parser.add_argument("--refill-interval", type=int, default=1)
+    parser.add_argument("--convergence-check-interval", type=int, default=1)
     parser.add_argument("--refill-tail-compaction-threshold", type=float)
     parser.add_argument("--cpu-threads", type=int, default=1)
     parser.add_argument("--deterministic", action="store_true")
@@ -156,6 +157,16 @@ def main() -> None:
         parser.error("CPU thread count must be positive")
     if args.refill_interval <= 0:
         parser.error("refill interval must be positive")
+    if args.convergence_check_interval <= 0:
+        parser.error("convergence check interval must be positive")
+    if args.convergence_check_interval != 1 and (
+        args.mlip != "atombit"
+        or args.optimizer != "bfgs"
+        or args.method != "refill"
+    ):
+        parser.error(
+            "blockwise convergence checks currently require AtomBit BFGS refill"
+        )
     if args.refill_tail_compaction_threshold is not None and not (
         0.0 < args.refill_tail_compaction_threshold < 1.0
     ):
@@ -222,6 +233,7 @@ def main() -> None:
                 refill_storage=args.refill_storage,
                 refill_min_chunk=1 if args.method == "refill" else None,
                 refill_interval=args.refill_interval,
+                convergence_check_interval=args.convergence_check_interval,
                 refill_tail_compaction_threshold=args.refill_tail_compaction_threshold,
                 linear_algebra_backend=args.linear_algebra_backend,
                 **common,
@@ -300,6 +312,9 @@ def main() -> None:
         "batch_size": None if args.method == "ase" else args.batch_size,
         "refill_storage": (args.refill_storage if args.method == "refill" else None),
         "refill_interval": (args.refill_interval if args.method == "refill" else None),
+        "convergence_check_interval": (
+            args.convergence_check_interval if args.method == "refill" else None
+        ),
         "refill_tail_compaction_threshold": (
             args.refill_tail_compaction_threshold if args.method == "refill" else None
         ),

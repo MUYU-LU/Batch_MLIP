@@ -314,6 +314,7 @@ def test_variable_cell_bfgs_refill_policies_preserve_state_and_output_order():
         refill_policy: str = "immediate",
         refill_storage: str = "repack",
         refill_interval: int = 1,
+        convergence_check_interval: int = 1,
         refill_tail_compaction_threshold: float | None = None,
         linear_algebra_backend: str = "auto",
     ):
@@ -329,6 +330,7 @@ def test_variable_cell_bfgs_refill_policies_preserve_state_and_output_order():
             refill_policy=refill_policy,
             refill_storage=refill_storage,
             refill_interval=refill_interval,
+            convergence_check_interval=convergence_check_interval,
             refill_tail_compaction_threshold=refill_tail_compaction_threshold,
             refill_low_watermark=0.5,
             refill_min_chunk=(1 if refill_batch_size is not None else None),
@@ -377,6 +379,16 @@ def test_variable_cell_bfgs_refill_policies_preserve_state_and_output_order():
         if name != "periodic":
             assert refill.active_batch_sizes[-1] == 1
     assert results["periodic"].graph_evaluations > results["slots"].graph_evaluations
+
+    blockwise = run(
+        refill_batch_size=2,
+        refill_storage="slots",
+        refill_interval=5,
+        convergence_check_interval=5,
+    )
+    assert bool(blockwise.converged.all())
+    assert bool((blockwise.converged_step >= active.converged_step).all())
+    assert bool((blockwise.converged_step - active.converged_step <= 4).all())
 
     tail_control = run(refill_batch_size=4, refill_storage="slots")
     tail = run(
@@ -638,6 +650,22 @@ def test_refill_preserves_survivor_neighbor_cache(monkeypatch):
         ),
         ({"refill_interval": 0}, "refill_interval must be"),
         ({"refill_interval": 2}, "require refill_batch_size"),
+        (
+            {"convergence_check_interval": 0},
+            "convergence_check_interval must be",
+        ),
+        (
+            {"convergence_check_interval": 2},
+            "blockwise convergence requires",
+        ),
+        (
+            {
+                "refill_batch_size": 1,
+                "refill_interval": 2,
+                "convergence_check_interval": 3,
+            },
+            "blockwise convergence requires",
+        ),
         (
             {"refill_batch_size": 1, "refill_tail_compaction_threshold": 1.0},
             "refill_tail_compaction_threshold must be",

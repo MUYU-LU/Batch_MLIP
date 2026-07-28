@@ -191,6 +191,7 @@ def run_batch(
     refill_low_watermark: float = 0.8,
     refill_min_chunk: int | None = None,
     refill_interval: int = 1,
+    convergence_check_interval: int = 1,
     refill_tail_compaction_threshold: float | None = None,
     linear_algebra_backend: str = "auto",
 ) -> dict[str, Any]:
@@ -253,6 +254,7 @@ def run_batch(
                 refill_low_watermark=refill_low_watermark,
                 refill_min_chunk=refill_min_chunk,
                 refill_interval=refill_interval,
+                convergence_check_interval=convergence_check_interval,
                 refill_tail_compaction_threshold=refill_tail_compaction_threshold,
                 linear_algebra_backend=linear_algebra_backend,
                 **common,

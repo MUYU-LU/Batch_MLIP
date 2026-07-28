@@ -1,0 +1,105 @@
+id: atombit-blockwise-refill
+date: 2026-07-28
+baseline_commit: bb089a7
+hypothesis: >-
+  For variable-horizon AtomBit BFGS pools, retiring converged residents and
+  refilling only every five scheduler steps can reduce scheduler mutation
+  overhead enough to outperform both active drain and immediate refill,
+  without violating the requested force threshold or materially changing
+  endpoint energies.
+mechanism:
+  active_drain:
+    convergence_check_interval: 1
+    refill: false
+  immediate_refill:
+    convergence_check_interval: 1
+    refill_interval: 1
+  frozen_delayed_refill:
+    convergence_check_interval: 1
+    refill_interval: 5
+  blockwise_refill:
+    convergence_check_interval: 5
+    refill_interval: 5
+workloads:
+  - manifest: benchmarks/workloads/manifests/OPT-H46-R256-v1.json
+    label: H46
+    jobs: 256
+    atoms_per_job: 46
+  - manifest: benchmarks/workloads/manifests/OPT-STEPVAR-ATOMBIT-R256-v1.json
+    label: STEPVAR-H276
+    jobs: 256
+    atoms_per_job: 276
+configuration:
+  model: AtomBit-OMC-s smooth_rms fp32 epoch5
+  optimizer: BFGS
+  optimizer_dtype: float64
+  linear_algebra_backend: auto
+  resident_batch: 64
+  variable_cell: FrechetCellFilter
+  cutoff_A: 6.0
+  skin_A: 0.5
+  neighbor_backend: auto
+  fmax_eV_per_A: 0.05
+  smax: null
+  max_steps: 500
+  deterministic_algorithms: true
+  cpu_threads_per_process: 1
+  cuda_allocator: expandable_segments
+fairness:
+  same_signed_jobs: true
+  same_checkpoint_and_precision: true
+  same_optimizer_equations: true
+  same_resident_capacity: true
+  one_model_warmup_excluded: true
+  cuda_synchronized_timing: true
+  timing_repeats: 1
+metrics:
+  - wall_seconds
+  - systems_per_second
+  - atoms_per_second
+  - peak_allocated_and_reserved_bytes
+  - model_and_graph_evaluations
+  - optimizer_steps_total
+  - neighbor_rebuilds
+  - refill_event_count_and_scheduler_time
+  - convergence_check_count
+  - final_force_energy_position_and_cell_differences
+gates:
+  all_jobs_converged: true
+  final_generalized_force_criterion: optimizer_converged
+  endpoint_energy_difference_meV_per_atom_max: 1.0
+  candidate_speedup_min: 1.02
+decision_rule: >-
+  Keep blockwise refill experimental unless it passes the correctness gates
+  and is at least two percent faster than both active drain and immediate
+  refill on at least one workload. Do not infer robustness from a single
+  workload or a single timing trial.
+limitations:
+  - One timing trial per point, as requested; no uncertainty interval.
+  - A K5 check may add up to four BFGS steps per resident job.
+  - Newly admitted jobs inherit the global scheduler cadence rather than
+    starting an independent five-step clock.
+  - This experiment covers AtomBit BFGS only, not FIRE, MACE, or MD.
+result:
+  blockwise_k5:
+    H46:
+      wall_seconds: 83.6430
+      speedup_vs_active: 0.9586
+      speedup_vs_immediate: 0.8365
+      extra_optimizer_steps_vs_immediate: 7094
+      max_energy_difference_meV_per_atom: 20.1695
+    STEPVAR_H276:
+      wall_seconds: 143.8176
+      speedup_vs_active: 0.7481
+      speedup_vs_immediate: 0.7073
+      extra_optimizer_steps_vs_immediate: 7446
+      max_energy_difference_meV_per_atom: 7.8060
+  frozen_k5:
+    H46_speedup_vs_immediate: 1.0228
+    STEPVAR_H276_speedup_vs_immediate: 0.9880
+  decision: >-
+    Reject blockwise K5: checking less often adds force evaluations and changes
+    endpoints because acceptable residents continue taking BFGS steps. Retain
+    frozen delayed refill as an explicit experiment, but do not select it
+    automatically from a single one-shot H46 win.
+status: complete

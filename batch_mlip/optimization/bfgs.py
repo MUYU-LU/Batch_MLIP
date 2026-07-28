@@ -442,6 +442,7 @@ def batched_bfgs_relax(
     refill_low_watermark: float = 0.8,
     refill_min_chunk: int | None = None,
     refill_interval: int = 1,
+    convergence_check_interval: int = 1,
     refill_tail_compaction_threshold: float | None = None,
     linear_algebra_backend: str = "auto",
 ) -> RelaxationResult:
@@ -458,7 +459,10 @@ def batched_bfgs_relax(
     equal-size resident slots and safely falls back to repacking otherwise.
     ``refill_storage="arena"`` uses reusable compact double buffers for
     heterogeneous batches. It is an explicit BFGS-only experimental mode and
-    is not selected by the automatic planner.
+    is not selected by the automatic planner. A
+    ``convergence_check_interval`` above one delays convergence retirement to
+    global scheduler boundaries and therefore may add up to one interval minus
+    one BFGS steps per resident job.
     """
 
     _validate_options(
@@ -494,20 +498,38 @@ def batched_bfgs_relax(
         or refill_interval <= 0
     ):
         raise ValueError("refill_interval must be a positive integer")
+    if (
+        isinstance(convergence_check_interval, bool)
+        or not isinstance(convergence_check_interval, int)
+        or convergence_check_interval <= 0
+    ):
+        raise ValueError("convergence_check_interval must be a positive integer")
+    if (
+        convergence_check_interval != 1
+        and convergence_check_interval != refill_interval
+    ):
+        raise ValueError(
+            "blockwise convergence requires convergence_check_interval="
+            "refill_interval"
+        )
     if refill_tail_compaction_threshold is not None and not (
         0.0 < refill_tail_compaction_threshold < 1.0
     ):
         raise ValueError("refill_tail_compaction_threshold must be in (0, 1) or None")
     if refill_tail_compaction_threshold is not None and (
-        refill_policy != "immediate" or refill_interval != 1
+        refill_policy != "immediate"
+        or refill_interval != 1
+        or convergence_check_interval != 1
     ):
         raise ValueError(
-            "tail compaction requires refill_policy='immediate' and refill_interval=1"
+            "tail compaction requires refill_policy='immediate', refill_interval=1, "
+            "and convergence_check_interval=1"
         )
     if refill_batch_size is None and (
         refill_policy != "immediate"
         or refill_min_chunk is not None
         or refill_interval != 1
+        or convergence_check_interval != 1
         or refill_tail_compaction_threshold is not None
     ):
         raise ValueError("refill policy options require refill_batch_size")
@@ -529,6 +551,7 @@ def batched_bfgs_relax(
                 max(8, refill_batch_size // 8) if refill_min_chunk is None else refill_min_chunk
             ),
             refill_interval=refill_interval,
+            convergence_check_interval=convergence_check_interval,
             refill_tail_compaction_threshold=refill_tail_compaction_threshold,
             fmax=fmax,
             max_steps=max_steps,
@@ -855,6 +878,7 @@ def _batched_bfgs_refill_relax(
     refill_low_watermark: float,
     refill_min_chunk: int,
     refill_interval: int,
+    convergence_check_interval: int,
     refill_tail_compaction_threshold: float | None,
     fmax: float,
     max_steps: int,
@@ -995,7 +1019,7 @@ def _batched_bfgs_refill_relax(
             cell_forces = None
             current_smax = None
             current_generalized_fmax = None
-            convergence_now = current_fmax < fmax
+            convergence_candidate = current_fmax < fmax
         else:
             if evaluation.stress is None or not bool(torch.isfinite(evaluation.stress).all()):
                 raise FloatingPointError(
@@ -1006,13 +1030,28 @@ def _batched_bfgs_refill_relax(
             current_generalized_fmax = max_generalized_force_per_system(
                 active_state, atomic_forces, cell_forces
             )
-            convergence_now = (
+            convergence_candidate = (
                 current_generalized_fmax < fmax
                 if smax is None
                 else (current_fmax <= fmax) & (current_smax <= smax)
             )
 
         sync_active_state(evaluation, current_fmax, current_smax, current_generalized_fmax)
+        convergence_check_due = scheduler_step % convergence_check_interval == 0
+        convergence_now = (
+            convergence_candidate
+            if convergence_check_due
+            else torch.zeros_like(convergence_candidate)
+        )
+        if convergence_check_due:
+            profile_event(
+                "convergence_check",
+                optimizer="bfgs",
+                scheduler_step=scheduler_step,
+                interval=convergence_check_interval,
+                resident_systems=active_state.n_systems,
+                candidates=int(convergence_candidate.sum().item()),
+            )
         resident_finished_before = finished[active_system_ids]
         exhausted_now = local_steps[active_system_ids] >= max_steps
         finish_now = (convergence_now | exhausted_now) & ~resident_finished_before
@@ -1066,9 +1105,13 @@ def _batched_bfgs_refill_relax(
         ready_local_ids = torch.nonzero(~resident_finished, as_tuple=False).flatten()
         ready_count = ready_local_ids.numel()
         if refill_tail_compaction_threshold is None:
+            interval_due = (
+                convergence_check_due
+                if convergence_check_interval > 1
+                else (scheduler_step + 1) % refill_interval == 0
+            )
             refill_due = bool(resident_finished.any()) and (
-                (scheduler_step + 1) % refill_interval == 0
-                or not bool((~resident_finished).any())
+                interval_due or not bool((~resident_finished).any())
             )
         elif next_pending < n_systems:
             refill_due = bool(resident_finished.any())
@@ -1289,6 +1332,7 @@ def _batched_bfgs_refill_relax(
                 "refill",
                 policy=refill_policy,
                 interval=refill_interval,
+                convergence_check_interval=convergence_check_interval,
                 tail_compaction_threshold=refill_tail_compaction_threshold,
                 tail_compaction=(
                     refill_tail_compaction_threshold is not None and pending_before == 0
