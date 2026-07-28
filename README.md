@@ -635,11 +635,28 @@ largest structures. It combines the measured model/graph peak with an explicit
 margin. This is not an optimization pilot: no structure is relaxed twice and
 no batch-size timing sweep is run.
 
-Automatic optimization uses active compaction and active drain. It does not
-select refill or CUDA MPS because the measured advantages of those mechanisms
-were workload-dependent. Every productive chunk reports its predicted peak,
-actual allocated peak, actual reserved peak, and resident count in
+Automatic optimization always uses active compaction. It normally uses active
+drain, but BFGS can select immediate slot refill from a packaged offline policy
+when the calculator, model state, precision, optimizer, cell filter, hardware,
+allocator, pool size, resident capacity, and workload descriptors match
+contract-identical evidence. No timing pilot is run. Unmatched cases and
+records that failed the speed, memory, convergence, or endpoint gates use
+active drain. Every productive chunk reports the refill decision, predicted
+peak, actual allocated peak, actual reserved peak, and resident count in
 `result.metadata["scheduling"]`.
+
+The packaged refill policy currently applies to current-process single-GPU
+automatic scheduling. Multi-GPU automatic execution continues to shard
+memory-safe active-drain chunks; per-worker refill is not inferred from
+single-GPU pool evidence.
+
+The first refill policy was calibrated on nine signed families with 256 unique
+structures each, B32/B64/B128, and paired active/refill BFGS runs on H100
+80GB GPUs. Its locked resident-atom speed rule predicted all nine held-out
+speed outcomes, with no selected speed loss. Two held-out refill cases failed
+the declared endpoint-equivalence gate and are therefore stored as active
+fallback records. Historical repeated-structure controls and results from
+different execution contracts are not used for selection.
 
 `AutoSchedulerConfig` exposes the 0.85 memory fraction, safety margin, probe
 size, and absolute-budget test override. Multiple homogeneous GPUs share the

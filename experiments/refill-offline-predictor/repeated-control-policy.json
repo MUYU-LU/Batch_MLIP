@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "locked_before_held_out_analysis": true,
+  "status": "rejected_repeated_workload_control",
+  "execution_contract": {
+    "calculator": "AtomBitBatchCalculator",
+    "checkpoint_sha256": "b27c372cb2c2848ae1e54a9ffd7a2aa0b0401d9cc0ed922e3be250ff63e44486",
+    "optimizer": "BatchedBFGS",
+    "optimizer_dtype": "float64",
+    "cell_filter": "BatchedFrechetCellFilter",
+    "gpu_name": "NVIDIA H100 80GB HBM3",
+    "pool_size": 256,
+    "cutoff_A": 6.0,
+    "skin_A": 0.5
+  },
+  "fit_families": [
+    "GUFJOG44",
+    "XATMOV88",
+    "XAFPAY172",
+    "OBEQIX220",
+    "ROFB296",
+    "ROFA-MIX"
+  ],
+  "excluded_fit_evidence": {
+    "GUFJOG44": "active/refill endpoint gate failed",
+    "ROFA-MIX": "only one repack family; no cross-family validation"
+  },
+  "eligible_storage": "slots",
+  "minimum_selected_speedup": 1.05,
+  "rules": [
+    {
+      "resident_capacity": 32,
+      "pool_to_resident_ratio": 8.0,
+      "fit_speedup_range": [1.1866, 1.3004],
+      "fit_family_count": 4,
+      "selected_mode": "refill"
+    },
+    {
+      "resident_capacity": 64,
+      "pool_to_resident_ratio": 4.0,
+      "fit_speedup_range": [1.0547, 1.1686],
+      "fit_family_count": 4,
+      "selected_mode": "refill"
+    },
+    {
+      "resident_capacity": 128,
+      "pool_to_resident_ratio": 2.0,
+      "fit_speedup_range": [1.0119, 1.0207],
+      "fit_family_count": 4,
+      "selected_mode": "active"
+    }
+  ],
+  "fallback_mode": "active",
+  "fallback_conditions": [
+    "execution contract mismatch",
+    "pool size other than 256",
+    "resident capacity outside 32, 64, or 128",
+    "repack storage",
+    "predicted peak memory above 85 percent",
+    "repeated workload calibration is not production evidence"
+  ]
+}

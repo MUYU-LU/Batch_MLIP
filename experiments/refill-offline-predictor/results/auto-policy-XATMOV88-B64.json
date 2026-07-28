@@ -1,0 +1,80 @@
+{
+  "all_converged": true,
+  "converged": 256,
+  "elapsed_seconds_including_profile_and_probe": 32.51670797681436,
+  "environment": {
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "PYTORCH_ALLOC_CONF": "expandable_segments:True",
+    "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+    "cuda": "12.8",
+    "gpu": "NVIDIA H100 80GB HBM3",
+    "gpu_total_memory_bytes": 85017886720,
+    "torch": "2.9.1+cu128"
+  },
+  "maximum_reference_energy_difference_meV_per_atom": 0.0,
+  "peak_allocated_bytes": 14550697472,
+  "peak_reserved_bytes": 16395534336,
+  "pool_size": 256,
+  "predictions": [
+    {
+      "evidence_split": "fit",
+      "matched_family": "XATMOV88",
+      "mode": "refill",
+      "policy_id": "atombit-smooth-rms-bfgs-h100-refill-v1",
+      "predicted_speedup": 1.2381393789878214,
+      "reason": "matched evidence passed speed, memory, convergence, and endpoint gates"
+    }
+  ],
+  "resident_capacity": 64,
+  "scheduling": {
+    "active_compaction": true,
+    "active_refill": true,
+    "batches": [
+      {
+        "active_refill": true,
+        "bucket_index": 0,
+        "model_evaluations": 202,
+        "peak_allocated_bytes": 14550697472,
+        "peak_reserved_bytes": 16395534336,
+        "predicted_peak_bytes": 20130568882,
+        "refill_prediction": {
+          "evidence_split": "fit",
+          "matched_family": "XATMOV88",
+          "mode": "refill",
+          "policy_id": "atombit-smooth-rms-bfgs-h100-refill-v1",
+          "predicted_speedup": 1.2381393789878214,
+          "reason": "matched evidence passed speed, memory, convergence, and endpoint gates"
+        },
+        "refill_storage": "slots",
+        "resident_capacity": 64,
+        "system_count": 256,
+        "wall_seconds": 31.226159702055156
+      }
+    ],
+    "decision": "deterministic_memory_plan",
+    "memory_budget_bytes": 71648543744,
+    "memory_fraction": 0.85,
+    "memory_growth_margin": 1.1,
+    "mps": false,
+    "policy": "auto",
+    "probe": {
+      "baseline_allocated_bytes": 1393664,
+      "model_bytes_per_work": 591.5797770521337,
+      "model_forward_count": 1,
+      "peak_allocated_bytes": 1201620480,
+      "peak_reserved_bytes": 1346371584,
+      "system_count": 4,
+      "system_indices": [
+        255,
+        253,
+        254,
+        251
+      ]
+    },
+    "profiling_seconds": 0.6493440689519048,
+    "total_seconds": 32.51617887476459
+  },
+  "schema_version": 1,
+  "status": "passed",
+  "systems_per_second": 7.872875697704013
+}

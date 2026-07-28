@@ -10,7 +10,7 @@ import sys
 import time
 from collections.abc import Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from queue import Empty, PriorityQueue
 from threading import Lock
 from typing import Any, Literal
@@ -59,6 +59,7 @@ from ..planning.policy import (
     TaskAwarePolicy,
     plan_task_aware_relaxation,
 )
+from ..planning.refill_policy import predict_refill
 
 
 def _normalize_systems(systems: Atoms | Sequence[Atoms]) -> list[Atoms]:
@@ -99,8 +100,9 @@ def relax(
 ) -> RelaxationResult:
     """Relax structures directly or through an automatic execution schedule.
 
-    With no planner or pilot, ``scheduling="auto"`` profiles the workload and
-    packs production chunks to a deterministic memory budget. The experimental
+    With no planner or pilot, ``scheduling="auto"`` profiles the workload,
+    packs production chunks to a deterministic memory budget, and uses refill
+    only when packaged contract-identical evidence matches. The experimental
     timing-based controller remains available as ``scheduling="autotune"``.
     Supplying a planner retains the explicit reproducible scheduling paths.
     """
@@ -627,14 +629,110 @@ def _deterministic_batch_metadata(
     return {
         "bucket_index": chunk.bucket_index,
         "system_count": len(chunk.system_indices),
-        "resident_capacity": len(chunk.system_indices),
-        "active_refill": False,
+        "resident_capacity": (
+            len(chunk.system_indices)
+            if chunk.resident_capacity is None
+            else chunk.resident_capacity
+        ),
+        "active_refill": chunk.active_refill,
+        "refill_storage": (
+            chunk.refill_storage if chunk.active_refill else None
+        ),
+        "refill_prediction": chunk.refill_prediction,
         "predicted_peak_bytes": chunk.predicted_peak_bytes,
         "peak_allocated_bytes": peak_allocated_bytes,
         "peak_reserved_bytes": peak_reserved_bytes,
         "wall_seconds": wall_seconds,
         "model_evaluations": result.model_evaluations,
     }
+
+
+def _coefficient_of_variation(values: list[float]) -> float:
+    mean = sum(values) / len(values)
+    if mean == 0.0:
+        return 0.0
+    variance = sum((value - mean) ** 2 for value in values) / len(values)
+    return math.sqrt(variance) / mean
+
+
+def _apply_offline_refill_policy(
+    plan: DeterministicRelaxationPlan,
+    calculator: BatchCalculator,
+    optimizer: BatchOptimizer,
+    optimizer_kwargs: dict[str, Any],
+    config: AutoSchedulerConfig,
+) -> DeterministicRelaxationPlan:
+    """Merge memory-safe waves only when packaged refill evidence matches."""
+
+    if (
+        not config.offline_refill_policy_enabled
+        or not getattr(optimizer.capabilities(), "active_refill", False)
+    ):
+        return plan
+    by_bucket: dict[int, list[DeterministicRelaxationChunk]] = {}
+    for chunk in plan.chunks:
+        by_bucket.setdefault(chunk.bucket_index, []).append(chunk)
+    profiles = {profile.index: profile for profile in plan.workload.profiles}
+    selected_chunks: list[DeterministicRelaxationChunk] = []
+    for bucket_index, bucket in enumerate(plan.workload.buckets):
+        chunks = by_bucket[bucket_index]
+        capacity = max(len(chunk.system_indices) for chunk in chunks)
+        atom_counts = [
+            float(profiles[index].atom_count)
+            for index in bucket.system_indices
+        ]
+        edge_counts = [
+            float(profiles[index].edge_count)
+            for index in bucket.system_indices
+        ]
+        peaks = [
+            chunk.predicted_peak_bytes
+            for chunk in chunks
+            if chunk.predicted_peak_bytes is not None
+        ]
+        predicted_peak = max(peaks) if peaks else None
+        prediction = predict_refill(
+            calculator,
+            optimizer,
+            optimizer_kwargs,
+            pool_size=len(bucket.system_indices),
+            resident_capacity=capacity,
+            mean_atom_count=sum(atom_counts) / len(atom_counts),
+            atom_count_cv=_coefficient_of_variation(atom_counts),
+            mean_edge_count=sum(edge_counts) / len(edge_counts),
+            edge_count_cv=_coefficient_of_variation(edge_counts),
+            homogeneous_atom_count=bucket.homogeneous_atom_count,
+            predicted_peak_bytes=predicted_peak,
+            memory_budget_bytes=plan.probe.memory_budget_bytes,
+        )
+        prediction_record = prediction.to_dict()
+        if prediction.use_refill:
+            selected_chunks.append(
+                DeterministicRelaxationChunk(
+                    # Preserve submitted order; the evidence was measured on
+                    # the signed queue order, not memory-sorted planner waves.
+                    system_indices=bucket.system_indices,
+                    bucket_index=bucket_index,
+                    predicted_peak_bytes=predicted_peak,
+                    estimated_cost=sum(
+                        chunk.estimated_cost for chunk in chunks
+                    ),
+                    resident_capacity=capacity,
+                    active_refill=True,
+                    refill_storage="slots",
+                    refill_prediction=prediction_record,
+                )
+            )
+        else:
+            selected_chunks.extend(
+                replace(
+                    chunk,
+                    resident_capacity=len(chunk.system_indices),
+                    refill_prediction=prediction_record,
+                )
+                for chunk in chunks
+            )
+    return replace(plan, chunks=tuple(selected_chunks))
 
 
 def _execute_deterministic_relaxation(
@@ -669,6 +767,13 @@ def _execute_deterministic_relaxation(
         calculator.dtype,
         config,
     )
+    plan = _apply_offline_refill_policy(
+        plan,
+        calculator,
+        optimizer,
+        optimizer_kwargs,
+        config,
+    )
     indexed_results: list[tuple[tuple[int, ...], RelaxationResult]] = []
     batch_metadata = []
     for chunk in plan.chunks:
@@ -677,11 +782,18 @@ def _execute_deterministic_relaxation(
             torch.cuda.synchronize(device)
             torch.cuda.reset_peak_memory_stats(device)
         started = time.perf_counter()
+        options = dict(optimizer_kwargs)
+        if chunk.active_refill:
+            if chunk.resident_capacity is None:
+                raise RuntimeError("refill chunk has no resident capacity")
+            options["refill_batch_size"] = chunk.resident_capacity
+            options.setdefault("refill_policy", "immediate")
+            options.setdefault("refill_storage", chunk.refill_storage)
         result = _run_optimizer(
             [systems[index] for index in chunk.system_indices],
             calculator,
             optimizer,
-            optimizer_kwargs,
+            options,
         )
         if device.type == "cuda":
             torch.cuda.synchronize(device)
@@ -733,7 +845,7 @@ def _execute_deterministic_relaxation(
         "active_compaction": bool(
             optimizer_kwargs.get("active_compaction", False)
         ),
-        "active_refill": False,
+        "active_refill": any(chunk.active_refill for chunk in plan.chunks),
         "mps": False,
         "total_seconds": time.perf_counter() - total_started,
     }

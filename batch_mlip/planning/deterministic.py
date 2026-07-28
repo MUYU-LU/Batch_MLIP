@@ -34,6 +34,10 @@ class DeterministicRelaxationChunk:
     bucket_index: int
     predicted_peak_bytes: int | None
     estimated_cost: float
+    resident_capacity: int | None = None
+    active_refill: bool = False
+    refill_storage: str = "repack"
+    refill_prediction: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)

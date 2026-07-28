@@ -56,6 +56,7 @@ class AutoSchedulerConfig:
     refill_occupancy_threshold: float = 0.65
     refill_min_pending_factor: float = 2.0
     refill_min_capacity: int = 8
+    offline_refill_policy_enabled: bool = True
     multi_gpu_cold_start_jobs: int = 32
     multi_gpu_worker_backend: Literal["auto", "process", "thread"] = "auto"
     multi_gpu_process_cpu_threads: int = 1
@@ -71,6 +72,8 @@ class AutoSchedulerConfig:
         _positive_int("max_batch_size", self.max_batch_size)
         _positive_int("memory_probe_batch_size", self.memory_probe_batch_size)
         _positive_int("refill_min_capacity", self.refill_min_capacity)
+        if not isinstance(self.offline_refill_policy_enabled, bool):
+            raise TypeError("offline_refill_policy_enabled must be a bool")
         _positive_int(
             "multi_gpu_cold_start_jobs",
             self.multi_gpu_cold_start_jobs,

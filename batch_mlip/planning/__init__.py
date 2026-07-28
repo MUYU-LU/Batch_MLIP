@@ -43,6 +43,12 @@ from .policy import (
     TaskAwarePolicy,
     plan_task_aware_relaxation,
 )
+from .refill_policy import (
+    RefillPrediction,
+    load_refill_policy,
+    model_state_sha256,
+    predict_refill,
+)
 
 __all__ = [
     "AutoBatchAction",
@@ -74,6 +80,10 @@ __all__ = [
     "plan_relaxation_execution",
     "plan_deterministic_relaxation",
     "plan_task_aware_relaxation",
+    "RefillPrediction",
+    "load_refill_policy",
+    "model_state_sha256",
+    "predict_refill",
     "profile_auto_workload",
     "profile_model_work",
     "optimizer_dof_bytes",

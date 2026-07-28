@@ -1,0 +1,93 @@
+id: refill-offline-predictor
+date: 2026-07-28
+baseline_commit: 4d30a44
+hypothesis: >-
+  For a fixed calculator, optimizer, hardware, and execution contract, refill
+  speedup can be predicted conservatively from pre-execution workload
+  descriptors and the pool-to-resident ratio. A predictor trained only on
+  contract-identical measurements can select refill above a five-percent
+  measured margin without a user pilot or online optimizer trial.
+stages:
+  repeated_control:
+    status: rejected_for_predictor_training
+    reason: >-
+      The R256 controls contain 32 structures repeated eight times in periodic
+      order. Dynamic refill redistributes repeated convergence horizons while
+      active drain preserves the repeated lane pattern, biasing the measured
+      scheduling gain.
+    artifact: results-repeated-control
+  unique_structure_calibration:
+    status: completed
+    unique_structures_per_family: 256
+    repetitions: 1
+claim_boundary:
+  calculator: AtomBitBatchCalculator
+  checkpoint: AtomBit-OMC-s smooth_rms fp32 epoch5
+  checkpoint_sha256: b27c372cb2c2848ae1e54a9ffd7a2aa0b0401d9cc0ed922e3be250ff63e44486
+  optimizer: BatchedBFGS
+  optimizer_dtype: float64
+  linear_algebra_backend: auto
+  cell_filter: BatchedFrechetCellFilter
+  gpu: NVIDIA H100 80GB HBM3
+  cutoff_A: 6.0
+  skin_A: 0.5
+  fmax_eV_per_A: 0.05
+  max_steps: 500
+  deterministic_algorithms: true
+  allocator:
+    PYTORCH_ALLOC_CONF: expandable_segments:True
+    PYTORCH_CUDA_ALLOC_CONF: expandable_segments:True
+  timing_scope: optimizer_only_after_one_model_warmup
+matrix:
+  jobs_per_workload: 256
+  resident_batches: [32, 64, 128]
+  pool_to_resident_ratios: [8, 4, 2]
+  methods: [active, refill]
+  timing_repeats: 1
+  fitting_families:
+    - GUFJOG44
+    - XATMOV88
+    - XAFPAY172
+    - OBEQIX220
+    - ROFB296
+    - ROFA-MIX
+  held_out_families:
+    - SOXLEX48
+    - AXOSOW64
+    - BOQWIN116
+  primary_runs: 54
+fairness:
+  - Every active/refill pair uses the same signed manifest.
+  - Every run is regenerated under this experiment; historical timings are excluded.
+  - Paired methods run concurrently on otherwise idle, homogeneous H100 GPUs.
+  - Method-to-GPU assignment is swapped at B64 to reduce device-position bias.
+  - CUDA is synchronized before and after timing by the benchmark harness.
+  - One identical model warm-up precedes every timed optimizer run.
+  - Contract validation rejects mismatched results before model fitting.
+gates:
+  all_jobs_converged: true
+  peak_reserved_fraction_max: 0.85
+  endpoint_energy_difference_meV_per_atom_max: 5.0
+  minimum_selected_refill_speedup: 1.05
+  predictor_validation: locked_independent_family_holdout
+  held_out_family_predictions: 9
+  predictor_fallback: active
+limitations:
+  - One timing observation per point does not estimate run-to-run variance.
+  - Each calibration manifest contains 256 unique structures.
+  - The fitted policy is valid only inside the declared execution contract.
+  - Descriptor matching does not extrapolate beyond measured pool sizes and capacities.
+result:
+  unique_matrix_runs: 54
+  held_out_speed_predictions_correct: 9
+  held_out_speed_predictions_total: 9
+  selected_refill_speed_losses: 0
+  selected_refill_scientific_gate_failures: 2
+  production_fallback_for_failed_gates: active
+  public_api_validation:
+    workload: XATMOV88-R256
+    resident_capacity: 64
+    selected_mode: refill
+    converged: 256
+    maximum_reference_energy_difference_meV_per_atom: 0.0
+status: completed
