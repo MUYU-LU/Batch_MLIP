@@ -1,0 +1,74 @@
+{
+  "baseline_commit": "be7d01d7eda957c22d5839ba5046ea01b0e2ee98",
+  "cases": [
+    {
+      "acknowledged_worker_ids": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "converged_after": 256,
+      "converged_before": 256,
+      "external_process_after_seconds": 71.788094201,
+      "external_process_before_seconds": 193.080039083,
+      "external_process_seconds_removed": 121.291944882,
+      "external_speedup_over_mps": 1.834554806417544,
+      "forced_worker_count": 4,
+      "gates": {
+        "convergence_match": true,
+        "external_process_faster_than_mps": true,
+        "peak_reserved_memory_relative_change_at_most_0_01": true,
+        "production_time_relative_change_at_most_0_02": true,
+        "shutdown_at_most_2_seconds": true
+      },
+      "mps_external_process_seconds": 131.69919326,
+      "peak_reserved_after_bytes": 9365880832,
+      "peak_reserved_before_bytes": 9367977984,
+      "pool_size": 256,
+      "production_after_seconds": 32.86350807687268,
+      "production_before_seconds": 33.20757104596123,
+      "raw_sha256": {
+        "automatic": "fff4b06f40577aa5426a099b6b2c12c19e6b8e2033f32aeafdf0949749aef9a0",
+        "external": "b271b041ef7edb4b759d5307cb794a478f63e68076e47fc3587ae645f6532058"
+      },
+      "shutdown_wall_seconds": 0.7829843936488032
+    },
+    {
+      "acknowledged_worker_ids": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "converged_after": 1024,
+      "converged_before": 1024,
+      "external_process_after_seconds": 180.70106202,
+      "external_process_before_seconds": 298.880819886,
+      "external_process_seconds_removed": 118.179757866,
+      "external_speedup_over_mps": 1.890715227269587,
+      "forced_worker_count": 4,
+      "gates": {
+        "convergence_match": true,
+        "external_process_faster_than_mps": true,
+        "peak_reserved_memory_relative_change_at_most_0_01": true,
+        "production_time_relative_change_at_most_0_02": true,
+        "shutdown_at_most_2_seconds": true
+      },
+      "mps_external_process_seconds": 341.654249545,
+      "peak_reserved_after_bytes": 46890221568,
+      "peak_reserved_before_bytes": 46890221568,
+      "pool_size": 1024,
+      "production_after_seconds": 90.72606111504138,
+      "production_before_seconds": 91.04718056879938,
+      "raw_sha256": {
+        "automatic": "8c6331b4ea43ea39ede642e1e8b95639f8f8a8fcca98a7544cba8df7bd3cc4ce",
+        "external": "5b3d4e6edbc895c603376547236cecc8b4779672f7fd53f0d0321f973ee51e4a"
+      },
+      "shutdown_wall_seconds": 1.0555515000596642
+    }
+  ],
+  "gates_passed": true,
+  "schema_version": 1,
+  "status": "completed"
+}

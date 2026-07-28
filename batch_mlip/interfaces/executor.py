@@ -229,6 +229,7 @@ class BatchExecutor:
         start_method: str = "spawn",
         startup_timeout_seconds: float = 1800.0,
         run_timeout_seconds: float = 7200.0,
+        shutdown_timeout_seconds: float = 2.0,
     ) -> None:
         resolved_devices = _normalize_devices(devices)
         if calculator.cutoff is None:
@@ -243,11 +244,15 @@ class BatchExecutor:
         self.start_method = start_method
         self.startup_timeout_seconds = float(startup_timeout_seconds)
         self.run_timeout_seconds = float(run_timeout_seconds)
+        self.shutdown_timeout_seconds = float(shutdown_timeout_seconds)
+        if self.shutdown_timeout_seconds <= 0.0:
+            raise ValueError("shutdown_timeout_seconds must be positive")
         self._pool: PersistentTaskPool | None = None
         self._pool_key: tuple[Any, ...] | None = None
         self._closed = False
         self._generation = 0
         self._relaxation_calls = 0
+        self._last_shutdown_metadata: dict[str, Any] | None = None
 
     @property
     def worker_generation(self) -> int:
@@ -336,6 +341,7 @@ class BatchExecutor:
             start_method=self.start_method,
             startup_timeout_seconds=self.startup_timeout_seconds,
             run_timeout_seconds=self.run_timeout_seconds,
+            shutdown_timeout_seconds=self.shutdown_timeout_seconds,
         )
         self._pool_key = desired_key
         self._generation += 1
@@ -560,9 +566,29 @@ class BatchExecutor:
             return
         self._closed = True
         if self._pool is not None:
-            self._pool.close()
+            pool = self._pool
+            pool.close()
+            self._last_shutdown_metadata = {
+                "wall_seconds": pool.shutdown_wall_seconds,
+                "acknowledged_worker_ids": list(
+                    pool.shutdown_acknowledged_workers
+                ),
+                "forced_worker_count": (
+                    pool.shutdown_forced_worker_count
+                ),
+            }
             self._pool = None
             self._pool_key = None
+
+    @property
+    def shutdown_metadata(self) -> dict[str, Any] | None:
+        """Return telemetry for the most recently closed worker generation."""
+
+        return (
+            None
+            if self._last_shutdown_metadata is None
+            else dict(self._last_shutdown_metadata)
+        )
 
     def __enter__(self) -> BatchExecutor:
         if self._closed:

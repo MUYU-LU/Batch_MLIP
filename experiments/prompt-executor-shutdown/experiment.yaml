@@ -1,0 +1,78 @@
+id: prompt-executor-shutdown
+date: 2026-07-28
+baseline_commit: be7d01d7eda957c22d5839ba5046ea01b0e2ee98
+hypothesis: >-
+  An acknowledged global-deadline shutdown and bounded descriptor-based tensor
+  sharing reduce four-GPU BatchExecutor shutdown below two seconds, eliminate
+  the post-summary interpreter hang, and preserve full convergence on the
+  held-out R256 and R1024 pools without changing compute time or peak memory.
+mechanism:
+  - Shared-memory event acknowledgment proves every worker consumed its
+    shutdown sentinel.
+  - One global deadline replaces four sequential 30-second joins.
+  - Acknowledged teardown stragglers are terminated concurrently.
+  - Descriptor-based tensor sharing avoids detached torch_shm_manager
+    processes retaining the parent resource-tracker pipe.
+workloads:
+  source_experiment: ../heldout-auto-vs-mps
+  manifests:
+    - ../heldout-auto-vs-mps/workloads/manifests/OPT-HOLDOUT-MIX-R256-v1.json
+    - ../heldout-auto-vs-mps/workloads/manifests/OPT-HOLDOUT-MIX-R1024-v1.json
+configuration:
+  identical_to_source_experiment: true
+  gpu_count: 4
+  shutdown_timeout_seconds: 2.0
+metrics:
+  - executor_shutdown_wall_seconds
+  - acknowledged_worker_ids
+  - forced_worker_count
+  - external_process_wall_seconds
+  - api_wall_seconds
+  - production_wall_seconds
+  - convergence
+  - final_state_sha256
+gates:
+  shutdown_wall_seconds_max: 2.0
+  external_process_faster_than_mps: true
+  convergence_match_before_after: true
+  production_time_relative_change_max: 0.02
+  peak_reserved_memory_relative_change_max: 0.01
+timing_repeats: 1
+results:
+  r256:
+    shutdown_wall_seconds: 0.7829843936488032
+    acknowledged_worker_ids: [0, 1, 2, 3]
+    forced_worker_count: 4
+    external_process_before_seconds: 193.080039083
+    external_process_after_seconds: 71.788094201
+    external_process_seconds_removed: 121.291944882
+    external_speedup_over_mps: 1.834554806417544
+    production_before_seconds: 33.20757104596123
+    production_after_seconds: 32.86350807687268
+    peak_reserved_before_bytes: 9367977984
+    peak_reserved_after_bytes: 9365880832
+    converged_before: 256
+    converged_after: 256
+  r1024:
+    shutdown_wall_seconds: 1.0555515000596642
+    acknowledged_worker_ids: [0, 1, 2, 3]
+    forced_worker_count: 4
+    external_process_before_seconds: 298.880819886
+    external_process_after_seconds: 180.70106202
+    external_process_seconds_removed: 118.179757866
+    external_speedup_over_mps: 1.890715227269587
+    production_before_seconds: 91.04718056879938
+    production_after_seconds: 90.72606111504138
+    peak_reserved_before_bytes: 46890221568
+    peak_reserved_after_bytes: 46890221568
+    converged_before: 1024
+    converged_after: 1024
+validation:
+  pytest: 250 passed, 10 skipped in 32.45s
+  ruff: passed
+  note: >-
+    Cross-run final-state hashes are not used as a gate because dynamic
+    work stealing is convergence-reproducible but not bitwise reproducible
+    across independent multi-GPU runs. Shutdown begins only after all task
+    results and state hashes have returned to the parent.
+status: completed

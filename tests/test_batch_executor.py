@@ -146,6 +146,9 @@ def test_batch_executor_reuses_workers_and_restores_input_order(tmp_path):
         )
 
     assert executor.closed
+    assert executor.shutdown_metadata is not None
+    assert executor.shutdown_metadata["acknowledged_worker_ids"] == [0, 1]
+    assert executor.shutdown_metadata["wall_seconds"] < 1.0
     with pytest.raises(RuntimeError, match="closed"):
         executor.relax(systems)
 
@@ -295,3 +298,12 @@ def test_batch_executor_rejects_thread_backend(tmp_path):
         assert not executor.started
     finally:
         executor.close()
+
+
+def test_batch_executor_rejects_invalid_shutdown_timeout():
+    with pytest.raises(ValueError, match="shutdown_timeout_seconds"):
+        BatchExecutor(
+            ExecutorQuadraticCalculator(),
+            devices=["cpu:0"],
+            shutdown_timeout_seconds=0.0,
+        )

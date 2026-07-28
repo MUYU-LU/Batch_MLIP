@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import os
+import threading
+import time
 from dataclasses import dataclass
 
 import pytest
@@ -73,6 +75,18 @@ class SharingStrategyPreparer:
     def __call__(self, worker):
         del worker
         return SharingStrategyRunner()
+
+
+class HangingExitTaskPreparer:
+    """Keep a non-daemon thread alive after the worker acknowledges shutdown."""
+
+    def __call__(self, worker):
+        threading.Thread(
+            target=time.sleep,
+            args=(30.0,),
+            daemon=False,
+        ).start()
+        return StubTaskRunner(worker.worker_id)
 
 
 def test_balance_work_is_deterministic_and_cost_balanced():
@@ -189,9 +203,11 @@ def test_persistent_task_pool_reuses_workers_and_preserves_call_order():
         ) == list(range(5))
 
     assert pool.closed
+    assert pool.shutdown_acknowledged_workers == (0, 1)
+    assert pool.shutdown_wall_seconds < 1.0
 
 
-def test_persistent_task_pool_uses_scalable_tensor_sharing():
+def test_persistent_task_pool_uses_bounded_descriptor_sharing():
     parent_strategy = torch_mp.get_sharing_strategy()
     with PersistentTaskPool(
         ["cpu:0"],
@@ -201,7 +217,7 @@ def test_persistent_task_pool_uses_scalable_tensor_sharing():
     ) as pool:
         execution = pool.execute([1], [1.0])
 
-    assert execution.task_results[0].payload == (1, "file_system")
+    assert execution.task_results[0].payload == (1, "file_descriptor")
     assert torch_mp.get_sharing_strategy() == parent_strategy
 
 
@@ -220,6 +236,36 @@ def test_persistent_task_pool_failure_breaks_generation():
             pool.execute([2], [1.0])
     finally:
         pool.close()
+
+
+def test_persistent_task_pool_bounds_acknowledged_shutdown_stragglers():
+    pool = PersistentTaskPool(
+        ["cpu:0", "cpu:1"],
+        HangingExitTaskPreparer(),
+        startup_timeout_seconds=30.0,
+        run_timeout_seconds=30.0,
+        shutdown_timeout_seconds=0.25,
+    )
+    execution = pool.execute([1, 2], [1.0, 1.0])
+
+    started = time.perf_counter()
+    pool.close()
+    elapsed = time.perf_counter() - started
+
+    assert [result.payload[1] for result in execution.task_results] == [1, 4]
+    assert pool.shutdown_acknowledged_workers == (0, 1)
+    assert pool.shutdown_forced_worker_count == 2
+    assert pool.shutdown_wall_seconds < 1.0
+    assert elapsed < 1.0
+
+
+def test_persistent_task_pool_rejects_invalid_shutdown_timeout():
+    with pytest.raises(ValueError, match="worker timeouts"):
+        PersistentTaskPool(
+            ["cpu:0"],
+            StubTaskPreparer(),
+            shutdown_timeout_seconds=0.0,
+        )
 
 
 @pytest.mark.parametrize("worker_count", [1, 2])

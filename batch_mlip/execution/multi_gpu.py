@@ -147,10 +147,10 @@ def _install_worker_environment(
             os.environ[name] = value
 
 
-def _use_scalable_tensor_sharing() -> None:
-    """Avoid exhausting child-owned file descriptors for large result pools."""
+def _use_persistent_tensor_sharing() -> None:
+    """Avoid detached file-system managers in bounded persistent pools."""
 
-    torch_mp.set_sharing_strategy("file_system")
+    torch_mp.set_sharing_strategy("file_descriptor")
 
 
 def balance_work(
@@ -226,12 +226,46 @@ def _worker_entry(
         result_queue.put((shard.worker_id, None, None, None, error))
 
 
-def _terminate(processes: Sequence[mp.Process]) -> None:
+def _reap_until(
+    processes: Sequence[mp.Process],
+    *,
+    deadline: float,
+) -> list[mp.Process]:
+    """Reap exited processes against one shared deadline."""
+
+    remaining = list(processes)
+    while remaining:
+        for process in remaining:
+            process.join(timeout=0.0)
+        remaining = [process for process in remaining if process.is_alive()]
+        if not remaining or time.perf_counter() >= deadline:
+            break
+        time.sleep(min(0.01, max(0.0, deadline - time.perf_counter())))
+    return remaining
+
+
+def _terminate(
+    processes: Sequence[mp.Process],
+    *,
+    timeout_seconds: float = 5.0,
+) -> None:
+    """Terminate all workers concurrently and bound total reaping time."""
+
+    remaining = [process for process in processes if process.is_alive()]
+    for process in remaining:
+        process.terminate()
+    remaining = _reap_until(
+        remaining,
+        deadline=time.perf_counter() + timeout_seconds,
+    )
+    for process in remaining:
+        process.kill()
+    _reap_until(
+        remaining,
+        deadline=time.perf_counter() + timeout_seconds,
+    )
     for process in processes:
-        if process.is_alive():
-            process.terminate()
-    for process in processes:
-        process.join(timeout=5.0)
+        process.join(timeout=0.0)
 
 
 def _task_worker_entry(
@@ -303,13 +337,14 @@ def _persistent_task_worker_entry(
     task_queue: Any,
     ready_queue: Any,
     result_queue: Any,
+    shutdown_acknowledged: Any,
 ) -> None:
     startup_started = time.perf_counter()
     try:
-        _use_scalable_tensor_sharing()
+        _use_persistent_tensor_sharing()
         # The parent receives every task before requesting shutdown. Avoid
-        # waiting again on the child queue feeder while file-system tensor
-        # handles are being released.
+        # waiting again on the child queue feeder while tensor handles are
+        # being released.
         result_queue.cancel_join_thread()
         _install_worker_environment(worker_environment)
         runner = prepare(worker)
@@ -324,6 +359,7 @@ def _persistent_task_worker_entry(
         while True:
             item = task_queue.get()
             if item is None:
+                shutdown_acknowledged.set()
                 return
             call_id, task_index, task = item
             task_started = time.perf_counter()
@@ -664,13 +700,18 @@ class PersistentTaskPool:
         start_method: str = "spawn",
         startup_timeout_seconds: float = 1800.0,
         run_timeout_seconds: float = 7200.0,
+        shutdown_timeout_seconds: float = 2.0,
     ) -> None:
         normalized_devices = tuple(str(device) for device in devices)
         if not normalized_devices:
             raise ValueError("devices must not be empty")
         if len(set(normalized_devices)) != len(normalized_devices):
             raise ValueError("devices must be unique")
-        if startup_timeout_seconds <= 0.0 or run_timeout_seconds <= 0.0:
+        if (
+            startup_timeout_seconds <= 0.0
+            or run_timeout_seconds <= 0.0
+            or shutdown_timeout_seconds <= 0.0
+        ):
             raise ValueError("worker timeouts must be positive")
 
         self._environment = _normalize_worker_environment(worker_environment)
@@ -680,10 +721,14 @@ class PersistentTaskPool:
         )
         self._startup_timeout_seconds = float(startup_timeout_seconds)
         self._run_timeout_seconds = float(run_timeout_seconds)
+        self._shutdown_timeout_seconds = float(shutdown_timeout_seconds)
         self._execute_lock = threading.Lock()
         self._closed = False
         self._broken = False
         self._call_id = 0
+        self.shutdown_wall_seconds = 0.0
+        self.shutdown_acknowledged_workers: tuple[int, ...] = ()
+        self.shutdown_forced_worker_count = 0
 
         context = mp.get_context(start_method)
         self._task_queues = tuple(
@@ -691,6 +736,9 @@ class PersistentTaskPool:
         )
         self._ready_queue = context.Queue()
         self._result_queue = context.Queue()
+        self._shutdown_acknowledged = tuple(
+            context.Event() for _ in self._workers
+        )
         self._processes = [
             context.Process(
                 target=_persistent_task_worker_entry,
@@ -701,6 +749,7 @@ class PersistentTaskPool:
                     self._task_queues[worker.worker_id],
                     self._ready_queue,
                     self._result_queue,
+                    self._shutdown_acknowledged[worker.worker_id],
                 ),
                 name=f"batch-mlip-persistent-worker-{worker.worker_id}",
             )
@@ -868,14 +917,50 @@ class PersistentTaskPool:
     def close(self) -> None:
         if self._closed:
             return
+        started = time.perf_counter()
         self._closed = True
-        if not self._broken:
-            for task_queue in self._task_queues:
-                task_queue.put(None)
-            for process in self._processes:
-                process.join(timeout=30.0)
-        _terminate(self._processes)
-        self._close_queues()
+        try:
+            if not self._broken:
+                for task_queue in self._task_queues:
+                    task_queue.put(None)
+                deadline = started + self._shutdown_timeout_seconds
+                while (
+                    not all(
+                        event.is_set()
+                        for event in self._shutdown_acknowledged
+                    )
+                    and any(
+                        process.is_alive() for process in self._processes
+                    )
+                    and time.perf_counter() < deadline
+                ):
+                    time.sleep(0.01)
+                self.shutdown_acknowledged_workers = tuple(
+                    worker.worker_id
+                    for worker, event in zip(
+                        self._workers,
+                        self._shutdown_acknowledged,
+                        strict=True,
+                    )
+                    if event.is_set()
+                )
+                # Acknowledgment proves that no useful task remains. Give
+                # normal interpreter cleanup a brief chance, then terminate
+                # CUDA or queue teardown stragglers together.
+                _reap_until(
+                    self._processes,
+                    deadline=min(deadline, time.perf_counter() + 0.1),
+                )
+            remaining = [
+                process
+                for process in self._processes
+                if process.is_alive()
+            ]
+            self.shutdown_forced_worker_count = len(remaining)
+            _terminate(remaining, timeout_seconds=1.0)
+        finally:
+            self._close_queues()
+            self.shutdown_wall_seconds = time.perf_counter() - started
 
     def _close_queues(self) -> None:
         for message_queue in (
@@ -883,6 +968,7 @@ class PersistentTaskPool:
             self._ready_queue,
             self._result_queue,
         ):
+            message_queue.cancel_join_thread()
             message_queue.close()
 
     def __enter__(self) -> PersistentTaskPool:

@@ -307,6 +307,7 @@ def main() -> None:
     )
     call_records = []
     session_started = time.perf_counter()
+    executor_shutdown = None
     try:
         for current_optimizer in optimizer_sequence:
             options = optimizer_options(current_optimizer)
@@ -342,6 +343,7 @@ def main() -> None:
     finally:
         if executor is not None:
             executor.close()
+            executor_shutdown = executor.shutdown_metadata
     session_seconds = time.perf_counter() - session_started
 
     steady_records = call_records[1:] or call_records
@@ -385,6 +387,7 @@ def main() -> None:
         )
         / len(steady_records),
         "session_wall_time_s": session_seconds,
+        "executor_shutdown": executor_shutdown,
         "environment": environment_metadata(primary_device),
         **model_info,
     }
