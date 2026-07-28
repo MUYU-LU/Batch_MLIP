@@ -1,0 +1,95 @@
+id: refill-cross-family-validation
+date: 2026-07-28
+baseline_commit: dff38f1
+hypothesis: >-
+  Immediate refill is beneficial only for workload regimes with sufficient
+  convergence-step spread and tail waste; atom count alone cannot determine
+  the choice. The production dual-variable allocator keeps both active drain
+  and refill below the 85-percent memory limit across independent families.
+workloads:
+  jobs_per_workload: 256
+  resident_batch: 64
+  families:
+    - label: GUFJOG44
+      manifest: benchmarks/workloads/manifests/OPT-RB-GUFJOG44-R256-v1.json
+      atom_counts: [44]
+      refill_storage: slots
+    - label: XATMOV88
+      manifest: benchmarks/workloads/manifests/OPT-RB-XATMOV88-R256-v1.json
+      atom_counts: [88]
+      refill_storage: slots
+    - label: XAFPAY172
+      manifest: benchmarks/workloads/manifests/OPT-RB-XAFPAY172-R256-v1.json
+      atom_counts: [172]
+      refill_storage: slots
+    - label: OBEQIX220
+      manifest: benchmarks/workloads/manifests/OPT-RB-OBEQIX220-R256-v1.json
+      atom_counts: [220]
+      refill_storage: slots
+    - label: ROFB296
+      manifest: benchmarks/workloads/manifests/OPT-RB-ROFB296-R256-v1.json
+      atom_counts: [296]
+      refill_storage: slots
+    - label: ROFA-MIX
+      manifest: benchmarks/workloads/manifests/OPT-RB-ROFA-MIX-R256-v1.json
+      atom_counts: [74, 148, 222, 296]
+      refill_storage: repack
+configuration:
+  model: AtomBit-OMC-s smooth_rms fp32 epoch5
+  optimizer: variable-cell BFGS
+  optimizer_dtype: float64
+  linear_algebra_backend: auto
+  cutoff_A: 6.0
+  skin_A: 0.5
+  fmax_eV_per_A: 0.05
+  smax: null
+  max_steps: 500
+  convergence_check_interval: 1
+  refill_interval: 1
+  allocator:
+    PYTORCH_ALLOC_CONF: expandable_segments:True
+    PYTORCH_CUDA_ALLOC_CONF: expandable_segments:True
+  deterministic_algorithms: true
+  cpu_threads_per_process: 1
+  timing_repeats: 1
+metrics:
+  - wall_seconds_and_systems_per_second
+  - speedup_refill_vs_active
+  - peak_allocated_and_reserved_memory
+  - convergence_step_mean_standard_deviation_and_range
+  - mean_active_occupancy
+  - model_and_graph_evaluations
+  - convergence_and_endpoint_differences
+gates:
+  all_jobs_converged: true
+  peak_reserved_fraction_max: 0.85
+  meaningful_speed_difference_fraction: 0.02
+  automatic_refill_speedup_min: 1.05
+  endpoint_energy_difference_meV_per_atom_max: 5.0
+decision_rule: >-
+  Recommend refill for an evidence-matched regime only when speedup is at
+  least five percent, memory and endpoint gates pass, and the pool exceeds
+  resident capacity. Differences below two percent are inconclusive.
+status: completed
+results:
+  primary_pairs: 6
+  total_primary_runs: 12
+  diagnostic_runs: 1
+  refill_speedup_range: [1.0419, 1.2461]
+  families_passing_five_percent_speed_gate:
+    - XAFPAY172
+    - OBEQIX220
+    - ROFB296
+    - ROFA-MIX
+  subthreshold_family:
+    - XATMOV88
+  endpoint_sensitive_family:
+    - GUFJOG44
+  maximum_peak_reserved_fraction: 0.3891
+  conclusion: >-
+    Refill is beneficial in four independently selected non-T2 family
+    regimes, but atom count alone does not predict the gain. The automatic
+    decision must combine pool size and memory feasibility with measured or
+    evidence-matched tail occupancy and endpoint stability. GUFJOG44 is
+    excluded from positive scheduler evidence because repeated identical
+    inputs bifurcate under both compacted and refilled BFGS trajectories.
