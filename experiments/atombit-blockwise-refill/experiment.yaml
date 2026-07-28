@@ -102,4 +102,10 @@ result:
     endpoints because acceptable residents continue taking BFGS steps. Retain
     frozen delayed refill as an explicit experiment, but do not select it
     automatically from a single one-shot H46 win.
+  memory_correction: >-
+    The raw launcher set only PYTORCH_ALLOC_CONF, which did not activate
+    expandable segments in the installed PyTorch 2.9.1 build. A matched
+    dual-variable production run measured 29.48 GiB for STEPVAR-H276 immediate
+    refill instead of 78.34 GiB. The raw memory gate is superseded by
+    experiments/refill-memory-control.
 status: complete

@@ -32,7 +32,10 @@ def test_auto_allocator_targets_measured_atombit_variable_cell_optimizers():
     )
 
     assert selected.selected_policy == "expandable_segments"
-    assert set(selected.environment().values()) == {"expandable_segments:True"}
+    assert selected.environment() == {
+        "PYTORCH_ALLOC_CONF": "expandable_segments:True",
+        "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+    }
     assert fixed_cell.selected_policy == "native"
     assert fire.selected_policy == "expandable_segments"
 

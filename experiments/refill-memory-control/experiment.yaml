@@ -1,0 +1,113 @@
+id: refill-memory-control
+date: 2026-07-28
+baseline_commit: d75d8df
+hypothesis: >-
+  H276 BFGS refill can retain its throughput advantage while satisfying the
+  85-percent reserved-memory policy by controlling CUDA cache reclamation or
+  avoiding variable large batched-Cholesky workspaces, without changing
+  optimizer equations or convergence checks.
+workload:
+  manifests:
+    - path: benchmarks/workloads/manifests/OPT-H46-R256-v1.json
+      jobs: 256
+      atoms_per_job: 46
+    - path: benchmarks/workloads/manifests/OPT-STEPVAR-ATOMBIT-R256-v1.json
+      jobs: 256
+      atoms_per_job: 276
+controls:
+  active_drain:
+    resident_batch: 64
+    linear_algebra_backend: auto
+  unsafe_refill:
+    resident_batch: 64
+    linear_algebra_backend: auto
+    measured_wall_seconds: 101.2818
+    measured_peak_reserved_GiB: 78.2227
+candidates:
+  - id: dual_variable_B64
+    resident_batch: 64
+    linear_algebra_backend: auto
+    allocator: >-
+      PYTORCH_ALLOC_CONF=expandable_segments:True and
+      PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+  - id: allocator_gc80_B64
+    resident_batch: 64
+    linear_algebra_backend: auto
+    allocator: expandable_segments:True,garbage_collection_threshold:0.8
+  - id: serial_B64
+    resident_batch: 64
+    linear_algebra_backend: serial
+    allocator: expandable_segments:True
+  - id: auto_B48
+    resident_batch: 48
+    linear_algebra_backend: auto
+    allocator: expandable_segments:True
+  - id: auto_B32
+    resident_batch: 32
+    linear_algebra_backend: auto
+    allocator: expandable_segments:True
+negative_controls:
+  - id: new_variable_only_B64
+    purpose: reproduce the unsafe 78-GiB reservation
+  - id: deprecated_allocator_alias_B64
+    purpose: test whether PYTORCH_CUDA_ALLOC_CONF explains the historical result
+  - id: native_gc80_B64
+    purpose: separate expandable-segment and garbage-collection effects
+fairness:
+  model: AtomBit-OMC-s smooth_rms fp32 epoch5
+  optimizer: variable-cell BFGS
+  optimizer_dtype: float64
+  convergence_check_interval: 1
+  refill_interval: 1
+  refill_storage: slots
+  fmax_eV_per_A: 0.05
+  smax: null
+  max_steps: 500
+  deterministic_algorithms: true
+  cpu_threads_per_process: 1
+  timing_repeats: 1
+metrics:
+  - wall_seconds
+  - systems_per_second
+  - peak_allocated_and_reserved_bytes
+  - allocator_retries_and_inactive_splits
+  - optimizer_steps_and_model_evaluations
+  - convergence_and_endpoint_differences
+gates:
+  all_jobs_converged: true
+  peak_reserved_fraction_max: 0.85
+  throughput_fraction_of_active_drain_min: 1.0
+  endpoint_energy_difference_meV_per_atom_max: 1.0
+decision_rule: >-
+  Prefer allocator control when it passes the gates without changing the
+  mathematical execution path. Otherwise select the largest memory-safe
+  resident capacity and backend that is not slower than active drain.
+result:
+  root_cause: >-
+    PYTORCH_ALLOC_CONF alone is reported but does not activate expandable
+    segments in the installed PyTorch 2.9.1 build. The CUDA-prefixed
+    compatibility spelling is required.
+  dual_variable_active_B64:
+    wall_seconds: 105.7012
+    peak_reserved_GiB: 27.1875
+  dual_variable_refill_B64:
+    wall_seconds: 101.5458
+    speedup_vs_active: 1.0409
+    peak_reserved_GiB: 29.4766
+    peak_reserved_fraction: 0.3719
+    allocation_retries: 0
+  H46:
+    active_wall_seconds: 78.6662
+    refill_wall_seconds: 67.9172
+    refill_speedup_vs_active: 1.1583
+    active_peak_reserved_GiB: 4.8750
+    refill_peak_reserved_GiB: 5.1113
+  correctness:
+    converged_jobs: 256
+    max_difference_vs_CUDA_prefixed_control: 0.0
+  decision: >-
+    Retain B64 immediate refill for matched variable-horizon H276 workloads.
+    Require both allocator environment spellings. The production planner
+    already satisfies this requirement; fix the benchmark launcher and
+    metadata rather than changing optimizer equations or resident capacity.
+status: complete

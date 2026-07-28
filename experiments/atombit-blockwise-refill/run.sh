@@ -14,6 +14,7 @@ export OPENBLAS_NUM_THREADS=1
 export MKL_NUM_THREADS=1
 export NUMEXPR_NUM_THREADS=1
 export PYTORCH_ALLOC_CONF=expandable_segments:True
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 mkdir -p "${OUTPUT_DIR}"
 

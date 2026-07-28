@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-07-28
+
+- Add an explicit BFGS convergence-check cadence and reject blockwise K5 after
+  it increased H46/STEPVAR work by 7,094/7,446 optimizer steps and changed
+  endpoint energies by up to 20.17/7.81 meV per atom.
+- Correct the cadence benchmark's allocator environment: the production
+  dual-variable configuration reduces STEPVAR-H276 refill peak reservation
+  from 78.22 to 29.48 GiB with zero allocation retries.
+- Validate immediate B64 refill at 67.92/101.55 s versus 78.67/105.70 s for
+  active drain on signed H46/STEPVAR-H276 R256 pools. Retain stepwise
+  convergence and expose both allocator variable values in benchmark telemetry.
+
 ## 2026-07-26
 
 - Add an allocator-aware one-or-more-GPU process launcher. It selects

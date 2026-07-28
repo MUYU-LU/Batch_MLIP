@@ -82,6 +82,12 @@ def _allocator_metrics(device: torch.device) -> dict[str, Any]:
         return {}
     stats = torch.cuda.memory_stats(device)
     return {
+        "cuda_allocator_environment": {
+            "PYTORCH_ALLOC_CONF": os.environ.get("PYTORCH_ALLOC_CONF"),
+            "PYTORCH_CUDA_ALLOC_CONF": os.environ.get(
+                "PYTORCH_CUDA_ALLOC_CONF"
+            ),
+        },
         "cuda_allocator_config": (
             os.environ.get("PYTORCH_ALLOC_CONF")
             or os.environ.get("PYTORCH_CUDA_ALLOC_CONF")
@@ -343,6 +349,12 @@ def main() -> None:
                 os.environ.get("PYTORCH_ALLOC_CONF")
                 or os.environ.get("PYTORCH_CUDA_ALLOC_CONF")
             ),
+            "cuda_allocator_environment": {
+                "PYTORCH_ALLOC_CONF": os.environ.get("PYTORCH_ALLOC_CONF"),
+                "PYTORCH_CUDA_ALLOC_CONF": os.environ.get(
+                    "PYTORCH_CUDA_ALLOC_CONF"
+                ),
+            },
         },
         "runtime_profile": runtime_profile,
         "timing_seconds": elapsed,

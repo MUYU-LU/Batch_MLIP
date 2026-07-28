@@ -30,6 +30,14 @@ criterion. Physical atomic-force maxima can slightly exceed `0.05 eV/A`
 because `smax=None` uses the Frechet generalized force, not the atomic-force
 maximum, as the stopping quantity.
 
+**Memory correction:** this launcher's original raw runs set only
+`PYTORCH_ALLOC_CONF`. On the installed PyTorch 2.9.1 build, that spelling is
+reported in allocator metadata but does not activate expandable segments.
+The production dual-variable environment reduces STEPVAR-H276 immediate-refill
+peak reservation from the table's `78.34 GiB` to `29.48 GiB`. Treat the raw
+memory columns as a negative allocator-compatibility control, not production
+memory. Timing and trajectory conclusions are unchanged.
+
 ## Mechanism
 
 Block K5 reduces convergence checks and refill events, but a check is much
@@ -41,8 +49,7 @@ block K5 fails both the speed and endpoint gates.
 
 Frozen K5 isolates swap overhead without deliberately overshooting convergence.
 For H46 it reduces refill events from 176 to 95 and is 2.3% faster than
-immediate refill. It is 1.2% slower on STEPVAR-H276, and both H276 refill modes
-reserve about 98.8% of the H100 memory, above the automatic policy's 85% limit.
+immediate refill. It is 1.2% slower on STEPVAR-H276.
 
 ## Decision
 
@@ -50,10 +57,9 @@ Reject blockwise convergence/refill K5. Keep `convergence_check_interval=1` as
 the default. Retain delayed physical refill as an explicit experimental
 parameter, but do not enable it automatically based on one H46 timing trial.
 The production planner remains active drain because it is memory-safe across
-these cases. A future H276 refill policy must either choose a smaller resident
-capacity or reuse variable-shape graph and autograd buffers well enough to keep
-the CUDA allocator below the 85% reserved-memory gate; pending neighbors are
-already constructed lazily.
+these cadence cases and blockwise K5 fails the speed and endpoint gates.
+Immediate refill is memory-safe under the production dual-variable allocator
+and remains available to the task-aware and online scheduling policies.
 
 Raw outputs are archived in `results/raw-results.tar.gz`; derived values are in
 `results/summary.json` and `results/summary.csv`.

@@ -14,6 +14,9 @@ _ALLOCATOR_ENVIRONMENT_KEYS = (
     "PYTORCH_ALLOC_CONF",
     "PYTORCH_CUDA_ALLOC_CONF",
 )
+# PyTorch 2.9.1 reports the new spelling but only applies expandable segments
+# reliably through the deprecated CUDA-prefixed spelling. Keep both identical
+# until the installed-version matrix proves the compatibility alias unnecessary.
 _EXPANDABLE_SEGMENTS = "expandable_segments:True"
 
 
