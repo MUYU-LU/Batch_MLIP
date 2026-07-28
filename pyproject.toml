@@ -37,6 +37,9 @@ where = ["."]
 include = ["batch_mlip*", "atombit_batch*", "src*", "examples*"]
 exclude = ["tests*", "benchmarks*", "tools*", "original_uploads*"]
 
+[tool.setuptools.package-data]
+"batch_mlip.planning" = ["data/*.json"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"

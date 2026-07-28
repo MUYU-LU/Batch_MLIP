@@ -650,13 +650,18 @@ automatic scheduling. Multi-GPU automatic execution continues to shard
 memory-safe active-drain chunks; per-worker refill is not inferred from
 single-GPU pool evidence.
 
-The first refill policy was calibrated on nine signed families with 256 unique
-structures each, B32/B64/B128, and paired active/refill BFGS runs on H100
-80GB GPUs. Its locked resident-atom speed rule predicted all nine held-out
-speed outcomes, with no selected speed loss. Two held-out refill cases failed
-the declared endpoint-equivalence gate and are therefore stored as active
-fallback records. Historical repeated-structure controls and results from
-different execution contracts are not used for selection.
+Refill policy v2 combines the original nine-family R256 matrix with a separate
+pool-transfer matrix at R128 and R512. The locked single-GPU transfer rule
+predicted all four held-out speed outcomes (`1.121-1.433x`) with no convergence,
+memory, or endpoint failures. Selection still requires an exact measured pool
+size and resident capacity; it does not interpolate.
+
+Per-worker refill was also tested under static G2/G4 sharding. Its GPU-count
+rule predicted only one of two held-out speed outcomes, and the selected G4
+BOQWIN point exceeded the endpoint gate. Multi-GPU automatic execution
+therefore remains active drain. Historical repeated-structure controls,
+multi-GPU transfer failures, and results from different execution contracts
+are not used for refill selection.
 
 `AutoSchedulerConfig` exposes the 0.85 memory fraction, safety margin, probe
 size, and absolute-budget test override. Multiple homogeneous GPUs share the

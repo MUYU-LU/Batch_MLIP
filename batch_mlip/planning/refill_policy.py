@@ -15,7 +15,7 @@ import torch
 
 from ..core.calculator import BatchCalculator
 
-_POLICY_PATH = Path(__file__).with_name("data") / "refill_policy_v1.json"
+_POLICY_PATH = Path(__file__).with_name("data") / "refill_policy_v2.json"
 
 
 @dataclass(frozen=True)

@@ -1,0 +1,95 @@
+id: refill-pool-multigpu-transfer
+date: 2026-07-28
+baseline_commit: fcc8fcb
+hypothesis: >-
+  Under the exact AtomBit/BFGS/H100 execution contract, refill benefit transfers
+  across total pool sizes when the pool-to-resident ratio remains large, and
+  across GPU counts when every worker receives the same validated 256-job queue.
+  A locked rule derived from fit families can select refill on held-out families
+  without a timing pilot.
+mechanism: >-
+  Immediate slot refill avoids the shrinking active-drain tail inside each
+  independent queue. Static signed per-worker queues preserve identical job
+  membership and order between active and refill, while one process owns each
+  GPU and model replica.
+contract:
+  calculator: AtomBitBatchCalculator
+  checkpoint: AtomBit-OMC-s smooth_rms fp32 epoch5
+  checkpoint_sha256: b27c372cb2c2848ae1e54a9ffd7a2aa0b0401d9cc0ed922e3be250ff63e44486
+  optimizer: BatchedBFGS
+  optimizer_dtype: float64
+  linear_algebra_backend: auto
+  cell_filter: BatchedFrechetCellFilter
+  cutoff_A: 6.0
+  skin_A: 0.5
+  fmax_eV_per_A: 0.05
+  smax_eV_per_A3: null
+  max_steps: 500
+  deterministic_algorithms: true
+  cpu_threads_per_worker: 1
+  gpu: NVIDIA H100 80GB HBM3
+  allocator: expandable_segments:True
+single_gpu_matrix:
+  fit_families: [XATMOV88, XAFPAY172]
+  held_out_families: [SOXLEX48]
+  points:
+    - {pool_size: 128, resident_capacity: 32}
+    - {pool_size: 128, resident_capacity: 64}
+    - {pool_size: 512, resident_capacity: 64}
+    - {pool_size: 512, resident_capacity: 128}
+  methods: [active, refill]
+  runs: 24
+multi_gpu_matrix:
+  fit_families: [XATMOV88]
+  held_out_families: [BOQWIN116]
+  points:
+    - {pool_size: 512, gpu_count: 2, worker_pool_size: 256, resident_capacity: 64}
+    - {pool_size: 1024, gpu_count: 4, worker_pool_size: 256, resident_capacity: 64}
+  methods: [active, refill]
+  runs: 8
+fairness:
+  - Every workload contains only unique normalized structures.
+  - R128 and R512 are deterministic density-stratified subsets of one signed R1024 family pool.
+  - Active and refill use the same signed manifest and exact per-worker system indices.
+  - Workers are prepared, warmed, and synchronized before optimization timing.
+  - G2 active/refill pairs run concurrently on disjoint GPUs.
+  - G4 methods run sequentially on the same four GPUs; method order is reversed between families.
+  - Every point is regenerated under this contract; historical timings are excluded.
+gates:
+  minimum_refill_speedup: 1.05
+  maximum_peak_reserved_fraction: 0.85
+  all_jobs_converged: true
+  endpoint_energy_difference_meV_per_atom_max: 5.0
+  endpoint_convergence_mismatches: 0
+  fallback: active
+timing:
+  warmups: 1
+  repeats: 1
+  primary_single_gpu: optimizer_only_seconds
+  primary_multi_gpu: synchronized_worker_run_wall_seconds
+limitations:
+  - One timing observation per point provides no run-to-run uncertainty.
+  - G4 active/refill methods cannot run concurrently on the seven-GPU host.
+  - Claims remain restricted to the exact execution contract and measured queue regions.
+result:
+  single_gpu:
+    fit_speedup_range: [1.0664, 1.2623]
+    heldout_speedup_range: [1.1208, 1.4326]
+    heldout_speed_predictions_correct: 4
+    heldout_speed_predictions_total: 4
+    scientific_gate_failures: 0
+    accepted: true
+  multi_gpu:
+    fit:
+      G2_speedup: 1.0489
+      G4_speedup: 1.1665
+    heldout:
+      G2_speedup: 1.1445
+      G4_speedup: 1.2009
+      G4_endpoint_energy_difference_meV_per_atom: 6.5265
+    heldout_speed_predictions_correct: 1
+    heldout_speed_predictions_total: 2
+    scientific_gate_failures: 1
+    accepted: false
+  production_policy: single_gpu_R128_R256_R512_exact_evidence_matching
+status: completed

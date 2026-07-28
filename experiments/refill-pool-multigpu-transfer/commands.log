@@ -1,0 +1,41 @@
+PYTHONPATH=. pytest -q
+
+PYTHONPATH=. /public/home/lmy/.conda/envs/lmy/bin/python \
+  experiments/refill-pool-multigpu-transfer/generate_workloads.py \
+  --dataset-dir /public/home/lmy/Batch_imple_project/test_set \
+  --output-dir experiments/refill-pool-multigpu-transfer/workloads
+
+PHASE=fit SPLIT=all \
+  OUTPUT=runs/refill_pool_multigpu_transfer \
+  bash experiments/refill-pool-multigpu-transfer/run.sh
+
+# The first multi-GPU fit launch failed before valid timing because the new
+# harness did not normalize bare device indices. The second active launch
+# failed before timing because refill_min_chunk was not conditional. Both were
+# fixed before regenerating the complete paired multi-GPU fit matrix.
+PHASE=fit SPLIT=multi \
+  OUTPUT=runs/refill_pool_multigpu_transfer \
+  bash experiments/refill-pool-multigpu-transfer/run.sh
+
+# locked-policy.json written here, before held-out execution.
+
+PHASE=heldout SPLIT=all \
+  OUTPUT=runs/refill_pool_multigpu_transfer \
+  bash experiments/refill-pool-multigpu-transfer/run.sh
+
+PYTHONPATH=. python experiments/refill-pool-multigpu-transfer/summarize.py \
+  --fit-dir experiments/refill-pool-multigpu-transfer/results/raw-fit \
+  --heldout-dir experiments/refill-pool-multigpu-transfer/results/raw-heldout \
+  --manifest-dir experiments/refill-pool-multigpu-transfer/workloads/manifests \
+  --output-dir experiments/refill-pool-multigpu-transfer/results
+
+PYTHONPATH=. python experiments/refill-pool-multigpu-transfer/build_policy.py \
+  --base-policy batch_mlip/planning/data/refill_policy_v1.json \
+  --summary experiments/refill-pool-multigpu-transfer/results/summary.json \
+  --output batch_mlip/planning/data/refill_policy_v2.json
+
+PYTHONPATH=. pytest -q
+ruff check batch_mlip/planning/refill_policy.py tests/test_refill_policy.py \
+  experiments/refill-pool-multigpu-transfer
+sha256sum -c experiments/refill-pool-multigpu-transfer/SHA256SUMS
+python -m pip wheel . --no-deps --wheel-dir /tmp/batch-mlip-wheel-refill-v2

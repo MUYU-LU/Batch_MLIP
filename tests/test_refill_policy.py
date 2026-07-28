@@ -107,7 +107,15 @@ def test_model_state_hash_is_stable_and_value_sensitive():
 
 def test_shipped_refill_records_select_only_valid_evidence():
     policy = load_refill_policy()
-    assert policy["validation"]["speed_predictions_correct"] == 9
+    assert policy["validation"]["r256_family_holdout"][
+        "speed_predictions_correct"
+    ] == 9
+    assert policy["validation"]["pool_transfer_family_holdout"] == {
+        "scientific_gate_failures": 0,
+        "speed_predictions_correct": 4,
+        "speed_predictions_total": 4,
+    }
+    assert not policy["validation"]["multi_gpu_transfer"]["accepted"]
     for record in policy["records"]:
         if record["selected_mode"] != "refill":
             continue
@@ -183,7 +191,23 @@ def test_refill_policy_artifact_is_canonical_json():
     policy = load_refill_policy()
     serialized = json.dumps(policy, indent=2, sort_keys=True) + "\n"
     assert serialized == (
-        Path("batch_mlip/planning/data/refill_policy_v1.json").read_text(
+        Path("batch_mlip/planning/data/refill_policy_v2.json").read_text(
             encoding="utf-8"
         )
     )
+
+
+def test_pool_transfer_records_are_single_gpu_only():
+    policy = load_refill_policy()
+    transferred = [
+        record
+        for record in policy["records"]
+        if record["pool_size"] in (128, 512)
+    ]
+    assert len(transferred) == 12
+    assert {record["resident_capacity"] for record in transferred} == {
+        32,
+        64,
+        128,
+    }
+    assert all(record["selected_mode"] == "refill" for record in transferred)

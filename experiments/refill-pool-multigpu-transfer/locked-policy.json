@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "status": "locked_before_heldout_execution",
+  "baseline_commit": "fcc8fcb",
+  "fit_families": {
+    "single_gpu": [
+      "XATMOV88",
+      "XAFPAY172"
+    ],
+    "multi_gpu": [
+      "XATMOV88"
+    ]
+  },
+  "minimum_selected_speedup": 1.05,
+  "scientific_gates_passed": true,
+  "rules": [
+    {
+      "pool_size": 128,
+      "gpu_count": 1,
+      "resident_capacity": 32,
+      "fit_speedup_range": [
+        1.2115,
+        1.2623
+      ],
+      "selected_mode": "refill"
+    },
+    {
+      "pool_size": 128,
+      "gpu_count": 1,
+      "resident_capacity": 64,
+      "fit_speedup_range": [
+        1.0782,
+        1.1255
+      ],
+      "selected_mode": "refill"
+    },
+    {
+      "pool_size": 512,
+      "gpu_count": 1,
+      "resident_capacity": 64,
+      "fit_speedup_range": [
+        1.1597,
+        1.1854
+      ],
+      "selected_mode": "refill"
+    },
+    {
+      "pool_size": 512,
+      "gpu_count": 1,
+      "resident_capacity": 128,
+      "fit_speedup_range": [
+        1.0664,
+        1.0923
+      ],
+      "selected_mode": "refill"
+    },
+    {
+      "pool_size": 512,
+      "gpu_count": 2,
+      "worker_pool_size": 256,
+      "resident_capacity": 64,
+      "measured_speedup": 1.0489,
+      "selected_mode": "active"
+    },
+    {
+      "pool_size": 1024,
+      "gpu_count": 4,
+      "worker_pool_size": 256,
+      "resident_capacity": 64,
+      "measured_speedup": 1.1665,
+      "selected_mode": "refill"
+    }
+  ],
+  "fallback_mode": "active",
+  "limitations": [
+    "One timing observation per fit point.",
+    "The multi-GPU rule is discrete and does not interpolate GPU count.",
+    "The G4 methods ran sequentially on the same devices."
+  ]
+}
