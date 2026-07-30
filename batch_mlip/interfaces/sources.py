@@ -34,9 +34,12 @@ class StructureProvider(Protocol):
     def materialize(self, indices: Sequence[int]) -> list[Atoms]: ...
 
 
-_AUTO_LOADER_PROCESS_COUNT = 4
-_AUTO_LOADER_MIN_POOL_SIZE = 2048
-_AUTO_LOADER_MIN_ATOMS_PER_WORKER = 32_000.0
+_AUTO_LOADER_MEDIUM_PROCESS_COUNT = 2
+_AUTO_LOADER_MEDIUM_MIN_POOL_SIZE = 512
+_AUTO_LOADER_MEDIUM_MIN_ATOMS_PER_WORKER = 3_000.0
+_AUTO_LOADER_LARGE_PROCESS_COUNT = 4
+_AUTO_LOADER_LARGE_MIN_POOL_SIZE = 2048
+_AUTO_LOADER_LARGE_MIN_ATOMS_PER_WORKER = 32_000.0
 
 
 @dataclass(frozen=True)
@@ -52,7 +55,7 @@ class ManifestLoaderDecision:
     active_worker_count: int
     available_cpu_count: int
     required_cpu_count: int
-    policy_id: str = "manifest-loader-process-policy-v1"
+    policy_id: str = "manifest-loader-process-policy-v2"
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -67,11 +70,20 @@ class ManifestLoaderDecision:
             "available_cpu_count": self.available_cpu_count,
             "required_cpu_count": self.required_cpu_count,
             "automatic_thresholds": {
-                "process_count": _AUTO_LOADER_PROCESS_COUNT,
-                "minimum_pool_size": _AUTO_LOADER_MIN_POOL_SIZE,
-                "minimum_atoms_per_worker": (
-                    _AUTO_LOADER_MIN_ATOMS_PER_WORKER
-                ),
+                "medium": {
+                    "process_count": _AUTO_LOADER_MEDIUM_PROCESS_COUNT,
+                    "minimum_pool_size": _AUTO_LOADER_MEDIUM_MIN_POOL_SIZE,
+                    "minimum_atoms_per_worker": (
+                        _AUTO_LOADER_MEDIUM_MIN_ATOMS_PER_WORKER
+                    ),
+                },
+                "large": {
+                    "process_count": _AUTO_LOADER_LARGE_PROCESS_COUNT,
+                    "minimum_pool_size": _AUTO_LOADER_LARGE_MIN_POOL_SIZE,
+                    "minimum_atoms_per_worker": (
+                        _AUTO_LOADER_LARGE_MIN_ATOMS_PER_WORKER
+                    ),
+                },
             },
         }
 
@@ -103,8 +115,11 @@ def select_manifest_loader_processes(
         raise ValueError("available_cpu_count must be positive")
     total_atoms = sum(counts)
     atoms_per_worker = total_atoms / active_worker_count
-    required_cpu_count = active_worker_count * (
-        _AUTO_LOADER_PROCESS_COUNT + compute_threads_per_worker
+    medium_required_cpu_count = active_worker_count * (
+        _AUTO_LOADER_MEDIUM_PROCESS_COUNT + compute_threads_per_worker
+    )
+    large_required_cpu_count = active_worker_count * (
+        _AUTO_LOADER_LARGE_PROCESS_COUNT + compute_threads_per_worker
     )
 
     if requested != "auto":
@@ -123,18 +138,34 @@ def select_manifest_loader_processes(
     elif not manifest_backed:
         selected = 1
         reason = "non-manifest providers do not use process materialization"
-    elif len(counts) < _AUTO_LOADER_MIN_POOL_SIZE:
+    elif (
+        len(counts) >= _AUTO_LOADER_LARGE_MIN_POOL_SIZE
+        and atoms_per_worker >= _AUTO_LOADER_LARGE_MIN_ATOMS_PER_WORKER
+        and cpu_count >= large_required_cpu_count
+    ):
+        selected = _AUTO_LOADER_LARGE_PROCESS_COUNT
+        reason = "large-pool atom-record and host-CPU gates passed"
+    elif (
+        len(counts) >= _AUTO_LOADER_MEDIUM_MIN_POOL_SIZE
+        and atoms_per_worker >= _AUTO_LOADER_MEDIUM_MIN_ATOMS_PER_WORKER
+        and cpu_count >= medium_required_cpu_count
+    ):
+        selected = _AUTO_LOADER_MEDIUM_PROCESS_COUNT
+        reason = "medium-pool atom-record and host-CPU gates passed"
+    elif len(counts) < _AUTO_LOADER_MEDIUM_MIN_POOL_SIZE:
         selected = 1
-        reason = "pool is below the validated process-loading regime"
-    elif atoms_per_worker < _AUTO_LOADER_MIN_ATOMS_PER_WORKER:
+        reason = "pool is below the validated two-process loading regime"
+    elif atoms_per_worker < _AUTO_LOADER_MEDIUM_MIN_ATOMS_PER_WORKER:
         selected = 1
-        reason = "atom-record pressure per worker is below the process threshold"
-    elif cpu_count < required_cpu_count:
+        reason = "atom-record pressure per worker is below the two-process gate"
+    elif cpu_count < medium_required_cpu_count:
         selected = 1
-        reason = "host CPU capacity is insufficient for bounded loader pools"
+        reason = "host CPU capacity is insufficient for two loader processes"
     else:
-        selected = _AUTO_LOADER_PROCESS_COUNT
-        reason = "validated large-pool atom-record and host-CPU gates passed"
+        raise RuntimeError("manifest loader policy did not select a tier")
+    required_cpu_count = active_worker_count * (
+        selected + compute_threads_per_worker
+    )
 
     return ManifestLoaderDecision(
         requested=requested,

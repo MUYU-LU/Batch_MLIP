@@ -286,30 +286,39 @@ def test_manifest_loader_process_count_must_be_positive():
 
 
 def test_manifest_loader_auto_policy_selects_processes_only_above_all_gates():
-    selected = select_manifest_loader_processes(
+    large = select_manifest_loader_processes(
         [120] * 2048,
         active_worker_count=7,
         available_cpu_count=128,
     )
+    medium = select_manifest_loader_processes(
+        [44] * 512,
+        active_worker_count=7,
+        available_cpu_count=128,
+    )
     small_pool = select_manifest_loader_processes(
-        [500] * 512,
+        [500] * 256,
         active_worker_count=7,
         available_cpu_count=128,
     )
     light_pool = select_manifest_loader_processes(
-        [77] * 2048,
+        [20] * 512,
         active_worker_count=7,
         available_cpu_count=128,
     )
     cpu_constrained = select_manifest_loader_processes(
         [120] * 2048,
         active_worker_count=7,
-        available_cpu_count=32,
+        available_cpu_count=20,
     )
 
-    assert selected.process_count == 4
-    assert selected.atoms_per_worker > 32_000
-    assert selected.required_cpu_count == 35
+    assert large.process_count == 4
+    assert large.atoms_per_worker > 32_000
+    assert large.required_cpu_count == 35
+    assert large.policy_id == "manifest-loader-process-policy-v2"
+    assert medium.process_count == 2
+    assert medium.atoms_per_worker > 3_000
+    assert medium.required_cpu_count == 21
     assert small_pool.process_count == 1
     assert light_pool.process_count == 1
     assert cpu_constrained.process_count == 1

@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "status": "preliminary_engineering",
+  "timing_trials_per_configuration": 1,
+  "publication_grade": false,
+  "seven_h100_validation_p512_sequence": {
+    "job_count": 3072,
+    "loader1_seconds": 260.04232805222273,
+    "loader2_seconds": 253.166412898805,
+    "loader4_seconds": 253.12641643034294,
+    "loader2_speedup": 1.0271596657498407,
+    "loader4_over_loader2_speedup": 1.0001577688626457
+  },
+  "seven_h100_heldout_p512_sequence": {
+    "job_count": 1536,
+    "loader1_seconds": 100.48673857888207,
+    "loader2_seconds": 94.81233651889488,
+    "loader2_speedup": 1.0598487735702657
+  },
+  "correctness": {
+    "source_order_equal": true,
+    "convergence_flags_equal": true,
+    "step_difference_count": 0,
+    "maximum_energy_delta_eV": 0.0,
+    "maximum_position_delta_A": 0.0,
+    "maximum_cell_delta_A": 0.0,
+    "maximum_stress_delta_eV_per_A3": 0.0
+  },
+  "decision": {
+    "medium_pool_loader_processes_per_gpu": 2,
+    "medium_minimum_pool_size": 512,
+    "medium_minimum_atoms_per_active_gpu": 3000.0,
+    "large_pool_loader_processes_per_gpu": 4,
+    "large_minimum_pool_size": 2048,
+    "large_minimum_atoms_per_active_gpu": 32000.0
+  },
+  "artifacts": {
+    "validation": "validation.json",
+    "heldout": "heldout.json"
+  }
+}

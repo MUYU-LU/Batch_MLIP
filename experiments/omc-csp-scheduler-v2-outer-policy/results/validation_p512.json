@@ -1,0 +1,680 @@
+{
+  "aggregate": {
+    "target1": {
+      "active_device_wall_seconds": 1653.3204889041372,
+      "all_candidate_jobs_converged": false,
+      "all_convergence_flags_equal": false,
+      "all_source_orders_equal": true,
+      "maximum_cell_delta_A": 2.9117698669433594,
+      "maximum_energy_delta_eV": 4.581233978271484,
+      "maximum_position_delta_A": 4.508696556091309,
+      "maximum_stress_delta_eV_per_A3": 0.005771492375060916,
+      "sequence_seconds": 238.67763854004443,
+      "sequence_speedup_over_baseline": 1.0895127404597387,
+      "sequence_wall_time_ratio": 0.917841492682346,
+      "step_difference_count": 170
+    }
+  },
+  "baseline": {
+    "active_device_wall_seconds": 1801.4542058706284,
+    "path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_v2_outer_policy/results/validation_p512/subdivide_target2.json",
+    "sequence_seconds": 260.04232805222273
+  },
+  "schema_version": 1,
+  "workloads": [
+    {
+      "baseline": {
+        "active_device_count": 7,
+        "active_device_wall_seconds": 450.0255607604049,
+        "execution_chunk_count": 14,
+        "execution_chunk_sizes": [
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          43,
+          43,
+          43,
+          43,
+          42,
+          42
+        ],
+        "materialization_dispatch_wait_seconds": 5.19371423823759,
+        "peak_reserved_fraction": 0.08056302851372497,
+        "production_seconds": 41.6093119350262,
+        "resident_plan_chunk_count": 2,
+        "seconds": 64.28936582291499,
+        "worker_startup_seconds": 21.31700266432017
+      },
+      "candidates": {
+        "target1": {
+          "correctness": {
+            "baseline_maximum_final_force_eV_per_A": 0.04996921494603157,
+            "candidate_all_converged": true,
+            "candidate_maximum_final_force_eV_per_A": 0.04996921494603157,
+            "convergence_flags_equal": true,
+            "maximum_cell_delta_A": 1.8047256469726562,
+            "maximum_energy_delta_eV": 1.6865224838256836,
+            "maximum_position_delta_A": 2.2553458213806152,
+            "maximum_stress_delta_eV_per_A3": 0.005771492375060916,
+            "source_order_equal": true,
+            "step_difference_count": 40
+          },
+          "execution": {
+            "active_device_count": 7,
+            "active_device_wall_seconds": 397.1449741013348,
+            "execution_chunk_count": 7,
+            "execution_chunk_sizes": [
+              64,
+              64,
+              64,
+              64,
+              86,
+              85,
+              85
+            ],
+            "materialization_dispatch_wait_seconds": 5.638206025119871,
+            "peak_reserved_fraction": 0.15683396671471628,
+            "production_seconds": 34.87650743499398,
+            "resident_plan_chunk_count": 2,
+            "seconds": 56.73499630019069,
+            "worker_startup_seconds": 20.484992344863713
+          },
+          "speedup_over_baseline": 1.133151846573733,
+          "wall_time_ratio": 0.8824942597266738
+        }
+      },
+      "pool_size": 512,
+      "static_profile": {
+        "active_edge_count": {
+          "coefficient_of_variation": 0.21433315873748765,
+          "maximum": 5464.0,
+          "mean": 3610.21875,
+          "minimum": 1088.0
+        },
+        "atom_count": {
+          "coefficient_of_variation": 0.0,
+          "maximum": 64.0,
+          "mean": 64.0,
+          "minimum": 64.0
+        },
+        "candidate_edge_count": {
+          "coefficient_of_variation": 0.20298881764605822,
+          "maximum": 7200.0,
+          "mean": 4658.71875,
+          "minimum": 1504.0
+        },
+        "dense_linear_algebra_work": {
+          "coefficient_of_variation": 0.0,
+          "maximum": 8120601.0,
+          "mean": 8120601.0,
+          "minimum": 8120601.0
+        },
+        "generalized_dimension": {
+          "coefficient_of_variation": 0.0,
+          "maximum": 201.0,
+          "mean": 201.0,
+          "minimum": 201.0
+        },
+        "model_work": {
+          "coefficient_of_variation": 0.2001411814633624,
+          "maximum": 366080.0,
+          "mean": 247438.0,
+          "minimum": 86016.0
+        },
+        "profile_sha256": "5c477f7a66517d8881043817ced5c53a24e1b6648cb59933037843d0d2bbca18",
+        "system_count": 512
+      },
+      "workload_id": "OPT-OMC-SCHED-E1-VALIDATION-AXOSOW-P512-INTRA-NARROW-v2"
+    },
+    {
+      "baseline": {
+        "active_device_count": 7,
+        "active_device_wall_seconds": 299.010068399366,
+        "execution_chunk_count": 14,
+        "execution_chunk_sizes": [
+          52,
+          51,
+          51,
+          51,
+          51,
+          29,
+          29,
+          29,
+          29,
+          28,
+          28,
+          34,
+          33,
+          17
+        ],
+        "materialization_dispatch_wait_seconds": 2.547971738036722,
+        "peak_reserved_fraction": 0.1306620826813231,
+        "production_seconds": 42.36162206996232,
+        "resident_plan_chunk_count": 4,
+        "seconds": 42.715724057052284,
+        "worker_startup_seconds": 0.0
+      },
+      "candidates": {
+        "target1": {
+          "correctness": {
+            "baseline_maximum_final_force_eV_per_A": 0.049996234476566315,
+            "candidate_all_converged": true,
+            "candidate_maximum_final_force_eV_per_A": 0.049996234476566315,
+            "convergence_flags_equal": true,
+            "maximum_cell_delta_A": 0.01207733154296875,
+            "maximum_energy_delta_eV": 0.05680084228515625,
+            "maximum_position_delta_A": 0.17040777206420898,
+            "maximum_stress_delta_eV_per_A3": 0.0003663994721136987,
+            "source_order_equal": true,
+            "step_difference_count": 16
+          },
+          "execution": {
+            "active_device_count": 7,
+            "active_device_wall_seconds": 269.2332667061128,
+            "execution_chunk_count": 7,
+            "execution_chunk_sizes": [
+              128,
+              128,
+              58,
+              57,
+              57,
+              67,
+              17
+            ],
+            "materialization_dispatch_wait_seconds": 5.467161010019481,
+            "peak_reserved_fraction": 0.3372004285923516,
+            "production_seconds": 38.107312438078225,
+            "resident_plan_chunk_count": 4,
+            "seconds": 38.461895243730396,
+            "worker_startup_seconds": 0.0
+          },
+          "speedup_over_baseline": 1.1105985231971973,
+          "wall_time_ratio": 0.9004153878407782
+        }
+      },
+      "pool_size": 512,
+      "static_profile": {
+        "active_edge_count": {
+          "coefficient_of_variation": 0.29582063024067845,
+          "maximum": 11088.0,
+          "mean": 5672.0078125,
+          "minimum": 2700.0
+        },
+        "atom_count": {
+          "coefficient_of_variation": 0.3401263957645842,
+          "maximum": 176.0,
+          "mean": 129.078125,
+          "minimum": 88.0
+        },
+        "candidate_edge_count": {
+          "coefficient_of_variation": 0.30254821441703245,
+          "maximum": 14352.0,
+          "mean": 7079.25,
+          "minimum": 3192.0
+        },
+        "dense_linear_algebra_work": {
+          "coefficient_of_variation": 0.8071937917452876,
+          "maximum": 154854153.0,
+          "mean": 83134207.828125,
+          "minimum": 20346417.0
+        },
+        "generalized_dimension": {
+          "coefficient_of_variation": 0.3324008228334592,
+          "maximum": 537.0,
+          "mean": 396.234375,
+          "minimum": 273.0
+        },
+        "model_work": {
+          "coefficient_of_variation": 0.29390722081709897,
+          "maximum": 754688.0,
+          "mean": 396052.5,
+          "minimum": 195328.0
+        },
+        "profile_sha256": "43f3483e2edc35b4888e8ed561101168fee706aa7acc2a8b5dc312d183fc6eda",
+        "system_count": 512
+      },
+      "workload_id": "OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P512-INTRA-WIDE-v2"
+    },
+    {
+      "baseline": {
+        "active_device_count": 7,
+        "active_device_wall_seconds": 370.4810422556475,
+        "execution_chunk_count": 14,
+        "execution_chunk_sizes": [
+          34,
+          33,
+          33,
+          33,
+          33,
+          33,
+          33,
+          43,
+          43,
+          43,
+          43,
+          42,
+          42,
+          24
+        ],
+        "materialization_dispatch_wait_seconds": 2.5426403479650617,
+        "peak_reserved_fraction": 0.1306620826813231,
+        "production_seconds": 52.564264917746186,
+        "resident_plan_chunk_count": 3,
+        "seconds": 52.92586317937821,
+        "worker_startup_seconds": 0.0
+      },
+      "candidates": {
+        "target1": {
+          "correctness": {
+            "baseline_maximum_final_force_eV_per_A": 0.0757930800318718,
+            "candidate_all_converged": false,
+            "candidate_maximum_final_force_eV_per_A": 0.14115767180919647,
+            "convergence_flags_equal": false,
+            "maximum_cell_delta_A": 2.9117698669433594,
+            "maximum_energy_delta_eV": 4.581233978271484,
+            "maximum_position_delta_A": 4.508696556091309,
+            "maximum_stress_delta_eV_per_A3": 0.0026340034091845155,
+            "source_order_equal": true,
+            "step_difference_count": 59
+          },
+          "execution": {
+            "active_device_count": 7,
+            "active_device_wall_seconds": 378.4746179333888,
+            "execution_chunk_count": 7,
+            "execution_chunk_sizes": [
+              78,
+              77,
+              77,
+              86,
+              85,
+              85,
+              24
+            ],
+            "materialization_dispatch_wait_seconds": 5.189686724450439,
+            "peak_reserved_fraction": 0.3372004285923516,
+            "production_seconds": 53.716442808974534,
+            "resident_plan_chunk_count": 3,
+            "seconds": 54.067802561912686,
+            "worker_startup_seconds": 0.0
+          },
+          "speedup_over_baseline": 0.9788794933689631,
+          "wall_time_ratio": 1.0215762070552195
+        }
+      },
+      "pool_size": 512,
+      "static_profile": {
+        "active_edge_count": {
+          "coefficient_of_variation": 0.22174913924571324,
+          "maximum": 8540.0,
+          "mean": 4726.2890625,
+          "minimum": 2536.0
+        },
+        "atom_count": {
+          "coefficient_of_variation": 0.0,
+          "maximum": 132.0,
+          "mean": 132.0,
+          "minimum": 132.0
+        },
+        "candidate_edge_count": {
+          "coefficient_of_variation": 0.23819829287882002,
+          "maximum": 10672.0,
+          "mean": 5864.7890625,
+          "minimum": 2816.0
+        },
+        "dense_linear_algebra_work": {
+          "coefficient_of_variation": 0.0,
+          "maximum": 66430125.0,
+          "mean": 66430125.0,
+          "minimum": 66430125.0
+        },
+        "generalized_dimension": {
+          "coefficient_of_variation": 0.0,
+          "maximum": 405.0,
+          "mean": 405.0,
+          "minimum": 405.0
+        },
+        "model_work": {
+          "coefficient_of_variation": 0.19946571628800713,
+          "maximum": 580352.0,
+          "mean": 336274.5,
+          "minimum": 196096.0
+        },
+        "profile_sha256": "63fb05b271502936df88bfca26db9fdfce3f541898003d2a7263d6ac7c6d02a7",
+        "system_count": 512
+      },
+      "workload_id": "OPT-OMC-SCHED-E1-VALIDATION-WICZUF-P512-INTRA-NARROW-v2"
+    },
+    {
+      "baseline": {
+        "active_device_count": 7,
+        "active_device_wall_seconds": 174.85712054139003,
+        "execution_chunk_count": 14,
+        "execution_chunk_sizes": [
+          43,
+          43,
+          43,
+          43,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          42,
+          42
+        ],
+        "materialization_dispatch_wait_seconds": 1.8977550817653537,
+        "peak_reserved_fraction": 0.1306620826813231,
+        "production_seconds": 24.643533600028604,
+        "resident_plan_chunk_count": 2,
+        "seconds": 24.979588648770005,
+        "worker_startup_seconds": 0.0
+      },
+      "candidates": {
+        "target1": {
+          "correctness": {
+            "baseline_maximum_final_force_eV_per_A": 0.0499999076128006,
+            "candidate_all_converged": true,
+            "candidate_maximum_final_force_eV_per_A": 0.0499999076128006,
+            "convergence_flags_equal": true,
+            "maximum_cell_delta_A": 0.11827850341796875,
+            "maximum_energy_delta_eV": 0.10143184661865234,
+            "maximum_position_delta_A": 0.241973876953125,
+            "maximum_stress_delta_eV_per_A3": 0.0007923261728137732,
+            "source_order_equal": true,
+            "step_difference_count": 12
+          },
+          "execution": {
+            "active_device_count": 7,
+            "active_device_wall_seconds": 155.67895902926102,
+            "execution_chunk_count": 7,
+            "execution_chunk_sizes": [
+              86,
+              85,
+              85,
+              64,
+              64,
+              64,
+              64
+            ],
+            "materialization_dispatch_wait_seconds": 3.157066471874714,
+            "peak_reserved_fraction": 0.3372004285923516,
+            "production_seconds": 21.934295729734004,
+            "resident_plan_chunk_count": 2,
+            "seconds": 22.239851289894432,
+            "worker_startup_seconds": 0.0
+          },
+          "speedup_over_baseline": 1.1231904531718016,
+          "wall_time_ratio": 0.8903209577468171
+        }
+      },
+      "pool_size": 512,
+      "static_profile": {
+        "active_edge_count": {
+          "coefficient_of_variation": 0.17030212560209507,
+          "maximum": 5820.0,
+          "mean": 3682.078125,
+          "minimum": 2340.0
+        },
+        "atom_count": {
+          "coefficient_of_variation": 0.0,
+          "maximum": 100.0,
+          "mean": 100.0,
+          "minimum": 100.0
+        },
+        "candidate_edge_count": {
+          "coefficient_of_variation": 0.18968582539586185,
+          "maximum": 7444.0,
+          "mean": 4592.4609375,
+          "minimum": 2736.0
+        },
+        "dense_linear_algebra_work": {
+          "coefficient_of_variation": 0.0,
+          "maximum": 29503629.0,
+          "mean": 29503629.0,
+          "minimum": 29503629.0
+        },
+        "generalized_dimension": {
+          "coefficient_of_variation": 0.0,
+          "maximum": 309.0,
+          "mean": 309.0,
+          "minimum": 309.0
+        },
+        "model_work": {
+          "coefficient_of_variation": 0.1536143386085921,
+          "maximum": 398080.0,
+          "mean": 261253.0,
+          "minimum": 175360.0
+        },
+        "profile_sha256": "98f804e8811096ebc6162139c05403bdd4f4e6165d4994cd540f54a32855b94e",
+        "system_count": 512
+      },
+      "workload_id": "OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P512-INTRA-NARROW-v2"
+    },
+    {
+      "baseline": {
+        "active_device_count": 7,
+        "active_device_wall_seconds": 208.90101238247007,
+        "execution_chunk_count": 14,
+        "execution_chunk_sizes": [
+          43,
+          43,
+          43,
+          43,
+          42,
+          42,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32,
+          32
+        ],
+        "materialization_dispatch_wait_seconds": 2.8048577695153654,
+        "peak_reserved_fraction": 0.1306620826813231,
+        "production_seconds": 29.487839256878942,
+        "resident_plan_chunk_count": 2,
+        "seconds": 29.843001768924296,
+        "worker_startup_seconds": 0.0
+      },
+      "candidates": {
+        "target1": {
+          "correctness": {
+            "baseline_maximum_final_force_eV_per_A": 0.04997711256146431,
+            "candidate_all_converged": true,
+            "candidate_maximum_final_force_eV_per_A": 0.04997711256146431,
+            "convergence_flags_equal": true,
+            "maximum_cell_delta_A": 0.4032783508300781,
+            "maximum_energy_delta_eV": 0.43551063537597656,
+            "maximum_position_delta_A": 1.1666946411132812,
+            "maximum_stress_delta_eV_per_A3": 0.0006044073961675167,
+            "source_order_equal": true,
+            "step_difference_count": 17
+          },
+          "execution": {
+            "active_device_count": 7,
+            "active_device_wall_seconds": 196.36428126133978,
+            "execution_chunk_count": 7,
+            "execution_chunk_sizes": [
+              86,
+              85,
+              85,
+              64,
+              64,
+              64,
+              64
+            ],
+            "materialization_dispatch_wait_seconds": 4.629183629062027,
+            "peak_reserved_fraction": 0.3372004285923516,
+            "production_seconds": 27.688695800025016,
+            "resident_plan_chunk_count": 2,
+            "seconds": 28.052040180191398,
+            "worker_startup_seconds": 0.0
+          },
+          "speedup_over_baseline": 1.063844254365412,
+          "wall_time_ratio": 0.9399872170165591
+        }
+      },
+      "pool_size": 512,
+      "static_profile": {
+        "active_edge_count": {
+          "coefficient_of_variation": 0.09898722878188093,
+          "maximum": 6562.0,
+          "mean": 4643.46484375,
+          "minimum": 3662.0
+        },
+        "atom_count": {
+          "coefficient_of_variation": 0.0,
+          "maximum": 124.0,
+          "mean": 124.0,
+          "minimum": 124.0
+        },
+        "candidate_edge_count": {
+          "coefficient_of_variation": 0.11466500086872687,
+          "maximum": 8334.0,
+          "mean": 5640.0859375,
+          "minimum": 4190.0
+        },
+        "dense_linear_algebra_work": {
+          "coefficient_of_variation": 0.0,
+          "maximum": 55306341.0,
+          "mean": 55306341.0,
+          "minimum": 55306341.0
+        },
+        "generalized_dimension": {
+          "coefficient_of_variation": 0.0,
+          "maximum": 381.0,
+          "mean": 381.0,
+          "minimum": 381.0
+        },
+        "model_work": {
+          "coefficient_of_variation": 0.08943415915917116,
+          "maximum": 451712.0,
+          "mean": 328925.75,
+          "minimum": 266112.0
+        },
+        "profile_sha256": "72f4b32a47aff2f14e344dabd40bf88df962ea62c1f84a1ad81bd1cd9049362b",
+        "system_count": 512
+      },
+      "workload_id": "OPT-OMC-SCHED-E1-VALIDATION-XAFQIH-P512-INTRA-NARROW-v2"
+    },
+    {
+      "baseline": {
+        "active_device_count": 7,
+        "active_device_wall_seconds": 298.17940153134987,
+        "execution_chunk_count": 14,
+        "execution_chunk_sizes": [
+          43,
+          32,
+          42,
+          42,
+          42,
+          42,
+          42,
+          31,
+          31,
+          31,
+          31,
+          35,
+          34,
+          34
+        ],
+        "materialization_dispatch_wait_seconds": 2.1776302149519324,
+        "peak_reserved_fraction": 0.1306620826813231,
+        "production_seconds": 42.264645799063146,
+        "resident_plan_chunk_count": 3,
+        "seconds": 42.59705736162141,
+        "worker_startup_seconds": 0.0
+      },
+      "candidates": {
+        "target1": {
+          "correctness": {
+            "baseline_maximum_final_force_eV_per_A": 0.13878732919692993,
+            "candidate_all_converged": false,
+            "candidate_maximum_final_force_eV_per_A": 0.0514480397105217,
+            "convergence_flags_equal": true,
+            "maximum_cell_delta_A": 2.514948844909668,
+            "maximum_energy_delta_eV": 2.2390456199645996,
+            "maximum_position_delta_A": 2.7053146362304688,
+            "maximum_stress_delta_eV_per_A3": 0.0032167411991395056,
+            "source_order_equal": true,
+            "step_difference_count": 26
+          },
+          "execution": {
+            "active_device_count": 7,
+            "active_device_wall_seconds": 256.4243898727,
+            "execution_chunk_count": 7,
+            "execution_chunk_sizes": [
+              103,
+              85,
+              84,
+              84,
+              52,
+              52,
+              52
+            ],
+            "materialization_dispatch_wait_seconds": 4.047984114382416,
+            "peak_reserved_fraction": 0.3372004285923516,
+            "production_seconds": 36.06829348485917,
+            "resident_plan_chunk_count": 3,
+            "seconds": 36.6320556961,
+            "worker_startup_seconds": 0.0
+          },
+          "speedup_over_baseline": 1.1628355698901296,
+          "wall_time_ratio": 0.8599668137899195
+        }
+      },
+      "pool_size": 512,
+      "static_profile": {
+        "active_edge_count": {
+          "coefficient_of_variation": 0.306797999331387,
+          "maximum": 10396.0,
+          "mean": 4425.2890625,
+          "minimum": 1520.0
+        },
+        "atom_count": {
+          "coefficient_of_variation": 0.2934085516124093,
+          "maximum": 176.0,
+          "mean": 109.578125,
+          "minimum": 64.0
+        },
+        "candidate_edge_count": {
+          "coefficient_of_variation": 0.3125208409119565,
+          "maximum": 13564.0,
+          "mean": 5518.88671875,
+          "minimum": 2256.0
+        },
+        "dense_linear_algebra_work": {
+          "coefficient_of_variation": 0.8293174826867481,
+          "maximum": 154854153.0,
+          "mean": 48204015.890625,
+          "minimum": 8120601.0
+        },
+        "generalized_dimension": {
+          "coefficient_of_variation": 0.2855897532904686,
+          "maximum": 537.0,
+          "mean": 337.734375,
+          "minimum": 201.0
+        },
+        "model_work": {
+          "coefficient_of_variation": 0.2981531090140135,
+          "maximum": 710400.0,
+          "mean": 311270.5,
+          "minimum": 113664.0
+        },
+        "profile_sha256": "eef54059de78395bbe4829f0c289b7ae533ab71734bde860dd3353a45b53e75a",
+        "system_count": 512
+      },
+      "workload_id": "OPT-OMC-SCHED-E1-VALIDATION-MIX-ALL-P512-INTER-WIDE-v2"
+    }
+  ]
+}

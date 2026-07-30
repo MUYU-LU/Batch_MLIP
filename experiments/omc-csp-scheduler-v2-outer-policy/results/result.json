@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "status": "mixed_result",
+  "timing_trials_per_configuration": 1,
+  "publication_grade": false,
+  "seven_h100_test_sequence": {
+    "job_count": 7680,
+    "subdivide_target2_seconds": 244.16844659484923,
+    "subdivide_target1_seconds": 276.02004463691264,
+    "preserve_resident_seconds": 410.9912605481222,
+    "target1_wall_time_ratio": 1.130449279938759,
+    "preserve_resident_wall_time_ratio": 1.683228387122778
+  },
+  "seven_h100_validation_p512_sequence": {
+    "job_count": 3072,
+    "subdivide_target2_seconds": 260.04232805222273,
+    "subdivide_target1_seconds": 238.67763854004443,
+    "target1_speedup": 1.0895127404597387
+  },
+  "correctness": {
+    "test_all_jobs_converged": true,
+    "target1_test_maximum_energy_delta_eV": 0.6928863525390625,
+    "target1_test_maximum_position_delta_A": 1.3432121276855469,
+    "target1_test_step_difference_count": 44,
+    "validation_convergence_flags_equal": false,
+    "target1_validation_maximum_energy_delta_eV": 4.581233978271484,
+    "target1_validation_maximum_position_delta_A": 4.508696556091309,
+    "target1_validation_step_difference_count": 170
+  },
+  "decision": {
+    "automatic_dispatch_policy": "subdivide",
+    "target_chunks_per_device": 2,
+    "preserve_resident": "explicit_experimental_only",
+    "reason": "outer chunk changes are not robustly faster and alter schedule-sensitive OMC-CSP endpoints"
+  },
+  "artifacts": {
+    "test_sequence": "test_sequence.json",
+    "validation_p512": "validation_p512.json"
+  }
+}

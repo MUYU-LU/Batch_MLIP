@@ -38,3 +38,7 @@ policy by the first paired seven-H100 sequence. The next bounded candidate is
 `subdivide` with one execution chunk per GPU, which retains persistent workers
 while measuring whether the second work-stealing wave is worth its smaller
 resident batches.
+
+Changing outer chunk depth is also rejected for automatic promotion because
+the OMC-CSP endpoints are schedule-sensitive. The safe CIF-loader follow-up is
+tracked separately in `omc-csp-scheduler-v2-loader-tier`.

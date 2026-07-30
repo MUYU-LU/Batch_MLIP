@@ -1,0 +1,27 @@
+id: omc-csp-scheduler-v2-loader-tier
+description: >-
+  Add a medium P512 CIF-materialization tier without changing the frozen
+  resident batches, work-stealing chunks, optimizer, or GPU worker lifecycle.
+hypothesis: >-
+  For seven-H100 OMC-CSP P512 manifest pools with at least 3,000 atom records
+  per active GPU, two reusable CIF loader processes per GPU will reduce total
+  persistent sequence makespan by at least 2% relative to one loader per GPU,
+  without changing source order, convergence flags, optimizer steps, energies,
+  forces, positions, cells, or stresses. Four loaders per GPU will not improve
+  makespan by more than 1% over two and therefore should remain reserved for
+  the existing heavy P2048 tier.
+environment:
+  baseline_commit: b6843e0c8b43eb47f7210cd65533e4f4a6fe0bec
+  frozen_v1_tag: omc-csp-scheduler-v1
+  evidence_status: preliminary_engineering
+commands:
+- name: tests
+  command:
+  - env
+  - PYTHONPATH=.
+  - python
+  - -m
+  - pytest
+  - -q
+collect_json:
+- experiments/omc-csp-scheduler-v2-loader-tier/results/result.json
