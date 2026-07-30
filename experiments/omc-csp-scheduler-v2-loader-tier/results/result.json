@@ -15,7 +15,12 @@
     "job_count": 1536,
     "loader1_seconds": 100.48673857888207,
     "loader2_seconds": 94.81233651889488,
-    "loader2_speedup": 1.0598487735702657
+    "loader2_speedup": 1.0598487735702657,
+    "auto_v2_seconds": 94.32065554894507,
+    "auto_v2_speedup_over_loader1": 1.0653736235615674,
+    "auto_v2_processes_per_gpu": 2,
+    "auto_v2_total_loader_processes": 14,
+    "auto_v2_execution_chunk_count": 14
   },
   "correctness": {
     "source_order_equal": true,
@@ -36,6 +41,7 @@
   },
   "artifacts": {
     "validation": "validation.json",
-    "heldout": "heldout.json"
+    "heldout": "heldout.json",
+    "auto_validation": "auto_validation.json"
   }
 }

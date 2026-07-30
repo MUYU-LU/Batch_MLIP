@@ -21,6 +21,8 @@ Two loaders improve validation makespan from 260.04 to 253.17 seconds (2.7%)
 and held-out makespan from 100.49 to 94.81 seconds (6.0%). Four loaders take
 253.13 seconds on validation, indistinguishable from two while consuming twice
 the loader processes. Loader changes produce exact endpoint and step equality.
+The implemented automatic rule selects two loaders per GPU and completes the
+held-out sequence in 94.32 seconds with the same exact endpoints.
 
 ## Decision
 
