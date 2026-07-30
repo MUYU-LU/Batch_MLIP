@@ -1,0 +1,26 @@
+id: omc-csp-scheduler-v2-outer-policy
+description: >-
+  Decouple memory-safe resident batches from outer work-stealing subdivisions
+  and instantiate only the GPU workers needed by preserved resident batches.
+hypothesis: >-
+  On OMC-CSP pools where scheduler-v1 fragments fewer memory-safe resident
+  batches into two tasks per supplied GPU, preserving those batches will raise
+  per-GPU useful work and reduce GPU-seconds without changing job coverage,
+  convergence, endpoint records, or the 85% memory gate. The candidate is
+  rejected as an automatic policy in any regime where its paired persistent
+  makespan regresses by more than 5%.
+environment:
+  baseline_commit: 7c06bbede9a27b93fc4d42fdb0858a3593a13485
+  baseline_tag: omc-csp-scheduler-v1
+  evidence_status: preliminary_engineering
+commands:
+- name: tests
+  command:
+  - env
+  - PYTHONPATH=.
+  - python
+  - -m
+  - pytest
+  - -q
+collect_json:
+- experiments/omc-csp-scheduler-v2-outer-policy/results/result.json

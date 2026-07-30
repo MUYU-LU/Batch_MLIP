@@ -141,6 +141,11 @@ def main() -> None:
         help="Override the pending work-stealing depth for calibration.",
     )
     parser.add_argument(
+        "--multi-gpu-dispatch-policy",
+        choices=("subdivide", "preserve_resident"),
+        default="subdivide",
+    )
+    parser.add_argument(
         "--cold-start-jobs",
         type=int,
         default=AutoSchedulerConfig().multi_gpu_cold_start_jobs,
@@ -257,6 +262,7 @@ def main() -> None:
         "multi_gpu_cold_start_jobs": args.cold_start_jobs,
         "multi_gpu_worker_backend": "process",
         "multi_gpu_process_cpu_threads": 1,
+        "multi_gpu_dispatch_policy": args.multi_gpu_dispatch_policy,
     }
     if not args.automatic_capacity:
         config_options.update(

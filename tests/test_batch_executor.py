@@ -410,6 +410,63 @@ def test_batch_executor_deterministic_plan_dispatches_work_to_all_workers(
     assert bool(result.converged.all())
 
 
+def test_batch_executor_resizes_pool_for_preserved_resident_batches(tmp_path):
+    systems = [
+        Atoms("H", positions=[[0.8 - 0.05 * index, 0.0, 0.0]])
+        for index in range(8)
+    ]
+    config = AutoSchedulerConfig(
+        cache_path=tmp_path / "preserve-resident-cache.json",
+        cache_enabled=False,
+        max_batch_size=4,
+        multi_gpu_dispatch_policy="preserve_resident",
+        multi_gpu_process_cpu_threads=1,
+    )
+    with BatchExecutor(
+        ExecutorQuadraticCalculator(),
+        devices=["cpu:0", "cpu:1"],
+        auto_config=config,
+        startup_timeout_seconds=30.0,
+        run_timeout_seconds=30.0,
+    ) as executor:
+        first = executor.relax(
+            systems[:4],
+            optimizer="fire",
+            fmax=1e-4,
+            max_steps=500,
+            dt_start=0.05,
+            dt_max=0.5,
+        )
+        assert len(executor.worker_pids) == 1
+        assert executor.worker_generation == 1
+
+        second = executor.relax(
+            systems,
+            optimizer="fire",
+            fmax=1e-4,
+            max_steps=500,
+            dt_start=0.05,
+            dt_max=0.5,
+        )
+        assert len(executor.worker_pids) == 2
+        assert executor.worker_generation == 2
+
+    first_schedule = first.metadata["scheduling"]
+    second_schedule = second.metadata["scheduling"]
+    assert bool(first.converged.all())
+    assert bool(second.converged.all())
+    assert first_schedule["multi_gpu_dispatch_policy"] == "preserve_resident"
+    assert first_schedule["active_gpu_count"] == 1
+    assert first_schedule["execution_chunk_count"] == 1
+    assert not first_schedule["worker_generation_restarted"]
+    assert second_schedule["active_gpu_count"] == 2
+    assert second_schedule["execution_chunk_count"] == 2
+    assert second_schedule["worker_generation_restarted"]
+    assert [
+        atoms.get_chemical_formula() for atoms in second.structures
+    ] == ["H"] * len(systems)
+
+
 def test_batch_executor_does_not_require_timing_policy_cache(tmp_path):
     systems = _systems()
     executor = BatchExecutor(

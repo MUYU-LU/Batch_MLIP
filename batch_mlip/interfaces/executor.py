@@ -422,6 +422,7 @@ class BatchExecutor:
         self,
         allocator_plan: CudaAllocatorPlan,
         config: AutoSchedulerConfig,
+        active_devices: Sequence[torch.device],
     ) -> tuple[Any, ...]:
         device_type = self.devices[0].type
         allocator = (
@@ -434,6 +435,7 @@ class BatchExecutor:
             allocator,
             config.multi_gpu_process_cpu_threads,
             self.start_method,
+            tuple(str(device) for device in active_devices),
         )
 
     def _ensure_pool(
@@ -444,8 +446,16 @@ class BatchExecutor:
         warmup_system: Atoms | None,
         warmup_provider: StructureProvider | None = None,
         compute_stress: bool,
+        active_devices: Sequence[torch.device],
     ) -> tuple[bool, float]:
-        desired_key = self._desired_pool_key(allocator_plan, config)
+        normalized_active_devices = tuple(active_devices)
+        if not normalized_active_devices:
+            raise ValueError("BatchExecutor requires at least one active device")
+        desired_key = self._desired_pool_key(
+            allocator_plan,
+            config,
+            normalized_active_devices,
+        )
         restarted = self._pool is not None and self._pool_key != desired_key
         if self._pool is not None and (
             restarted or self._pool.broken or self._pool.closed
@@ -483,7 +493,7 @@ class BatchExecutor:
             ) from error
         has_cuda = self.devices[0].type == "cuda"
         self._pool = PersistentTaskPool(
-            [str(device) for device in self.devices],
+            [str(device) for device in normalized_active_devices],
             preparer,
             worker_environment=(
                 allocator_plan.environment() if has_cuda else None
@@ -590,7 +600,10 @@ class BatchExecutor:
             target_chunks_per_device=(
                 config.multi_gpu_target_chunks_per_device
             ),
+            dispatch_policy=config.multi_gpu_dispatch_policy,
         )
+        active_worker_count = min(len(self.devices), len(pending_chunks))
+        active_devices = self.devices[:active_worker_count]
         planning_seconds = time.perf_counter() - planning_started
 
         restarted, startup_seconds = self._ensure_pool(
@@ -599,6 +612,7 @@ class BatchExecutor:
             warmup_system=normalized[0],
             warmup_provider=None,
             compute_stress=options.get("cell_filter") is not None,
+            active_devices=active_devices,
         )
         if self._pool is None:  # pragma: no cover - narrowed by _ensure_pool
             raise RuntimeError("persistent worker pool did not start")
@@ -659,6 +673,7 @@ class BatchExecutor:
             "decision": "persistent_deterministic_memory_plan",
             "devices": [str(device) for device in self.devices],
             "gpu_count": len(self.devices),
+            "active_gpu_count": active_worker_count,
             "fingerprint": workload.fingerprint,
             "memory_fraction": plan.memory_fraction,
             "memory_growth_margin": plan.memory_growth_margin,
@@ -681,7 +696,9 @@ class BatchExecutor:
                 target_chunks_per_device=(
                     config.multi_gpu_target_chunks_per_device
                 ),
+                dispatch_policy=config.multi_gpu_dispatch_policy,
             ),
+            "multi_gpu_dispatch_policy": config.multi_gpu_dispatch_policy,
             "target_chunks_per_device": (
                 config.multi_gpu_target_chunks_per_device
             ),
@@ -868,6 +885,7 @@ class BatchExecutor:
             target_chunks_per_device=(
                 config.multi_gpu_target_chunks_per_device
             ),
+            dispatch_policy=config.multi_gpu_dispatch_policy,
         )
         planning_seconds = time.perf_counter() - planning_started
         active_worker_count = min(
@@ -896,6 +914,7 @@ class BatchExecutor:
             warmup_system=None,
             warmup_provider=provider,
             compute_stress=options.get("cell_filter") is not None,
+            active_devices=self.devices[:active_worker_count],
         )
         if self._pool is None:
             raise RuntimeError("persistent worker pool did not start")
@@ -1000,8 +1019,10 @@ class BatchExecutor:
                     target_chunks_per_device=(
                         config.multi_gpu_target_chunks_per_device
                     ),
+                    dispatch_policy=config.multi_gpu_dispatch_policy,
                 )
             ),
+            "multi_gpu_dispatch_policy": config.multi_gpu_dispatch_policy,
             "target_chunks_per_device": (
                 config.multi_gpu_target_chunks_per_device
             ),

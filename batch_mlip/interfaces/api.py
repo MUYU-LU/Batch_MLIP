@@ -1436,22 +1436,31 @@ def _parallel_deterministic_chunks(
     *,
     device_count: int,
     target_chunks_per_device: int,
+    dispatch_policy: Literal["subdivide", "preserve_resident"] = "subdivide",
 ) -> list[_PendingAutoChunk]:
-    """Expose safe batches with enough tasks to absorb convergence tails."""
+    """Expose memory-safe batches under one explicit outer dispatch policy."""
 
     if device_count <= 0:
         raise ValueError("device_count must be positive")
     if target_chunks_per_device <= 0:
         raise ValueError("target_chunks_per_device must be positive")
+    if dispatch_policy not in ("subdivide", "preserve_resident"):
+        raise ValueError(
+            "dispatch_policy must be 'subdivide' or 'preserve_resident'"
+        )
     profiles = {profile.index: profile for profile in plan.workload.profiles}
     system_costs = {
         index: (profile_model_work(profile) + math.sqrt(profile.dof_squared))
         for index, profile in profiles.items()
     }
     system_count = sum(len(chunk.system_indices) for chunk in plan.chunks)
-    target_part_count = max(
-        len(plan.chunks),
-        min(device_count * target_chunks_per_device, system_count),
+    target_part_count = (
+        len(plan.chunks)
+        if dispatch_policy == "preserve_resident"
+        else max(
+            len(plan.chunks),
+            min(device_count * target_chunks_per_device, system_count),
+        )
     )
     part_counts = [1] * len(plan.chunks)
     for _ in range(target_part_count - len(plan.chunks)):
@@ -1513,9 +1522,12 @@ def _parallel_deterministic_chunk_policy(
     *,
     device_count: int,
     target_chunks_per_device: int,
+    dispatch_policy: Literal["subdivide", "preserve_resident"] = "subdivide",
 ) -> str:
     """Describe whether memory-safe chunks require extra device subdivision."""
 
+    if dispatch_policy == "preserve_resident":
+        return "resident_batches_preserved"
     system_count = sum(len(chunk.system_indices) for chunk in plan.chunks)
     occupancy_parts = min(device_count, system_count)
     target_parts = min(
@@ -1621,6 +1633,7 @@ def _execute_multi_device_deterministic_provider_relaxation(
         plan,
         device_count=len(devices),
         target_chunks_per_device=config.multi_gpu_target_chunks_per_device,
+        dispatch_policy=config.multi_gpu_dispatch_policy,
     )
     worker_count = min(len(devices), len(chunks))
     worker_devices = devices[:worker_count]
@@ -1919,7 +1932,9 @@ def _execute_multi_device_deterministic_provider_relaxation(
             plan,
             device_count=len(devices),
             target_chunks_per_device=(config.multi_gpu_target_chunks_per_device),
+            dispatch_policy=config.multi_gpu_dispatch_policy,
         ),
+        "multi_gpu_dispatch_policy": config.multi_gpu_dispatch_policy,
         "target_chunks_per_device": (config.multi_gpu_target_chunks_per_device),
         "resident_plan_chunk_count": len(plan.chunks),
         "execution_chunk_count": len(chunks),

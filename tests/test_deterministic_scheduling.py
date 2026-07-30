@@ -19,6 +19,7 @@ from batch_mlip import (
     relax,
 )
 from batch_mlip.interfaces.api import (
+    _parallel_deterministic_chunk_policy,
     _parallel_deterministic_chunks,
     _reserved_incremental_bytes,
 )
@@ -182,6 +183,43 @@ def test_parallel_chunks_add_only_minimum_parts_for_idle_devices():
     assert sorted(
         index for chunk in chunks for index in chunk.indices
     ) == list(range(8))
+
+
+def test_parallel_chunks_can_preserve_resident_batches_and_idle_devices():
+    config = AutoSchedulerConfig(max_batch_size=8)
+    probe = DeterministicMemoryProbe(
+        memory_budget_bytes=None,
+        baseline_allocated_bytes=None,
+        peak_allocated_bytes=None,
+        peak_reserved_bytes=None,
+        probe_indices=(),
+        probe_model_work=0,
+        model_bytes_per_work=0.0,
+    )
+    plan = plan_deterministic_relaxation(
+        _workload(8),
+        probe,
+        BatchedFIRE(),
+        {},
+        torch.float64,
+        config,
+    )
+
+    chunks = _parallel_deterministic_chunks(
+        plan,
+        device_count=4,
+        target_chunks_per_device=2,
+        dispatch_policy="preserve_resident",
+    )
+
+    assert len(plan.chunks) == 1
+    assert [chunk.indices for chunk in chunks] == [tuple(range(8))]
+    assert _parallel_deterministic_chunk_policy(
+        plan,
+        device_count=4,
+        target_chunks_per_device=2,
+        dispatch_policy="preserve_resident",
+    ) == "resident_batches_preserved"
 
 
 def test_parallel_chunks_split_only_enough_to_occupy_devices():
@@ -451,6 +489,40 @@ def test_multi_device_auto_shards_deterministic_chunks_without_autotuning():
     assert manifest["inner_scheduler"]["refill"]["evidence_source"] == (
         "policy_exclusion"
     )
+
+
+def test_multi_device_auto_can_preserve_resident_batch_and_idle_devices():
+    systems = [
+        Atoms("H", positions=[[0.8 - 0.05 * index, 0.0, 0.0]])
+        for index in range(8)
+    ]
+    result = relax(
+        systems,
+        QuadraticCalculator(),
+        devices=["cpu:0", "cpu:1"],
+        auto_config=AutoSchedulerConfig(
+            max_batch_size=8,
+            multi_gpu_worker_backend="thread",
+            multi_gpu_dispatch_policy="preserve_resident",
+        ),
+        fmax=1e-5,
+        max_steps=500,
+        dt_start=0.05,
+        dt_max=0.5,
+    )
+
+    schedule = result.metadata["scheduling"]
+    assert bool(result.converged.all())
+    assert schedule["gpu_count"] == 2
+    assert schedule["active_gpu_count"] == 1
+    assert schedule["multi_gpu_dispatch_policy"] == "preserve_resident"
+    assert schedule["parallel_chunk_policy"] == "resident_batches_preserved"
+    assert schedule["resident_plan_chunk_count"] == 1
+    assert schedule["execution_chunk_count"] == 1
+    assert schedule["planned_chunks"][0]["system_count"] == len(systems)
+    assert schedule["policy_manifest"]["outer_scheduler"][
+        "active_device_count"
+    ] == 1
 
 
 def test_multi_device_auto_supports_persistent_process_workers():

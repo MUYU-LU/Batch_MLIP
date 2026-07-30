@@ -72,6 +72,10 @@ class AutoSchedulerConfig:
     multi_gpu_process_cpu_threads: int = 1
     multi_gpu_process_min_chunks_per_device: int = 8
     multi_gpu_target_chunks_per_device: int = 2
+    multi_gpu_dispatch_policy: Literal[
+        "subdivide",
+        "preserve_resident",
+    ] = "subdivide"
     cuda_allocator_policy: Literal[
         "auto", "native", "expandable_segments"
     ] = "auto"
@@ -128,6 +132,14 @@ class AutoSchedulerConfig:
         if self.multi_gpu_worker_backend not in ("auto", "process", "thread"):
             raise ValueError(
                 "multi_gpu_worker_backend must be 'auto', 'process', or 'thread'"
+            )
+        if self.multi_gpu_dispatch_policy not in (
+            "subdivide",
+            "preserve_resident",
+        ):
+            raise ValueError(
+                "multi_gpu_dispatch_policy must be 'subdivide' or "
+                "'preserve_resident'"
             )
         if self.cuda_allocator_policy not in (
             "auto",

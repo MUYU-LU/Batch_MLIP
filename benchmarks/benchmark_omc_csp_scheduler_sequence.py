@@ -97,6 +97,11 @@ def main() -> None:
     parser.add_argument("--max-steps", type=int, default=500)
     parser.add_argument("--manifest-prefetch-depth", type=int, default=1)
     parser.add_argument(
+        "--multi-gpu-dispatch-policy",
+        choices=("subdivide", "preserve_resident"),
+        default="subdivide",
+    )
+    parser.add_argument(
         "--manifest-loader-processes",
         type=_loader_process_count,
         default="auto",
@@ -150,6 +155,7 @@ def main() -> None:
     config = AutoSchedulerConfig(
         manifest_loader_processes=args.manifest_loader_processes,
         manifest_prefetch_chunks_per_worker=args.manifest_prefetch_depth,
+        multi_gpu_dispatch_policy=args.multi_gpu_dispatch_policy,
     )
     relaxation_options = {
         "cell_filter": FrechetCellFilter(),
@@ -189,6 +195,7 @@ def main() -> None:
                     f"{manifest.workload_id} did not retain manifest order"
                 )
             scheduling = result.metadata["scheduling"]
+            active_device_count = int(scheduling["active_gpu_count"])
             calls.append(
                 {
                     "call": call_index + 1,
@@ -197,6 +204,9 @@ def main() -> None:
                     "planning_profile_sha256": profile.profile_sha256,
                     "pool_size": len(source_ids),
                     "seconds": call_seconds,
+                    "active_device_wall_seconds": (
+                        call_seconds * active_device_count
+                    ),
                     "converged_count": int(result.converged.sum().item()),
                     "model_evaluations": result.model_evaluations,
                     "graph_evaluations": result.graph_evaluations,
@@ -256,6 +266,7 @@ def main() -> None:
             "manifest_prefetch_chunks_per_worker": (
                 args.manifest_prefetch_depth
             ),
+            "multi_gpu_dispatch_policy": args.multi_gpu_dispatch_policy,
         },
         "reproducibility": reproducibility,
         "environment": environment_metadata(devices[0]),
@@ -263,6 +274,9 @@ def main() -> None:
             "script_seconds": time.perf_counter() - started,
             "sequence_seconds": sequence_seconds,
             "call_seconds": [call["seconds"] for call in calls],
+            "active_device_wall_seconds": sum(
+                call["active_device_wall_seconds"] for call in calls
+            ),
         },
         "persistence": {
             "worker_pid_sequences": worker_pid_sequences,
