@@ -1,0 +1,63 @@
+schema_version: 1
+status: constructed_and_validated
+date: 2026-07-29
+
+source:
+  path: /public/home/lmy/Batch_imple_project/test_set
+  family_directories: 24
+  nonempty_families: 23
+  empty_families: [OBEQET]
+  candidate_cifs: 299609
+  excluded_experimental_references: 27
+  source_modified: false
+
+construction:
+  output: /public/home/lmy/Batch_imple_project/omc_csp_workloads_v1
+  construction_sha256: 48c6b87ce74b2af0ec13e6830cd048b05c985f7605662a091cd7bdf26f7982c1
+  selection_seed: 20260729
+  pool_sizes: [64, 512, 2048]
+  replication: false
+  selected_unique_candidates_per_family: 2048
+  selected_family_records: 47104
+  construction_seconds: 272
+  cpu_workers: 24
+  disk_size_MiB_approx: 210
+
+workloads:
+  total: 87
+  intra_family: 69
+  inter_family: 18
+  inter_family_series:
+    - MIX-ALL
+    - COSTBAND-01
+    - COSTBAND-02
+    - COSTBAND-03
+    - COSTBAND-04
+    - COSTBAND-05
+  manifest_job_references: 76096
+
+profile_range:
+  atoms: [44, 800]
+  candidate_edges_at_6_5_A: [664, 60352]
+  cell_mode: variable
+  optimizer_profile: BFGS
+  optimizer_dimension: 3N+9
+  semantics: legacy_omc_variable_cell_bfgs_proxy_not_universal
+
+validation:
+  status: passed
+  checked:
+    - construction_index_hash
+    - manifest_hashes
+    - catalog_job_counts
+    - unique_source_paths_within_every_pool
+    - unique_normalized_structures_within_every_pool
+    - experimental_reference_exclusion
+    - ordered_nested_pool_prefixes
+    - all_nonempty_family_coverage
+    - all_requested_pool_sizes
+
+scope:
+  model_loaded: false
+  optimization_run: false
+  speedup_claim: false

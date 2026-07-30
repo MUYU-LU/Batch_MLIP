@@ -1,0 +1,128 @@
+schema_version: 1
+status: validation_complete
+date: 2026-07-30
+
+artifacts:
+  host_results: /public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch2/results/source_backed_p2048_v1
+  completion:
+    path: results/source_backed_analysis/completion.json
+    sha256: 0f91c81931f7c653e5d783003f0877cfa192b9c7ad9e47d377b72a59e244b70a
+  analysis:
+    json: results/source_backed_analysis/source_backed_analysis.json
+    json_sha256: fbeb16791b167916e7956de5d4d7e25de5fcbaf3855082354caf567f7b383873
+    csv: results/source_backed_analysis/source_backed_analysis.csv
+    csv_sha256: b8fd9ce385496752c87149999bec959fd0d623e2a8f60dadf3c498f104cf05fb
+    markdown: results/source_backed_analysis/source_backed_analysis.md
+    markdown_sha256: 0b3122d24e0b45a3b90183b8b1544af804927af889b91def2005f779d988ad46
+  host_validation_results: /public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch2/results/source_backed_validation_p2048_v1
+  validation_completion:
+    path: results/source_backed_validation/completion.json
+    sha256: 2d4a342f8a75ddeaa595291bb006013a054131fbf9c4c2fac30217f8c75dcb0a
+  validation_analysis:
+    json: results/source_backed_validation/source_backed_analysis.json
+    json_sha256: 56b8c572873faddcbd86e8dfa5ba65642842e456c2258c4caca2b690bb8b594b
+    csv: results/source_backed_validation/source_backed_analysis.csv
+    csv_sha256: db6cdf3a52359abc4f15f6adb289876e3922f317b2fb41cb9b7242c646973448
+    markdown: results/source_backed_validation/source_backed_analysis.md
+    markdown_sha256: f358ea1c9cd64f214020fedb2cf425d55bffdf32df6ca5bad758ab168e7d2d4a
+  epoch1_runner_frozen: /public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/runner_frozen
+  epoch1_runner_hash_manifest_sha256: 73eed63501d3c1551be2a9757614ed4f85fa03a177f2aa98763a4538f063beb0
+
+matrix:
+  workloads: 5
+  jobs_per_workload: 2048
+  jobs: 10240
+  source_backed_runs: 5
+  timing_repeats: 1
+  eager_reference: frozen_epoch1_test
+  mps_reference: frozen_epoch1_test
+  gpus: [0, 1, 2, 3, 4, 5, 6]
+
+gates:
+  exact_identity_and_order: pass
+  identical_plan_signature_to_eager: pass
+  requested_numerical_contract: pass
+  no_oom: pass
+  peak_reserved_memory_below_85_percent: pass
+  convergence_count_non_regression: pass
+  endpoint_equality_to_eager: pass
+  external_makespan_improves_over_eager: pass
+
+performance:
+  external_seconds:
+    source_backed: 570.660942
+    eager: 1425.509318
+    ase_cuda_mps: 1544.514994
+  aggregate_speedup:
+    over_eager: 2.497997
+    over_ase_cuda_mps: 2.706537
+  median_speedup:
+    over_eager: 2.421413
+    over_ase_cuda_mps: 2.264015
+  wins:
+    over_eager: 5
+    over_ase_cuda_mps: 5
+  maximum_peak_reserved_memory_fraction: 0.720084
+
+scientific:
+  source_backed_converged: 10240
+  eager_converged: 10240
+  ase_cuda_mps_converged: 10240
+  maximum_endpoint_difference_from_eager: 0.0
+
+attribution:
+  eager_structure_model_setup_output_seconds: 946.967346
+  source_backed_structure_model_setup_output_seconds: 13.951880
+  mechanism: >-
+    The parent plans from signed layered sidecars and loads only the warm-up
+    and representative probe structures. Process-owned GPU workers materialize
+    their assigned production chunks in parallel.
+  unchanged:
+    - deterministic_probe
+    - resident_plan
+    - execution_chunks
+    - optimizer_and_cell_filter
+    - model_and_precision
+    - graph_cache_and_compaction
+    - tail_recovery
+
+decision:
+  causal_mechanism: accepted
+  validation: pass
+  default_policy: source_backed_for_signed_large_pool_omc_csp
+  in_memory_relax_interface: unchanged
+  next_action: integrate_signed_hardware_capacity_model_without_online_probe
+
+validation:
+  workloads: 5
+  jobs: 10240
+  families: [BOQWIN, GUFJOG, KONTIQ, ROF-B, XAFPAY]
+  tail_recovery: none
+  gates:
+    exact_identity_and_order: pass
+    identical_plan_signature_to_eager: pass
+    requested_numerical_contract: pass
+    no_oom: pass
+    peak_reserved_memory_below_85_percent: pass
+    tensor_convergence_equals_eager: pass
+    endpoint_equality_to_eager: pass
+    external_makespan_improves_over_eager: pass
+  external_seconds:
+    source_backed: 1238.178463
+    eager: 2149.890754
+    ase_cuda_mps: 4061.142890
+  aggregate_speedup:
+    over_eager: 1.736334
+    over_ase_cuda_mps: 3.279933
+  median_speedup:
+    over_eager: 1.663532
+    over_ase_cuda_mps: 2.827691
+  wins:
+    over_eager: 5
+    over_ase_cuda_mps: 5
+  convergence_before_tail_recovery:
+    source_backed: 10146
+    eager: 10146
+    ase_cuda_mps: 10183
+  maximum_endpoint_difference_from_eager: 0.0
+  maximum_peak_reserved_memory_fraction: 0.761747

@@ -1,0 +1,302 @@
+{
+  "aggregate": {
+    "all_gates_passed": false,
+    "jobs": 6144,
+    "maximum_peak_reserved_fraction": 0.6485743137511851,
+    "mps_external_seconds": 814.0925032859668,
+    "offline_external_seconds": 309.00509683648124,
+    "probe_backed_external_seconds": 312.46418651752174,
+    "speedup_over_mps": 2.63456011444616,
+    "speedup_over_probe_backed": 1.0111942803418255,
+    "workloads": 3
+  },
+  "rows": [
+    {
+      "all_gates_passed": false,
+      "execution_chunks": 14,
+      "gates": {
+        "contract_and_identity_equal": true,
+        "convergence_non_regression": true,
+        "memory_at_most_85_percent": true,
+        "no_parent_production_materialization": true,
+        "offline_policy_selected": true,
+        "predicted_chunk_bounds_hold": false,
+        "source_endpoints_within_established_tolerances": true,
+        "status_complete": true,
+        "zero_probe": true
+      },
+      "mps_converged": 2048,
+      "mps_endpoint_maximum_difference": 8.0,
+      "mps_external_seconds": 441.25656653987244,
+      "offline_converged": 2048,
+      "offline_external_seconds": 139.62338783731684,
+      "peak_reserved_bytes": 50637832192,
+      "peak_reserved_fraction": 0.5956138660417646,
+      "probe_backed_converged": 2048,
+      "probe_backed_external_seconds": 138.88653837470338,
+      "resident_plan_chunks": 10,
+      "source_endpoint_maximum_difference": 4.0,
+      "source_physical_endpoints": {
+        "convergence_state_mismatch_count": 0,
+        "failed_checks": [],
+        "maximums": {
+          "max_cell_rmsd_A": 0.001904845341175152,
+          "max_energy_error_eV_per_atom": 7.53789334683805e-05,
+          "max_final_fmax_error_eV_per_A": 0.005779135972261429,
+          "max_position_rmsd_A": 0.008781256453520375,
+          "max_stress_tensor_error_eV_per_A3": 0.00015482517483178526
+        },
+        "metrics": {
+          "absolute_step_difference": {
+            "max": 4.0,
+            "mean": 0.01513671875,
+            "min": 0.0,
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "cell_rmsd_A": {
+            "max": 0.001904845341175152,
+            "mean": 5.7440307826536185e-06,
+            "min": 0.0,
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "energy_error_eV_per_atom": {
+            "max": 7.53789334683805e-05,
+            "mean": 2.429430448525661e-07,
+            "min": 0.0,
+            "p50": 0.0,
+            "p95": 1.2887490762246622e-08
+          },
+          "final_fmax_error_eV_per_A": {
+            "max": 0.005779135972261429,
+            "mean": 2.1195764929871075e-05,
+            "min": 0.0,
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "position_rmsd_A": {
+            "max": 0.008781256453520375,
+            "mean": 2.9798810945380663e-05,
+            "min": 0.0,
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "stress_tensor_error_eV_per_A3": {
+            "max": 0.00015482517483178526,
+            "mean": 3.928178350376399e-07,
+            "min": 0.0,
+            "p50": 0.0,
+            "p95": 0.0
+          }
+        },
+        "passed": true,
+        "same_source_set": true,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "speedup_over_mps": 3.1603341916757213,
+      "speedup_over_probe_backed": 0.9947225928690971,
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2"
+    },
+    {
+      "all_gates_passed": false,
+      "execution_chunks": 14,
+      "gates": {
+        "contract_and_identity_equal": true,
+        "convergence_non_regression": true,
+        "memory_at_most_85_percent": true,
+        "no_parent_production_materialization": true,
+        "offline_policy_selected": true,
+        "predicted_chunk_bounds_hold": false,
+        "source_endpoints_within_established_tolerances": false,
+        "status_complete": true,
+        "zero_probe": true
+      },
+      "mps_converged": 2048,
+      "mps_endpoint_maximum_difference": 98.0,
+      "mps_external_seconds": 212.01317953225225,
+      "offline_converged": 2048,
+      "offline_external_seconds": 92.86829403601587,
+      "peak_reserved_bytes": 43532681216,
+      "peak_reserved_fraction": 0.512041440871985,
+      "probe_backed_converged": 2048,
+      "probe_backed_external_seconds": 93.64476616261527,
+      "resident_plan_chunks": 9,
+      "source_endpoint_maximum_difference": 26.0,
+      "source_physical_endpoints": {
+        "convergence_state_mismatch_count": 0,
+        "failed_checks": [
+          "max_energy_error_eV_per_atom",
+          "max_position_rmsd_A"
+        ],
+        "maximums": {
+          "max_cell_rmsd_A": 0.01564396859962258,
+          "max_energy_error_eV_per_atom": 0.0006359562729344224,
+          "max_final_fmax_error_eV_per_A": 0.008571472018957138,
+          "max_position_rmsd_A": 0.07617466441652597,
+          "max_stress_tensor_error_eV_per_A3": 0.00043964308133581653
+        },
+        "metrics": {
+          "absolute_step_difference": {
+            "max": 26.0,
+            "mean": 0.0283203125,
+            "min": 0.0,
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "cell_rmsd_A": {
+            "max": 0.01564396859962258,
+            "mean": 1.588189184474649e-05,
+            "min": 0.0,
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "energy_error_eV_per_atom": {
+            "max": 0.0006359562729344224,
+            "mean": 6.184652165481539e-07,
+            "min": 0.0,
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "final_fmax_error_eV_per_A": {
+            "max": 0.008571472018957138,
+            "mean": 1.5227882613544352e-05,
+            "min": 0.0,
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "position_rmsd_A": {
+            "max": 0.07617466441652597,
+            "mean": 7.63889441158827e-05,
+            "min": 0.0,
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "stress_tensor_error_eV_per_A3": {
+            "max": 0.00043964308133581653,
+            "mean": 6.065897437679268e-07,
+            "min": 0.0,
+            "p50": 0.0,
+            "p95": 0.0
+          }
+        },
+        "passed": false,
+        "same_source_set": true,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "speedup_over_mps": 2.282944698542971,
+      "speedup_over_probe_backed": 1.008361003447509,
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2"
+    },
+    {
+      "all_gates_passed": false,
+      "execution_chunks": 14,
+      "gates": {
+        "contract_and_identity_equal": true,
+        "convergence_non_regression": true,
+        "memory_at_most_85_percent": true,
+        "no_parent_production_materialization": true,
+        "offline_policy_selected": true,
+        "predicted_chunk_bounds_hold": true,
+        "source_endpoints_within_established_tolerances": false,
+        "status_complete": true,
+        "zero_probe": true
+      },
+      "mps_converged": 2048,
+      "mps_endpoint_maximum_difference": 197.0,
+      "mps_external_seconds": 160.82275721384212,
+      "offline_converged": 2048,
+      "offline_external_seconds": 76.51341496314853,
+      "peak_reserved_bytes": 55140417536,
+      "peak_reserved_fraction": 0.6485743137511851,
+      "probe_backed_converged": 2048,
+      "probe_backed_external_seconds": 79.93288198020309,
+      "resident_plan_chunks": 12,
+      "source_endpoint_maximum_difference": 9.0,
+      "source_physical_endpoints": {
+        "convergence_state_mismatch_count": 0,
+        "failed_checks": [
+          "max_energy_error_eV_per_atom",
+          "max_position_rmsd_A"
+        ],
+        "maximums": {
+          "max_cell_rmsd_A": 0.004642440807697407,
+          "max_energy_error_eV_per_atom": 0.000401001710158128,
+          "max_final_fmax_error_eV_per_A": 0.019942356273531914,
+          "max_position_rmsd_A": 0.02855090635092961,
+          "max_stress_tensor_error_eV_per_A3": 0.0013350944500416517
+        },
+        "metrics": {
+          "absolute_step_difference": {
+            "max": 9.0,
+            "mean": 0.0107421875,
+            "min": 0.0,
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "cell_rmsd_A": {
+            "max": 0.004642440807697407,
+            "mean": 1.3942419646209581e-05,
+            "min": 0.0,
+            "p50": 0.0,
+            "p95": 4.801376695062386e-07
+          },
+          "energy_error_eV_per_atom": {
+            "max": 0.000401001710158128,
+            "mean": 3.2016452258596053e-07,
+            "min": 0.0,
+            "p50": 0.0,
+            "p95": 5.501967210036058e-08
+          },
+          "final_fmax_error_eV_per_A": {
+            "max": 0.019942356273531914,
+            "mean": 9.341111035610083e-05,
+            "min": 0.0,
+            "p50": 0.0,
+            "p95": 5.194917321205139e-05
+          },
+          "position_rmsd_A": {
+            "max": 0.02855090635092961,
+            "mean": 4.7568388994822745e-05,
+            "min": 0.0,
+            "p50": 0.0,
+            "p95": 4.711238177893339e-06
+          },
+          "stress_tensor_error_eV_per_A3": {
+            "max": 0.0013350944500416517,
+            "mean": 3.958115468155957e-06,
+            "min": 0.0,
+            "p50": 0.0,
+            "p95": 4.2149164869442757e-07
+          }
+        },
+        "passed": false,
+        "same_source_set": true,
+        "tolerances": {
+          "max_cell_rmsd_A": 0.02,
+          "max_energy_error_eV_per_atom": 0.0001,
+          "max_final_fmax_error_eV_per_A": 0.03,
+          "max_position_rmsd_A": 0.02,
+          "max_stress_tensor_error_eV_per_A3": 0.01
+        }
+      },
+      "speedup_over_mps": 2.1018896789706725,
+      "speedup_over_probe_backed": 1.0446910782730257,
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2"
+    }
+  ],
+  "schema_version": 1,
+  "status": "complete"
+}

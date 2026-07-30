@@ -1,0 +1,88 @@
+schema_version: 1
+status: complete
+date: 2026-07-29
+
+artifacts:
+  compute_root: /public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1
+  calibration: results/expanded/calibration.json
+  calibration_sha256: d27468326e2b7f464b37c8739d3d3bd219425081bdb96dabf0f250928c78b297
+  seed_calibration: results/calibration.json
+  seed_calibration_sha256: 3360044f76ebac7fe144412c75b166c9ab4df9a9d54f63c029d288ff4bb497b3
+  expanded_matrix: results/expanded/planned_matrix.json
+  final_matrix: results/expanded/final_planned_matrix.json
+  final_summary: results/expanded/final_summary.json
+  capacity_plans: results/capacity_plans.json
+  capacity_validation: results/capacity_validation
+
+matrix:
+  fit_points: 42
+  heldout_points: 20
+  untouched_final_points: 8
+  timing_repeats: 1
+  warm_executions_per_point: 1
+  measured_executions_per_point: 1
+  resident_batch_range: [8, 512]
+  fit_family_count: 12
+  heldout_family_count: 6
+  untouched_final_families: [UJIRIO112, WIDBAO100, XAFQIH124, XULDUD52-104]
+
+heldout_error:
+  peak_allocated_bytes:
+    mean_absolute_relative_error: 0.008141
+    max_absolute_relative_error: 0.009390
+  peak_reserved_bytes:
+    mean_absolute_relative_error: 0.030969
+    max_absolute_relative_error: 0.072459
+  seconds_per_evaluation:
+    mean_absolute_relative_error: 0.234372
+    max_absolute_relative_error: 0.661749
+
+untouched_final_error:
+  peak_allocated_bytes:
+    mean_absolute_relative_error: 0.009019
+    max_absolute_relative_error: 0.009567
+  peak_reserved_bytes:
+    mean_absolute_relative_error: 0.030549
+    max_absolute_relative_error: 0.072142
+    minimum_predicted_to_measured: 1.014920
+  seconds_per_evaluation:
+    mean_absolute_relative_error: 0.177676
+    max_absolute_relative_error: 0.401640
+
+capacity_validation:
+  memory_budget_bytes: 72300757811
+  device_memory_fraction: 0.85
+  workloads:
+    AXOSOW:
+      resident_batch_size: 364
+      predicted_peak_bytes: 72185809270
+      observed_peak_reserved_bytes: 71175241728
+      observed_budget_fraction: 0.984433
+    BOQQUT:
+      resident_batch_size: 195
+      predicted_peak_bytes: 72144619127
+      observed_peak_reserved_bytes: 71619837952
+      observed_budget_fraction: 0.990582
+    ROF-A:
+      resident_batch_size: 195
+      predicted_peak_bytes: 66638024483
+      observed_peak_reserved_bytes: 67553460224
+      observed_budget_fraction: 0.934340
+
+negative_controls:
+  auto_split: >-
+    Automatic bucketing split heterogeneous calibration inputs, invalidating
+    the correspondence between aggregate features and the measured peak.
+  default_allocator: >-
+    ROF-B B64 allocated 25.92 GiB but reserved 77.92 GiB. The accepted
+    calibration contract therefore requires expandable_segments.
+  unsupported_elements: >-
+    COSTBAND-03 and MIX-ALL contain Si, which is outside this checkpoint's
+    element map; they were excluded before the accepted fit.
+
+decision:
+  reserved_memory_model: accepted_for_single_gpu_capacity_planning
+  allocated_memory_model: accepted_for_diagnostics
+  runtime_model: informational_coarse_ordering_prior
+  runtime_throughput_knee: retain_measured_frontier_policy
+  multi_gpu_binding: pending_outer_scheduler_integration

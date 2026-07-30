@@ -1,0 +1,82 @@
+schema_version: 1
+status: capacity_validation_complete
+date: 2026-07-30
+
+artifacts:
+  host_results: /public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch3/results/capacity_nonfit_p2048_v2
+  host_analysis: /public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch3/results/capacity_nonfit_p2048_analysis_v2
+  completion:
+    path: results/refined_v2/completion.json
+    sha256: 8405bb15998a3b8c141566f8b766d450d8e65e7ea51aa795922ae430fce48e0e
+  analysis:
+    json: results/refined_v2/capacity_integration.json
+    json_sha256: 8a4753bfbea7ca632ef3073316c4b4abc14f4f00ca1fa32d817c9d18c4ef3b50
+    csv: results/refined_v2/capacity_integration.csv
+    csv_sha256: 53a1d390df0c07aafd9023c211ef484d8191803ec1968519afd75aa6536ca657
+    markdown: results/refined_v2/capacity_integration.md
+    markdown_sha256: 3e8b5f55334719ab35fa180ba25d3e131c6834d447de157fa9fa149ba668a3ba
+  diagnostic_v1:
+    host_results: /public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch3/results/capacity_nonfit_p2048_v1
+    completion_sha256: b3df87768b588c92ac9d18db5a1d64b00c632fe86c8763f1d4d847cb3b95cc1b
+    analysis_json_sha256: 05c1598ae2ebe3526b4b174fbedaf3d658fd91ec0a8a054c9372012e309c6f88
+
+performance:
+  jobs: 6144
+  external_seconds:
+    offline_capacity: 301.507502
+    probe_backed_tensor: 312.464187
+    ase_cuda_mps: 814.092503
+  aggregate_speedup:
+    over_probe_backed_tensor: 1.036340
+    over_ase_cuda_mps: 2.700074
+  wins:
+    over_probe_backed_tensor: 2
+    over_ase_cuda_mps: 3
+
+capacity:
+  all_gates: pass
+  production_probe_system_count: 0
+  production_probe_model_forward_count: 0
+  maximum_peak_reserved_memory_fraction: 0.635846
+  maximum_actual_to_predicted_memory_ratio: 0.916044
+  predicted_bound_violations: 0
+  converged:
+    offline_capacity: 6144
+    probe_backed_tensor: 6144
+    ase_cuda_mps: 6144
+
+strict_endpoint_diagnostics:
+  all_gates: fail
+  probe_backed_tensor_reference:
+    ROF-A:
+      failed_energy_records: 0
+      failed_position_records: 0
+    ROF-C:
+      failed_energy_records: 3
+      failed_position_records: 2
+    XULDUD:
+      failed_energy_records: 1
+      failed_position_records: 0
+  force_stress_cell_convergence_identity_and_coverage: pass
+
+diagnostic_and_fix:
+  v1_failure:
+    predicted_bound_violations: 7
+    worst_actual_to_predicted_ratio: 1.015035
+  causes:
+    - existing_1_10_growth_margin_not_applied
+    - inner_capacity_layer_rebucketed_outer_workload
+  correction:
+    - apply_configured_growth_margin_to_all_offline_estimates
+    - preserve_outer_workload_buckets_and_pack_only_inside_each_bucket
+
+decision:
+  capacity_mechanism: accepted_for_exact_signed_contract
+  default_manifest_behavior: offline_model_on_exact_match
+  mismatch_behavior: representative_probe_fallback
+  strict_schedule_invariant_endpoints: not_established
+  excluded_transfer:
+    - MACE
+    - non_H100_hardware
+    - other_optimizers
+    - other_model_or_graph_contracts

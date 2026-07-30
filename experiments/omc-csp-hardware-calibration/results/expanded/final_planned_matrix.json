@@ -1,0 +1,151 @@
+{
+  "execution_contract": {
+    "cell_filter": "FrechetCellFilter",
+    "cuda_allocator": "expandable_segments",
+    "cutoff_A": 6.0,
+    "deterministic": true,
+    "force_mode": "autograd",
+    "max_steps": 3,
+    "measured_executions": 1,
+    "mlip": "AtomBit-smooth-rms-fp32",
+    "neighbor_backend": "auto",
+    "optimizer": "BatchedBFGS",
+    "optimizer_dtype": "torch.float64",
+    "scheduling": "single_batch",
+    "skin_A": 0.5,
+    "warm_executions": 1
+  },
+  "families": {
+    "OPT-OMC-UJIRIO-P512-INTRA-NARROW-v1": {
+      "bucket_count": 2,
+      "family": "UJIRIO",
+      "memory_budget_bytes": 72265203712,
+      "resident_capacity": 286,
+      "split": "final"
+    },
+    "OPT-OMC-WIDBAO-P512-INTRA-NARROW-v1": {
+      "bucket_count": 2,
+      "family": "WIDBAO",
+      "memory_budget_bytes": 72265203712,
+      "resident_capacity": 364,
+      "split": "final"
+    },
+    "OPT-OMC-XAFQIH-P512-INTRA-NARROW-v1": {
+      "bucket_count": 1,
+      "family": "XAFQIH",
+      "memory_budget_bytes": 72265203712,
+      "resident_capacity": 293,
+      "split": "final"
+    },
+    "OPT-OMC-XULDUD-P512-INTRA-WIDE-v1": {
+      "bucket_count": 3,
+      "family": "XULDUD",
+      "memory_budget_bytes": 72265203712,
+      "resident_capacity": 207,
+      "split": "final"
+    }
+  },
+  "points": [
+    {
+      "batch_size": 128,
+      "family": "UJIRIO",
+      "indices_json": "selections/expanded-final-UJIRIO-knee-B128.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-final-UJIRIO-knee-B128",
+      "pool_size": 512,
+      "scale": "knee",
+      "split": "final",
+      "workload_id": "OPT-OMC-UJIRIO-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 286,
+      "family": "UJIRIO",
+      "indices_json": "selections/expanded-final-UJIRIO-near_capacity-B286.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-final-UJIRIO-near_capacity-B286",
+      "pool_size": 512,
+      "scale": "near_capacity",
+      "split": "final",
+      "workload_id": "OPT-OMC-UJIRIO-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 128,
+      "family": "WIDBAO",
+      "indices_json": "selections/expanded-final-WIDBAO-knee-B128.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-final-WIDBAO-knee-B128",
+      "pool_size": 512,
+      "scale": "knee",
+      "split": "final",
+      "workload_id": "OPT-OMC-WIDBAO-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 364,
+      "family": "WIDBAO",
+      "indices_json": "selections/expanded-final-WIDBAO-near_capacity-B364.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-final-WIDBAO-near_capacity-B364",
+      "pool_size": 512,
+      "scale": "near_capacity",
+      "split": "final",
+      "workload_id": "OPT-OMC-WIDBAO-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 128,
+      "family": "XAFQIH",
+      "indices_json": "selections/expanded-final-XAFQIH-knee-B128.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-final-XAFQIH-knee-B128",
+      "pool_size": 512,
+      "scale": "knee",
+      "split": "final",
+      "workload_id": "OPT-OMC-XAFQIH-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 293,
+      "family": "XAFQIH",
+      "indices_json": "selections/expanded-final-XAFQIH-near_capacity-B293.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-final-XAFQIH-near_capacity-B293",
+      "pool_size": 512,
+      "scale": "near_capacity",
+      "split": "final",
+      "workload_id": "OPT-OMC-XAFQIH-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 128,
+      "family": "XULDUD",
+      "indices_json": "selections/expanded-final-XULDUD-knee-B128.json",
+      "mixing": "INTRA-WIDE",
+      "observation_id": "expanded-final-XULDUD-knee-B128",
+      "pool_size": 512,
+      "scale": "knee",
+      "split": "final",
+      "workload_id": "OPT-OMC-XULDUD-P512-INTRA-WIDE-v1"
+    },
+    {
+      "batch_size": 207,
+      "family": "XULDUD",
+      "indices_json": "selections/expanded-final-XULDUD-near_capacity-B207.json",
+      "mixing": "INTRA-WIDE",
+      "observation_id": "expanded-final-XULDUD-near_capacity-B207",
+      "pool_size": 512,
+      "scale": "near_capacity",
+      "split": "final",
+      "workload_id": "OPT-OMC-XULDUD-P512-INTRA-WIDE-v1"
+    }
+  ],
+  "schema_version": 1,
+  "selection_design": {
+    "design": "final",
+    "nested": true,
+    "scales": [
+      "B128",
+      "model_predicted_capacity"
+    ],
+    "single_measurement_per_point": true
+  },
+  "source_calibration": "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/calibration_expanded.json",
+  "source_calibration_sha256": "d27468326e2b7f464b37c8739d3d3bd219425081bdb96dabf0f250928c78b297",
+  "status": "planned"
+}

@@ -1,0 +1,59 @@
+{
+  "baselines": {
+    "best_one_shot_four_loader_seconds": 100.72698727902025,
+    "mps_seconds": 441.2566
+  },
+  "correctness": {
+    "chunk_plan_equal": true,
+    "converged_jobs": 2048,
+    "energy_maximum_difference_eV": 0.0,
+    "force_maximum_difference_eV_per_A": 0.0,
+    "optimization_step_difference_count": 0,
+    "source_order_equal": true
+  },
+  "persistent_no_prefetch": {
+    "call_1_seconds": 85.62572612660006,
+    "call_1_worker_startup_seconds": 21.378173663746566,
+    "call_2_seconds": 58.06340878782794,
+    "call_2_worker_startup_seconds": 0.0,
+    "prefetch_depth": 0,
+    "two_call_seconds": 143.689134914428
+  },
+  "persistent_prefetch": {
+    "call_1_production_seconds": 60.10331874713302,
+    "call_1_seconds": 83.43513412913308,
+    "call_1_worker_startup_seconds": 20.227869148831815,
+    "call_2_production_seconds": 55.71804592013359,
+    "call_2_seconds": 57.49221803387627,
+    "call_2_worker_startup_seconds": 0.0,
+    "loader_processes": 28,
+    "prefetch_depth": 1,
+    "prefetch_hits_after_initial_wave": 7,
+    "prefetch_opportunities_after_initial_wave": 7,
+    "two_call_seconds": 140.92735216300935,
+    "worker_pids_reused": true
+  },
+  "resource": {
+    "gpu_count": 7,
+    "gpu_model": "NVIDIA H100 80GB HBM3",
+    "peak_allocated_bytes": 48517884416,
+    "peak_reserved_bytes": 54058287104,
+    "peak_reserved_fraction": 0.6345014957473698
+  },
+  "schema_version": 1,
+  "speedups": {
+    "call_1_over_best_one_shot": 1.2072490603673562,
+    "call_2_over_best_one_shot": 1.7520108063958961,
+    "prefetch_call_1_over_no_prefetch": 1.0262550305735303,
+    "prefetch_call_2_over_no_prefetch": 1.009935096844152,
+    "prefetch_two_call_over_no_prefetch": 1.0195972088386656,
+    "second_call_over_first_no_prefetch": 1.4746934069869855,
+    "two_call_over_two_best_one_shot": 1.4294881118962668,
+    "two_call_over_two_mps": 6.2621853490811725
+  },
+  "timing_repeats": 1,
+  "workload": {
+    "id": "OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2",
+    "pool_size": 2048
+  }
+}

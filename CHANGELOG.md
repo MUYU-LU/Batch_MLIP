@@ -1,7 +1,78 @@
 # Changelog
 
+## OMC-CSP Scheduler v1 freeze validation
+
+- Add a signed multi-manifest sequence benchmark for persistent OMC-CSP
+  execution across homogeneous and mixed P512/P2048 pools.
+- Validate 7,680 test-split variable-cell BFGS jobs with exact standalone
+  tensor endpoints, complete convergence, bounded memory, cross-family GPU
+  worker persistence, heavy-to-light CPU-loader adaptation, and deterministic
+  cleanup.
+- Freeze the exact AtomBit/H100 OMC-CSP scheduler contract at `5.157x`
+  internal-script and `5.043x` production speedup over the frozen MPS
+  references.
+
+## 2026-07-30
+
+- Integrate the signed AtomBit/H100 peak-reserved-byte model into
+  `relax_manifest`, with exact checkpoint/task/graph/allocator/software/
+  hardware matching and automatic representative-probe fallback.
+- Preserve outer task-profiler buckets and apply the existing 1.10
+  optimization-growth guard when offline capacity packs inner resident chunks.
+- Validate zero-probe capacity on three non-fit P2048 OMC-CSP families:
+  all 6,144 jobs converge, every predicted chunk bound holds, peak reservation
+  is 63.58%, and aggregate speedup is 1.036x over the probe-backed tensor path
+  and 2.700x over frozen MPS.
+- Record six sparse strict endpoint-tolerance exceptions separately from the
+  accepted capacity gates instead of claiming schedule-invariant numerical
+  endpoints.
+- Add deterministic worker-local CPU process pools for file-backed structure
+  parsing, with a no-pilot pool/atom-pressure/CPU-capacity selector. Four
+  loaders reduce ROF-A critical-worker materialization by 3.23x while the
+  policy retains serial loading for light workloads where processes regress.
+- Extend `BatchExecutor` to signed manifest pools with reusable model-owning
+  GPU workers and a bounded global CPU prefetch source that preserves dynamic
+  GPU assignment. On ROF-A P2048, two calls are 1.429x faster than two best
+  one-shot calls; prefetch contributes a separate 1.020x over persistence
+  alone, with exact endpoints and 63.45% peak reservation.
+
+## 2026-07-29
+
+- Expand the signed layered H100 calibration to 42 fit points from 12 OMC
+  families and 20 validation points from six held-out families. Reserved-memory
+  validation MARE/max error is 3.10%/7.25%; eight tests on four untouched
+  families complete without OOM and conservatively overpredict reserve by
+  1.49-7.21%. Runtime prediction is explicitly informational.
+- Bind the accepted calibration to `expandable_segments`; reject the default
+  allocator after a B64 negative control reserved 77.92 GiB for 25.92 GiB
+  allocated.
+- Separate general structure, MLIP graph, task auxiliary, graph execution
+  policy, and hardware cost layers in sealed planning-profile sidecars.
+- Retain scheduler-v1 scalar `SystemProfile` and the frozen OMC workload
+  `planning_cost` key only as explicitly marked compatibility projections.
+- Add one process-wide reproducibility contract covering Python hashing and
+  `random`, NumPy, PyTorch CPU/CUDA RNGs, deterministic kernels, cuBLAS,
+  cuDNN, TF32, CPU threads, spawned workers, and MPS workers.
+- Define a three-seed OMC-CSP optimization robustness gate while retaining
+  immutable per-job random streams for stochastic MD.
+- Add deterministic OMC-CSP workload construction for exact unique,
+  content-hashed, nested `P64/P512/P2048` family and mixed-family pools.
+- Add an on-disk validator for manifest hashes, reference exclusion,
+  normalized-structure uniqueness, ordered nesting, and family coverage.
+- Compose the automatic relaxation mechanisms into one inspectable policy
+  manifest covering task detection, workload distributions, pool pressure,
+  bucketing, device assignment, graph/cache contract, compaction, refill
+  evidence, conservative fallbacks, and observed duration dispersion.
+- Distinguish the runtime-detected periodic variable-cell relaxation task from
+  the study-level OMC-CSP application label without changing numerical
+  execution or claiming a new performance result.
+
 ## 2026-07-28
 
+- Reframe the project around a frozen scheduler-v1 baseline and a separate
+  chemical-transfer study; add a complete status registry for all experiment
+  directories and forbid incompatible historical timings as transfer-planner
+  labels.
 - Add an explicit BFGS convergence-check cadence and reject blockwise K5 after
   it increased H46/STEPVAR work by 7,094/7,446 optimizer steps and changed
   endpoint energies by up to 20.17/7.81 meV per atom.

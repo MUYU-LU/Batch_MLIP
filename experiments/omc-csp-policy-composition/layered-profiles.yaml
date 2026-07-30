@@ -1,0 +1,53 @@
+schema_version: 1
+status: validated
+date: 2026-07-29
+
+artifacts:
+  frozen_workloads: /public/home/lmy/Batch_imple_project/omc_csp_workloads_v1
+  planning_profiles: /public/home/lmy/Batch_imple_project/omc_csp_planning_profiles_v1
+  profile_index_sha256: 7d2b6d074fea31d2394ec6e98a03d0ebbada069ab4caaf014885a5713da3c073
+  profile_count: 87
+  unique_structure_workloads: 87
+  validated_system_references: 76096
+  disk_usage: 83M
+
+contracts:
+  structure:
+    general_features: [atom_count]
+    identity_independent_of_model_task_and_execution: true
+  mlip:
+    model_id: AtomBit-smooth-rms-fp32
+    cutoff_A: 6.0
+    active_edge_count: required
+    force_mode: autograd
+    model_dtype: torch.float32
+  task:
+    operation: optimization
+    optimizer: BatchedBFGS
+    optimizer_state_dtype: torch.float64
+    variable_cell: true
+    stress_required: true
+    cell_filter: FrechetCellFilter
+    generalized_dimension: 3N+9
+    dense_state_elements: D^2
+    dense_linear_algebra_work: D^3
+    horizon: variable
+  graph_execution:
+    skin_A: 0.5
+    candidate_edge_count: required
+    neighbor_backend: auto
+  hardware:
+    bound: false
+    note: >-
+      A scalar seconds or bytes estimate requires calibrated coefficients for
+      a concrete model, task, execution policy, device, and software stack.
+
+validation:
+  workload_manifest_hashes: passed
+  structure_identity_hashes: passed
+  sidecar_content_hashes: passed
+  atom_counts: passed
+  active_edge_counts: passed
+  candidate_edge_counts: passed
+  bfgs_dimensions_and_state: passed
+  variable_cell_task_contract: passed

@@ -1,0 +1,15 @@
+schema_version: 1
+name: omc-csp-workload-construction
+baseline_commit: 4ee8b18
+hypothesis: >-
+  Exact unique CSP candidates can be frozen into nested P64, P512, and P2048
+  intra-family and inter-family workloads without replication, while retaining
+  the atom, edge, and variable-cell BFGS descriptors used by scheduler v1.
+performance_claim: none
+validation:
+  - experimental_references_excluded
+  - every_pool_contains_unique_structures
+  - p64_is_an_ordered_subset_of_p512_and_p2048
+  - all_nonempty_families_have_intra_family_pools
+  - cross_family_pools_are_family_balanced
+  - workload_manifests_are_content_hashed

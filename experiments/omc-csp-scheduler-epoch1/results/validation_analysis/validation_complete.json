@@ -1,0 +1,546 @@
+{
+  "methods_per_workload": [
+    "current_auto",
+    "ase_cuda_mps_static_lpt"
+  ],
+  "runs": [
+    {
+      "gpus": "0",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P64-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P64-INTRA-WIDE-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P64-INTRA-WIDE-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 91.08704530727118,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P64-INTRA-WIDE-v2/ase_cuda_mps.log",
+          "resumed": true,
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P64-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P64-INTRA-WIDE-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 49.64394304389134,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P64-INTRA-WIDE-v2/current_auto.log",
+          "resumed": true,
+          "returncode": 0
+        }
+      },
+      "pool_size": 64,
+      "workload_id": "OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P64-INTRA-WIDE-v2",
+      "workload_manifest_sha256": "b0019f0911d7ec3cd40a5de49c916bd27ea40aad7643deb08396c331d39947ec"
+    },
+    {
+      "gpus": "0",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P64-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P64-INTRA-NARROW-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P64-INTRA-NARROW-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 55.181207702029496,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P64-INTRA-NARROW-v2/ase_cuda_mps.log",
+          "resumed": true,
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P64-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P64-INTRA-NARROW-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 31.439001614693552,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P64-INTRA-NARROW-v2/current_auto.log",
+          "resumed": true,
+          "returncode": 0
+        }
+      },
+      "pool_size": 64,
+      "workload_id": "OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P64-INTRA-NARROW-v2",
+      "workload_manifest_sha256": "4f99afdc53c0f3830d942f1b79b048eec578b1403e5f68834b767d9c28d9f8a6"
+    },
+    {
+      "gpus": "0,1,2,3",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-VALIDATION-AXOSOW-P512-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0,1,2,3",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-AXOSOW-P512-INTRA-NARROW-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-AXOSOW-P512-INTRA-NARROW-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 165.9835785329342,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-AXOSOW-P512-INTRA-NARROW-v2/ase_cuda_mps.log",
+          "resumed": true,
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-VALIDATION-AXOSOW-P512-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0,1,2,3",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-AXOSOW-P512-INTRA-NARROW-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 81.22858585231006,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-AXOSOW-P512-INTRA-NARROW-v2/current_auto.log",
+          "resumed": true,
+          "returncode": 0
+        }
+      },
+      "pool_size": 512,
+      "workload_id": "OPT-OMC-SCHED-E1-VALIDATION-AXOSOW-P512-INTRA-NARROW-v2",
+      "workload_manifest_sha256": "4ee912b283f0fac2e80949d9cd5b89c9184cde161b663c9d44303d40a11ac3bd"
+    },
+    {
+      "gpus": "0,1,2,3",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P512-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0,1,2,3",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P512-INTRA-WIDE-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P512-INTRA-WIDE-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 206.39229315891862,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P512-INTRA-WIDE-v2/ase_cuda_mps.log",
+          "resumed": true,
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P512-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0,1,2,3",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P512-INTRA-WIDE-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 119.35420254198834,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P512-INTRA-WIDE-v2/current_auto.log",
+          "resumed": true,
+          "returncode": 0
+        }
+      },
+      "pool_size": 512,
+      "workload_id": "OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P512-INTRA-WIDE-v2",
+      "workload_manifest_sha256": "5db744d39669bbe61f7029723b174712999df8bb7f36cbc8f7c476c9a97cef0f"
+    },
+    {
+      "gpus": "0,1,2,3",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-VALIDATION-MIX-ALL-P512-INTER-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0,1,2,3",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-MIX-ALL-P512-INTER-WIDE-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-MIX-ALL-P512-INTER-WIDE-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 168.94014168903232,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-MIX-ALL-P512-INTER-WIDE-v2/ase_cuda_mps.log",
+          "resumed": true,
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-VALIDATION-MIX-ALL-P512-INTER-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0,1,2,3",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-MIX-ALL-P512-INTER-WIDE-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 115.10699165705591,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-MIX-ALL-P512-INTER-WIDE-v2/current_auto.log",
+          "resumed": true,
+          "returncode": 0
+        }
+      },
+      "pool_size": 512,
+      "workload_id": "OPT-OMC-SCHED-E1-VALIDATION-MIX-ALL-P512-INTER-WIDE-v2",
+      "workload_manifest_sha256": "bdc6f476c12f14ae82dbd248eec426f0696f7e7beaded33005c64554dd98842e"
+    },
+    {
+      "gpus": "0,1,2,3",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-VALIDATION-WICZUF-P512-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0,1,2,3",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-WICZUF-P512-INTRA-NARROW-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-WICZUF-P512-INTRA-NARROW-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 242.46299176104367,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-WICZUF-P512-INTRA-NARROW-v2/ase_cuda_mps.log",
+          "resumed": true,
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-VALIDATION-WICZUF-P512-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0,1,2,3",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-WICZUF-P512-INTRA-NARROW-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 173.59726339578629,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-WICZUF-P512-INTRA-NARROW-v2/current_auto.log",
+          "resumed": true,
+          "returncode": 0
+        }
+      },
+      "pool_size": 512,
+      "workload_id": "OPT-OMC-SCHED-E1-VALIDATION-WICZUF-P512-INTRA-NARROW-v2",
+      "workload_manifest_sha256": "81beecbfed8bb0e7f471075ff746060741bc8b2a8cb6ec8c7c46e6caa4d11cb3"
+    },
+    {
+      "gpus": "0,1,2,3",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P512-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0,1,2,3",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P512-INTRA-NARROW-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P512-INTRA-NARROW-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 118.52984919492155,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P512-INTRA-NARROW-v2/ase_cuda_mps.log",
+          "resumed": true,
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P512-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0,1,2,3",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P512-INTRA-NARROW-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 77.38452911842614,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P512-INTRA-NARROW-v2/current_auto.log",
+          "resumed": true,
+          "returncode": 0
+        }
+      },
+      "pool_size": 512,
+      "workload_id": "OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P512-INTRA-NARROW-v2",
+      "workload_manifest_sha256": "ee163e6c89cca46fb8286678db86db18a09f238e2489b00726ef1865982a019e"
+    },
+    {
+      "gpus": "0,1,2,3",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-VALIDATION-XAFQIH-P512-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0,1,2,3",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-XAFQIH-P512-INTRA-NARROW-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-XAFQIH-P512-INTRA-NARROW-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 143.68775165313855,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-XAFQIH-P512-INTRA-NARROW-v2/ase_cuda_mps.log",
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-VALIDATION-XAFQIH-P512-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0,1,2,3",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-XAFQIH-P512-INTRA-NARROW-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 100.27008698927239,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-XAFQIH-P512-INTRA-NARROW-v2/current_auto.log",
+          "returncode": 0
+        }
+      },
+      "pool_size": 512,
+      "workload_id": "OPT-OMC-SCHED-E1-VALIDATION-XAFQIH-P512-INTRA-NARROW-v2",
+      "workload_manifest_sha256": "d57413ef0f97ee16387075c5358ef6a5e6e98cfe5e3756cb2fa14807de426369"
+    },
+    {
+      "gpus": "0,1,2,3,4,5,6",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P2048-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0,1,2,3,4,5,6",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P2048-INTRA-WIDE-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P2048-INTRA-WIDE-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 442.8025287762284,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P2048-INTRA-WIDE-v2/ase_cuda_mps.log",
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P2048-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0,1,2,3,4,5,6",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P2048-INTRA-WIDE-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 324.387222642079,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P2048-INTRA-WIDE-v2/current_auto.log",
+          "returncode": 0
+        }
+      },
+      "pool_size": 2048,
+      "workload_id": "OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P2048-INTRA-WIDE-v2",
+      "workload_manifest_sha256": "4b2eafd60048b0fd98f76f88965f06266f4856bd37fe1da2278452e3a7089033"
+    },
+    {
+      "gpus": "0,1,2,3,4,5,6",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P2048-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0,1,2,3,4,5,6",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P2048-INTRA-NARROW-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P2048-INTRA-NARROW-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 260.73491138918325,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P2048-INTRA-NARROW-v2/ase_cuda_mps.log",
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P2048-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0,1,2,3,4,5,6",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P2048-INTRA-NARROW-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 196.43803220335394,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1/OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P2048-INTRA-NARROW-v2/current_auto.log",
+          "returncode": 0
+        }
+      },
+      "pool_size": 2048,
+      "workload_id": "OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P2048-INTRA-NARROW-v2",
+      "workload_manifest_sha256": "fcd5b640f376fa5b12eedcb0a6b2f95ba185284154721401a408c31689a504d6"
+    }
+  ],
+  "schema_version": 1,
+  "split": "validation",
+  "status": "complete",
+  "workload_count": 10
+}

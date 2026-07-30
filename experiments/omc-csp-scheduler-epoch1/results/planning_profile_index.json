@@ -1,0 +1,533 @@
+{
+  "contract": {
+    "cell_filter": "FrechetCellFilter",
+    "cutoff_A": 6.0,
+    "force_mode": "autograd",
+    "model_dtype": "torch.float32",
+    "model_id": "AtomBit-smooth-rms-fp32",
+    "neighbor_backend": "auto",
+    "optimizer": "BatchedBFGS",
+    "optimizer_dtype": "torch.float64",
+    "skin_A": 0.5
+  },
+  "index_sha256": "4b99107315f3b61970dc6525460216aedd22d4e07e718d21664bdb86f549ed6d",
+  "layers": {
+    "general_structure": [
+      "atom_count"
+    ],
+    "graph_execution_policy": [
+      "skin_A",
+      "candidate_edge_count",
+      "cache_enabled",
+      "neighbor_backend"
+    ],
+    "hardware": "bound later by the execution planner",
+    "mlip_graph": [
+      "model_id",
+      "cutoff_A",
+      "active_edge_count",
+      "force_mode",
+      "model_dtype"
+    ],
+    "task_auxiliary": [
+      "algorithm",
+      "variable_cell",
+      "stress_required",
+      "cell_method",
+      "cell_degrees_of_freedom",
+      "state_dtype",
+      "generalized_dimension",
+      "dense_state_elements",
+      "dense_linear_algebra_work",
+      "horizon_kind"
+    ]
+  },
+  "profile_kind": "model_task_execution_sidecar",
+  "profiles": {
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-BOQWIN-P2048-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-BOQWIN-P2048-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "f47ee7264b307c414fc7a18ee0479f86eb63c721f470230a729c0380805f9fdd",
+      "structure_workload_sha256": "161cd22ec81953843f3b1f9a45c1427ebb877022b6d59d039457c266cdaa9c45",
+      "system_count": 2048,
+      "workload_manifest_sha256": "ee66812745790bd453a6fdf66ce8b923dd073b41aaeb742e55fa40e84c4fba65"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-BOQWIN-P512-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-BOQWIN-P512-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "8f2a93c0d0ab522d2fb5cdef61307ee35da52f044a53836a6b3de1d15ff717b7",
+      "structure_workload_sha256": "145267c23bfc2877a6adac502e1099844420e1249514ddf67fb723b8c49e82a7",
+      "system_count": 512,
+      "workload_manifest_sha256": "a3436f5c6669d491ee025097b42aceaaafb38625b3214ee19ddc4cf9f34b798a"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-BOQWIN-P64-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-BOQWIN-P64-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "b934a4e5dfb9890d16b9f7e01889520b7b10aba2182fd04dcc15143db519a72e",
+      "structure_workload_sha256": "b9a5e36e86e39bba990aab6f44fdba0de07f95758182275e107fff0fc181c601",
+      "system_count": 64,
+      "workload_manifest_sha256": "224b55d446c5c703b2acc206edb755b5bc5bcbedefb03fee677df3dc1984140c"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-GUFJOG-P2048-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-GUFJOG-P2048-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "a5b3df106556713db44778a4547092369603b8b3fe4489fe891fa7ba4fd67798",
+      "structure_workload_sha256": "bd1e4ff646a8a3b71f218d7c5ffef6392f5aed692e4b18a03ad2d34c29658941",
+      "system_count": 2048,
+      "workload_manifest_sha256": "f5165a27a811586c695f283287d9b12ed89e615bd40315c55dbeba3210c25b56"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-GUFJOG-P512-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-GUFJOG-P512-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "0c8383b5d0d74ee8b8915930d973d8254b3c2cae0fc90baad1db82b9a323c010",
+      "structure_workload_sha256": "3275ace240c34917e8c85692e45c7c17b11581ece3b57ef9c48f03fc54d21541",
+      "system_count": 512,
+      "workload_manifest_sha256": "720a686a2084920e9ac56f1e9d1cc16d743abe4e57e7fbcc4c16963d862c38a6"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-GUFJOG-P64-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-GUFJOG-P64-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "a96d9ccecdd458bbafbfcca91df10a56cfe18cb7b225b8f576106ebdad9ca07e",
+      "structure_workload_sha256": "2b63376db90b8126ecaec09b4c1a3cf9474f4069c1b2b90b71fc9f3d42fccce6",
+      "system_count": 64,
+      "workload_manifest_sha256": "d5d9669c3c45b6e2c575e0b3939ebfb555101970541532440f5101520488bacd"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-HAMTIZ-P2048-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-HAMTIZ-P2048-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "6cf2cc5cc58b6d971f77839be4bf165e4cd1752ed01116102259b521b30e5653",
+      "structure_workload_sha256": "9c68996a644d66729b623d4c2e6f28fa2939e239be71a40c360696a45e262e0b",
+      "system_count": 2048,
+      "workload_manifest_sha256": "acda56387957606498008eef3c3840e2a7edecef8a625508b131502f74f6e4e4"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-HAMTIZ-P512-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-HAMTIZ-P512-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "97b6ab3f39f86ee01b4c0486047165030435bf52c3a0bbdb374a527fcf2ffd96",
+      "structure_workload_sha256": "154069ef656c3757811495e42642f6a133f394f2d97c1ff09998a068e968eeb1",
+      "system_count": 512,
+      "workload_manifest_sha256": "84d72eaaecc1c15d45ccb71fc15a4b12445a582d9845995d4408e315ed3c6d0f"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-HAMTIZ-P64-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-HAMTIZ-P64-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "4194725d766808b9f37cacdee48517292cdbbded1d74b4a53bc9389f416072d3",
+      "structure_workload_sha256": "a296994b51b6dc4a373bd902ca4d00f222b0bd096cfb68738e1aeb305c6273ba",
+      "system_count": 64,
+      "workload_manifest_sha256": "cd0cf0434a45d7b7db321cbc3872cdb65d3a646ea676d99922ce6744c7b1089f"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-KONTIQ-P2048-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-KONTIQ-P2048-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "5edf9cbd906c427b6f49ea3971beb1294a45c3c9c33d50d2cea8e94d38c388bc",
+      "structure_workload_sha256": "e3fc800ef0b1f2c3b7c0dd5e3e4159a350c52dd8c32b18d1bd6d2ea6602d6156",
+      "system_count": 2048,
+      "workload_manifest_sha256": "72ee686564b4d8911b0dd4bdf35b7c5329cbbf4e97c77451ba77fa550c1ee126"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-KONTIQ-P512-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-KONTIQ-P512-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "9a0d6821929649375af2f33827fc2c0175a437d4658319bfa3568c4b00c09b4f",
+      "structure_workload_sha256": "7fa18973ea6370765556aba618f1942a593669be279ea0d587f220e1725f5f12",
+      "system_count": 512,
+      "workload_manifest_sha256": "e9139a225724b2e2f075681f47967ee39f0b556db42f83cddf2cf7785f74dc02"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-KONTIQ-P64-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-KONTIQ-P64-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "870623c14f1813b71ed5563d076fe98d078bac192d232889ef57ff4f48671dc9",
+      "structure_workload_sha256": "ac6f2e30e266d40d3d9148d4ff8283b17df4cc853acfc67ea469e42a4cc737f7",
+      "system_count": 64,
+      "workload_manifest_sha256": "26231f7b80081272d87a5c706f2ea02edf6a6186c19c55ce255e770e24da5692"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-MIX-ALL-P512-INTER-WIDE-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-MIX-ALL-P512-INTER-WIDE-v2.json",
+      "planning_profile_sha256": "b56e409ae19542cb77d44d8d5039a726cd543d42a06ae1793660dd5dafbca311",
+      "structure_workload_sha256": "8f186f6b39dfc45cd187336669492d28b0ea6b691b4b7de141a0cabf52e52ed5",
+      "system_count": 512,
+      "workload_manifest_sha256": "57750bd663b46ba432f63ceca4e38c428451b8d3fbf1fa301f4dd4fe8050f30b"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-NACJAF-P2048-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-NACJAF-P2048-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "2b1dd92db7b9a99b865d7f4f99464648ec3f743c4259668e9ea0b6bea23803b2",
+      "structure_workload_sha256": "03ab0ebb05d4043754d3d308db60578ce8735c0a81f2fc88709c3d73865984d0",
+      "system_count": 2048,
+      "workload_manifest_sha256": "490059ddfb96f68511ff11647a951486e4b638e958d3d8f89de70e86aed3d4e6"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-NACJAF-P512-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-NACJAF-P512-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "bb1871e8b1cbb8b3821b4d4e74e7b0efb49ebe13a331a38c55613a8a96a09f28",
+      "structure_workload_sha256": "ee6f0f9250f6cd5a90d300434777691ec08bd4d6ca4046c36c07884fe759531f",
+      "system_count": 512,
+      "workload_manifest_sha256": "d6767589f59a887e7e2462ea755e9f544a1a10012440e229f978d809b22a8509"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-NACJAF-P64-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-NACJAF-P64-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "424aae2e90559268cc6668a72664b576c85d24451de0d68794b734cb7d7753f5",
+      "structure_workload_sha256": "5f9b3e57859dc58c57b5935dc525048aa2af01e9f27b4e31a8fa9835ee72d9b5",
+      "system_count": 64,
+      "workload_manifest_sha256": "6f0611f92e359c154c2e4d62239507be46c1be4bedb13981c6b4c769833c2237"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-OBEQUJ-P2048-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-OBEQUJ-P2048-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "f4bf9f05a8344c6aad4a05960aaf37c44d20598e8bb39be422f19ac48cf180a3",
+      "structure_workload_sha256": "0f7691fb75e40faa45138b957c257580685f2a00091fd99d084fc9a18d335e4d",
+      "system_count": 2048,
+      "workload_manifest_sha256": "b0633470cd07d46f315527126f9eaa581737ce6f2f52655c81917a8b001e58c3"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-OBEQUJ-P512-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-OBEQUJ-P512-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "7e06fe23d127a96d6ca96a689628975d60e2ea5da2b23d55c11638c81fd204bc",
+      "structure_workload_sha256": "7aab0fa6b148d2fe1174e31ac7bbc65f9b7c029a2d6bf3115775d779393e1c66",
+      "system_count": 512,
+      "workload_manifest_sha256": "bfb0b0f9d9aa8dfa6b4902c2765fb3b611231746aa639cba954f9ee321c2c345"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-OBEQUJ-P64-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-OBEQUJ-P64-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "87cbdce2fce8a1c615e1adc6525a44a62ba665cdee57be96863fc1afb0539076",
+      "structure_workload_sha256": "002f17ba297d1e0d65d9b69261404961e44270c2fcf9689533ef8c0c1fe5a2ef",
+      "system_count": 64,
+      "workload_manifest_sha256": "238af17a96f4984f093155821b5fae7b0fa850f769a17a7e3684483cb25b9276"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-PAHYON-P2048-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-PAHYON-P2048-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "9ce12d1a75c368613e4b528d44005757c26433b6356072cffa68de70c4b1dfb5",
+      "structure_workload_sha256": "2b7879d7b10ed555ed132f5beb1c043162e821ca65609a1fddd998e9de00541b",
+      "system_count": 2048,
+      "workload_manifest_sha256": "de073e2c6d61bc2d9c5db3c3fe3d3457d191310aab731f4a73313954ad95bf5a"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-PAHYON-P512-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-PAHYON-P512-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "f38ad69a72a7c05510e48f19b0fb74028e55e480ec273249c8ffae8620bf61a4",
+      "structure_workload_sha256": "be1d15867c9fbcb25dd0656a2692c965841c56edbf2dff2e0b5d0421e3e0be77",
+      "system_count": 512,
+      "workload_manifest_sha256": "f97ecd10e69ffed88cfcac20bfd26c5e5e8a7b3e075757e9632a8711b48ed596"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-PAHYON-P64-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-PAHYON-P64-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "eb7e8aa7adad3dd04c72c1a8e45645ee976b46fb1f97a6d0ef0d6ea59e6e075c",
+      "structure_workload_sha256": "9ade4fe3dad6ce276893b7f51a32a109f2d14f85dd70f2427e41dc7e01496753",
+      "system_count": 64,
+      "workload_manifest_sha256": "4fa4a83751dee406c11391d0eef541ed80f2933e18369bb0726b2971b58eeb0f"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-ROF-B-P2048-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-ROF-B-P2048-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "e8e81ce942cbfa2c24c079d77af3954f4178e270eab8f55bc70579a35041959f",
+      "structure_workload_sha256": "005e22387eae7388b9b797e533f199dc6530af6590ee07c269daebc3e024f3c9",
+      "system_count": 2048,
+      "workload_manifest_sha256": "14b331901219b5cd2445ed7405102c74633c3346cb3662cad176666c3ab30039"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-ROF-B-P512-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-ROF-B-P512-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "0dc47455fc3a334b0070d393779c9ccaea42ad5d6c405a257848e32ba936dc14",
+      "structure_workload_sha256": "3f87c55e7b116682841214e8a3052994dd9908cad3b4f2d4d6d4e2f8d1a65c9c",
+      "system_count": 512,
+      "workload_manifest_sha256": "25270eb5ce542de672845ef3852ed14000682883ad8aacd7a76c77585a30eeb4"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-ROF-B-P64-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-ROF-B-P64-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "ad85e41f00fbaa1cecd4f539f49abae384dd8b39ecd7e1410ca0979bdaaf8f03",
+      "structure_workload_sha256": "c2e514a7e7ae44b4d4801708f6a684507d75e6af9e593098efe588d5fa78d64d",
+      "system_count": 64,
+      "workload_manifest_sha256": "562f246b4277f3488c0c0d5e59d84813ce32d33e058e78f1c5edae52ae8841dd"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-SOXLEX-P2048-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-SOXLEX-P2048-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "b2ddc52c8302bafc4a2e5b76f2fe81f738635ec8224ea82b4ad7021610c2d401",
+      "structure_workload_sha256": "4a0d41a32e28282a07679ab7cecc1b2fc4c66d7c4a6b22f6c7d818909db54339",
+      "system_count": 2048,
+      "workload_manifest_sha256": "30a5b8012b9a6f4ea4825b9ef0e1ddc9c1d84bfa0e67fd6e09941ff6575ca849"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-SOXLEX-P512-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-SOXLEX-P512-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "892e95049f85411084841e9a413aef9229ecf8eeb36a4562aab6837906da53cc",
+      "structure_workload_sha256": "10718545f58c48d8402cf73f9f73daa84f0f471dad3566862b05cf82d58a8a0f",
+      "system_count": 512,
+      "workload_manifest_sha256": "5fa39b22d657fa519d2cdb101b96e82833dae20de34bc024fb2c44d266986a7f"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-SOXLEX-P64-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-SOXLEX-P64-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "8567abdf46f19ff5d33fd623f4adec4004d188adf0486d81beab89e5ab7004ed",
+      "structure_workload_sha256": "58d2956c1a11cc8f64858896dc0c6c3dbf45946f523e6ab9442f45ebbd139e34",
+      "system_count": 64,
+      "workload_manifest_sha256": "538d2c407d345f1d3c71c0dd7b3ef3951c361740d616d83c94faf8300bc4421a"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-UJIRIO-P2048-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-UJIRIO-P2048-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "9856569091c144b1750c23fb56c9aec1b4a066ac0b894866ad8b8c546ccd3bb4",
+      "structure_workload_sha256": "9be238bc6d25cd69a65826b7c52cac43f843163dcb03b210b30fec93141e5cc5",
+      "system_count": 2048,
+      "workload_manifest_sha256": "4f6bce33f0646f966f30934b994b1553bed6b6b184f031e0ce854f5d7855939b"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-UJIRIO-P512-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-UJIRIO-P512-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "40d79d84e3cde74a51ba4d77fc822691e763ee4a5b5b42c3d4c209f4a4be2cc2",
+      "structure_workload_sha256": "20b6837e1dfff7224d3ad46279ff5b09250f94434565b5a6ab690554fb74f328",
+      "system_count": 512,
+      "workload_manifest_sha256": "5fe833a8ed547207fcaf526da1b1e690bb27397c479fcb28b97c61ce2d3ec080"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-UJIRIO-P64-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-UJIRIO-P64-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "00d6f8679bf33ff1afd19cd643255c8f8d051e9e4c4d4255132ba1ffa738c366",
+      "structure_workload_sha256": "6e2d42116bd160cc7a44b7bd6d05d09ecc779f8a447327ae5110f05e51286fe4",
+      "system_count": 64,
+      "workload_manifest_sha256": "0489d2bc1ea3a04b97a71480e34e133de2063967d8120a2e49fbb8b42353d405"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-XAFPAY-P2048-INTRA-WIDE-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-XAFPAY-P2048-INTRA-WIDE-v2.json",
+      "planning_profile_sha256": "61cdfb185a5f5d69a29f49accc58f40f044828c05f1f78192153eeb87c028093",
+      "structure_workload_sha256": "4a1c683684ac0524f5fb37ecd3f312ecab8b16ab4a02bfc588add26835fa304b",
+      "system_count": 2048,
+      "workload_manifest_sha256": "c0f616dcb893a507667b5f158b28212387b6b752ce55d217b3bdbea00f8708b9"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-XAFPAY-P512-INTRA-WIDE-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-XAFPAY-P512-INTRA-WIDE-v2.json",
+      "planning_profile_sha256": "ecaeac6cc109faae906fc271196a82d3c680732e281e7f5b19ea8c71196a6ae1",
+      "structure_workload_sha256": "945018546b3f8f0ce2e256bf788da851ef4919ee47fd6c0b809a494d8a06e7b3",
+      "system_count": 512,
+      "workload_manifest_sha256": "cfbcf1a8c45cc08484b2f152aa4e6c6a05b7e69ab74a3399f9ba9c4a136b4578"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-XAFPAY-P64-INTRA-WIDE-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-XAFPAY-P64-INTRA-WIDE-v2.json",
+      "planning_profile_sha256": "220735d63f062e15af4c223f1fcde82e614d3cddc33839d3bb9376eb53e8683b",
+      "structure_workload_sha256": "5f52cb47ea49b2b91da87962986a04522bedc0367f93a2c331e2caf351a89d4c",
+      "system_count": 64,
+      "workload_manifest_sha256": "c06c33e1e772ebab613cf313af34880f79e056e27b959e1e670cf16e7a0db6e4"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-XATMOV-P2048-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-XATMOV-P2048-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "313daf5fdb34517c160445135e1ddd563a1d6b34023fe92e79cd199dd978d0be",
+      "structure_workload_sha256": "e735cc5c34171908cd23240ec06a9891651ac1e59cee5c03e915b710f13e42ad",
+      "system_count": 2048,
+      "workload_manifest_sha256": "cf0e469dd0db78333b3a384cdbf4c8cc30220d80bd0c3b2332444478521b8aaa"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-XATMOV-P512-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-XATMOV-P512-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "1b7ab6bc8604d4b9c070b55e6fe57700f69452ddfa63b7523014192c12223065",
+      "structure_workload_sha256": "08b56201c5cdec22a65dc452310085efb0588cdedad21be584a0374f526409d6",
+      "system_count": 512,
+      "workload_manifest_sha256": "9cbb3c1a51fc3e8155f6674eab423289761673ba5bbbf3f3eb8bbc1777116007"
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-XATMOV-P64-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-DEVELOPMENT-XATMOV-P64-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "716c4152c2a16085994bdd0374aa7ffa6d89201df6cb15590727e6f715fbe77a",
+      "structure_workload_sha256": "0cc8ecef41a86dda72ba7a8d1d515f3e3be87d942c062261b505c733b1feda45",
+      "system_count": 64,
+      "workload_manifest_sha256": "cf9a6a6778460dd473081414e775048f9e6c6a859ef1e7490a009f3f307f189d"
+    },
+    "OPT-OMC-SCHED-E1-TEST-JAYDUI-P2048-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-TEST-JAYDUI-P2048-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "09de2b1066fbaca830f06b3fc868707d8255f18de2c8fc9c19e9422544628189",
+      "structure_workload_sha256": "bf4a3d88585a1c2db945c1793a8d8e9ede85803bb63a7ae8a2d25fa0a38e0984",
+      "system_count": 2048,
+      "workload_manifest_sha256": "398fe84812ff6f59ce96e4cb8ee95c0a82eef95b0bb41730dfa0d28f0fe9a03b"
+    },
+    "OPT-OMC-SCHED-E1-TEST-JAYDUI-P512-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-TEST-JAYDUI-P512-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "be69decdb0350d4c47c06767d1e70ac76d020bf7e304f3fcf6c4c665fe4b905e",
+      "structure_workload_sha256": "0ef89b1774e959c51d2f83a66f2d4c1c457989dd37021b247bc54ac30219afea",
+      "system_count": 512,
+      "workload_manifest_sha256": "eaaaa99b824ee22097db5f6d0f60b7bf401c198a2f0f6d92335f80c3d748a66e"
+    },
+    "OPT-OMC-SCHED-E1-TEST-JAYDUI-P64-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-TEST-JAYDUI-P64-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "984727c999ad8de7f17e4a30c8c30b616a4b0d3f8d7b3234ac90cbba49f72e2e",
+      "structure_workload_sha256": "0fdc7646d808363e2bc983247a97e2ed487a6db82ae4288f0be2a0acb0b8e6a9",
+      "system_count": 64,
+      "workload_manifest_sha256": "4f5aaa2c55fceb6f9ec08b49941574ca2c4ff7907d072dbbf237c12504680efc"
+    },
+    "OPT-OMC-SCHED-E1-TEST-MIX-ALL-P512-INTER-WIDE-v2": {
+      "path": "OPT-OMC-SCHED-E1-TEST-MIX-ALL-P512-INTER-WIDE-v2.json",
+      "planning_profile_sha256": "9603a8b673941998b81ea00d30cf93403b269b2583351597245633710222014f",
+      "structure_workload_sha256": "b2475a9f77ac954150d7fb27ec75cd0b29a2c01fa82aa6921ecc9d9cfa04952e",
+      "system_count": 512,
+      "workload_manifest_sha256": "44e2765119b44947ee9d6231e1616b2ef1f70d4e6622071595370fc6cc3e9ca5"
+    },
+    "OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "9b4efa368490ad5efe4fa428c76992babd78ad90888981687f0a14e0492b6fe4",
+      "structure_workload_sha256": "7e798adcd1035ba4f5a945f2ee573a186f8857edf59c257e4f9f5ac82d44bd41",
+      "system_count": 2048,
+      "workload_manifest_sha256": "68dacfd500f151612ef193f1cc930085c146cc46b681e9025dd936e579436e47"
+    },
+    "OPT-OMC-SCHED-E1-TEST-OBEQIX-P512-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-TEST-OBEQIX-P512-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "1d5fe786056e1653a68a31ad732d5b0376d6882fb59fde901cb0ba90d449a8d7",
+      "structure_workload_sha256": "ad68d0919891b872acc7d639e6768cbc226056588927f17e8f2d5632d3946750",
+      "system_count": 512,
+      "workload_manifest_sha256": "ed8ec42a4f812a480c698667d897cb14b38a750d1731f2a1d076682ce828c789"
+    },
+    "OPT-OMC-SCHED-E1-TEST-OBEQIX-P64-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-TEST-OBEQIX-P64-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "b98e56b2c5cfbe457037583c5aac3258c1a92d083b818f6b901a8e9c45013ff1",
+      "structure_workload_sha256": "1c31e1c5708b273d73100ae600de813886cd8e8bc42691240c208d26769ac0aa",
+      "system_count": 64,
+      "workload_manifest_sha256": "ba0aeb321b8b8e27608020d2e72641f0554d0e2827bb8e9e4c0d435d7885ef1a"
+    },
+    "OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2": {
+      "path": "OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2.json",
+      "planning_profile_sha256": "58028a8c762bd0edff2afd4c47675c899d9cd4d75a4554c16b4380009057b5b1",
+      "structure_workload_sha256": "f46bd2e90f550fad4c85cf6e546e80d8a2dd0f34a2fbab9109f42cba032c6218",
+      "system_count": 2048,
+      "workload_manifest_sha256": "53442cc94cad00a06f2243ae479f068c60ebf91c00c98d882ba667238b9a379a"
+    },
+    "OPT-OMC-SCHED-E1-TEST-ROF-A-P512-INTRA-WIDE-v2": {
+      "path": "OPT-OMC-SCHED-E1-TEST-ROF-A-P512-INTRA-WIDE-v2.json",
+      "planning_profile_sha256": "80f7b4e8c7dcc95394f8cd86848c32b3b9c8ff9fb6d44faa74fd3a1e1e1ae71f",
+      "structure_workload_sha256": "b55c603cdb4affa90a701e404fe820c5b4ee88e6e51cc801c94de96d7eb3df33",
+      "system_count": 512,
+      "workload_manifest_sha256": "188d909ce01dc93773569b08c1439f68e1ab07863edb1a7c1d1ee3ed6a299d95"
+    },
+    "OPT-OMC-SCHED-E1-TEST-ROF-A-P64-INTRA-WIDE-v2": {
+      "path": "OPT-OMC-SCHED-E1-TEST-ROF-A-P64-INTRA-WIDE-v2.json",
+      "planning_profile_sha256": "a276b36594474ba96900872583a0d0391d1c1bf7a546286e8837dd6f17d1fcbe",
+      "structure_workload_sha256": "1ccba1727d0abeb12a8fa3c98725da56dd907075bd6bd5ed1d8321195640251d",
+      "system_count": 64,
+      "workload_manifest_sha256": "aa60966e68589c2b0c5d59cb35a8a1cc2c482fba5f205edf9555cc3a7132fa0c"
+    },
+    "OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2": {
+      "path": "OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2.json",
+      "planning_profile_sha256": "48c69cee4184b786cae7fdc78b170b8c8189feff2024af6a57420f154c0340da",
+      "structure_workload_sha256": "b3aaf6b82f593d2fad555857bbe145c4ecbbc3b3844340417eb8daa9d7f2f52d",
+      "system_count": 2048,
+      "workload_manifest_sha256": "a8aa05178634172b53197afee1325e5a37e2e9fbc2921aaa332a4c4209627da8"
+    },
+    "OPT-OMC-SCHED-E1-TEST-ROF-C-P512-INTRA-WIDE-v2": {
+      "path": "OPT-OMC-SCHED-E1-TEST-ROF-C-P512-INTRA-WIDE-v2.json",
+      "planning_profile_sha256": "40264c5c96e3b100e82d2b50c52ed208debd017212a7db483e71f413acb0ea22",
+      "structure_workload_sha256": "1faab6d3fae7a64b12756409dd27073229c1f3bb011150f0c409c83d867b9dd0",
+      "system_count": 512,
+      "workload_manifest_sha256": "e2b98f1e0b8913dc5428d666c072cfa4a383115a3c4102f2c4ad8ea80e62a0fb"
+    },
+    "OPT-OMC-SCHED-E1-TEST-ROF-C-P64-INTRA-WIDE-v2": {
+      "path": "OPT-OMC-SCHED-E1-TEST-ROF-C-P64-INTRA-WIDE-v2.json",
+      "planning_profile_sha256": "282ebb9e34332a4e86bf592e7b82b8feec4c7809806690f40c92cb24351c123c",
+      "structure_workload_sha256": "135c0fb0ae2e6a98370aa0bb4fc7ba284a1fa3f8b6f2da8898cbae8fe029dd75",
+      "system_count": 64,
+      "workload_manifest_sha256": "181b3a656d44df6b99f34a64f79003da4cf03d7ebc78d1d220c529eaadc5fd03"
+    },
+    "OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2": {
+      "path": "OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2.json",
+      "planning_profile_sha256": "bf62610241d0643cf2b318a4270806aea954d7a346614d429267ef1882074df2",
+      "structure_workload_sha256": "9517fba55830e867a9c779e51a7b68c2d80b8727839dfd131e280ffeba053b96",
+      "system_count": 2048,
+      "workload_manifest_sha256": "ec9d6f04a1f9674c433336c423fa3c489241315caf3d4bb504750224fbac29dd"
+    },
+    "OPT-OMC-SCHED-E1-TEST-XULDUD-P512-INTRA-WIDE-v2": {
+      "path": "OPT-OMC-SCHED-E1-TEST-XULDUD-P512-INTRA-WIDE-v2.json",
+      "planning_profile_sha256": "2fc7fbc2ecc85fb39bcf504cec9e31184a26681e42ea7b811f06a29da158390f",
+      "structure_workload_sha256": "7fbbb810d71a424aea54d2f437da09dfff7c639ea7c36052b17b46fea19891a0",
+      "system_count": 512,
+      "workload_manifest_sha256": "00bdfba239a364b1f2d53e751620a0dec95a46dda7b1bc493cc832b5e53b0dea"
+    },
+    "OPT-OMC-SCHED-E1-TEST-XULDUD-P64-INTRA-WIDE-v2": {
+      "path": "OPT-OMC-SCHED-E1-TEST-XULDUD-P64-INTRA-WIDE-v2.json",
+      "planning_profile_sha256": "05122749af20fb08ba832425d123f1848aa4c9cda3754c316516253874d76a88",
+      "structure_workload_sha256": "ff8f12ea29499ae20e8d6111ff7b3cace42ae4e6ec686cb4e6ee1cf65c1ea3f1",
+      "system_count": 64,
+      "workload_manifest_sha256": "a7b7e2e3eb54356b40c2186c0893e0bd5dee961b86c088c3b7e9c39c17860798"
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-AXOSOW-P2048-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-VALIDATION-AXOSOW-P2048-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "04cb7fb23097ad8731c4a04c2a0e0662d5e9226548bd61c74f98450f8aae0412",
+      "structure_workload_sha256": "1062c1ab1bac74394d63c261a0b154a8f937860a0ae00ab894b67798f2252f3a",
+      "system_count": 2048,
+      "workload_manifest_sha256": "5cc74fed26c7af42da8f44d3bf2c55b234b3861990376902a40186791b7b19a9"
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-AXOSOW-P512-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-VALIDATION-AXOSOW-P512-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "5c477f7a66517d8881043817ced5c53a24e1b6648cb59933037843d0d2bbca18",
+      "structure_workload_sha256": "4ca953f5155fa08656a458529890f5e3893f5b34057f4e538165874d348f4705",
+      "system_count": 512,
+      "workload_manifest_sha256": "4ee912b283f0fac2e80949d9cd5b89c9184cde161b663c9d44303d40a11ac3bd"
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-AXOSOW-P64-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-VALIDATION-AXOSOW-P64-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "3a7705105cadd4b2d620af66bbeed9dda10ebe98dc05d7abce7b2aba2312703a",
+      "structure_workload_sha256": "e5afbadcba5496808c64bb09d982075c7c4d281c1964a5dee0d0434d2eaf8158",
+      "system_count": 64,
+      "workload_manifest_sha256": "ee178f98307646b36e9e685c9e06855be579a7388beb76726fa9424e7c072ba2"
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P2048-INTRA-WIDE-v2": {
+      "path": "OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P2048-INTRA-WIDE-v2.json",
+      "planning_profile_sha256": "60bdb0e70e4b1ff501bcd658f1d003db95214c01b403a70a020e733e3a9b4e8e",
+      "structure_workload_sha256": "20175fca3f69be268f9bf1a298a8b912dad3c9eddfbff6a8fe7c9c7180bed3a5",
+      "system_count": 2048,
+      "workload_manifest_sha256": "4b2eafd60048b0fd98f76f88965f06266f4856bd37fe1da2278452e3a7089033"
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P512-INTRA-WIDE-v2": {
+      "path": "OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P512-INTRA-WIDE-v2.json",
+      "planning_profile_sha256": "43f3483e2edc35b4888e8ed561101168fee706aa7acc2a8b5dc312d183fc6eda",
+      "structure_workload_sha256": "20e8c4370116ca2d866be17280743deef983323657a215be9db8a96346229f12",
+      "system_count": 512,
+      "workload_manifest_sha256": "5db744d39669bbe61f7029723b174712999df8bb7f36cbc8f7c476c9a97cef0f"
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P64-INTRA-WIDE-v2": {
+      "path": "OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P64-INTRA-WIDE-v2.json",
+      "planning_profile_sha256": "aa92e2fc02ede6b1a4017be555d627ae69ed175cc0975f4319727854f84dc92b",
+      "structure_workload_sha256": "94e9b5255db996e05f979a2b121150df71e04164d957725ddfce76e4cc088413",
+      "system_count": 64,
+      "workload_manifest_sha256": "b0019f0911d7ec3cd40a5de49c916bd27ea40aad7643deb08396c331d39947ec"
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-MIX-ALL-P512-INTER-WIDE-v2": {
+      "path": "OPT-OMC-SCHED-E1-VALIDATION-MIX-ALL-P512-INTER-WIDE-v2.json",
+      "planning_profile_sha256": "eef54059de78395bbe4829f0c289b7ae533ab71734bde860dd3353a45b53e75a",
+      "structure_workload_sha256": "d512d08fe6175378e58a730c728851f0f575069abb3d5da8bbfd86810026f17f",
+      "system_count": 512,
+      "workload_manifest_sha256": "bdc6f476c12f14ae82dbd248eec426f0696f7e7beaded33005c64554dd98842e"
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-WICZUF-P2048-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-VALIDATION-WICZUF-P2048-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "ba895936d39e535640451a13a559e12f4a3df33dc547eaa7b9b21d918408eb08",
+      "structure_workload_sha256": "93a8237f82b3737abee6ca4788a9feaaa61b312e2b6b79bdc42fc74197f137ef",
+      "system_count": 2048,
+      "workload_manifest_sha256": "6c1e10c286d6799351e42c8276c82c69de4663754ae3607a5a8deec943ccead6"
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-WICZUF-P512-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-VALIDATION-WICZUF-P512-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "63fb05b271502936df88bfca26db9fdfce3f541898003d2a7263d6ac7c6d02a7",
+      "structure_workload_sha256": "2ecbdc001105a2783f660d6b42adecbaf41f2fca28441034677949d4f8993cd8",
+      "system_count": 512,
+      "workload_manifest_sha256": "81beecbfed8bb0e7f471075ff746060741bc8b2a8cb6ec8c7c46e6caa4d11cb3"
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-WICZUF-P64-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-VALIDATION-WICZUF-P64-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "7b397a9b20f499c7bae19371c0d79519188481cced223b7641f4cbfe4f5643b3",
+      "structure_workload_sha256": "f2776cfa3c0171ba26ddc408a7ddb3a9d9548abdc9df6fda1fb521fa5112932a",
+      "system_count": 64,
+      "workload_manifest_sha256": "b37ce4b239b4068cfeed5e0cd759310c63d76b3bd70faacb066ae35d2d5d4c30"
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P2048-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P2048-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "8341c82cb53e22b277ad4f28d5a9c9bb9bd74b346af7e646de5cc1182f7e5b72",
+      "structure_workload_sha256": "8539b16091ba96a4fa5ea9d761832c26f567e3144b6ae9b8eb0adfdece0fb84c",
+      "system_count": 2048,
+      "workload_manifest_sha256": "fcd5b640f376fa5b12eedcb0a6b2f95ba185284154721401a408c31689a504d6"
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P512-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P512-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "98f804e8811096ebc6162139c05403bdd4f4e6165d4994cd540f54a32855b94e",
+      "structure_workload_sha256": "424a20ea0316c636f60805db0cf627a1838e5dc29a3eace0f990c8033dc010c7",
+      "system_count": 512,
+      "workload_manifest_sha256": "ee163e6c89cca46fb8286678db86db18a09f238e2489b00726ef1865982a019e"
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P64-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P64-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "b533b4b9d88ac6f3658cd7b6d688fcabe9fa2ee8f3c38e9fe3fb9b3c02adc4b8",
+      "structure_workload_sha256": "b7f391191cf286db0ef49232f5520d23a58e78c3daef9869625b706dbdcfb7aa",
+      "system_count": 64,
+      "workload_manifest_sha256": "4f99afdc53c0f3830d942f1b79b048eec578b1403e5f68834b767d9c28d9f8a6"
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-XAFQIH-P2048-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-VALIDATION-XAFQIH-P2048-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "f306cb72d878fce52368287b7f295ddcd7c339ab73056a0f6076d694e1753d6d",
+      "structure_workload_sha256": "0ded136e23bb0ea82149bb3750a4af534c966761d2ea36b157003e11112796d1",
+      "system_count": 2048,
+      "workload_manifest_sha256": "24952adcbe4c92ca977d05959c79249fb2145f151ed12b359d5a5d8f8bbf5ba0"
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-XAFQIH-P512-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-VALIDATION-XAFQIH-P512-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "72f4b32a47aff2f14e344dabd40bf88df962ea62c1f84a1ad81bd1cd9049362b",
+      "structure_workload_sha256": "c78060446e96839db3e3febaa4655253e3a75ce9c2af9b90e22148d277a43dd2",
+      "system_count": 512,
+      "workload_manifest_sha256": "d57413ef0f97ee16387075c5358ef6a5e6e98cfe5e3756cb2fa14807de426369"
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-XAFQIH-P64-INTRA-NARROW-v2": {
+      "path": "OPT-OMC-SCHED-E1-VALIDATION-XAFQIH-P64-INTRA-NARROW-v2.json",
+      "planning_profile_sha256": "40f9aa1d9064189d9e06c27aabddb3783938bba440de4ec835121810ef97721c",
+      "structure_workload_sha256": "d1eccf13d936d0bfda66910f031a8c421e7f85303c6bf7084db235b245b9b806",
+      "system_count": 64,
+      "workload_manifest_sha256": "cb14cd19951969b5ed656f8513d639240fab85668f8fbe1e8e3bf726adc682c1"
+    }
+  },
+  "schema_version": 1,
+  "universal_scalar_cost": false
+}

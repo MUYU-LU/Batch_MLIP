@@ -25,6 +25,13 @@ except ImportError:  # pragma: no cover - project execution targets POSIX hosts
 from ..core.calculator import BatchCalculator
 from ..core.neighbors import neighbor_list
 from .memory import SystemProfile
+from .profiles import (
+    BoundSystemCostProfile,
+    GraphExecutionCostProfile,
+    MLIPGraphCostProfile,
+    StructureCostProfile,
+    TaskAuxiliaryCostProfile,
+)
 
 
 def _positive_int(name: str, value: int) -> None:
@@ -57,6 +64,9 @@ class AutoSchedulerConfig:
     refill_min_pending_factor: float = 2.0
     refill_min_capacity: int = 8
     offline_refill_policy_enabled: bool = True
+    offline_hardware_capacity_enabled: bool = True
+    manifest_loader_processes: int | Literal["auto"] = "auto"
+    manifest_prefetch_chunks_per_worker: int = 1
     multi_gpu_cold_start_jobs: int = 32
     multi_gpu_worker_backend: Literal["auto", "process", "thread"] = "auto"
     multi_gpu_process_cpu_threads: int = 1
@@ -74,6 +84,25 @@ class AutoSchedulerConfig:
         _positive_int("refill_min_capacity", self.refill_min_capacity)
         if not isinstance(self.offline_refill_policy_enabled, bool):
             raise TypeError("offline_refill_policy_enabled must be a bool")
+        if not isinstance(self.offline_hardware_capacity_enabled, bool):
+            raise TypeError("offline_hardware_capacity_enabled must be a bool")
+        if self.manifest_loader_processes != "auto":
+            _positive_int(
+                "manifest_loader_processes",
+                self.manifest_loader_processes,
+            )
+        if (
+            isinstance(self.manifest_prefetch_chunks_per_worker, bool)
+            or not isinstance(
+                self.manifest_prefetch_chunks_per_worker,
+                int,
+            )
+            or self.manifest_prefetch_chunks_per_worker < 0
+        ):
+            raise ValueError(
+                "manifest_prefetch_chunks_per_worker must be a "
+                "non-negative integer"
+            )
         _positive_int(
             "multi_gpu_cold_start_jobs",
             self.multi_gpu_cold_start_jobs,
@@ -527,35 +556,22 @@ def _profile_cost(
     )
 
 
-def profile_auto_workload(
-    systems: Sequence[Atoms],
+def _assemble_auto_workload(
+    profiles: Sequence[SystemProfile],
     calculator: BatchCalculator,
     optimizer: object,
     optimizer_kwargs: Mapping[str, Any],
     config: AutoSchedulerConfig,
+    *,
+    profiling_seconds: float,
 ) -> AutoWorkloadPlan:
-    """Profile topology once and group structures by relative execution cost."""
+    """Group already bound profiles with the standard deterministic policy."""
 
-    if calculator.cutoff is None:
-        raise ValueError("automatic scheduling requires a calculator cutoff")
-    started = time.perf_counter()
-    variable_cell = optimizer_kwargs.get("cell_filter") is not None
-    profiles = []
-    for index, atoms in enumerate(systems):
-        centers = neighbor_list(
-            "i",
-            atoms,
-            calculator.cutoff + calculator.skin,
-        )
-        dof = 3 * len(atoms) + (9 if variable_cell else 0)
-        profiles.append(
-            SystemProfile(
-                index=index,
-                atom_count=len(atoms),
-                edge_count=len(centers),
-                dof_squared=dof * dof,
-            )
-        )
+    if not profiles:
+        raise ValueError("automatic workload profiles cannot be empty")
+    expected_indices = list(range(len(profiles)))
+    if sorted(profile.index for profile in profiles) != expected_indices:
+        raise ValueError("automatic workload profile indices must be contiguous")
     ordered = sorted(
         profiles,
         key=lambda profile: _profile_cost(
@@ -604,9 +620,99 @@ def profile_auto_workload(
     return AutoWorkloadPlan(
         profiles=tuple(sorted(profiles, key=lambda profile: profile.index)),
         buckets=buckets,
-        profiling_seconds=time.perf_counter() - started,
+        profiling_seconds=profiling_seconds,
         fingerprint=fingerprint,
         fingerprint_fields=fields,
+    )
+
+
+def profile_bound_auto_workload(
+    profiles: Sequence[BoundSystemCostProfile],
+    calculator: BatchCalculator,
+    optimizer: object,
+    optimizer_kwargs: Mapping[str, Any],
+    config: AutoSchedulerConfig,
+    *,
+    profiling_seconds: float = 0.0,
+) -> AutoWorkloadPlan:
+    """Plan from a signed layered sidecar without rebuilding topology."""
+
+    if not math.isfinite(profiling_seconds) or profiling_seconds < 0.0:
+        raise ValueError("profiling_seconds must be finite and non-negative")
+    return _assemble_auto_workload(
+        tuple(SystemProfile.from_bound_cost(profile) for profile in profiles),
+        calculator,
+        optimizer,
+        optimizer_kwargs,
+        config,
+        profiling_seconds=profiling_seconds,
+    )
+
+
+def profile_auto_workload(
+    systems: Sequence[Atoms],
+    calculator: BatchCalculator,
+    optimizer: object,
+    optimizer_kwargs: Mapping[str, Any],
+    config: AutoSchedulerConfig,
+) -> AutoWorkloadPlan:
+    """Profile topology once and group structures by relative execution cost."""
+
+    if calculator.cutoff is None:
+        raise ValueError("automatic scheduling requires a calculator cutoff")
+    started = time.perf_counter()
+    variable_cell = optimizer_kwargs.get("cell_filter") is not None
+    profiles = []
+    model_id = (
+        f"{type(calculator).__module__}.{type(calculator).__qualname__}"
+    )
+    force_mode = str(getattr(calculator, "force_mode", "unspecified"))
+    for index, atoms in enumerate(systems):
+        distances = neighbor_list(
+            "d",
+            atoms,
+            calculator.cutoff + calculator.skin,
+        )
+        candidate_edges = len(distances)
+        active_edges = int((distances < calculator.cutoff).sum())
+        bound = BoundSystemCostProfile(
+            structure=StructureCostProfile(
+                index=index,
+                atom_count=len(atoms),
+            ),
+            mlip_graph=MLIPGraphCostProfile(
+                index=index,
+                model_id=model_id,
+                cutoff_A=calculator.cutoff,
+                active_edge_count=active_edges,
+                force_mode=force_mode,
+                model_dtype=str(calculator.dtype),
+            ),
+            task_auxiliary=TaskAuxiliaryCostProfile.relaxation(
+                index=index,
+                atom_count=len(atoms),
+                optimizer=optimizer,
+                variable_cell=variable_cell,
+                cell_method=optimizer_kwargs.get("cell_filter"),
+            ),
+            graph_execution=GraphExecutionCostProfile(
+                index=index,
+                skin_A=calculator.skin,
+                candidate_edge_count=candidate_edges,
+                cache_enabled=calculator.skin > 0.0,
+                neighbor_backend=calculator.neighbor_backend,
+            ),
+        )
+        profiles.append(
+            SystemProfile.from_bound_cost(bound)
+        )
+    return _assemble_auto_workload(
+        profiles,
+        calculator,
+        optimizer,
+        optimizer_kwargs,
+        config,
+        profiling_seconds=time.perf_counter() - started,
     )
 
 

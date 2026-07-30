@@ -39,12 +39,21 @@ examples/               Python API and checkpoint-loader examples
 data/                   Small demo extxyz batch
 benchmarks/              Scaling and profiling scripts
 experiments/             Reproducible experiment specifications
-research/                Imported research protocols and active-baseline notes
+research/                Authoritative project map and historical protocols
 runs/                    Generated outputs; ignored by Git
 tests/                   Correctness and regression tests
 docs/                    Architecture, validation, and roadmap
 AGENTS.md                Rules for autonomous experimental agents
 ```
+
+## Project logic
+
+The authoritative research framing is
+[research/project/README.md](research/project/README.md). It separates the
+validated execution foundation, mechanism evidence, frozen scheduler-v1
+baseline, and the next chemical-transfer study. The accompanying evidence
+registry classifies every experiment directory and prevents historical timings
+collected under incompatible contracts from becoming planner-training labels.
 
 New code should import from `batch_mlip`. Flat paths such as
 `batch_mlip.filters` remain available, and the former `atombit_batch` package
@@ -258,6 +267,16 @@ with BatchExecutor(
         fmax=0.03,
         max_steps=500,
     )
+
+    crystal_result = executor.relax_manifest(
+        crystal_manifest,
+        "/path/to/cif/root",
+        crystal_planning_profile,
+        optimizer="bfgs",
+        cell_filter=FrechetCellFilter(),
+        fmax=0.03,
+        max_steps=500,
+    )
 ```
 
 Each call profiles atoms and candidate edges, performs one representative model
@@ -267,6 +286,15 @@ call starts and warms the worker generation; compatible later calls reuse the
 same worker PIDs and model instances. A change that requires an incompatible
 CUDA allocator policy closes that generation and starts a new one. Leaving the
 context releases all worker processes and GPU reservations.
+
+`relax_manifest` on the executor retains the same GPU workers and model
+instances across compatible signed pools. Its parent-owned CPU loader keeps a
+global cost-ordered buffer of at most one running plus one prefetched chunk per
+active worker. Prefetched chunks remain unassigned until a GPU finishes, so
+pending work stealing is preserved. A matching signed capacity policy removes
+the representative forward; a mismatch retains the bounded probe fallback.
+The CPU loader pool is also reused while its selected process count remains
+compatible.
 
 Internal phase timing is opt-in and does not change calculator or optimizer
 signatures:
@@ -615,25 +643,105 @@ result = relax(
     structures,
     calculator,
     optimizer="bfgs",
-    devices=["cuda:0", "cuda:1", "cuda:2", "cuda:3"],  # optional
+    devices=["cuda:0", "cuda:1", "cuda:2", "cuda:3"],  # omit for one GPU
     cell_filter=FrechetCellFilter(),
     fmax=0.05,
 )
-print(result.metadata["scheduling"])
+print(result.schedule)
 ```
 
-Passing `devices` activates deterministic automatic scheduling, so the
-`scheduling` argument is optional in this plug-and-play form. Use
-`scheduling="single_batch"` without `devices` only for an explicitly unmanaged
-resident batch.
+For a large, signed file-backed pool, use the corresponding source-backed
+entry point instead of loading every CIF into the parent process:
 
-The runtime profiles atoms, candidate edges, and optimizer dimensions once,
-then performs one representative model forward containing up to four of the
-largest structures. It combines the measured model/graph peak with an explicit
-`D²` allowance for dense BFGS state and packs largest-cost-first chunks within
-85% of available GPU memory. The prediction also carries a 1.25 memory-growth
-margin. This is not an optimization pilot: no structure is relaxed twice and
-no batch-size timing sweep is run.
+```python
+from batch_mlip import read_planning_profile, relax_manifest
+from batch_mlip.workloads import read_workload_manifest
+
+manifest = read_workload_manifest("workload.json")
+profile = read_planning_profile("planning-profile.json")
+result = relax_manifest(
+    manifest,
+    "/path/to/cif/root",
+    profile,
+    calculator,
+    optimizer="bfgs",
+    devices=["cuda:0", "cuda:1", "cuda:2", "cuda:3"],
+    cell_filter=FrechetCellFilter(),
+    fmax=0.05,
+)
+```
+
+`relax_manifest` verifies the manifest/profile binding, plans without a timing
+pilot, and sends immutable source references to persistent GPU workers. Each
+worker materializes only its assigned chunks. Results retain manifest order,
+and the returned object is the same `OptimizationResult` used by `relax`.
+This path is the accepted default for signed large-pool OMC-CSP workloads;
+ordinary in-memory use remains unchanged.
+
+Manifest loading also has a bounded CPU-process policy. The default
+`manifest_loader_processes="auto"` keeps one loader for pools below 2,048 jobs,
+for fewer than 32,000 atom-records per active GPU, or when the host cannot
+supply five CPU threads per GPU worker. Otherwise, it uses four `spawn`
+processes per worker. This preserves ordering, avoids forking an initialized
+CUDA process, and requires no timing pilot. Pass a positive integer to override
+the offline decision.
+
+For consecutive pools, prefer `BatchExecutor.relax_manifest`. It overlaps the
+next globally unassigned CIF chunks with the current GPU wave and avoids
+restarting model-owning workers. Set
+`manifest_prefetch_chunks_per_worker=0` to retain persistence while disabling
+the overlap buffer.
+
+For the exact packaged AtomBit/H100 variable-cell BFGS contract,
+`relax_manifest` also selects a signed offline reserved-memory model and
+performs zero representative model probes. The model is matched against the
+checkpoint state, calculator, optimizer, cell filter, graph policy, allocator,
+software, hardware, and planning sidecar. Any mismatch automatically restores
+the representative-probe capacity path.
+
+Automatic scheduling is the ordinary default when the calculator exposes a
+cutoff. The user selects structures, calculator, optimizer, and optional
+devices; the runtime owns the remaining decisions:
+
+| Step | Automatic decision |
+|---|---|
+| 1 | Preserve structure atoms, then bind MLIP active edges, task auxiliary state, and graph-policy candidate edges separately. |
+| 2 | Preserve compatible outer buckets, then use an exact-contract signed byte model or the safe probe fallback to pack each GPU to the 85% memory budget. |
+| 3 | Always remove converged structures from later model evaluations. |
+| 4 | Select refill only from scientifically accepted matching evidence; otherwise drain safely. |
+| 5 | On multiple GPUs, balance memory-safe chunks through work stealing. |
+
+No timing sweep or trial relaxation is performed. The compact `summary`
+reports only the selected batch mode, devices, resident capacities, memory
+fraction, compaction, work stealing, and any refill fallback reason. Detailed
+profiling and evidence records remain available in the surrounding
+`metadata["scheduling"]` mapping.
+
+Use `scheduling="single_batch"` only for an explicitly unmanaged batch.
+Supplying manual refill controls also preserves this expert path for backward
+compatibility. `scheduling="autotune"` and explicit `BatchPlanner` inputs are
+advanced experimental interfaces, not competing production defaults.
+
+The runtime records atoms and active MLIP edges as the base compute interface.
+It separately records cutoff/force mode, task auxiliary state, stress/cell
+mode, skin/cache candidate edges, and hardware. For variable-cell BFGS,
+`D=3N+9`, dense state is `D²`, and dense eigensolver work is represented by
+`D³`. A scalar estimate exists only after coefficients have been calibrated
+for that exact model/task/policy/hardware contract.
+
+When no exact signed capacity policy matches, the runtime performs one
+representative model forward containing up to four of the largest structures.
+It combines the measured model/graph peak with the explicit dense-BFGS
+allowance and packs largest-cost-first chunks within 85% of available GPU
+memory.
+
+For the packaged AtomBit/H100 manifest contract, a signed peak-reserved-byte
+model replaces that forward. It charges the fixed model/allocator term once
+per resident batch and the calibrated active- and candidate-edge terms per
+system, then applies the same 1.10 optimization-growth margin used by the
+probe path. The task profiler's outer buckets are retained; the hardware model
+only chooses inner resident chunks. Neither path runs an optimization pilot,
+relaxes a structure twice, or performs a batch-size timing sweep.
 
 Automatic optimization always uses active compaction. It normally uses active
 drain, but BFGS can select immediate slot refill from a packaged offline policy
@@ -663,14 +771,14 @@ therefore remains active drain. Historical repeated-structure controls,
 multi-GPU transfer failures, and results from different execution contracts
 are not used for refill selection.
 
-`AutoSchedulerConfig` exposes the 0.85 memory fraction, safety margin, probe
-size, and absolute-budget test override. Multiple homogeneous GPUs share the
-same plan and pull memory-safe chunks from one largest-work-first queue. Active
-optimizer states never migrate between GPUs. Automatic execution uses threads
-for short queues. When at least eight pending chunks per active device can
-amortize spawn startup, it uses one isolated persistent process per GPU; each
-process keeps its calculator and optimizer alive while pulling later chunks.
-Override this conservative rule with
+`AutoSchedulerConfig` exposes the 0.85 memory fraction, safety margin, offline
+capacity-policy enable flag, probe size, and absolute-budget test override.
+Multiple homogeneous GPUs share the same plan and pull memory-safe chunks from
+one largest-work-first queue. Active optimizer states never migrate between
+GPUs. Automatic execution uses threads for short queues. When at least eight
+pending chunks per active device can amortize spawn startup, it uses one
+isolated persistent process per GPU; each process keeps its calculator and
+optimizer alive while pulling later chunks. Override this conservative rule with
 `AutoSchedulerConfig(multi_gpu_worker_backend="process" | "thread")`.
 Non-serializable custom adapters fall back to threads during preflight, before
 any production job starts. In-process MPS dispatch remains a future execution
@@ -682,15 +790,22 @@ from completed production chunks and stores compatible decisions in
 `~/.cache/batch_mlip/autoscheduler-v1.json`; it is not used by
 `scheduling="auto"`.
 
-An offline nearest-workload capacity table was also rejected rather than
-shipped. The controlled matrix contains 208 full-optimization points across 13
-signed workloads, AtomBit/MACE, FIRE/BFGS, and B64/B128/B192/B256. The static
-descriptor rule passed only 6 of 12 cases on the second independent holdout.
-By contrast, the largest measured capacity satisfying convergence and the 85%
-memory gate remained within 5% of peak throughput on all 48 eligible curves.
-This supports the automatic memory probe and deterministic packing rule above;
-it does not support extrapolating a throughput knee from a chemically similar
-family.
+The earlier nearest-workload throughput table remains rejected. Its static
+descriptor rule passed only 6 of 12 cases on the second independent holdout,
+so the runtime still does not infer a throughput knee from a chemically
+similar family. The packaged policy is different: it is a continuous
+reserved-memory regression over signed layered graph features, makes no
+throughput claim, and is enabled only by exact execution-contract matching.
+On three non-fit P2048 families it performed zero probes, satisfied every
+predicted chunk bound, used at most 63.58% of H100 memory, and ran 1.036x
+faster than the probe-backed path and 2.700x faster than frozen MPS.
+
+Capacity safety passed, but changing resident chunk composition produced six
+sparse endpoint-tolerance exceptions among 6,144 jobs relative to the
+probe-backed tensor schedule. All jobs converged. Capacity acceptance and
+strict schedule-invariant endpoint reproducibility are therefore reported
+separately in
+[`experiments/omc-csp-scheduler-epoch3`](experiments/omc-csp-scheduler-epoch3).
 
 For frozen experiments, `BatchPlanner` still provides explicitly calibrated
 memory-safe queues without coupling planning to a particular MLIP or optimizer:

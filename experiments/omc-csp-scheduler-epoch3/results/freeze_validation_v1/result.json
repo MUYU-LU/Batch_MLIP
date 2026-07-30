@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "status": "pass",
+  "decision": "freeze_omc_csp_scheduler_v1_for_exact_contract",
+  "scope": {
+    "application": "closed-pool OMC-CSP variable-cell relaxation",
+    "model": "AtomBit smooth-rms fp32",
+    "optimizer": "BatchedBFGS",
+    "optimizer_state_dtype": "float64",
+    "cell_filter": "FrechetCellFilter",
+    "cutoff_A": 6.0,
+    "skin_A": 0.5,
+    "hardware": "7 x NVIDIA H100 80GB HBM3",
+    "pool_sizes": [
+      512,
+      2048
+    ],
+    "family_scope": [
+      "intra-family narrow",
+      "intra-family wide",
+      "inter-family wide"
+    ]
+  },
+  "matrix": {
+    "workload_count": 6,
+    "job_count": 7680,
+    "workloads": [
+      {
+        "workload_id": "OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2",
+        "pool_size": 2048,
+        "sequence_call_seconds": 85.21190672926605,
+        "production_seconds": 60.47286168113351,
+        "mps_script_seconds": 433.0951043330133,
+        "resident_call_speedup_over_mps_script": 5.0825655821672475,
+        "loader_processes": 28,
+        "materializer_generation": 1,
+        "execution_chunks": 14
+      },
+      {
+        "workload_id": "OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2",
+        "pool_size": 2048,
+        "sequence_call_seconds": 41.77273849258199,
+        "production_seconds": 40.33929881686345,
+        "mps_script_seconds": 206.14992299117148,
+        "resident_call_speedup_over_mps_script": 4.935034915840617,
+        "loader_processes": 28,
+        "materializer_generation": 1,
+        "execution_chunks": 14
+      },
+      {
+        "workload_id": "OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2",
+        "pool_size": 2048,
+        "sequence_call_seconds": 42.43979659117758,
+        "production_seconds": 40.53689926629886,
+        "mps_script_seconds": 155.8129153898917,
+        "resident_call_speedup_over_mps_script": 3.6713869505746457,
+        "loader_processes": 7,
+        "materializer_generation": 2,
+        "execution_chunks": 14
+      },
+      {
+        "workload_id": "OPT-OMC-SCHED-E1-TEST-MIX-ALL-P512-INTER-WIDE-v2",
+        "pool_size": 512,
+        "sequence_call_seconds": 22.769728823099285,
+        "production_seconds": 22.36291172914207,
+        "mps_script_seconds": 145.32561789592728,
+        "resident_call_speedup_over_mps_script": 6.382404420578707,
+        "loader_processes": 7,
+        "materializer_generation": 2,
+        "execution_chunks": 14
+      },
+      {
+        "workload_id": "OPT-OMC-SCHED-E1-TEST-OBEQIX-P512-INTRA-NARROW-v2",
+        "pool_size": 512,
+        "sequence_call_seconds": 41.100698604248464,
+        "production_seconds": 40.61696454323828,
+        "mps_script_seconds": 278.8296145289205,
+        "resident_call_speedup_over_mps_script": 6.784060222764648,
+        "loader_processes": 7,
+        "materializer_generation": 2,
+        "execution_chunks": 14
+      },
+      {
+        "workload_id": "OPT-OMC-SCHED-E1-TEST-JAYDUI-P512-INTRA-NARROW-v2",
+        "pool_size": 512,
+        "sequence_call_seconds": 4.993199260905385,
+        "production_seconds": 4.709054847247899,
+        "mps_script_seconds": 40.89068811386824,
+        "resident_call_speedup_over_mps_script": 8.189276249002285,
+        "loader_processes": 7,
+        "materializer_generation": 2,
+        "execution_chunks": 14
+      }
+    ]
+  },
+  "timing": {
+    "tensor_script_seconds": 244.35934923309833,
+    "tensor_sequence_seconds": 242.56886817375198,
+    "tensor_call_seconds": 238.28806850127876,
+    "tensor_production_seconds": 209.03799088392407,
+    "mps_script_seconds": 1260.1038632527925,
+    "mps_external_seconds": 1290.8407413363457,
+    "mps_production_seconds": 1054.2234882866032,
+    "script_speedup_over_mps": 5.156765506241216,
+    "production_speedup_over_mps": 5.043214794730777,
+    "sequence_speedup_over_mps_external": 5.321543325220601
+  },
+  "correctness": {
+    "source_order_pass": true,
+    "exact_job_coverage_pass": true,
+    "converged_jobs": 7680,
+    "convergence_rate": 1.0,
+    "maximum_final_force_eV_per_A": 0.04999870806932449,
+    "standalone_chunk_plans_equal": true,
+    "standalone_exact_endpoint_records": 7680,
+    "standalone_convergence_mismatch_count": 0,
+    "mps_converged_jobs": 7680,
+    "mps_convergence_mismatch_count": 0,
+    "mps_endpoint_differences_reported_not_gated": true
+  },
+  "persistence": {
+    "worker_pids_constant": true,
+    "worker_generations": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "worker_restart_count": 0,
+    "loader_processes": [
+      28,
+      28,
+      7,
+      7,
+      7,
+      7
+    ],
+    "materializer_generations": [
+      1,
+      1,
+      2,
+      2,
+      2,
+      2
+    ],
+    "materializer_restart_count": 1,
+    "heavy_to_light_transition_pass": true
+  },
+  "prefetch": {
+    "eligible_chunk_count": 42,
+    "hit_count": 42,
+    "hit_rate": 1.0,
+    "initial_dispatch_wait_seconds": 37.15676475036889,
+    "prefetched_dispatch_wait_seconds": 0.0024623610079288483
+  },
+  "capacity": {
+    "all_calls_used_signed_offline_model": true,
+    "representative_model_forward_count": 0,
+    "maximum_allocated_bytes": 48517884416,
+    "maximum_reserved_bytes": 54081355776,
+    "maximum_reserved_fraction": 0.6361173849699754,
+    "memory_limit_fraction": 0.85,
+    "memory_gate_pass": true
+  },
+  "execution": {
+    "active_compaction": true,
+    "active_refill": false,
+    "pending_work_stealing": true,
+    "shutdown_acknowledged_worker_count": 7,
+    "shutdown_forced_worker_count_after_acknowledgment": 7,
+    "shutdown_wall_seconds": 1.840858364943415,
+    "post_run_process_leak_count": 0
+  },
+  "standalone_p512_persistence_speedups": {
+    "OPT-OMC-SCHED-E1-TEST-MIX-ALL-P512-INTER-WIDE-v2": 2.188502872619252,
+    "OPT-OMC-SCHED-E1-TEST-OBEQIX-P512-INTRA-NARROW-v2": 1.721681866945852,
+    "OPT-OMC-SCHED-E1-TEST-JAYDUI-P512-INTRA-NARROW-v2": 6.2689543713500235
+  },
+  "raw": {
+    "sequence_path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch3/results/freeze_validation_v1/sequence.json",
+    "sequence_sha256": "9013ab3ee974e2c8c87ad4c6cba5201752072dfa2b38368b98cd46773822b5ea",
+    "standalone_sha256": {
+      "OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2": "a8ed276d3eab86da45869bf561266d2017dc464f5677b66c926066e8bb186c14",
+      "OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2": "36579ff47a37d9b824715eed244efbfcea506d7366cf064865655a1f94db2153",
+      "OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2": "dee8094d1faa1c506b7244037b6513ef941ffd494b69ff1bd2b76a392140c68f",
+      "OPT-OMC-SCHED-E1-TEST-MIX-ALL-P512-INTER-WIDE-v2": "f815f427db25383799308b111d434d0a1cea63a3f8e73de92ec3e27873d64177",
+      "OPT-OMC-SCHED-E1-TEST-OBEQIX-P512-INTRA-NARROW-v2": "9da90bedd889c32e7e1064010d90159ef9a3a9872edff63d5f0ab4747c3b33f1",
+      "OPT-OMC-SCHED-E1-TEST-JAYDUI-P512-INTRA-NARROW-v2": "e9dababb0dad4172988a4f0fe9a171aa09a3dbf8d34f5658d2bd63a1970d1580"
+    }
+  },
+  "excluded_claims": [
+    "automatic GPU-count selection",
+    "multi-GPU active refill",
+    "MACE transfer",
+    "molecular conformer scheduling",
+    "MD scheduling",
+    "hardware transfer beyond the signed H100 contract"
+  ]
+}

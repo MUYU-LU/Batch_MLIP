@@ -1,0 +1,95 @@
+schema_version: 1
+id: omc-csp-scheduler-epoch1
+date: 2026-07-29
+status: complete
+
+hypothesis: >-
+  A single targeted refinement to the automatic OMC-CSP scheduler can improve
+  full-process makespan while preserving numerical endpoints and the 85%
+  per-GPU memory contract on families withheld from method selection.
+
+contract:
+  mlip: AtomBit-smooth-rms-fp32
+  optimizer: BatchedBFGS
+  optimizer_dtype: torch.float64
+  cell_filter: FrechetCellFilter
+  cutoff_A: 6.0
+  skin_A: 0.5
+  force_mode: autograd
+  deterministic: true
+  cuda_allocator: expandable_segments
+  mps_workers_per_gpu: 4
+  timing_repeats: 1
+
+workloads:
+  source_v1_construction_sha256: 48c6b87ce74b2af0ec13e6830cd048b05c985f7605662a091cd7bdf26f7982c1
+  scheduler_v2_construction_sha256: 16337463225baf362840bea21e598d295c7dde41c7aa3819ec1c226bf7f7469a
+  pool_sizes: [64, 512, 2048]
+  replication: false
+  excluded:
+    XIFZOF: unsupported_element_Si
+    OBEQET: no_candidates
+  splits:
+    development:
+      families: [BOQWIN, GUFJOG, HAMTIZ, KONTIQ, NACJAF, OBEQUJ, PAHYON, SOXLEX, UJIRIO, XAFPAY, XATMOV, rof-b]
+      all_family_p512: true
+      selected_intra_family_extreme_pool_families: [GUFJOG, KONTIQ, BOQWIN, XAFPAY, rof-b]
+      mixed_p512: true
+    validation:
+      families: [AXOSOW, BOQQUT, WICZUF, WIDBAO, XAFQIH]
+      all_family_p512: true
+      selected_intra_family_extreme_pool_families: [BOQQUT, WIDBAO]
+      mixed_p512: true
+    test:
+      families: [JAYDUI, OBEQIX, XULDUD, rof-a, rof-c]
+      all_family_p64_p512_p2048: true
+      mixed_p512: true
+
+epoch_protocol:
+  development:
+    methods: [current_auto, ase_cuda_mps_4_workers]
+    purpose: bottleneck_attribution
+  refinement:
+    maximum_implementation_changes: 1
+    target: selected_from_development_phase_telemetry
+  validation:
+    methods: [refined_auto, ase_cuda_mps_4_workers]
+    result_controls_method_freeze: true
+  test:
+    methods: [refined_auto, ase_cuda_mps_4_workers]
+    execute_only_after_validation_pass: true
+    may_not_select_further_change: true
+
+outcome:
+  refinement: persistent_ase_bfgs_nonconverged_tail_recovery
+  validation: accepted
+  untouched_test:
+    scientific_and_resource_gates: pass
+    automatic_external_wins: 14
+    workloads: 16
+    p2048_external_wins: 3
+    p2048_workloads: 5
+  method_frozen_after_test: true
+  observed_limit: eager_parent_structure_materialization_at_large_pool
+  deferred_hypothesis: manifest_backed_lazy_worker_materialization
+
+metrics:
+  primary: full_process_makespan_seconds
+  secondary:
+    - production_makespan_seconds
+    - peak_reserved_bytes_per_gpu
+    - worker_load_imbalance
+    - neighbor_seconds
+    - model_seconds
+    - optimizer_seconds
+    - compaction_refill_seconds
+    - converged_count
+    - final_energy_forces_stress_positions_cells
+
+gates:
+  no_oom: true
+  exact_job_coverage: true
+  peak_reserved_memory_fraction_per_gpu_max: 0.85
+  no_lower_converged_count_than_mps: true
+  validation_full_process_makespan_non_regression: true
+  test_results_do_not_select_method: true

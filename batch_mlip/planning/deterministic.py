@@ -10,7 +10,7 @@ from typing import Any
 import torch
 
 from .auto import AutoSchedulerConfig, AutoWorkloadPlan
-from .memory import SystemProfile
+from .memory import HardwareCalibratedBatchPlanner, SystemProfile
 
 
 @dataclass(frozen=True)
@@ -212,6 +212,94 @@ def plan_deterministic_relaxation(
         chunks=tuple(chunks),
         memory_fraction=config.memory_safety_fraction,
         memory_growth_margin=config.memory_growth_margin,
+    )
+
+
+def plan_hardware_calibrated_relaxation(
+    workload: AutoWorkloadPlan,
+    planner: HardwareCalibratedBatchPlanner,
+    *,
+    memory_fraction: float,
+) -> DeterministicRelaxationPlan:
+    """Capacity-pack the outer scheduler's buckets from an offline byte model."""
+
+    profiles = {profile.index: profile for profile in workload.profiles}
+    chunks: list[DeterministicRelaxationChunk] = []
+    for bucket_index, bucket in enumerate(workload.buckets):
+        ordered = sorted(
+            bucket.system_indices,
+            key=lambda index: (
+                planner.incremental_profile_bytes(profiles[index]),
+                -index,
+            ),
+            reverse=True,
+        )
+        pending: list[int] = []
+        for index in ordered:
+            candidate = [*pending, index]
+            predicted = planner.estimate_profiles_bytes(
+                [profiles[item] for item in candidate]
+            )
+            exceeds_memory = (
+                bool(pending)
+                and predicted > planner.memory_budget_bytes
+            )
+            exceeds_count = (
+                planner.max_batch_size is not None
+                and len(pending) >= planner.max_batch_size
+            )
+            if exceeds_memory or exceeds_count:
+                chunks.append(
+                    _make_chunk(
+                        pending,
+                        bucket_index=bucket_index,
+                        predicted_peak_bytes=planner.estimate_profiles_bytes(
+                            [profiles[item] for item in pending]
+                        ),
+                        profiles=profiles,
+                    )
+                )
+                pending = []
+                candidate = [index]
+                predicted = planner.estimate_profiles_bytes(
+                    [profiles[index]]
+                )
+            if predicted > planner.memory_budget_bytes:
+                raise MemoryError(
+                    f"system {index} is predicted to require {predicted} "
+                    "bytes, exceeding the offline capacity model's "
+                    f"{planner.memory_budget_bytes}-byte device budget"
+                )
+            pending = candidate
+        if pending:
+            chunks.append(
+                _make_chunk(
+                    pending,
+                    bucket_index=bucket_index,
+                    predicted_peak_bytes=planner.estimate_profiles_bytes(
+                        [profiles[item] for item in pending]
+                    ),
+                    profiles=profiles,
+                )
+            )
+    executed = [index for chunk in chunks for index in chunk.system_indices]
+    if sorted(executed) != list(range(len(workload.profiles))):
+        raise RuntimeError("calibrated planning duplicated or omitted systems")
+    probe = DeterministicMemoryProbe(
+        memory_budget_bytes=planner.memory_budget_bytes,
+        baseline_allocated_bytes=0,
+        peak_allocated_bytes=None,
+        peak_reserved_bytes=None,
+        probe_indices=(),
+        probe_model_work=0,
+        model_bytes_per_work=0.0,
+    )
+    return DeterministicRelaxationPlan(
+        workload=workload,
+        probe=probe,
+        chunks=tuple(chunks),
+        memory_fraction=memory_fraction,
+        memory_growth_margin=planner.prediction_margin,
     )
 
 

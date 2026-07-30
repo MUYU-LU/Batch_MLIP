@@ -1,0 +1,1468 @@
+{
+  "aggregate": {
+    "aggregate_speedup_over_eager": 1.736333507928383,
+    "aggregate_speedup_over_mps": 3.279933395783995,
+    "all_plan_signatures_equal": true,
+    "all_scientific_and_resource_gates_pass": true,
+    "eager_components": {
+      "fraction": {
+        "external_wrapper": 0.019772633167619208,
+        "profiling": 0.010357541664326432,
+        "scheduler_other": 0.007151049944913698,
+        "structure_model_setup_and_output": 0.5077653080411708,
+        "tail_recovery": 0.0,
+        "worker_execution": 0.4037723549553683,
+        "worker_startup": 0.051181112226601544
+      },
+      "seconds": {
+        "external_wrapper": 42.50900122290477,
+        "profiling": 22.26758305495605,
+        "scheduler_other": 15.37397615564987,
+        "structure_model_setup_and_output": 1091.6399407954887,
+        "tail_recovery": 0.0,
+        "worker_execution": 868.0664525087923,
+        "worker_startup": 110.03379993885756
+      }
+    },
+    "eager_converged": 10146,
+    "eager_external_seconds": 2149.890753676649,
+    "jobs": 10240,
+    "maximum_memory_fraction": 0.7617473617674039,
+    "mps_converged": 10183,
+    "mps_external_seconds": 4061.142889930401,
+    "source_backed_components": {
+      "fraction": {
+        "external_wrapper": 0.03726009526019008,
+        "profiling": 5.197708655850822e-05,
+        "scheduler_other": 0.018668289386829517,
+        "structure_model_setup_and_output": 0.010658141842969275,
+        "tail_recovery": 0.0,
+        "worker_execution": 0.8495321256960481,
+        "worker_startup": 0.0838293707274046
+      },
+      "seconds": {
+        "external_wrapper": 46.13464747136459,
+        "profiling": 0.0643569091334939,
+        "scheduler_other": 23.11467385524884,
+        "structure_model_setup_and_output": 13.196681682951748,
+        "tail_recovery": 0.0,
+        "worker_execution": 1051.872381455265,
+        "worker_startup": 103.79572138097137
+      }
+    },
+    "source_backed_converged": 10146,
+    "source_backed_external_seconds": 1238.178462754935,
+    "source_backed_wins_over_eager": 5,
+    "source_backed_wins_over_mps": 5,
+    "speedup_over_eager": {
+      "max": 2.1533984954876173,
+      "mean": 1.6177664342595737,
+      "min": 1.1481740970020176,
+      "p50": 1.663532160485544,
+      "p95": 2.1533984954876173
+    },
+    "speedup_over_mps": {
+      "max": 4.236536479186782,
+      "mean": 2.9483137139358218,
+      "min": 2.30255311416151,
+      "p50": 2.827690693839936,
+      "p95": 4.236536479186782
+    },
+    "worker_materialization_seconds": 1093.6256815111265,
+    "workloads": 5
+  },
+  "experiment": "omc_csp_scheduler_epoch2_source_backed_validation",
+  "rows": [
+    {
+      "all_scientific_and_resource_gates_pass": true,
+      "convergence": {
+        "eager": 2048,
+        "mps": 2048,
+        "mps_non_regression_gate_applicable": false,
+        "source_backed": 2048
+      },
+      "endpoints": {
+        "source_backed_vs_eager": {
+          "automatic_only_sources": [],
+          "automatic_record_count": 2048,
+          "common_source_count": 2048,
+          "convergence_categories": {
+            "automatic_only_converged": 0,
+            "both_converged": 2048,
+            "mps_only_converged": 0,
+            "neither_converged": 0
+          },
+          "convergence_state_mismatch_count": 0,
+          "metrics": {
+            "absolute_energy_eV": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "absolute_max_force_eV_per_A": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "absolute_max_stress_eV_per_A3": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "absolute_step_difference": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "max_cell_component_A": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "max_position_component_A": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "max_stress_component_eV_per_A3": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            }
+          },
+          "mps_only_sources": [],
+          "mps_record_count": 2048,
+          "same_source_set": true,
+          "threshold_gate_applied": false,
+          "threshold_gate_reason": "The frozen epoch contract requires endpoint retention and convergence-count non-regression but does not declare cross-optimizer endpoint tolerances."
+        },
+        "source_backed_vs_mps": {
+          "automatic_only_sources": [],
+          "automatic_record_count": 2048,
+          "common_source_count": 2048,
+          "convergence_categories": {
+            "automatic_only_converged": 0,
+            "both_converged": 2048,
+            "mps_only_converged": 0,
+            "neither_converged": 0
+          },
+          "convergence_state_mismatch_count": 0,
+          "metrics": {
+            "absolute_energy_eV": {
+              "max": 2.12221622467041,
+              "mean": 0.05253723310306668,
+              "min": 0.0,
+              "p50": 0.0020084381103515625,
+              "p95": 0.3081064224243164
+            },
+            "absolute_max_force_eV_per_A": {
+              "max": 0.02623308077454567,
+              "mean": 0.0029633907188326702,
+              "min": 1.4901161193847656e-08,
+              "p50": 0.0021790675818920135,
+              "p95": 0.008748196065425873
+            },
+            "absolute_max_stress_eV_per_A3": {
+              "max": 0.0024804859422147274,
+              "mean": 0.00016462323904420373,
+              "min": 0.0,
+              "p50": 6.651680450886488e-05,
+              "p95": 0.0006846868200227618
+            },
+            "absolute_step_difference": {
+              "max": 204.0,
+              "mean": 7.744140625,
+              "min": 0.0,
+              "p50": 1.0,
+              "p95": 49.0
+            },
+            "max_cell_component_A": {
+              "max": 2.441565744946569,
+              "mean": 0.0422403542318789,
+              "min": 1.720705533614364e-07,
+              "p50": 0.0011274825694638224,
+              "p95": 0.21507379195774412
+            },
+            "max_position_component_A": {
+              "max": 4.422558018775929,
+              "mean": 0.11900324160824009,
+              "min": 3.537376514373136e-06,
+              "p50": 0.00932608696278514,
+              "p95": 0.7540886936312567
+            },
+            "max_stress_component_eV_per_A3": {
+              "max": 0.006444508908316493,
+              "mean": 0.00032875596731249943,
+              "min": 5.844049155712128e-08,
+              "p50": 0.00013887296518078074,
+              "p95": 0.0012507489882409573
+            }
+          },
+          "mps_only_sources": [],
+          "mps_record_count": 2048,
+          "same_source_set": true,
+          "threshold_gate_applied": false,
+          "threshold_gate_reason": "The frozen epoch contract requires endpoint retention and convergence-count non-regression but does not declare cross-optimizer endpoint tolerances."
+        }
+      },
+      "gates": {
+        "convergence_matches_eager": true,
+        "convergence_not_below_mps_after_required_recovery": true,
+        "exact_identity_and_order": true,
+        "external_faster_than_eager": true,
+        "external_faster_than_mps": true,
+        "memory_at_most_85_percent": true,
+        "no_oom": true,
+        "same_plan_signature_as_eager": true,
+        "same_requested_contract_as_eager": true,
+        "same_requested_contract_as_mps": true,
+        "status_complete": true
+      },
+      "materialization": {
+        "mode": "manifest_lazy_worker",
+        "parent_system_count": 4,
+        "worker_seconds": 122.54543759673834,
+        "worker_system_count": 2048
+      },
+      "memory": {
+        "accounting": "Within each temporal stage, the per-device safety upper bound adds concurrent parent and worker allocations. Tensor execution and tail recovery are sequential, so their stage peaks are combined by maximum rather than addition.",
+        "conservative_peak_reserved_bytes_by_device": {
+          "cuda:0": 64762150912,
+          "cuda:1": 63243812864,
+          "cuda:2": 63453528064,
+          "cuda:3": 59630419968,
+          "cuda:4": 54173630464,
+          "cuda:5": 31669092352,
+          "cuda:6": 31354519552
+        },
+        "gpu_total_bytes": 85017886720,
+        "max_conservative_peak_fraction": 0.7617473617674039,
+        "max_conservative_peak_reserved_bytes": 64762150912,
+        "max_worker_peak_fraction": 0.7463550378872555,
+        "max_worker_peak_reserved_bytes": 63453528064,
+        "parent_peak_reserved_bytes_by_device": {
+          "cuda:0": 1769996288,
+          "cuda:1": 0,
+          "cuda:2": 0,
+          "cuda:3": 0,
+          "cuda:4": 0,
+          "cuda:5": 0,
+          "cuda:6": 0
+        },
+        "predicted_to_actual_chunk_peak_ratio": {
+          "max": 2.2689092936033264,
+          "mean": 1.7681529944251213,
+          "min": 1.0967174488293003,
+          "p50": 2.2463719521000813,
+          "p95": 2.2676427539401356
+        },
+        "recovery_conservative_peak_reserved_bytes_by_device": {},
+        "recovery_parent_reserved_bytes_by_device": {},
+        "recovery_worker_peak_reserved_bytes_by_device": {},
+        "tensor_conservative_peak_reserved_bytes_by_device": {
+          "cuda:0": 64762150912,
+          "cuda:1": 63243812864,
+          "cuda:2": 63453528064,
+          "cuda:3": 59630419968,
+          "cuda:4": 54173630464,
+          "cuda:5": 31669092352,
+          "cuda:6": 31354519552
+        },
+        "worker_peak_reserved_bytes_by_device": {
+          "cuda:0": 62992154624,
+          "cuda:1": 63243812864,
+          "cuda:2": 63453528064,
+          "cuda:3": 59630419968,
+          "cuda:4": 54173630464,
+          "cuda:5": 31669092352,
+          "cuda:6": 31354519552
+        }
+      },
+      "phases": {
+        "accounting": "Fractions use non-overlapping top-level phase names over summed chunk work time. Detailed nested phases are diagnostic only.",
+        "chunk_wall_work_seconds": 777.2380051291548,
+        "exclusive_phase_fraction": {
+          "active_compaction": 0.024834328366892467,
+          "bfgs_update": 0.06095081010712056,
+          "model_autograd": 0.3564044501229832,
+          "model_forward": 0.16880140003744973,
+          "neighbor_update": 0.17285861255827142,
+          "unprofiled": 0.2161503988072826
+        },
+        "exclusive_phase_seconds": {
+          "active_compaction": 19.30218383860588,
+          "bfgs_update": 47.373286058664306,
+          "model_autograd": 277.01108383274084,
+          "model_forward": 131.19886342811586,
+          "neighbor_update": 134.35228319418434,
+          "unprofiled": 168.00030477684356
+        },
+        "neighbor_search_diagnostic_seconds": 15.384673303961753
+      },
+      "plan_signature_equal": true,
+      "pool_size": 2048,
+      "raw": {
+        "eager_path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/clean_baseline_v1/OPT-OMC-SCHED-E1-DEVELOPMENT-BOQWIN-P2048-INTRA-NARROW-v2/current_auto.json",
+        "eager_sha256": "4dcc9fd62903e82b967af2370d9bb8122c3f1e3585c846db30633e1e3dcc8135",
+        "mps_path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/clean_baseline_v1/OPT-OMC-SCHED-E1-DEVELOPMENT-BOQWIN-P2048-INTRA-NARROW-v2/ase_cuda_mps.json",
+        "mps_sha256": "d2ab94a71fe6d2d7770b84df5f0028be9cc1012a9258d0df369e47034759c104",
+        "source_backed_path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch2/results/source_backed_validation_p2048_v1/OPT-OMC-SCHED-E1-DEVELOPMENT-BOQWIN-P2048-INTRA-NARROW-v2/source_backed_auto.json",
+        "source_backed_sha256": "0563c382c6eb6569633b4251968de3ab16f8699f5f9191649eee1d8d96a0ad60"
+      },
+      "timing": {
+        "eager_components_seconds": {
+          "external_wrapper": 7.410636646207422,
+          "profiling": 6.376560776960105,
+          "scheduler_other": 2.8821952980943024,
+          "structure_model_setup_and_output": 121.5558161297813,
+          "tail_recovery": 0.0,
+          "worker_execution": 105.72204030584544,
+          "worker_startup": 21.93424933217466
+        },
+        "eager_external_seconds": 265.88149848906323,
+        "mps_external_seconds": 368.0158922597766,
+        "source_backed_components_seconds": {
+          "external_wrapper": 7.651399252936244,
+          "profiling": 0.013057663105428219,
+          "scheduler_other": 4.038805776741356,
+          "structure_model_setup_and_output": 2.5097455834038556,
+          "tail_recovery": 0.0,
+          "worker_execution": 125.30482386378571,
+          "worker_startup": 20.31165886996314
+        },
+        "source_backed_external_seconds": 159.82949100993574,
+        "speedup_over_eager": 1.663532160485544,
+        "speedup_over_mps": 2.30255311416151
+      },
+      "workload_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-BOQWIN-P2048-INTRA-NARROW-v2"
+    },
+    {
+      "all_scientific_and_resource_gates_pass": true,
+      "convergence": {
+        "eager": 2041,
+        "mps": 2047,
+        "mps_non_regression_gate_applicable": false,
+        "source_backed": 2041
+      },
+      "endpoints": {
+        "source_backed_vs_eager": {
+          "automatic_only_sources": [],
+          "automatic_record_count": 2048,
+          "common_source_count": 2048,
+          "convergence_categories": {
+            "automatic_only_converged": 0,
+            "both_converged": 2041,
+            "mps_only_converged": 0,
+            "neither_converged": 7
+          },
+          "convergence_state_mismatch_count": 0,
+          "metrics": {
+            "absolute_energy_eV": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "absolute_max_force_eV_per_A": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "absolute_max_stress_eV_per_A3": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "absolute_step_difference": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "max_cell_component_A": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "max_position_component_A": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "max_stress_component_eV_per_A3": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            }
+          },
+          "mps_only_sources": [],
+          "mps_record_count": 2048,
+          "same_source_set": true,
+          "threshold_gate_applied": false,
+          "threshold_gate_reason": "The frozen epoch contract requires endpoint retention and convergence-count non-regression but does not declare cross-optimizer endpoint tolerances."
+        },
+        "source_backed_vs_mps": {
+          "automatic_only_sources": [],
+          "automatic_record_count": 2048,
+          "common_source_count": 2048,
+          "convergence_categories": {
+            "automatic_only_converged": 1,
+            "both_converged": 2040,
+            "mps_only_converged": 7,
+            "neither_converged": 0
+          },
+          "convergence_state_mismatch_count": 8,
+          "metrics": {
+            "absolute_energy_eV": {
+              "max": 3.6126036643981934,
+              "mean": 0.1901454769540578,
+              "min": 1.9073486328125e-06,
+              "p50": 0.0037178993225097656,
+              "p95": 1.281829833984375
+            },
+            "absolute_max_force_eV_per_A": {
+              "max": 0.7063069492578506,
+              "mean": 0.007500092657210189,
+              "min": 2.0578503608703613e-05,
+              "p50": 0.005587652325630188,
+              "p95": 0.018188927322626114
+            },
+            "absolute_max_stress_eV_per_A3": {
+              "max": 0.00456902856240049,
+              "mean": 0.00038158373516772315,
+              "min": 1.4572287909686565e-07,
+              "p50": 0.00016913958825170994,
+              "p95": 0.0015435201639775187
+            },
+            "absolute_step_difference": {
+              "max": 444.0,
+              "mean": 29.95849609375,
+              "min": 0.0,
+              "p50": 4.0,
+              "p95": 168.0
+            },
+            "max_cell_component_A": {
+              "max": 6.951654097329152,
+              "mean": 0.3300307044403955,
+              "min": 1.5758033547790045e-05,
+              "p50": 0.013945989298015604,
+              "p95": 2.003558120557846
+            },
+            "max_position_component_A": {
+              "max": 6.6983062012033106,
+              "mean": 0.5242263400529859,
+              "min": 0.00037446573744048806,
+              "p50": 0.04265193371788545,
+              "p95": 2.959017095707094
+            },
+            "max_stress_component_eV_per_A3": {
+              "max": 0.006174237234517932,
+              "mean": 0.0008745967799225485,
+              "min": 6.340211257338524e-06,
+              "p50": 0.00042579605360515416,
+              "p95": 0.003196114208549261
+            }
+          },
+          "mps_only_sources": [],
+          "mps_record_count": 2048,
+          "same_source_set": true,
+          "threshold_gate_applied": false,
+          "threshold_gate_reason": "The frozen epoch contract requires endpoint retention and convergence-count non-regression but does not declare cross-optimizer endpoint tolerances."
+        }
+      },
+      "gates": {
+        "convergence_matches_eager": true,
+        "convergence_not_below_mps_after_required_recovery": true,
+        "exact_identity_and_order": true,
+        "external_faster_than_eager": true,
+        "external_faster_than_mps": true,
+        "memory_at_most_85_percent": true,
+        "no_oom": true,
+        "same_plan_signature_as_eager": true,
+        "same_requested_contract_as_eager": true,
+        "same_requested_contract_as_mps": true,
+        "status_complete": true
+      },
+      "materialization": {
+        "mode": "manifest_lazy_worker",
+        "parent_system_count": 4,
+        "worker_seconds": 30.240871192421764,
+        "worker_system_count": 2048
+      },
+      "memory": {
+        "accounting": "Within each temporal stage, the per-device safety upper bound adds concurrent parent and worker allocations. Tensor execution and tail recovery are sequential, so their stage peaks are combined by maximum rather than addition.",
+        "conservative_peak_reserved_bytes_by_device": {
+          "cuda:0": 16798187520,
+          "cuda:1": 15055454208,
+          "cuda:2": 14719909888,
+          "cuda:3": 12807307264,
+          "cuda:4": 12937330688,
+          "cuda:5": 12958302208,
+          "cuda:6": 12073304064
+        },
+        "gpu_total_bytes": 85017886720,
+        "max_conservative_peak_fraction": 0.19758415749998073,
+        "max_conservative_peak_reserved_bytes": 16798187520,
+        "max_worker_peak_fraction": 0.19035667208830853,
+        "max_worker_peak_reserved_bytes": 16183721984,
+        "parent_peak_reserved_bytes_by_device": {
+          "cuda:0": 614465536,
+          "cuda:1": 0,
+          "cuda:2": 0,
+          "cuda:3": 0,
+          "cuda:4": 0,
+          "cuda:5": 0,
+          "cuda:6": 0
+        },
+        "predicted_to_actual_chunk_peak_ratio": {
+          "max": 2.438768813478656,
+          "mean": 2.1254772396753525,
+          "min": 1.2020758232397475,
+          "p50": 2.2315112029965687,
+          "p95": 2.382407158441017
+        },
+        "recovery_conservative_peak_reserved_bytes_by_device": {},
+        "recovery_parent_reserved_bytes_by_device": {},
+        "recovery_worker_peak_reserved_bytes_by_device": {},
+        "tensor_conservative_peak_reserved_bytes_by_device": {
+          "cuda:0": 16798187520,
+          "cuda:1": 15055454208,
+          "cuda:2": 14719909888,
+          "cuda:3": 12807307264,
+          "cuda:4": 12937330688,
+          "cuda:5": 12958302208,
+          "cuda:6": 12073304064
+        },
+        "worker_peak_reserved_bytes_by_device": {
+          "cuda:0": 16183721984,
+          "cuda:1": 15055454208,
+          "cuda:2": 14719909888,
+          "cuda:3": 12807307264,
+          "cuda:4": 12937330688,
+          "cuda:5": 12958302208,
+          "cuda:6": 12073304064
+        }
+      },
+      "phases": {
+        "accounting": "Fractions use non-overlapping top-level phase names over summed chunk work time. Detailed nested phases are diagnostic only.",
+        "chunk_wall_work_seconds": 766.0024397163652,
+        "exclusive_phase_fraction": {
+          "active_compaction": 0.039550206411356044,
+          "bfgs_update": 0.11085454689185391,
+          "model_autograd": 0.24551686285915364,
+          "model_forward": 0.1283798128545933,
+          "neighbor_update": 0.3459535332135061,
+          "unprofiled": 0.12974503776953697
+        },
+        "exclusive_phase_seconds": {
+          "active_compaction": 30.295554602384556,
+          "bfgs_update": 84.9148533728123,
+          "model_autograd": 188.06651594161994,
+          "model_forward": 98.33924985694884,
+          "neighbor_update": 265.00125047004224,
+          "unprofiled": 99.38501547255726
+        },
+        "neighbor_search_diagnostic_seconds": 48.27195531022549
+      },
+      "plan_signature_equal": true,
+      "pool_size": 2048,
+      "raw": {
+        "eager_path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/clean_baseline_v1/OPT-OMC-SCHED-E1-DEVELOPMENT-GUFJOG-P2048-INTRA-NARROW-v2/current_auto.json",
+        "eager_sha256": "70974da1d9e6f8ae50190ca2131701b8f0a3ad192c655b86e6ff0d0b1b621221",
+        "mps_path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/clean_baseline_v1/OPT-OMC-SCHED-E1-DEVELOPMENT-GUFJOG-P2048-INTRA-NARROW-v2/ase_cuda_mps.json",
+        "mps_sha256": "64e4dc9215172079d8dce78d70c9936e858eb42676bd7ba5b8dfd02fdcb8e077",
+        "source_backed_path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch2/results/source_backed_validation_p2048_v1/OPT-OMC-SCHED-E1-DEVELOPMENT-GUFJOG-P2048-INTRA-NARROW-v2/source_backed_auto.json",
+        "source_backed_sha256": "2fb010e560bbaf5aca55eff05aa931f6f701643a6d2a612120fe9f7b4b05d5a3"
+      },
+      "timing": {
+        "eager_components_seconds": {
+          "external_wrapper": 7.7530192085541785,
+          "profiling": 2.016258627176285,
+          "scheduler_other": 2.7745057698339224,
+          "structure_model_setup_and_output": 31.11298803286627,
+          "tail_recovery": 0.0,
+          "worker_execution": 124.05823742691427,
+          "worker_startup": 21.335167129989713
+        },
+        "eager_external_seconds": 189.05017619533464,
+        "mps_external_seconds": 465.58742728317156,
+        "source_backed_components_seconds": {
+          "external_wrapper": 8.43209872301668,
+          "profiling": 0.013421803712844849,
+          "scheduler_other": 3.307727458421141,
+          "structure_model_setup_and_output": 2.1805683290585876,
+          "tail_recovery": 0.0,
+          "worker_execution": 130.30179312359542,
+          "worker_startup": 20.41727437917143
+        },
+        "source_backed_external_seconds": 164.6528838169761,
+        "speedup_over_eager": 1.1481740970020176,
+        "speedup_over_mps": 2.827690693839936
+      },
+      "workload_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-GUFJOG-P2048-INTRA-NARROW-v2"
+    },
+    {
+      "all_scientific_and_resource_gates_pass": true,
+      "convergence": {
+        "eager": 1974,
+        "mps": 2008,
+        "mps_non_regression_gate_applicable": false,
+        "source_backed": 1974
+      },
+      "endpoints": {
+        "source_backed_vs_eager": {
+          "automatic_only_sources": [],
+          "automatic_record_count": 2048,
+          "common_source_count": 2048,
+          "convergence_categories": {
+            "automatic_only_converged": 0,
+            "both_converged": 1974,
+            "mps_only_converged": 0,
+            "neither_converged": 74
+          },
+          "convergence_state_mismatch_count": 0,
+          "metrics": {
+            "absolute_energy_eV": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "absolute_max_force_eV_per_A": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "absolute_max_stress_eV_per_A3": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "absolute_step_difference": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "max_cell_component_A": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "max_position_component_A": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "max_stress_component_eV_per_A3": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            }
+          },
+          "mps_only_sources": [],
+          "mps_record_count": 2048,
+          "same_source_set": true,
+          "threshold_gate_applied": false,
+          "threshold_gate_reason": "The frozen epoch contract requires endpoint retention and convergence-count non-regression but does not declare cross-optimizer endpoint tolerances."
+        },
+        "source_backed_vs_mps": {
+          "automatic_only_sources": [],
+          "automatic_record_count": 2048,
+          "common_source_count": 2048,
+          "convergence_categories": {
+            "automatic_only_converged": 21,
+            "both_converged": 1953,
+            "mps_only_converged": 55,
+            "neither_converged": 19
+          },
+          "convergence_state_mismatch_count": 76,
+          "metrics": {
+            "absolute_energy_eV": {
+              "max": 5.767179489135742,
+              "mean": 0.3177565196529031,
+              "min": 0.0,
+              "p50": 0.011630058288574219,
+              "p95": 2.1294326782226562
+            },
+            "absolute_max_force_eV_per_A": {
+              "max": 0.9152770340442657,
+              "mean": 0.010960452170365897,
+              "min": 1.6987323760986328e-06,
+              "p50": 0.004715442657470703,
+              "p95": 0.020804334431886673
+            },
+            "absolute_max_stress_eV_per_A3": {
+              "max": 0.00541475135833025,
+              "mean": 0.000323059636013312,
+              "min": 1.3504177331924438e-07,
+              "p50": 0.00014101015403866768,
+              "p95": 0.0013067146064713597
+            },
+            "absolute_step_difference": {
+              "max": 429.0,
+              "mean": 36.39306640625,
+              "min": 0.0,
+              "p50": 6.0,
+              "p95": 197.0
+            },
+            "max_cell_component_A": {
+              "max": 6.701364818591923,
+              "mean": 0.284581025876746,
+              "min": 6.664810676682009e-07,
+              "p50": 0.020372135246230272,
+              "p95": 1.5984677042899946
+            },
+            "max_position_component_A": {
+              "max": 8.581264527350527,
+              "mean": 0.6128365329120449,
+              "min": 0.00010356433474356663,
+              "p50": 0.08214417992629564,
+              "p95": 3.1297835100857947
+            },
+            "max_stress_component_eV_per_A3": {
+              "max": 0.008347880560904741,
+              "mean": 0.0007163603314637793,
+              "min": 1.1212550674599697e-06,
+              "p50": 0.00030978923314251006,
+              "p95": 0.0027844500727951527
+            }
+          },
+          "mps_only_sources": [],
+          "mps_record_count": 2048,
+          "same_source_set": true,
+          "threshold_gate_applied": false,
+          "threshold_gate_reason": "The frozen epoch contract requires endpoint retention and convergence-count non-regression but does not declare cross-optimizer endpoint tolerances."
+        }
+      },
+      "gates": {
+        "convergence_matches_eager": true,
+        "convergence_not_below_mps_after_required_recovery": true,
+        "exact_identity_and_order": true,
+        "external_faster_than_eager": true,
+        "external_faster_than_mps": true,
+        "memory_at_most_85_percent": true,
+        "no_oom": true,
+        "same_plan_signature_as_eager": true,
+        "same_requested_contract_as_eager": true,
+        "same_requested_contract_as_mps": true,
+        "status_complete": true
+      },
+      "materialization": {
+        "mode": "manifest_lazy_worker",
+        "parent_system_count": 4,
+        "worker_seconds": 72.88634564075619,
+        "worker_system_count": 2048
+      },
+      "memory": {
+        "accounting": "Within each temporal stage, the per-device safety upper bound adds concurrent parent and worker allocations. Tensor execution and tail recovery are sequential, so their stage peaks are combined by maximum rather than addition.",
+        "conservative_peak_reserved_bytes_by_device": {
+          "cuda:0": 31962693632,
+          "cuda:1": 28416409600,
+          "cuda:2": 27766292480,
+          "cuda:3": 25899827200,
+          "cuda:4": 24073207808,
+          "cuda:5": 23697817600,
+          "cuda:6": 22246588416
+        },
+        "gpu_total_bytes": 85017886720,
+        "max_conservative_peak_fraction": 0.37595257733548143,
+        "max_conservative_peak_reserved_bytes": 31962693632,
+        "max_worker_peak_fraction": 0.3626816314259946,
+        "max_worker_peak_reserved_bytes": 30834425856,
+        "parent_peak_reserved_bytes_by_device": {
+          "cuda:0": 1128267776,
+          "cuda:1": 0,
+          "cuda:2": 0,
+          "cuda:3": 0,
+          "cuda:4": 0,
+          "cuda:5": 0,
+          "cuda:6": 0
+        },
+        "predicted_to_actual_chunk_peak_ratio": {
+          "max": 2.3957376605445306,
+          "mean": 2.1355658716980797,
+          "min": 1.1977588826682644,
+          "p50": 2.277495265302405,
+          "p95": 2.366258914875224
+        },
+        "recovery_conservative_peak_reserved_bytes_by_device": {},
+        "recovery_parent_reserved_bytes_by_device": {},
+        "recovery_worker_peak_reserved_bytes_by_device": {},
+        "tensor_conservative_peak_reserved_bytes_by_device": {
+          "cuda:0": 31962693632,
+          "cuda:1": 28416409600,
+          "cuda:2": 27766292480,
+          "cuda:3": 25899827200,
+          "cuda:4": 24073207808,
+          "cuda:5": 23697817600,
+          "cuda:6": 22246588416
+        },
+        "worker_peak_reserved_bytes_by_device": {
+          "cuda:0": 30834425856,
+          "cuda:1": 28416409600,
+          "cuda:2": 27766292480,
+          "cuda:3": 25899827200,
+          "cuda:4": 24073207808,
+          "cuda:5": 23697817600,
+          "cuda:6": 22246588416
+        }
+      },
+      "phases": {
+        "accounting": "Fractions use non-overlapping top-level phase names over summed chunk work time. Detailed nested phases are diagnostic only.",
+        "chunk_wall_work_seconds": 1391.9505950021558,
+        "exclusive_phase_fraction": {
+          "active_compaction": 0.026105841897872618,
+          "bfgs_update": 0.08687121266318616,
+          "model_autograd": 0.3355413265942149,
+          "model_forward": 0.15592899397951682,
+          "neighbor_update": 0.2830122153809406,
+          "unprofiled": 0.11254040948426891
+        },
+        "exclusive_phase_seconds": {
+          "active_compaction": 36.338042162776,
+          "bfgs_update": 120.92043615508078,
+          "model_autograd": 467.0569492006301,
+          "model_forward": 217.04545594787598,
+          "neighbor_update": 393.9390215923786,
+          "unprofiled": 156.65068994341436
+        },
+        "neighbor_search_diagnostic_seconds": 66.06696590638164
+      },
+      "plan_signature_equal": true,
+      "pool_size": 2048,
+      "raw": {
+        "eager_path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/clean_baseline_v1/OPT-OMC-SCHED-E1-DEVELOPMENT-KONTIQ-P2048-INTRA-NARROW-v2/current_auto.json",
+        "eager_sha256": "5ce76b809ebf88209e102267026f6c28224b21db6512b9ec786b63632c254adf",
+        "mps_path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/clean_baseline_v1/OPT-OMC-SCHED-E1-DEVELOPMENT-KONTIQ-P2048-INTRA-NARROW-v2/ase_cuda_mps.json",
+        "mps_sha256": "555fc6ef84ec461948e63bd958d7dd0b38ba028e8ad2fe28d33b983f5aa55ea7",
+        "source_backed_path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch2/results/source_backed_validation_p2048_v1/OPT-OMC-SCHED-E1-DEVELOPMENT-KONTIQ-P2048-INTRA-NARROW-v2/source_backed_auto.json",
+        "source_backed_sha256": "07ff8cc70bfc48c11ca95d48009ee234ce6da1d8ee7b8d144524e7732cd1df3c"
+      },
+      "timing": {
+        "eager_components_seconds": {
+          "external_wrapper": 8.485784461256117,
+          "profiling": 3.2051667110063136,
+          "scheduler_other": 2.9370632683858275,
+          "structure_model_setup_and_output": 72.60020872671157,
+          "tail_recovery": 0.0,
+          "worker_execution": 200.6077011669986,
+          "worker_startup": 22.28407329088077
+        },
+        "eager_external_seconds": 310.1199976252392,
+        "mps_external_seconds": 716.3727054181509,
+        "source_backed_components_seconds": {
+          "external_wrapper": 9.456923170946538,
+          "profiling": 0.013327107299119234,
+          "scheduler_other": 3.7443865770474076,
+          "structure_model_setup_and_output": 2.4198222951963544,
+          "tail_recovery": 0.0,
+          "worker_execution": 210.74677222268656,
+          "worker_startup": 20.738050296902657
+        },
+        "source_backed_external_seconds": 247.11928167007864,
+        "speedup_over_eager": 1.2549405110333351,
+        "speedup_over_mps": 2.898894414781272
+      },
+      "workload_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-KONTIQ-P2048-INTRA-NARROW-v2"
+    },
+    {
+      "all_scientific_and_resource_gates_pass": true,
+      "convergence": {
+        "eager": 2035,
+        "mps": 2032,
+        "mps_non_regression_gate_applicable": false,
+        "source_backed": 2035
+      },
+      "endpoints": {
+        "source_backed_vs_eager": {
+          "automatic_only_sources": [],
+          "automatic_record_count": 2048,
+          "common_source_count": 2048,
+          "convergence_categories": {
+            "automatic_only_converged": 0,
+            "both_converged": 2035,
+            "mps_only_converged": 0,
+            "neither_converged": 13
+          },
+          "convergence_state_mismatch_count": 0,
+          "metrics": {
+            "absolute_energy_eV": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "absolute_max_force_eV_per_A": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "absolute_max_stress_eV_per_A3": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "absolute_step_difference": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "max_cell_component_A": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "max_position_component_A": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "max_stress_component_eV_per_A3": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            }
+          },
+          "mps_only_sources": [],
+          "mps_record_count": 2048,
+          "same_source_set": true,
+          "threshold_gate_applied": false,
+          "threshold_gate_reason": "The frozen epoch contract requires endpoint retention and convergence-count non-regression but does not declare cross-optimizer endpoint tolerances."
+        },
+        "source_backed_vs_mps": {
+          "automatic_only_sources": [],
+          "automatic_record_count": 2048,
+          "common_source_count": 2048,
+          "convergence_categories": {
+            "automatic_only_converged": 14,
+            "both_converged": 2021,
+            "mps_only_converged": 11,
+            "neither_converged": 2
+          },
+          "convergence_state_mismatch_count": 25,
+          "metrics": {
+            "absolute_energy_eV": {
+              "max": 19.297565460205078,
+              "mean": 0.5021479381248355,
+              "min": 1.9073486328125e-06,
+              "p50": 0.017923355102539062,
+              "p95": 1.9314098358154297
+            },
+            "absolute_max_force_eV_per_A": {
+              "max": 2.463069699704647,
+              "mean": 0.009538597940263571,
+              "min": 5.960464477539062e-07,
+              "p50": 0.0028291530907154083,
+              "p95": 0.010763969272375107
+            },
+            "absolute_max_stress_eV_per_A3": {
+              "max": 0.003921026946045458,
+              "mean": 0.00011291568424631748,
+              "min": 3.0231603886932135e-08,
+              "p50": 5.176645936444402e-05,
+              "p95": 0.00042718555778265
+            },
+            "absolute_step_difference": {
+              "max": 432.0,
+              "mean": 29.25390625,
+              "min": 0.0,
+              "p50": 6.0,
+              "p95": 143.0
+            },
+            "max_cell_component_A": {
+              "max": 3.6568789598618068,
+              "mean": 0.062433012775607345,
+              "min": 1.5551068948127522e-05,
+              "p50": 0.004789179974764579,
+              "p95": 0.30075499328275157
+            },
+            "max_position_component_A": {
+              "max": 6.8350176047402895,
+              "mean": 0.35216215867103934,
+              "min": 0.0009886933155680566,
+              "p50": 0.05609586139888467,
+              "p95": 1.767664016840648
+            },
+            "max_stress_component_eV_per_A3": {
+              "max": 0.004833062528632581,
+              "mean": 0.00021980752440389426,
+              "min": 2.9512011678889394e-06,
+              "p50": 0.00012241949116287287,
+              "p95": 0.0007047923572827131
+            }
+          },
+          "mps_only_sources": [],
+          "mps_record_count": 2048,
+          "same_source_set": true,
+          "threshold_gate_applied": false,
+          "threshold_gate_reason": "The frozen epoch contract requires endpoint retention and convergence-count non-regression but does not declare cross-optimizer endpoint tolerances."
+        }
+      },
+      "gates": {
+        "convergence_matches_eager": true,
+        "convergence_not_below_mps_after_required_recovery": true,
+        "exact_identity_and_order": true,
+        "external_faster_than_eager": true,
+        "external_faster_than_mps": true,
+        "memory_at_most_85_percent": true,
+        "no_oom": true,
+        "same_plan_signature_as_eager": true,
+        "same_requested_contract_as_eager": true,
+        "same_requested_contract_as_mps": true,
+        "status_complete": true
+      },
+      "materialization": {
+        "mode": "manifest_lazy_worker",
+        "parent_system_count": 4,
+        "worker_seconds": 677.2569622979499,
+        "worker_system_count": 2048
+      },
+      "memory": {
+        "accounting": "Within each temporal stage, the per-device safety upper bound adds concurrent parent and worker allocations. Tensor execution and tail recovery are sequential, so their stage peaks are combined by maximum rather than addition.",
+        "conservative_peak_reserved_bytes_by_device": {
+          "cuda:0": 59091451904,
+          "cuda:1": 55102668800,
+          "cuda:2": 55058628608,
+          "cuda:3": 54976839680,
+          "cuda:4": 54767124480,
+          "cuda:5": 54746152960,
+          "cuda:6": 54704209920
+        },
+        "gpu_total_bytes": 85017886720,
+        "max_conservative_peak_fraction": 0.6950472916200945,
+        "max_conservative_peak_reserved_bytes": 59091451904,
+        "max_worker_peak_fraction": 0.6599705535470642,
+        "max_worker_peak_reserved_bytes": 56109301760,
+        "parent_peak_reserved_bytes_by_device": {
+          "cuda:0": 2982150144,
+          "cuda:1": 0,
+          "cuda:2": 0,
+          "cuda:3": 0,
+          "cuda:4": 0,
+          "cuda:5": 0,
+          "cuda:6": 0
+        },
+        "predicted_to_actual_chunk_peak_ratio": {
+          "max": 1.3171185102987013,
+          "mean": 1.295930082039448,
+          "min": 1.2513389237727701,
+          "p50": 1.295659471706067,
+          "p95": 1.3169772864565483
+        },
+        "recovery_conservative_peak_reserved_bytes_by_device": {},
+        "recovery_parent_reserved_bytes_by_device": {},
+        "recovery_worker_peak_reserved_bytes_by_device": {},
+        "tensor_conservative_peak_reserved_bytes_by_device": {
+          "cuda:0": 59091451904,
+          "cuda:1": 55102668800,
+          "cuda:2": 55058628608,
+          "cuda:3": 54976839680,
+          "cuda:4": 54767124480,
+          "cuda:5": 54746152960,
+          "cuda:6": 54704209920
+        },
+        "worker_peak_reserved_bytes_by_device": {
+          "cuda:0": 56109301760,
+          "cuda:1": 55102668800,
+          "cuda:2": 55058628608,
+          "cuda:3": 54976839680,
+          "cuda:4": 54767124480,
+          "cuda:5": 54746152960,
+          "cuda:6": 54704209920
+        }
+      },
+      "phases": {
+        "accounting": "Fractions use non-overlapping top-level phase names over summed chunk work time. Detailed nested phases are diagnostic only.",
+        "chunk_wall_work_seconds": 2781.353658663109,
+        "exclusive_phase_fraction": {
+          "active_compaction": 0.007597699331441382,
+          "bfgs_update": 0.14925167971020512,
+          "model_autograd": 0.31903538205797666,
+          "model_forward": 0.14661188661574479,
+          "neighbor_update": 0.09546539549576223,
+          "unprofiled": 0.28203795678886984
+        },
+        "exclusive_phase_seconds": {
+          "active_compaction": 21.131888832926744,
+          "bfgs_update": 415.1217054235935,
+          "model_autograd": 887.3502271299362,
+          "model_forward": 407.77950724220267,
+          "neighbor_update": 265.523027037859,
+          "unprofiled": 784.4473029965909
+        },
+        "neighbor_search_diagnostic_seconds": 38.470250891447066
+      },
+      "plan_signature_equal": true,
+      "pool_size": 2048,
+      "raw": {
+        "eager_path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/clean_baseline_v1/OPT-OMC-SCHED-E1-DEVELOPMENT-ROF-B-P2048-INTRA-NARROW-v2/current_auto.json",
+        "eager_sha256": "a703ee823f17ac5139c36bef6b486b51526f3cc1809a9142d0656185d658dd39",
+        "mps_path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/clean_baseline_v1/OPT-OMC-SCHED-E1-DEVELOPMENT-ROF-B-P2048-INTRA-NARROW-v2/ase_cuda_mps.json",
+        "mps_sha256": "10d9e9364a1869b1598ca19a9d14cee8e25e6404efd1000474c5c72a49e628c4",
+        "source_backed_path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch2/results/source_backed_validation_p2048_v1/OPT-OMC-SCHED-E1-DEVELOPMENT-ROF-B-P2048-INTRA-NARROW-v2/source_backed_auto.json",
+        "source_backed_sha256": "5fb147a8027c9a6ba37e9b4a6910d81875a176de4d633827e9b5f288295b42ea"
+      },
+      "timing": {
+        "eager_components_seconds": {
+          "external_wrapper": 11.65864259377122,
+          "profiling": 5.7522755758836865,
+          "scheduler_other": 3.764634973369539,
+          "structure_model_setup_and_output": 673.4743004743941,
+          "tail_recovery": 0.0,
+          "worker_execution": 335.55837443470955,
+          "worker_startup": 22.60696693789214
+        },
+        "eager_external_seconds": 1052.8151949900202,
+        "mps_external_seconds": 2071.2794165890664,
+        "source_backed_components_seconds": {
+          "external_wrapper": 12.44909550016746,
+          "profiling": 0.012232963927090168,
+          "scheduler_other": 6.572030335199088,
+          "structure_model_setup_and_output": 3.441460474859923,
+          "tail_recovery": 0.0,
+          "worker_execution": 444.6990606947802,
+          "worker_startup": 21.734790300950408
+        },
+        "source_backed_external_seconds": 488.90867026988417,
+        "speedup_over_eager": 2.1533984954876173,
+        "speedup_over_mps": 4.236536479186782
+      },
+      "workload_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-ROF-B-P2048-INTRA-NARROW-v2"
+    },
+    {
+      "all_scientific_and_resource_gates_pass": true,
+      "convergence": {
+        "eager": 2048,
+        "mps": 2048,
+        "mps_non_regression_gate_applicable": false,
+        "source_backed": 2048
+      },
+      "endpoints": {
+        "source_backed_vs_eager": {
+          "automatic_only_sources": [],
+          "automatic_record_count": 2048,
+          "common_source_count": 2048,
+          "convergence_categories": {
+            "automatic_only_converged": 0,
+            "both_converged": 2048,
+            "mps_only_converged": 0,
+            "neither_converged": 0
+          },
+          "convergence_state_mismatch_count": 0,
+          "metrics": {
+            "absolute_energy_eV": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "absolute_max_force_eV_per_A": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "absolute_max_stress_eV_per_A3": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "absolute_step_difference": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "max_cell_component_A": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "max_position_component_A": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "max_stress_component_eV_per_A3": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            }
+          },
+          "mps_only_sources": [],
+          "mps_record_count": 2048,
+          "same_source_set": true,
+          "threshold_gate_applied": false,
+          "threshold_gate_reason": "The frozen epoch contract requires endpoint retention and convergence-count non-regression but does not declare cross-optimizer endpoint tolerances."
+        },
+        "source_backed_vs_mps": {
+          "automatic_only_sources": [],
+          "automatic_record_count": 2048,
+          "common_source_count": 2048,
+          "convergence_categories": {
+            "automatic_only_converged": 0,
+            "both_converged": 2048,
+            "mps_only_converged": 0,
+            "neither_converged": 0
+          },
+          "convergence_state_mismatch_count": 0,
+          "metrics": {
+            "absolute_energy_eV": {
+              "max": 2.087718963623047,
+              "mean": 0.029105539433658123,
+              "min": 0.0,
+              "p50": 0.0001277923583984375,
+              "p95": 0.14642333984375
+            },
+            "absolute_max_force_eV_per_A": {
+              "max": 0.019311370328068733,
+              "mean": 0.0019150466077917372,
+              "min": 3.6135315895080566e-07,
+              "p50": 0.0009564310312271118,
+              "p95": 0.006735119968652725
+            },
+            "absolute_max_stress_eV_per_A3": {
+              "max": 0.0025378522695973516,
+              "mean": 5.737807795647143e-05,
+              "min": 8.149072527885437e-10,
+              "p50": 1.0492338333278894e-05,
+              "p95": 0.0002651604590937495
+            },
+            "absolute_step_difference": {
+              "max": 325.0,
+              "mean": 5.6357421875,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 30.0
+            },
+            "max_cell_component_A": {
+              "max": 2.351148842026914,
+              "mean": 0.016845342461283188,
+              "min": 9.573772885573817e-08,
+              "p50": 0.00017267383012153914,
+              "p95": 0.06239227217387011
+            },
+            "max_position_component_A": {
+              "max": 2.7483839462017423,
+              "mean": 0.07053450793616868,
+              "min": 6.081446183969774e-06,
+              "p50": 0.0019763303827851075,
+              "p95": 0.4189753921035789
+            },
+            "max_stress_component_eV_per_A3": {
+              "max": 0.0031166987027972937,
+              "mean": 0.00011020800302270761,
+              "min": 1.7980528355110437e-07,
+              "p50": 2.1193845896050334e-05,
+              "p95": 0.0004651834460673854
+            }
+          },
+          "mps_only_sources": [],
+          "mps_record_count": 2048,
+          "same_source_set": true,
+          "threshold_gate_applied": false,
+          "threshold_gate_reason": "The frozen epoch contract requires endpoint retention and convergence-count non-regression but does not declare cross-optimizer endpoint tolerances."
+        }
+      },
+      "gates": {
+        "convergence_matches_eager": true,
+        "convergence_not_below_mps_after_required_recovery": true,
+        "exact_identity_and_order": true,
+        "external_faster_than_eager": true,
+        "external_faster_than_mps": true,
+        "memory_at_most_85_percent": true,
+        "no_oom": true,
+        "same_plan_signature_as_eager": true,
+        "same_requested_contract_as_eager": true,
+        "same_requested_contract_as_mps": true,
+        "status_complete": true
+      },
+      "materialization": {
+        "mode": "manifest_lazy_worker",
+        "parent_system_count": 4,
+        "worker_seconds": 190.69606478326023,
+        "worker_system_count": 2048
+      },
+      "memory": {
+        "accounting": "Within each temporal stage, the per-device safety upper bound adds concurrent parent and worker allocations. Tensor execution and tail recovery are sequential, so their stage peaks are combined by maximum rather than addition.",
+        "conservative_peak_reserved_bytes_by_device": {
+          "cuda:0": 59915632640,
+          "cuda:1": 57751371776,
+          "cuda:2": 47815065600,
+          "cuda:3": 44350570496,
+          "cuda:4": 39545995264,
+          "cuda:5": 30744248320,
+          "cuda:6": 30492590080
+        },
+        "gpu_total_bytes": 85017886720,
+        "max_conservative_peak_fraction": 0.7047414956023033,
+        "max_conservative_peak_reserved_bytes": 59915632640,
+        "max_worker_peak_fraction": 0.680986995768036,
+        "max_worker_peak_reserved_bytes": 57896075264,
+        "parent_peak_reserved_bytes_by_device": {
+          "cuda:0": 2019557376,
+          "cuda:1": 0,
+          "cuda:2": 0,
+          "cuda:3": 0,
+          "cuda:4": 0,
+          "cuda:5": 0,
+          "cuda:6": 0
+        },
+        "predicted_to_actual_chunk_peak_ratio": {
+          "max": 2.444614466239671,
+          "mean": 1.8498151847430562,
+          "min": 1.1192827189386936,
+          "p50": 2.3088986232531186,
+          "p95": 2.363537349465682
+        },
+        "recovery_conservative_peak_reserved_bytes_by_device": {},
+        "recovery_parent_reserved_bytes_by_device": {},
+        "recovery_worker_peak_reserved_bytes_by_device": {},
+        "tensor_conservative_peak_reserved_bytes_by_device": {
+          "cuda:0": 59915632640,
+          "cuda:1": 57751371776,
+          "cuda:2": 47815065600,
+          "cuda:3": 44350570496,
+          "cuda:4": 39545995264,
+          "cuda:5": 30744248320,
+          "cuda:6": 30492590080
+        },
+        "worker_peak_reserved_bytes_by_device": {
+          "cuda:0": 57896075264,
+          "cuda:1": 57751371776,
+          "cuda:2": 47815065600,
+          "cuda:3": 44350570496,
+          "cuda:4": 39545995264,
+          "cuda:5": 30744248320,
+          "cuda:6": 30492590080
+        }
+      },
+      "phases": {
+        "accounting": "Fractions use non-overlapping top-level phase names over summed chunk work time. Detailed nested phases are diagnostic only.",
+        "chunk_wall_work_seconds": 834.2406956516206,
+        "exclusive_phase_fraction": {
+          "active_compaction": 0.021698178437266152,
+          "bfgs_update": 0.06262176127282812,
+          "model_autograd": 0.3068590567557654,
+          "model_forward": 0.14635098650989842,
+          "neighbor_update": 0.17732419851848638,
+          "unprofiled": 0.28514581850575565
+        },
+        "exclusive_phase_seconds": {
+          "active_compaction": 18.10150347387791,
+          "bfgs_update": 52.24162168717385,
+          "model_autograd": 255.99431297492987,
+          "model_forward": 122.0919487953186,
+          "neighbor_update": 147.93106272792815,
+          "unprofiled": 237.88024599239236
+        },
+        "neighbor_search_diagnostic_seconds": 19.454072824239727
+      },
+      "plan_signature_equal": true,
+      "pool_size": 2048,
+      "raw": {
+        "eager_path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/clean_baseline_v1/OPT-OMC-SCHED-E1-DEVELOPMENT-XAFPAY-P2048-INTRA-WIDE-v2/current_auto.json",
+        "eager_sha256": "8b0a738f0cb8030635dbb82d69be4aac4ea6d6ec33027020d5f1e26bbae578d0",
+        "mps_path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/clean_baseline_v1/OPT-OMC-SCHED-E1-DEVELOPMENT-XAFPAY-P2048-INTRA-WIDE-v2/ase_cuda_mps.json",
+        "mps_sha256": "3ff96e4b9549b6c9b4111d6ae9b236cfe20318f34069e7bd4e4744c46eafe7ce",
+        "source_backed_path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch2/results/source_backed_validation_p2048_v1/OPT-OMC-SCHED-E1-DEVELOPMENT-XAFPAY-P2048-INTRA-WIDE-v2/source_backed_auto.json",
+        "source_backed_sha256": "eec1a0391e6e07830918e491c21715358c0c007e59e94c6e1cb9068ccb70dbdd"
+      },
+      "timing": {
+        "eager_components_seconds": {
+          "external_wrapper": 7.200918313115835,
+          "profiling": 4.917321363929659,
+          "scheduler_other": 3.0155768459662795,
+          "structure_model_setup_and_output": 192.8966274317354,
+          "tail_recovery": 0.0,
+          "worker_execution": 102.12009917432442,
+          "worker_startup": 21.873343247920275
+        },
+        "eager_external_seconds": 332.02388637699187,
+        "mps_external_seconds": 439.8874483802356,
+        "source_backed_components_seconds": {
+          "external_wrapper": 8.145130824297667,
+          "profiling": 0.01231737108901143,
+          "scheduler_other": 5.451723707839847,
+          "structure_model_setup_and_output": 2.6450850004330277,
+          "tail_recovery": 0.0,
+          "worker_execution": 140.8199315504171,
+          "worker_startup": 20.593947533983737
+        },
+        "source_backed_external_seconds": 177.66813598806038,
+        "speedup_over_eager": 1.8687869072893548,
+        "speedup_over_mps": 2.4758938677096087
+      },
+      "workload_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-XAFPAY-P2048-INTRA-WIDE-v2"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "completion_path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch2/results/source_backed_validation_p2048_v1/completion.json",
+    "completion_sha256": "2d4a342f8a75ddeaa595291bb006013a054131fbf9c4c2fac30217f8c75dcb0a"
+  },
+  "status": "complete"
+}

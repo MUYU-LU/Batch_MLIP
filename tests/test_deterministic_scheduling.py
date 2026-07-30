@@ -327,6 +327,75 @@ def test_auto_relaxation_uses_deterministic_active_drain_without_probe_on_cpu():
     assert not schedule["active_refill"]
     assert not schedule["mps"]
     assert [batch["system_count"] for batch in schedule["batches"]] == [2, 2]
+    manifest = schedule["policy_manifest"]
+    assert result.execution_policy == manifest
+    assert manifest["task"]["kind"] == "fixed_cell_relaxation"
+    assert manifest["outer_scheduler"]["pool_regime"] == (
+        "multiple_resident_waves"
+    )
+    assert manifest["inner_scheduler"]["queue_policy"] == "active_drain"
+
+
+def test_ordinary_relaxation_defaults_to_automatic_scheduling():
+    systems = [
+        Atoms("H", positions=[[0.8 - 0.1 * index, 0.0, 0.0]])
+        for index in range(4)
+    ]
+
+    result = relax(
+        systems,
+        QuadraticCalculator(),
+        auto_config=AutoSchedulerConfig(max_batch_size=2),
+        fmax=1e-5,
+        max_steps=500,
+        dt_start=0.05,
+        dt_max=0.5,
+    )
+
+    schedule = result.metadata["scheduling"]
+    assert schedule["decision"] == "deterministic_memory_plan"
+    assert schedule["summary"] == {
+        "strategy": "automatic",
+        "batch_mode": "active_drain",
+        "devices": ["cpu"],
+        "device_count": 1,
+        "resident_capacities": [2],
+        "memory_fraction": 0.85,
+        "active_compaction": True,
+        "work_stealing": False,
+        "refill_reasons": [
+            "calculator has no hashable torch model"
+        ],
+    }
+
+
+def test_explicit_single_batch_remains_available():
+    systems = [
+        Atoms("H", positions=[[0.8, 0.0, 0.0]]),
+        Atoms("H", positions=[[0.6, 0.0, 0.0]]),
+    ]
+
+    result = relax(
+        systems,
+        QuadraticCalculator(),
+        scheduling="single_batch",
+        fmax=1e-5,
+        max_steps=500,
+        dt_start=0.05,
+        dt_max=0.5,
+    )
+
+    assert result.schedule == {
+        "strategy": "manual",
+        "batch_mode": "active_drain",
+        "devices": ["cpu"],
+        "device_count": 1,
+        "resident_capacities": [2],
+        "memory_fraction": None,
+        "active_compaction": False,
+        "work_stealing": False,
+        "refill_reasons": [],
+    }
 
 
 def test_multi_device_auto_shards_deterministic_chunks_without_autotuning():
@@ -363,6 +432,25 @@ def test_multi_device_auto_shards_deterministic_chunks_without_autotuning():
         chunk["system_count"] for chunk in schedule["planned_chunks"]
     ) == len(systems)
     assert not schedule["active_refill"]
+    assert schedule["summary"] == {
+        "strategy": "automatic",
+        "batch_mode": "active_drain",
+        "devices": ["cpu:0", "cpu:1"],
+        "device_count": 2,
+        "resident_capacities": [2],
+        "memory_fraction": 0.85,
+        "active_compaction": True,
+        "work_stealing": True,
+        "refill_reasons": [
+            "multi-GPU refill has no accepted scientific policy"
+        ],
+    }
+    manifest = schedule["policy_manifest"]
+    assert manifest["outer_scheduler"]["active_device_count"] == 2
+    assert manifest["outer_scheduler"]["execution_chunk_count"] == 4
+    assert manifest["inner_scheduler"]["refill"]["evidence_source"] == (
+        "policy_exclusion"
+    )
 
 
 def test_multi_device_auto_supports_persistent_process_workers():

@@ -89,6 +89,40 @@ class HangingExitTaskPreparer:
         return StubTaskRunner(worker.worker_id)
 
 
+@dataclass
+class StubTaskSource:
+    values: tuple[int, ...]
+    prepared_order: tuple[int, ...] = ()
+    prefetch_capacity: int = 0
+    resolved: list[int] | None = None
+    finished: bool = False
+
+    @property
+    def task_count(self) -> int:
+        return len(self.values)
+
+    def prepare(
+        self,
+        ordered_task_indices,
+        *,
+        prefetch_capacity,
+        initial_dispatch_count,
+    ):
+        del initial_dispatch_count
+        self.prepared_order = tuple(ordered_task_indices)
+        self.prefetch_capacity = prefetch_capacity
+        self.resolved = []
+
+    def resolve(self, task_index):
+        if self.resolved is None:
+            raise RuntimeError("source was not prepared")
+        self.resolved.append(task_index)
+        return self.values[task_index]
+
+    def finish(self):
+        self.finished = True
+
+
 def test_balance_work_is_deterministic_and_cost_balanced():
     costs = [1.0, 9.0, 2.0, 8.0, 3.0, 7.0]
 
@@ -205,6 +239,36 @@ def test_persistent_task_pool_reuses_workers_and_preserves_call_order():
     assert pool.closed
     assert pool.shutdown_acknowledged_workers == (0, 1)
     assert pool.shutdown_wall_seconds < 1.0
+
+
+def test_persistent_task_pool_resolves_bounded_source_without_preassignment():
+    source = StubTaskSource((0, 1, 2, 3, 4))
+    with PersistentTaskPool(
+        ["cpu:0", "cpu:1"],
+        StubTaskPreparer(),
+        startup_timeout_seconds=30.0,
+        run_timeout_seconds=30.0,
+    ) as pool:
+        execution = pool.execute_source(
+            source,
+            [1.0, 5.0, 2.0, 4.0, 3.0],
+            prefetch_depth=1,
+        )
+
+    assert source.prepared_order == (1, 3, 4, 2, 0)
+    assert source.prefetch_capacity == 4
+    assert sorted(source.resolved or []) == list(range(5))
+    assert source.finished
+    assert [result.payload[1] for result in execution.task_results] == [
+        0,
+        1,
+        4,
+        9,
+        16,
+    ]
+    assert [
+        worker.task_indices[0] for worker in execution.worker_results
+    ] == [1, 3]
 
 
 def test_persistent_task_pool_uses_bounded_descriptor_sharing():

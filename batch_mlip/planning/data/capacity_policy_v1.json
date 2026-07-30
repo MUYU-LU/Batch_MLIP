@@ -1,0 +1,50 @@
+{
+  "contract": {
+    "calculator_type": "batch_mlip.models.potential.AtomBitBatchCalculator",
+    "cell_filter_type": "FrechetCellFilter",
+    "cpu_threads": 1,
+    "cuda": "12.8",
+    "cuda_allocator": "expandable_segments",
+    "cutoff_A": 6.0,
+    "force_mode": "autograd",
+    "linear_algebra_backend": "auto",
+    "maximum_validated_batch_size": 512,
+    "model_call_kwargs": {},
+    "model_dtype": "torch.float32",
+    "model_id": "AtomBit-smooth-rms-fp32",
+    "model_parameter_count": 344653,
+    "model_state_sha256": "200b8a378d848c00b9a690583e34e49dacad79975cf3c7c4c92c39a0e24d620d",
+    "model_type": "src.model.AtomBitModel",
+    "neighbor_backend": "auto",
+    "optimizer_dtype": "torch.float64",
+    "optimizer_type": "BatchedBFGS",
+    "skin_A": 0.5,
+    "torch": "2.9.1+cu128"
+  },
+  "model": {
+    "coefficients": {
+      "fixed": 136969871.2217998,
+      "per_active_edge": 44501.585159377086,
+      "per_atom": 0.0,
+      "per_candidate_edge": 3197.754732736302,
+      "per_dense_linear_algebra_work": 0.0,
+      "per_dense_state_element": 0.0,
+      "per_linear_state_element": 0.0
+    },
+    "contract_id": "atombit-smooth-rms-fp32-bfgs-f64-frechet-h100-peak_reserved_bytes-v1",
+    "hardware": {
+      "device_count": 1,
+      "device_name": "NVIDIA H100 80GB HBM3",
+      "device_type": "cuda",
+      "memory_safety_fraction": 0.85,
+      "total_memory_bytes": 85017886720
+    },
+    "metric": "bytes",
+    "safety_factor": 1.026901080329114
+  },
+  "model_name": "peak_reserved_bytes",
+  "policy_id": "omc-csp-atombit-h100-capacity-v1",
+  "policy_sha256": "d8ed5cbbfd63d6e845eb3d552f628169a0c4e99f996f820c81299bdeafaf46fb",
+  "schema_version": 1,
+  "source_calibration_sha256": "d27468326e2b7f464b37c8739d3d3bd219425081bdb96dabf0f250928c78b297"
+}

@@ -1,5 +1,9 @@
 # Workload-aware performance strategy
 
+> Historical mechanism protocol. Current evidence status, scheduler-v1
+> boundaries, and the chemical-transfer plan are authoritative under
+> [`research/project/`](../research/project/README.md).
+
 ## Objective
 
 Maximize completed-structure throughput without assuming that one batch size,

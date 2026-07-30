@@ -1,0 +1,51 @@
+schema_version: 1
+status: implementation_validated_gpu_gate_pending
+date: 2026-07-29
+
+contract:
+  workload_selection_seed: 20260729
+  execution_seeds: [20260729, 20260730, 20260731]
+  same_signed_workload_for_every_seed: true
+  python_hash_seed_before_interpreter: true
+  python_random_seeded: true
+  numpy_global_rng_seeded: true
+  torch_cpu_and_cuda_rngs_seeded: true
+  torch_deterministic_algorithms: true
+  cublas_workspace_config: ":4096:8"
+  cudnn_benchmark: false
+  cudnn_deterministic: true
+  allow_tf32: false
+  cpu_threads_per_worker: 1
+  interop_threads_per_worker: 1
+  propagated_before_worker_model_or_cuda_initialization: true
+  tensor_and_mps_contract_identical: true
+
+validated:
+  same_seed_python_hash_and_rng_subprocess_reproduction: true
+  different_seed_changes_all_global_rng_streams: true
+  deterministic_planner_tests: true
+  spawned_worker_tests: true
+  persistent_executor_tests: true
+  mps_helper_tests: true
+
+pending_gpu_gate:
+  workload_scope: one fixed OMC-CSP P64 manifest
+  runs:
+    - {seed: 20260729, repetition: 0}
+    - {seed: 20260729, repetition: 1}
+    - {seed: 20260730, repetition: 0}
+    - {seed: 20260731, repetition: 0}
+  methods:
+    - batch_mlip_auto
+    - cuda_mps_four_workers
+  timing_use: correctness_only
+  required_checks:
+    - identical_input_manifest_hash
+    - identical_scheduler_policy_manifest_for_batch_runs
+    - convergence_flags
+    - convergence_steps
+    - final_energy
+    - final_forces
+    - final_stress
+    - final_positions
+    - final_cells

@@ -1,0 +1,190 @@
+schema_version: 1
+status: complete
+date: 2026-07-29
+
+artifacts:
+  host_workloads: /public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2
+  host_planning_profiles: /public/home/lmy/Batch_imple_project/omc_csp_scheduler_planning_profiles_v2
+  local_index: results/workload_index.json
+  construction_sha256: 16337463225baf362840bea21e598d295c7dde41c7aa3819ec1c226bf7f7469a
+  planning_profile_index_sha256: 4b99107315f3b61970dc6525460216aedd22d4e07e718d21664bdb86f549ed6d
+  host_development_results: /public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/clean_baseline_v1
+  development_analysis:
+    json: results/development_analysis/development_analysis.json
+    json_sha256: 85e3c3bd500b8becfb4aa719e8024ab6b02a74248242d55342bef414973da5d9
+    csv: results/development_analysis/development_analysis.csv
+    csv_sha256: af7f01a19073d75dd96acb5ffd6066dc41ceef3e173cd4be69e536e4f6ecc89a
+    markdown: results/development_analysis/development_analysis.md
+    markdown_sha256: 8b4c7d7a79faf9020c365b41fe4474de3026c7b2c3b17d0dee06ce4175981795
+  host_validation_results: /public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/validation_refined_v1
+  validation_analysis:
+    json: results/validation_analysis/validation_analysis.json
+    json_sha256: e1458ef9498cb77ddd98408019f3e7ddedb0a232b574a097eeb9e79d19146542
+    csv: results/validation_analysis/validation_analysis.csv
+    csv_sha256: f9b38b7e9d7ed8b3e25d392a4b0914141a1d4fbcee8b759ff6e51ca13c123adf
+    markdown: results/validation_analysis/validation_analysis.md
+    markdown_sha256: d0d3b37c57a027fb7c41aa1d5e073544603add131a9e54090f5d2afc89e40d80
+    completion: results/validation_analysis/validation_complete.json
+    completion_sha256: d2d5ccee8be34040b6b416e0ebaa96d1b90d9c81bc90e4052bc16ccfd298f8a1
+  host_test_results: /public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1
+  test_analysis:
+    json: results/test_analysis/test_analysis.json
+    json_sha256: ed7926e93b60bd0cf94036f734b9f7756e62f0543afb6f8941010d839f06f202
+    csv: results/test_analysis/test_analysis.csv
+    csv_sha256: de438105803e329e34c52c3da9b4e8a76ad58d74a1252553ffd97ce96a4f2050
+    markdown: results/test_analysis/test_analysis.md
+    markdown_sha256: 4b92d63bbc8cef3ecbc0b92581e621ea7444ede82a8f17319fa076650be2a5b4
+    completion: results/test_analysis/test_complete.json
+    completion_sha256: 5f39dcb430ef3ca0d9d034bf507e670da2d8f006e80ab4c457244cbc11625279
+
+construction:
+  compatible_family_count: 22
+  intra_family_workloads: 66
+  split_local_inter_family_workloads: 3
+  total_workloads: 69
+  planning_profile_count: 69
+  validated_system_references: 59264
+  split_workloads:
+    development: 37
+    validation: 16
+    test: 16
+  v1_cif_order_preserved: true
+  unique_cifs_per_manifest: true
+  nested_pool_prefixes: true
+  cross_split_family_admission: forbidden
+  replication: false
+
+development:
+  workloads: 23
+  method_runs: 46
+  jobs: 17216
+  automatic_external_wins: 23
+  external_speedup_over_mps:
+    minimum: 1.2332
+    median: 2.0958
+    maximum: 4.3080
+  pool_median_speedup:
+    P64: 2.0969
+    P512: 2.0076
+    P2048: 1.9674
+  gates:
+    exact_identity_and_coverage: pass
+    requested_numerical_contract: pass
+    no_oom: pass
+    peak_reserved_memory_below_85_percent: pass
+    convergence_count_non_regression: fail
+  convergence:
+    automatic: 17072
+    ase_cuda_mps: 17132
+    automatic_only: 56
+    mps_only: 116
+    automatic_nonconverged_tail: 144
+    deterministic_tail_union: 17188
+
+solver_diagnostic:
+  batched_eigen:
+    KONTIQ_P64: 63
+    ROF_B_P64: 62
+  serial_eigen:
+    KONTIQ_P64: 62
+    ROF_B_P64: 62
+  tensor_B1:
+    attempted: 4
+    converged: 1
+  raw_sha256:
+    KONTIQ-P64-grouped.json: 94f29313485dc82e0aa21ac00f5a76dcb790094657c98a15fc3714f98f77822b
+    KONTIQ-P64-serial.json: 4d5cb27b9afd30ba5670af0ce90647547a70eff517d96e188b3a694845e12f60
+    ROF-B-P64-grouped.json: a27c0727fe5ca1cf571ba11562c7384c445af1f3f9880a1db94af32234bbbd6f
+    ROF-B-P64-serial.json: 34b87fb4864b62f0a87db9bdf4a1a59941e98960623030c77fdc73f9f659a279
+    KONTIQ-I00028-B1-grouped.json: aab292609d066a52de8019cfe4193640d50b24593e6fe9717854b94d492f1675
+    KONTIQ-I00061-B1-grouped.json: d71f8d60f7eb23e89044eb70460728952fb238718f2a9cbb68b9d31664a6a8cf
+    ROF-B-I00002-B1-grouped.json: e81b600deabb772a9dd95fddfbbd299a169585d0081781214d483eba42aa171e
+    ROF-B-I00006-B1-grouped.json: 78512596a1ada03b96aa8e92f5bbd9b52f0a5331e962c4f45107d3f5002c0796
+  conclusion: >-
+    Neither an eigen-only backend nor tensor B1 recovery fixes the
+    convergence gate across both development families.
+  host_raw_directory: /public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/clean_baseline_v1/diagnostics
+
+refinement:
+  decision: persistent_ase_bfgs_nonconverged_tail_recovery
+  specification: refinement_decision.json
+  reason: >-
+    Scientific convergence must be restored before selecting the largest
+    speed-only opportunity, which is structure/model setup and output at
+    37.71 percent of aggregate automatic external time.
+
+validation:
+  workloads: 10
+  method_runs: 20
+  jobs: 7296
+  automatic_external_wins: 10
+  external_speedup_over_mps:
+    minimum: 1.3273
+    median: 1.4677
+    maximum: 2.0434
+  convergence:
+    automatic: 7295
+    ase_cuda_mps: 7294
+    tail_recovery_attempted: 3
+    tail_recovery_converged: 2
+  gates:
+    exact_identity_and_coverage: pass
+    requested_numerical_contract: pass
+    no_oom: pass
+    peak_reserved_memory_below_85_percent: pass
+    convergence_count_non_regression: pass
+    external_makespan_non_regression: pass
+
+test:
+  workloads: 16
+  method_runs: 32
+  jobs: 13632
+  automatic_external_wins: 14
+  external_speedup_over_mps:
+    minimum: 0.6427
+    median: 1.4842
+    maximum: 2.6277
+  pool_median_speedup:
+    P64: 2.1593
+    P512: 1.4034
+    P2048: 1.0533
+  pool_wins:
+    P64: 5
+    P512: 6
+    P2048: 3
+  pool_workloads:
+    P64: 5
+    P512: 6
+    P2048: 5
+  convergence:
+    automatic: 13632
+    ase_cuda_mps: 13632
+    tail_recovery_attempted: 0
+  automatic_external_time_fraction:
+    structure_model_setup_and_output: 0.590340
+    worker_execution: 0.246045
+    worker_startup: 0.100752
+    profiling: 0.011323
+  gates:
+    exact_identity_and_coverage: pass
+    requested_numerical_contract: pass
+    no_oom: pass
+    peak_reserved_memory_below_85_percent: pass
+    convergence_count_non_regression: pass
+    external_makespan_faster_than_mps_all_workloads: fail
+
+decision:
+  epoch1_refinement: accepted
+  epoch1_method_frozen: true
+  performance_scope: >-
+    Reliable wins on untouched P64 and P512 OMC-CSP workloads; mixed
+    family-dependent behavior at P2048 under eager parent materialization.
+  selected_next_bottleneck: structure_materialization_model_setup_and_output
+  rejected_next_targets:
+    - optimizer_change
+    - refill_change
+    - compaction_change
+    - graph_cache_change
+    - memory_recalibration
+
+next_action: isolate_manifest_backed_lazy_worker_materialization_in_epoch2

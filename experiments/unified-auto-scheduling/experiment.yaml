@@ -1,0 +1,12 @@
+schema_version: 1
+name: unified-auto-scheduling
+baseline_commit: 4ee8b18
+hypothesis: >-
+  Default deterministic scheduling can simplify the public interface without
+  changing explicit manual execution or optimizer results.
+performance_claim: none
+validation:
+  - default_auto_schedule
+  - explicit_single_batch_compatibility
+  - manual_refill_compatibility
+  - normalized_single_and_multi_device_metadata

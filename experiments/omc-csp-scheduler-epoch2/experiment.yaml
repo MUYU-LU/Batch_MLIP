@@ -1,0 +1,122 @@
+schema_version: 1
+id: omc-csp-scheduler-epoch2
+date: 2026-07-30
+status: validation_complete
+
+hypothesis: >-
+  Signed-sidecar planning plus worker-side lazy structure materialization
+  reduces OMC-CSP P2048 full-process makespan while preserving the exact
+  deterministic schedule, numerical contract, endpoints, and 85% memory gate.
+
+single_change:
+  id: manifest_backed_lazy_worker_materialization
+  parent:
+    planning_input: signed_layered_planning_profile
+    production_structures_loaded: false
+    representative_memory_probe_only: true
+  worker:
+    task_payload: immutable_source_descriptors
+    production_structure_loading: true
+  unchanged:
+    - optimizer
+    - cell_filter
+    - model_and_precision
+    - cutoff_and_skin
+    - resident_memory_planner
+    - chunk_partitioning
+    - work_stealing
+    - active_compaction
+    - refill_policy
+    - tail_recovery
+
+matrix:
+  workloads:
+    - OPT-OMC-SCHED-E1-TEST-JAYDUI-P2048-INTRA-NARROW-v2
+    - OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2
+    - OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2
+    - OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2
+    - OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2
+  methods:
+    source_backed_auto:
+      execution: new_run
+      timing_repeats: 1
+    eager_auto:
+      execution: reuse_frozen_epoch1_test
+    ase_cuda_mps_4_workers:
+      execution: reuse_frozen_epoch1_test
+  gpus: [0, 1, 2, 3, 4, 5, 6]
+
+contract:
+  mlip: AtomBit-smooth-rms-fp32
+  optimizer: BatchedBFGS
+  optimizer_dtype: torch.float64
+  cell_filter: FrechetCellFilter
+  cutoff_A: 6.0
+  skin_A: 0.5
+  force_mode: autograd
+  fmax_eV_per_A: 0.05
+  max_steps: 500
+  max_step_A: 0.2
+  alpha: 70.0
+  deterministic: true
+  cuda_allocator: expandable_segments
+  tail_recovery: ase_bfgs
+
+gates:
+  exact_identity_and_coverage: true
+  identical_plan_signature_to_eager: true
+  requested_numerical_contract: true
+  no_oom: true
+  peak_reserved_memory_fraction_per_gpu_max: 0.85
+  convergence_count_non_regression: true
+  external_makespan_improves_over_eager: true
+  test_results_do_not_define_final_default_policy: true
+
+outcome:
+  workloads: 5
+  jobs: 10240
+  plan_signatures_equal: 5
+  scientific_and_resource_gates: pass
+  source_backed_external_wins_over_eager: 5
+  source_backed_external_wins_over_mps: 5
+  aggregate_speedup_over_eager: 2.497997
+  aggregate_speedup_over_mps: 2.706537
+  median_speedup_over_eager: 2.421413
+  median_speedup_over_mps: 2.264015
+  convergence:
+    source_backed: 10240
+    eager: 10240
+    ase_cuda_mps: 10240
+  maximum_peak_reserved_memory_fraction: 0.720084
+  eager_structure_model_setup_output_seconds: 946.967346
+  source_backed_structure_model_setup_output_seconds: 13.951880
+  endpoint_difference_from_eager: exactly_zero
+  decision: accepted_after_regime_held_out_validation
+
+validation:
+  families: [BOQWIN, GUFJOG, KONTIQ, ROF-B, XAFPAY]
+  workloads: 5
+  jobs: 10240
+  tail_recovery: disabled_for_data_path_isolation
+  plan_signatures_equal: 5
+  endpoint_difference_from_eager: exactly_zero
+  scientific_and_resource_gates: pass
+  source_backed_external_wins_over_eager: 5
+  source_backed_external_wins_over_mps: 5
+  aggregate_speedup_over_eager: 1.736334
+  aggregate_speedup_over_mps: 3.279933
+  median_speedup_over_eager: 1.663532
+  median_speedup_over_mps: 2.827691
+  maximum_peak_reserved_memory_fraction: 0.761747
+  convergence_before_tail_recovery:
+    source_backed: 10146
+    eager: 10146
+    ase_cuda_mps: 10183
+
+decision:
+  mechanism: accepted
+  omc_csp_large_pool_default: manifest_backed_worker_materialization
+  ordinary_in_memory_interface: unchanged
+  deferred:
+    - offline_hardware_calibrated_outer_planner_binding
+    - asynchronous_worker_prefetch

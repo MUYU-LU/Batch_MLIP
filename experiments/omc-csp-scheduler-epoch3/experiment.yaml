@@ -1,0 +1,80 @@
+schema_version: 1
+id: omc-csp-scheduler-epoch3
+date: 2026-07-30
+status: capacity_validation_complete
+
+hypothesis: >-
+  An exact-contract signed H100 reserved-memory model can replace the
+  representative production probe while preserving outer workload buckets
+  and satisfying all per-chunk memory bounds.
+
+single_change:
+  id: signed_offline_hardware_capacity
+  matched_contract:
+    capacity_source: packaged_signed_peak_reserved_bytes_model
+    production_probe_system_count: 0
+    production_probe_model_forward_count: 0
+  unmatched_contract:
+    capacity_source: representative_probe_fallback
+  unchanged:
+    - task_profiler_and_outer_buckets
+    - optimizer_and_cell_filter
+    - model_and_precision
+    - cutoff_skin_and_neighbor_backend
+    - active_compaction_and_drain
+    - multi_gpu_work_stealing
+    - tail_recovery
+
+policy:
+  id: omc-csp-atombit-h100-capacity-v1
+  sha256: d8ed5cbbfd63d6e845eb3d552f628169a0c4e99f996f820c81299bdeafaf46fb
+  source_calibration_sha256: d27468326e2b7f464b37c8739d3d3bd219425081bdb96dabf0f250928c78b297
+  memory_metric: peak_reserved_bytes
+  memory_safety_fraction: 0.85
+  calibration_safety_factor: 1.026901080329114
+  optimization_growth_margin: 1.10
+
+matrix:
+  workloads:
+    - OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2
+    - OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2
+    - OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2
+  jobs_per_workload: 2048
+  jobs: 6144
+  timing_repeats: 1
+  gpus: [0, 1, 2, 3, 4, 5, 6]
+  references:
+    probe_backed_tensor: frozen_epoch2
+    ase_cuda_mps_4_workers: frozen_epoch1
+
+contract:
+  mlip: AtomBit-smooth-rms-fp32
+  optimizer: BatchedBFGS
+  optimizer_dtype: torch.float64
+  cell_filter: FrechetCellFilter
+  cutoff_A: 6.0
+  skin_A: 0.5
+  force_mode: autograd
+  fmax_eV_per_A: 0.05
+  max_steps: 500
+  deterministic: true
+  cuda_allocator: expandable_segments
+  tail_recovery: ase_bfgs
+
+capacity_gates:
+  exact_identity_and_coverage: true
+  exact_policy_contract_match: true
+  zero_production_probe: true
+  no_parent_production_materialization: true
+  predicted_chunk_bounds_hold: true
+  peak_reserved_memory_fraction_per_gpu_max: 0.85
+  convergence_count_non_regression: true
+
+endpoint_diagnostics:
+  tolerances_source: established_variable_cell_project_contract
+  energy_eV_per_atom: 0.0001
+  final_fmax_eV_per_A: 0.03
+  stress_tensor_eV_per_A3: 0.01
+  position_rmsd_A: 0.02
+  cell_rmsd_A: 0.02
+  optimizer_steps: diagnostic_only

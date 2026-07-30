@@ -17,6 +17,8 @@ from typing import Any, Protocol
 
 import torch.multiprocessing as torch_mp
 
+from .reproducibility import configure_reproducibility_from_environment
+
 
 @dataclass(frozen=True)
 class WorkerShard:
@@ -112,6 +114,25 @@ class PreparedTaskWorker(Protocol):
     def __call__(self, task: Any) -> Any: ...
 
 
+class PersistentTaskSource(Protocol):
+    """Parent-owned bounded producer for lazily prepared worker tasks."""
+
+    @property
+    def task_count(self) -> int: ...
+
+    def prepare(
+        self,
+        ordered_task_indices: Sequence[int],
+        *,
+        prefetch_capacity: int,
+        initial_dispatch_count: int,
+    ) -> None: ...
+
+    def resolve(self, task_index: int) -> Any: ...
+
+    def finish(self) -> None: ...
+
+
 TaskWorkerPreparer = Callable[[TaskWorker], PreparedTaskWorker]
 
 
@@ -145,6 +166,7 @@ def _install_worker_environment(
             os.environ.pop(name, None)
         else:
             os.environ[name] = value
+    configure_reproducibility_from_environment()
 
 
 def _use_persistent_tensor_sharing() -> None:
@@ -280,6 +302,7 @@ def _task_worker_entry(
     finish_event: Any,
 ) -> None:
     startup_started = time.perf_counter()
+    runner: PreparedTaskWorker | None = None
     try:
         _install_worker_environment(worker_environment)
         runner = prepare(worker)
@@ -308,6 +331,10 @@ def _task_worker_entry(
                 )
             )
             task_indices.append(int(task_index))
+        close = getattr(runner, "close", None)
+        if callable(close):
+            close()
+            runner = None
         result_queue.put(
             (
                 "done",
@@ -324,6 +351,13 @@ def _task_worker_entry(
         finish_event.wait()
     except Exception:
         error = traceback.format_exc()
+        if runner is not None:
+            close = getattr(runner, "close", None)
+            if callable(close):
+                try:
+                    close()
+                except Exception:
+                    pass
         ready_queue.put((worker.worker_id, None, error))
         result_queue.put(
             ("error", worker.worker_id, None, None, None, error)
@@ -340,6 +374,7 @@ def _persistent_task_worker_entry(
     shutdown_acknowledged: Any,
 ) -> None:
     startup_started = time.perf_counter()
+    runner: PreparedTaskWorker | None = None
     try:
         _use_persistent_tensor_sharing()
         # The parent receives every task before requesting shutdown. Avoid
@@ -359,6 +394,10 @@ def _persistent_task_worker_entry(
         while True:
             item = task_queue.get()
             if item is None:
+                close = getattr(runner, "close", None)
+                if callable(close):
+                    close()
+                    runner = None
                 shutdown_acknowledged.set()
                 return
             call_id, task_index, task = item
@@ -376,6 +415,13 @@ def _persistent_task_worker_entry(
             )
     except Exception:
         error = traceback.format_exc()
+        if runner is not None:
+            close = getattr(runner, "close", None)
+            if callable(close):
+                try:
+                    close()
+                except Exception:
+                    pass
         ready_queue.put((worker.worker_id, None, os.getpid(), error))
         result_queue.put((None, worker.worker_id, None, None, None, error))
 
@@ -806,14 +852,55 @@ class PersistentTaskPool:
         costs: Sequence[float],
     ) -> PersistentTaskExecution:
         normalized_tasks = tuple(tasks)
+        return self._execute(
+            task_count=len(normalized_tasks),
+            costs=costs,
+            resolve_task=normalized_tasks.__getitem__,
+        )
+
+    def execute_source(
+        self,
+        source: PersistentTaskSource,
+        costs: Sequence[float],
+        *,
+        prefetch_depth: int = 1,
+    ) -> PersistentTaskExecution:
+        """Execute a bounded lazy source without binding prefetched tasks."""
+
+        if (
+            isinstance(prefetch_depth, bool)
+            or not isinstance(prefetch_depth, int)
+            or prefetch_depth < 0
+        ):
+            raise ValueError("prefetch_depth must be a non-negative integer")
+        return self._execute(
+            task_count=source.task_count,
+            costs=costs,
+            resolve_task=source.resolve,
+            source=source,
+            prefetch_capacity=min(
+                source.task_count,
+                len(self._workers) * (1 + prefetch_depth),
+            ),
+        )
+
+    def _execute(
+        self,
+        *,
+        task_count: int,
+        costs: Sequence[float],
+        resolve_task: Callable[[int], Any],
+        source: PersistentTaskSource | None = None,
+        prefetch_capacity: int = 0,
+    ) -> PersistentTaskExecution:
         normalized_costs = tuple(float(cost) for cost in costs)
         if self._closed:
             raise RuntimeError("persistent task pool is closed")
         if self._broken:
             raise RuntimeError("persistent task pool is broken")
-        if not normalized_tasks:
+        if task_count <= 0:
             raise ValueError("tasks must not be empty")
-        if len(normalized_tasks) != len(normalized_costs):
+        if task_count != len(normalized_costs):
             raise ValueError("tasks and costs must have the same length")
         if any(not math.isfinite(cost) or cost <= 0.0 for cost in normalized_costs):
             raise ValueError("costs must be finite and positive")
@@ -823,18 +910,10 @@ class PersistentTaskPool:
             call_id = self._call_id
             pending = deque(
                 sorted(
-                    range(len(normalized_tasks)),
+                    range(task_count),
                     key=lambda index: (-normalized_costs[index], index),
                 )
             )
-            for worker in self._workers:
-                if not pending:
-                    break
-                task_index = pending.popleft()
-                self._task_queues[worker.worker_id].put(
-                    (call_id, task_index, normalized_tasks[task_index])
-                )
-
             started = time.perf_counter()
             deadline = started + self._run_timeout_seconds
             outputs: dict[int, TaskResult] = {}
@@ -845,7 +924,28 @@ class PersistentTaskPool:
                 worker.worker_id: 0.0 for worker in self._workers
             }
             try:
-                while len(outputs) < len(normalized_tasks):
+                if source is not None:
+                    source.prepare(
+                        tuple(pending),
+                        prefetch_capacity=prefetch_capacity,
+                        initial_dispatch_count=min(
+                            len(self._workers),
+                            task_count,
+                        ),
+                    )
+                for worker in self._workers:
+                    if not pending:
+                        break
+                    task_index = pending.popleft()
+                    self._task_queues[worker.worker_id].put(
+                        (
+                            call_id,
+                            task_index,
+                            resolve_task(task_index),
+                        )
+                    )
+
+                while len(outputs) < task_count:
                     (
                         returned_call_id,
                         worker_id,
@@ -887,18 +987,21 @@ class PersistentTaskPool:
                             (
                                 call_id,
                                 next_index,
-                                normalized_tasks[next_index],
+                                resolve_task(next_index),
                             )
                         )
             except BaseException:
                 self._broken = True
                 _terminate(self._processes)
                 raise
+            finally:
+                if source is not None:
+                    source.finish()
 
             return PersistentTaskExecution(
                 call_id=call_id,
                 task_results=tuple(
-                    outputs[index] for index in range(len(normalized_tasks))
+                    outputs[index] for index in range(task_count)
                 ),
                 worker_results=tuple(
                     TaskWorkerResult(

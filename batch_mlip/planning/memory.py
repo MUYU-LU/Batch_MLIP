@@ -11,6 +11,7 @@ import numpy as np
 from ase import Atoms
 
 from ..core.neighbors import neighbor_list
+from .profiles import BoundSystemCostProfile, HardwareBoundCostModel
 
 
 @dataclass(frozen=True)
@@ -134,12 +135,55 @@ def fit_memory_coefficients(
 
 @dataclass(frozen=True)
 class SystemProfile:
-    """Static graph and optimizer work estimate for one input structure."""
+    """Legacy scalar projection of a bound layered cost profile.
+
+    ``edge_count`` is the execution candidate-edge count and ``dof_squared`` is
+    the task-bound dense-coordinate dimension squared. New code should populate
+    ``bound_cost`` and use its explicit layers as the semantic source.
+    """
 
     index: int
     atom_count: int
     edge_count: int
     dof_squared: int
+    bound_cost: BoundSystemCostProfile | None = None
+
+    def __post_init__(self) -> None:
+        if self.index < 0 or self.atom_count <= 0:
+            raise ValueError("system profile index and atom count are invalid")
+        if self.edge_count < 0 or self.dof_squared <= 0:
+            raise ValueError("edge and dimension counts are invalid")
+        if self.bound_cost is None:
+            return
+        if self.bound_cost.index != self.index:
+            raise ValueError("bound cost index differs from system profile")
+        if self.bound_cost.structure.atom_count != self.atom_count:
+            raise ValueError("bound cost atom count differs from system profile")
+        if (
+            self.bound_cost.graph_execution.candidate_edge_count
+            != self.edge_count
+        ):
+            raise ValueError("bound candidate edges differ from system profile")
+        if (
+            self.bound_cost.task_auxiliary.generalized_dimension**2
+            != self.dof_squared
+        ):
+            raise ValueError("bound task dimension differs from system profile")
+
+    @classmethod
+    def from_bound_cost(
+        cls,
+        profile: BoundSystemCostProfile,
+    ) -> SystemProfile:
+        """Project explicit layers into the scheduler-v1 scalar interface."""
+
+        return cls(
+            index=profile.index,
+            atom_count=profile.structure.atom_count,
+            edge_count=profile.graph_execution.candidate_edge_count,
+            dof_squared=profile.task_auxiliary.generalized_dimension**2,
+            bound_cost=profile,
+        )
 
 
 @dataclass(frozen=True)
@@ -312,3 +356,114 @@ class BatchPlanner:
         profiles = self.profile_systems(systems, cutoff=cutoff, skin=skin)
         elapsed = time.perf_counter() - started
         return self.plan_profiles(profiles, profiling_seconds=elapsed)
+
+
+class HardwareCalibratedBatchPlanner(BatchPlanner):
+    """Memory planner driven by one signed layered byte model."""
+
+    def __init__(
+        self,
+        model: HardwareBoundCostModel,
+        *,
+        memory_budget_bytes: int | None = None,
+        max_batch_size: int | None = None,
+        max_cost_ratio: float = 2.0,
+        prediction_margin: float = 1.0,
+    ) -> None:
+        if model.metric != "bytes":
+            raise ValueError("hardware-calibrated batch planning requires bytes")
+        if not math.isfinite(prediction_margin) or prediction_margin < 1.0:
+            raise ValueError("prediction_margin must be finite and at least one")
+        budget = (
+            math.floor(
+                model.hardware.total_memory_bytes
+                * model.hardware.memory_safety_fraction
+            )
+            if memory_budget_bytes is None
+            else memory_budget_bytes
+        )
+        super().__init__(
+            MemoryCoefficients(0.0, 0.0, 0.0, 0.0),
+            memory_budget_bytes=budget,
+            max_batch_size=max_batch_size,
+            max_cost_ratio=max_cost_ratio,
+        )
+        self.hardware_model = model
+        self.prediction_margin = prediction_margin
+
+    @property
+    def _fixed_bytes(self) -> int:
+        return math.ceil(
+            self.prediction_margin
+            * self.hardware_model.safety_factor
+            * self.hardware_model.coefficients.fixed
+        )
+
+    def _incremental_bytes(self, profile: SystemProfile) -> int:
+        if profile.bound_cost is None:
+            raise ValueError(
+                "hardware-calibrated planning requires bound layered profiles"
+            )
+        singleton = (
+            self.prediction_margin
+            * self.hardware_model.estimate(profile.bound_cost)
+        )
+        return max(0, math.ceil(singleton - self._fixed_bytes))
+
+    def incremental_profile_bytes(self, profile: SystemProfile) -> int:
+        """Return one profile's calibrated cost excluding the batch intercept."""
+
+        return self._incremental_bytes(profile)
+
+    def estimate_profiles_bytes(
+        self,
+        profiles: Sequence[SystemProfile],
+    ) -> int:
+        """Estimate one batch from its exact bound layered features."""
+
+        bound = []
+        for profile in profiles:
+            if profile.bound_cost is None:
+                raise ValueError(
+                    "hardware-calibrated planning requires bound layered profiles"
+                )
+            bound.append(profile.bound_cost)
+        return math.ceil(
+            self.prediction_margin
+            * self.hardware_model.estimate_batch(bound)
+        )
+
+    def _resident_capacity(
+        self,
+        profiles: Sequence[SystemProfile],
+    ) -> tuple[int, int]:
+        resident: list[SystemProfile] = []
+        predicted = self._fixed_bytes
+        capacity = 0
+        for profile in sorted(
+            profiles,
+            key=self._incremental_bytes,
+            reverse=True,
+        ):
+            if self.max_batch_size is not None and capacity >= self.max_batch_size:
+                break
+            candidate_profiles = [*resident, profile]
+            candidate = self.estimate_profiles_bytes(candidate_profiles)
+            if candidate > self.memory_budget_bytes:
+                break
+            resident = candidate_profiles
+            predicted = candidate
+            capacity += 1
+        if capacity == 0:
+            raise MemoryError("one system exceeds the configured memory budget")
+        return capacity, predicted
+
+    def plan_bound_profiles(
+        self,
+        profiles: Sequence[BoundSystemCostProfile],
+    ) -> BatchPlan:
+        """Bucket and size already bound profiles without an online probe."""
+
+        return self.plan_profiles(
+            tuple(SystemProfile.from_bound_cost(profile) for profile in profiles)
+        )

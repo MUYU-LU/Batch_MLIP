@@ -7,6 +7,12 @@ runtime:
   device: cuda
   dtype: float32
   skin: 0.5
+  reproducibility:
+    seed: 20260729
+    deterministic_algorithms: true
+    allow_tf32: false
+    cpu_threads: 1
+    interop_threads: 1
 
 model:
   factory: examples.atombit_loader:load_pickled_model

@@ -22,6 +22,10 @@ from ..dynamics.integrators import (
     initialize_maxwell_boltzmann,
 )
 from ..dynamics.mtk import batched_isotropic_mtk
+from ..execution.reproducibility import (
+    ReproducibilityConfig,
+    configure_reproducibility,
+)
 from ..models.loaders import build_model, infer_cutoff, load_e0, parse_dtype
 from ..models.potential import AtomBitBatchCalculator
 from ..optimization.cell_filters import GPA_TO_EV_PER_A3, FrechetCellFilter
@@ -36,6 +40,24 @@ def _as_mapping(value: Any, context: str) -> dict[str, Any]:
     if not isinstance(value, Mapping):
         raise TypeError(f"{context} must be a mapping")
     return dict(value)
+
+
+def _configure_runtime_reproducibility(
+    config: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    runtime = _as_mapping(config.get("runtime"), "runtime")
+    value = runtime.get("reproducibility")
+    if value is None or value is False:
+        return None
+    options = {} if value is True else _as_mapping(
+        value,
+        "runtime.reproducibility",
+    )
+    require_hash = bool(options.pop("require_preconfigured_python_hash", False))
+    return configure_reproducibility(
+        ReproducibilityConfig(**options),
+        require_preconfigured_python_hash=require_hash,
+    )
 
 
 def _prepare(config: Mapping[str, Any]):
@@ -132,13 +154,14 @@ def _json_value(value: Any) -> Any:
         return value.detach().cpu().tolist()
     if isinstance(value, Mapping):
         return {str(key): _json_value(item) for key, item in value.items()}
-    if isinstance(value, (list, tuple)):
+    if isinstance(value, list | tuple):
         return [_json_value(item) for item in value]
     return value
 
 
 def run_config(config_path: str | Path) -> dict[str, Any]:
     config = load_yaml(config_path)
+    reproducibility = _configure_runtime_reproducibility(config)
     task = str(required(config, "task", "config")).lower()
     output = Path(str(required(config, "output", "config")))
 
@@ -268,6 +291,7 @@ def run_config(config_path: str | Path) -> dict[str, Any]:
             **result_summary,
         }
     )
+    summary["reproducibility"] = reproducibility
 
     reporting = _as_mapping(config.get("reporting"), "reporting")
     summary_path = Path(
@@ -280,6 +304,7 @@ def run_config(config_path: str | Path) -> dict[str, Any]:
 
 def validate_batch(config_path: str | Path) -> dict[str, Any]:
     config = load_yaml(config_path)
+    reproducibility = _configure_runtime_reproducibility(config)
     state, potential, model, input_file = _prepare(config)
     batch_eval = potential(state, neighbor_policy="auto")
 
@@ -311,6 +336,7 @@ def validate_batch(config_path: str | Path) -> dict[str, Any]:
         "max_abs_force_error": force_error,
         "cross_system_edges": False,
         "passed": bool(energy_error < 1e-9 and force_error < 1e-8),
+        "reproducibility": reproducibility,
     }
     output = Path(str(config.get("validation_output", "validation.json")))
     output.parent.mkdir(parents=True, exist_ok=True)

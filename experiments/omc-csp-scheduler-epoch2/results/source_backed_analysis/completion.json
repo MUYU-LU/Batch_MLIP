@@ -1,0 +1,220 @@
+{
+  "devices": "0,1,2,3,4,5,6",
+  "experiment": "omc_csp_scheduler_epoch2_source_backed_ablation",
+  "schema_version": 1,
+  "status": "complete",
+  "timing_repeats": 1,
+  "workload_count": 5,
+  "workloads": [
+    {
+      "frozen_references": {
+        "ase_cuda_mps": {
+          "path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-JAYDUI-P2048-INTRA-NARROW-v2/ase_cuda_mps.json",
+          "sha256": "da8c8f98635c6ded9e17ddb17f019ba26851ba7633bf86dc88892c373278d6e7"
+        },
+        "eager": {
+          "path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-JAYDUI-P2048-INTRA-NARROW-v2/current_auto.json",
+          "sha256": "3c0777487d671a4487c6b3d293c66bc40ee1cc2292172deb0d7f37a5cf268e3a"
+        }
+      },
+      "plan_signature_equal": true,
+      "source_backed": {
+        "command": [
+          "/public/home/lmy/.conda/envs/lmy/bin/python",
+          "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+          "--manifest",
+          "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-JAYDUI-P2048-INTRA-NARROW-v2.json",
+          "--planning-profile",
+          "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_planning_profiles_v2/OPT-OMC-SCHED-E1-TEST-JAYDUI-P2048-INTRA-NARROW-v2.json",
+          "--dataset-dir",
+          "/public/home/lmy/Batch_imple_project/test_set",
+          "--checkpoint",
+          "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+          "--devices",
+          "0,1,2,3,4,5,6",
+          "--materialization",
+          "manifest_lazy",
+          "--tail-recovery",
+          "ase_bfgs",
+          "--output",
+          "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch2/results/source_backed_p2048_v1/OPT-OMC-SCHED-E1-TEST-JAYDUI-P2048-INTRA-NARROW-v2/source_backed_auto.json"
+        ],
+        "external_process_wall_seconds": 47.633417850825936,
+        "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch2/results/source_backed_p2048_v1/OPT-OMC-SCHED-E1-TEST-JAYDUI-P2048-INTRA-NARROW-v2/source_backed_auto.log",
+        "output": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch2/results/source_backed_p2048_v1/OPT-OMC-SCHED-E1-TEST-JAYDUI-P2048-INTRA-NARROW-v2/source_backed_auto.json",
+        "output_sha256": "488e675ec7c8c58fd4617d1b0d38d0e3e1a3ac75d9a313f3a5d9a825a24d1e6c",
+        "returncode": 0
+      },
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-JAYDUI-P2048-INTRA-NARROW-v2",
+      "workload_manifest_sha256": "398fe84812ff6f59ce96e4cb8ee95c0a82eef95b0bb41730dfa0d28f0fe9a03b"
+    },
+    {
+      "frozen_references": {
+        "ase_cuda_mps": {
+          "path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2/ase_cuda_mps.json",
+          "sha256": "cbb178055ec20f98e1949ae18e50dca573b8162305e82746767f02c5921a33b8"
+        },
+        "eager": {
+          "path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2/current_auto.json",
+          "sha256": "7cde1debf49b6cc6dc0e2efe83b12d7b582b8fc4e3634ae7dc2505ba692fd1c2"
+        }
+      },
+      "plan_signature_equal": true,
+      "source_backed": {
+        "command": [
+          "/public/home/lmy/.conda/envs/lmy/bin/python",
+          "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+          "--manifest",
+          "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2.json",
+          "--planning-profile",
+          "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_planning_profiles_v2/OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2.json",
+          "--dataset-dir",
+          "/public/home/lmy/Batch_imple_project/test_set",
+          "--checkpoint",
+          "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+          "--devices",
+          "0,1,2,3,4,5,6",
+          "--materialization",
+          "manifest_lazy",
+          "--tail-recovery",
+          "ase_bfgs",
+          "--output",
+          "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch2/results/source_backed_p2048_v1/OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2/source_backed_auto.json"
+        ],
+        "external_process_wall_seconds": 210.56333734793589,
+        "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch2/results/source_backed_p2048_v1/OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2/source_backed_auto.log",
+        "output": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch2/results/source_backed_p2048_v1/OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2/source_backed_auto.json",
+        "output_sha256": "25635b0f9c39187efc8dc6553ff84e0276b70f4d432ca1bf040c8bbb4ae22738",
+        "returncode": 0
+      },
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2",
+      "workload_manifest_sha256": "68dacfd500f151612ef193f1cc930085c146cc46b681e9025dd936e579436e47"
+    },
+    {
+      "frozen_references": {
+        "ase_cuda_mps": {
+          "path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2/ase_cuda_mps.json",
+          "sha256": "a3ccac316a3cee879a236dc1f5506f6d7c16662d5051d308cac9d1ae378edb8d"
+        },
+        "eager": {
+          "path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2/current_auto.json",
+          "sha256": "b6ea311b0063a8f2f78b1debb1b1d341d7de2a2d9161821f6e5d0473d2398127"
+        }
+      },
+      "plan_signature_equal": true,
+      "source_backed": {
+        "command": [
+          "/public/home/lmy/.conda/envs/lmy/bin/python",
+          "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+          "--manifest",
+          "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2.json",
+          "--planning-profile",
+          "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_planning_profiles_v2/OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2.json",
+          "--dataset-dir",
+          "/public/home/lmy/Batch_imple_project/test_set",
+          "--checkpoint",
+          "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+          "--devices",
+          "0,1,2,3,4,5,6",
+          "--materialization",
+          "manifest_lazy",
+          "--tail-recovery",
+          "ase_bfgs",
+          "--output",
+          "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch2/results/source_backed_p2048_v1/OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2/source_backed_auto.json"
+        ],
+        "external_process_wall_seconds": 138.88653837470338,
+        "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch2/results/source_backed_p2048_v1/OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2/source_backed_auto.log",
+        "output": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch2/results/source_backed_p2048_v1/OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2/source_backed_auto.json",
+        "output_sha256": "efcad7caab7030adf87806718d246cdf4c33bae54db6c94024f0f8e04ee73f57",
+        "returncode": 0
+      },
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2",
+      "workload_manifest_sha256": "53442cc94cad00a06f2243ae479f068c60ebf91c00c98d882ba667238b9a379a"
+    },
+    {
+      "frozen_references": {
+        "ase_cuda_mps": {
+          "path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2/ase_cuda_mps.json",
+          "sha256": "a7a1999b17dda4ebdb789e02caadd886e6a3e965b717dc97efa7a9ad569efa98"
+        },
+        "eager": {
+          "path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2/current_auto.json",
+          "sha256": "f6527c4dc45ad676c35e3367db28bc8d4164ec10979ac4a116f4d22c28fc0bc1"
+        }
+      },
+      "plan_signature_equal": true,
+      "source_backed": {
+        "command": [
+          "/public/home/lmy/.conda/envs/lmy/bin/python",
+          "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+          "--manifest",
+          "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2.json",
+          "--planning-profile",
+          "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_planning_profiles_v2/OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2.json",
+          "--dataset-dir",
+          "/public/home/lmy/Batch_imple_project/test_set",
+          "--checkpoint",
+          "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+          "--devices",
+          "0,1,2,3,4,5,6",
+          "--materialization",
+          "manifest_lazy",
+          "--tail-recovery",
+          "ase_bfgs",
+          "--output",
+          "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch2/results/source_backed_p2048_v1/OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2/source_backed_auto.json"
+        ],
+        "external_process_wall_seconds": 93.64476616261527,
+        "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch2/results/source_backed_p2048_v1/OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2/source_backed_auto.log",
+        "output": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch2/results/source_backed_p2048_v1/OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2/source_backed_auto.json",
+        "output_sha256": "71a5a97ced522250a020d26ff7b73fb38cc683649d202cc1e3a2d112d1460db6",
+        "returncode": 0
+      },
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2",
+      "workload_manifest_sha256": "a8aa05178634172b53197afee1325e5a37e2e9fbc2921aaa332a4c4209627da8"
+    },
+    {
+      "frozen_references": {
+        "ase_cuda_mps": {
+          "path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2/ase_cuda_mps.json",
+          "sha256": "22b053e2898f3589b1f52db0b7cca75b452ff84fa2b12ce0c9a3b02a8e219ae8"
+        },
+        "eager": {
+          "path": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2/current_auto.json",
+          "sha256": "90edae5a80829aff8b6047c2f0db19b03367c852865b54ff1efe7ff5cf3cdc0a"
+        }
+      },
+      "plan_signature_equal": true,
+      "source_backed": {
+        "command": [
+          "/public/home/lmy/.conda/envs/lmy/bin/python",
+          "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+          "--manifest",
+          "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2.json",
+          "--planning-profile",
+          "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_planning_profiles_v2/OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2.json",
+          "--dataset-dir",
+          "/public/home/lmy/Batch_imple_project/test_set",
+          "--checkpoint",
+          "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+          "--devices",
+          "0,1,2,3,4,5,6",
+          "--materialization",
+          "manifest_lazy",
+          "--tail-recovery",
+          "ase_bfgs",
+          "--output",
+          "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch2/results/source_backed_p2048_v1/OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2/source_backed_auto.json"
+        ],
+        "external_process_wall_seconds": 79.93288198020309,
+        "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch2/results/source_backed_p2048_v1/OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2/source_backed_auto.log",
+        "output": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch2/results/source_backed_p2048_v1/OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2/source_backed_auto.json",
+        "output_sha256": "3c3e799def55447adfc116296c3f3ecced69debcd66bcb24ac14e3d316cc4239",
+        "returncode": 0
+      },
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2",
+      "workload_manifest_sha256": "ec9d6f04a1f9674c433336c423fa3c489241315caf3d4bb504750224fbac29dd"
+    }
+  ]
+}

@@ -1,0 +1,476 @@
+{
+  "execution_contract": {
+    "cell_filter": "FrechetCellFilter",
+    "cuda_allocator": "expandable_segments",
+    "cutoff_A": 6.0,
+    "deterministic": true,
+    "force_mode": "autograd",
+    "max_steps": 3,
+    "measured_executions": 1,
+    "mlip": "AtomBit-smooth-rms-fp32",
+    "neighbor_backend": "auto",
+    "optimizer": "BatchedBFGS",
+    "optimizer_dtype": "torch.float64",
+    "scheduling": "single_batch",
+    "skin_A": 0.5,
+    "warm_executions": 1
+  },
+  "families": {
+    "OPT-OMC-BOQWIN-P512-INTRA-NARROW-v1": {
+      "bucket_count": 2,
+      "family": "BOQWIN",
+      "memory_budget_bytes": 72300757811,
+      "resident_capacity": 232,
+      "split": "fit"
+    },
+    "OPT-OMC-HAMTIZ-P512-INTRA-NARROW-v1": {
+      "bucket_count": 2,
+      "family": "HAMTIZ",
+      "memory_budget_bytes": 72300757811,
+      "resident_capacity": 258,
+      "split": "fit"
+    },
+    "OPT-OMC-JAYDUI-P512-INTRA-NARROW-v1": {
+      "bucket_count": 3,
+      "family": "JAYDUI",
+      "memory_budget_bytes": 72300757811,
+      "resident_capacity": 375,
+      "split": "fit"
+    },
+    "OPT-OMC-KONTIQ-P512-INTRA-NARROW-v1": {
+      "bucket_count": 2,
+      "family": "KONTIQ",
+      "memory_budget_bytes": 72300757811,
+      "resident_capacity": 390,
+      "split": "fit"
+    },
+    "OPT-OMC-NACJAF-P512-INTRA-NARROW-v1": {
+      "bucket_count": 2,
+      "family": "NACJAF",
+      "memory_budget_bytes": 72300757811,
+      "resident_capacity": 376,
+      "split": "fit"
+    },
+    "OPT-OMC-OBEQUJ-P512-INTRA-NARROW-v1": {
+      "bucket_count": 2,
+      "family": "OBEQUJ",
+      "memory_budget_bytes": 72300757811,
+      "resident_capacity": 256,
+      "split": "validation"
+    },
+    "OPT-OMC-PAHYON-P512-INTRA-NARROW-v1": {
+      "bucket_count": 3,
+      "family": "PAHYON",
+      "memory_budget_bytes": 72300757811,
+      "resident_capacity": 289,
+      "split": "validation"
+    },
+    "OPT-OMC-ROF-C-P512-INTRA-WIDE-v1": {
+      "bucket_count": 2,
+      "family": "ROF-C",
+      "memory_budget_bytes": 72300757811,
+      "resident_capacity": 381,
+      "split": "validation"
+    },
+    "OPT-OMC-SOXLEX-P512-INTRA-NARROW-v1": {
+      "bucket_count": 3,
+      "family": "SOXLEX",
+      "memory_budget_bytes": 72300757811,
+      "resident_capacity": 377,
+      "split": "fit"
+    },
+    "OPT-OMC-WICZUF-P512-INTRA-NARROW-v1": {
+      "bucket_count": 2,
+      "family": "WICZUF",
+      "memory_budget_bytes": 72300757811,
+      "resident_capacity": 262,
+      "split": "fit"
+    },
+    "OPT-OMC-XAFPAY-P512-INTRA-WIDE-v1": {
+      "bucket_count": 3,
+      "family": "XAFPAY",
+      "memory_budget_bytes": 72300757811,
+      "resident_capacity": 227,
+      "split": "fit"
+    }
+  },
+  "points": [
+    {
+      "batch_size": 16,
+      "family": "SOXLEX",
+      "indices_json": "selections/expanded-fit-SOXLEX-small-B16.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-fit-SOXLEX-small-B16",
+      "pool_size": 512,
+      "scale": "small",
+      "split": "fit",
+      "workload_id": "OPT-OMC-SOXLEX-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 128,
+      "family": "SOXLEX",
+      "indices_json": "selections/expanded-fit-SOXLEX-knee-B128.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-fit-SOXLEX-knee-B128",
+      "pool_size": 512,
+      "scale": "knee",
+      "split": "fit",
+      "workload_id": "OPT-OMC-SOXLEX-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 377,
+      "family": "SOXLEX",
+      "indices_json": "selections/expanded-fit-SOXLEX-near_capacity-B377.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-fit-SOXLEX-near_capacity-B377",
+      "pool_size": 512,
+      "scale": "near_capacity",
+      "split": "fit",
+      "workload_id": "OPT-OMC-SOXLEX-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 16,
+      "family": "JAYDUI",
+      "indices_json": "selections/expanded-fit-JAYDUI-small-B16.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-fit-JAYDUI-small-B16",
+      "pool_size": 512,
+      "scale": "small",
+      "split": "fit",
+      "workload_id": "OPT-OMC-JAYDUI-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 128,
+      "family": "JAYDUI",
+      "indices_json": "selections/expanded-fit-JAYDUI-knee-B128.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-fit-JAYDUI-knee-B128",
+      "pool_size": 512,
+      "scale": "knee",
+      "split": "fit",
+      "workload_id": "OPT-OMC-JAYDUI-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 375,
+      "family": "JAYDUI",
+      "indices_json": "selections/expanded-fit-JAYDUI-near_capacity-B375.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-fit-JAYDUI-near_capacity-B375",
+      "pool_size": 512,
+      "scale": "near_capacity",
+      "split": "fit",
+      "workload_id": "OPT-OMC-JAYDUI-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 16,
+      "family": "NACJAF",
+      "indices_json": "selections/expanded-fit-NACJAF-small-B16.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-fit-NACJAF-small-B16",
+      "pool_size": 512,
+      "scale": "small",
+      "split": "fit",
+      "workload_id": "OPT-OMC-NACJAF-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 128,
+      "family": "NACJAF",
+      "indices_json": "selections/expanded-fit-NACJAF-knee-B128.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-fit-NACJAF-knee-B128",
+      "pool_size": 512,
+      "scale": "knee",
+      "split": "fit",
+      "workload_id": "OPT-OMC-NACJAF-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 376,
+      "family": "NACJAF",
+      "indices_json": "selections/expanded-fit-NACJAF-near_capacity-B376.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-fit-NACJAF-near_capacity-B376",
+      "pool_size": 512,
+      "scale": "near_capacity",
+      "split": "fit",
+      "workload_id": "OPT-OMC-NACJAF-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 16,
+      "family": "KONTIQ",
+      "indices_json": "selections/expanded-fit-KONTIQ-small-B16.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-fit-KONTIQ-small-B16",
+      "pool_size": 512,
+      "scale": "small",
+      "split": "fit",
+      "workload_id": "OPT-OMC-KONTIQ-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 128,
+      "family": "KONTIQ",
+      "indices_json": "selections/expanded-fit-KONTIQ-knee-B128.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-fit-KONTIQ-knee-B128",
+      "pool_size": 512,
+      "scale": "knee",
+      "split": "fit",
+      "workload_id": "OPT-OMC-KONTIQ-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 390,
+      "family": "KONTIQ",
+      "indices_json": "selections/expanded-fit-KONTIQ-near_capacity-B390.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-fit-KONTIQ-near_capacity-B390",
+      "pool_size": 512,
+      "scale": "near_capacity",
+      "split": "fit",
+      "workload_id": "OPT-OMC-KONTIQ-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 16,
+      "family": "HAMTIZ",
+      "indices_json": "selections/expanded-fit-HAMTIZ-small-B16.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-fit-HAMTIZ-small-B16",
+      "pool_size": 512,
+      "scale": "small",
+      "split": "fit",
+      "workload_id": "OPT-OMC-HAMTIZ-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 128,
+      "family": "HAMTIZ",
+      "indices_json": "selections/expanded-fit-HAMTIZ-knee-B128.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-fit-HAMTIZ-knee-B128",
+      "pool_size": 512,
+      "scale": "knee",
+      "split": "fit",
+      "workload_id": "OPT-OMC-HAMTIZ-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 258,
+      "family": "HAMTIZ",
+      "indices_json": "selections/expanded-fit-HAMTIZ-near_capacity-B258.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-fit-HAMTIZ-near_capacity-B258",
+      "pool_size": 512,
+      "scale": "near_capacity",
+      "split": "fit",
+      "workload_id": "OPT-OMC-HAMTIZ-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 16,
+      "family": "BOQWIN",
+      "indices_json": "selections/expanded-fit-BOQWIN-small-B16.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-fit-BOQWIN-small-B16",
+      "pool_size": 512,
+      "scale": "small",
+      "split": "fit",
+      "workload_id": "OPT-OMC-BOQWIN-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 128,
+      "family": "BOQWIN",
+      "indices_json": "selections/expanded-fit-BOQWIN-knee-B128.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-fit-BOQWIN-knee-B128",
+      "pool_size": 512,
+      "scale": "knee",
+      "split": "fit",
+      "workload_id": "OPT-OMC-BOQWIN-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 232,
+      "family": "BOQWIN",
+      "indices_json": "selections/expanded-fit-BOQWIN-near_capacity-B232.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-fit-BOQWIN-near_capacity-B232",
+      "pool_size": 512,
+      "scale": "near_capacity",
+      "split": "fit",
+      "workload_id": "OPT-OMC-BOQWIN-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 16,
+      "family": "WICZUF",
+      "indices_json": "selections/expanded-fit-WICZUF-small-B16.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-fit-WICZUF-small-B16",
+      "pool_size": 512,
+      "scale": "small",
+      "split": "fit",
+      "workload_id": "OPT-OMC-WICZUF-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 128,
+      "family": "WICZUF",
+      "indices_json": "selections/expanded-fit-WICZUF-knee-B128.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-fit-WICZUF-knee-B128",
+      "pool_size": 512,
+      "scale": "knee",
+      "split": "fit",
+      "workload_id": "OPT-OMC-WICZUF-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 262,
+      "family": "WICZUF",
+      "indices_json": "selections/expanded-fit-WICZUF-near_capacity-B262.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-fit-WICZUF-near_capacity-B262",
+      "pool_size": 512,
+      "scale": "near_capacity",
+      "split": "fit",
+      "workload_id": "OPT-OMC-WICZUF-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 16,
+      "family": "XAFPAY",
+      "indices_json": "selections/expanded-fit-XAFPAY-small-B16.json",
+      "mixing": "INTRA-WIDE",
+      "observation_id": "expanded-fit-XAFPAY-small-B16",
+      "pool_size": 512,
+      "scale": "small",
+      "split": "fit",
+      "workload_id": "OPT-OMC-XAFPAY-P512-INTRA-WIDE-v1"
+    },
+    {
+      "batch_size": 128,
+      "family": "XAFPAY",
+      "indices_json": "selections/expanded-fit-XAFPAY-knee-B128.json",
+      "mixing": "INTRA-WIDE",
+      "observation_id": "expanded-fit-XAFPAY-knee-B128",
+      "pool_size": 512,
+      "scale": "knee",
+      "split": "fit",
+      "workload_id": "OPT-OMC-XAFPAY-P512-INTRA-WIDE-v1"
+    },
+    {
+      "batch_size": 227,
+      "family": "XAFPAY",
+      "indices_json": "selections/expanded-fit-XAFPAY-near_capacity-B227.json",
+      "mixing": "INTRA-WIDE",
+      "observation_id": "expanded-fit-XAFPAY-near_capacity-B227",
+      "pool_size": 512,
+      "scale": "near_capacity",
+      "split": "fit",
+      "workload_id": "OPT-OMC-XAFPAY-P512-INTRA-WIDE-v1"
+    },
+    {
+      "batch_size": 16,
+      "family": "PAHYON",
+      "indices_json": "selections/expanded-validation-PAHYON-small-B16.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-validation-PAHYON-small-B16",
+      "pool_size": 512,
+      "scale": "small",
+      "split": "validation",
+      "workload_id": "OPT-OMC-PAHYON-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 128,
+      "family": "PAHYON",
+      "indices_json": "selections/expanded-validation-PAHYON-knee-B128.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-validation-PAHYON-knee-B128",
+      "pool_size": 512,
+      "scale": "knee",
+      "split": "validation",
+      "workload_id": "OPT-OMC-PAHYON-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 289,
+      "family": "PAHYON",
+      "indices_json": "selections/expanded-validation-PAHYON-near_capacity-B289.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-validation-PAHYON-near_capacity-B289",
+      "pool_size": 512,
+      "scale": "near_capacity",
+      "split": "validation",
+      "workload_id": "OPT-OMC-PAHYON-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 16,
+      "family": "OBEQUJ",
+      "indices_json": "selections/expanded-validation-OBEQUJ-small-B16.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-validation-OBEQUJ-small-B16",
+      "pool_size": 512,
+      "scale": "small",
+      "split": "validation",
+      "workload_id": "OPT-OMC-OBEQUJ-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 128,
+      "family": "OBEQUJ",
+      "indices_json": "selections/expanded-validation-OBEQUJ-knee-B128.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-validation-OBEQUJ-knee-B128",
+      "pool_size": 512,
+      "scale": "knee",
+      "split": "validation",
+      "workload_id": "OPT-OMC-OBEQUJ-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 256,
+      "family": "OBEQUJ",
+      "indices_json": "selections/expanded-validation-OBEQUJ-near_capacity-B256.json",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "expanded-validation-OBEQUJ-near_capacity-B256",
+      "pool_size": 512,
+      "scale": "near_capacity",
+      "split": "validation",
+      "workload_id": "OPT-OMC-OBEQUJ-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 16,
+      "family": "ROF-C",
+      "indices_json": "selections/expanded-validation-ROF-C-small-B16.json",
+      "mixing": "INTRA-WIDE",
+      "observation_id": "expanded-validation-ROF-C-small-B16",
+      "pool_size": 512,
+      "scale": "small",
+      "split": "validation",
+      "workload_id": "OPT-OMC-ROF-C-P512-INTRA-WIDE-v1"
+    },
+    {
+      "batch_size": 128,
+      "family": "ROF-C",
+      "indices_json": "selections/expanded-validation-ROF-C-knee-B128.json",
+      "mixing": "INTRA-WIDE",
+      "observation_id": "expanded-validation-ROF-C-knee-B128",
+      "pool_size": 512,
+      "scale": "knee",
+      "split": "validation",
+      "workload_id": "OPT-OMC-ROF-C-P512-INTRA-WIDE-v1"
+    },
+    {
+      "batch_size": 381,
+      "family": "ROF-C",
+      "indices_json": "selections/expanded-validation-ROF-C-near_capacity-B381.json",
+      "mixing": "INTRA-WIDE",
+      "observation_id": "expanded-validation-ROF-C-near_capacity-B381",
+      "pool_size": 512,
+      "scale": "near_capacity",
+      "split": "validation",
+      "workload_id": "OPT-OMC-ROF-C-P512-INTRA-WIDE-v1"
+    }
+  ],
+  "schema_version": 1,
+  "selection_design": {
+    "design": "expanded",
+    "nested": true,
+    "scales": [
+      "B16",
+      "B128",
+      "model_predicted_capacity"
+    ],
+    "single_measurement_per_point": true
+  },
+  "source_calibration": "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/calibration_final.json",
+  "source_calibration_sha256": "3360044f76ebac7fe144412c75b166c9ab4df9a9d54f63c029d288ff4bb497b3",
+  "status": "planned"
+}

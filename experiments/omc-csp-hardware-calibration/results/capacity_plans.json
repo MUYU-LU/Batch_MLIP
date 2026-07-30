@@ -1,0 +1,108 @@
+{
+  "calibration": "omc_csp_hardware_calibration_v1/calibration_final.json",
+  "cost_model_contract_id": "atombit-smooth-rms-fp32-bfgs-f64-frechet-h100-peak_reserved_bytes-v1",
+  "max_batch_size": 512,
+  "max_cost_ratio": 2.0,
+  "memory_budget_bytes": 72300757811,
+  "memory_safety_fraction": 0.85,
+  "schema_version": 1,
+  "status": "complete",
+  "workloads": {
+    "OPT-OMC-AXOSOW-P512-INTRA-NARROW-v1": {
+      "bucket_count": 3,
+      "buckets": [
+        {
+          "atom_count_max": 64,
+          "atom_count_min": 64,
+          "predicted_budget_fraction": 0.998410133662769,
+          "predicted_peak_bytes": 72185809270,
+          "resident_capacity": 364,
+          "system_count": 438
+        },
+        {
+          "atom_count_max": 64,
+          "atom_count_min": 64,
+          "predicted_budget_fraction": 0.11463985769923647,
+          "predicted_peak_bytes": 8288548587,
+          "resident_capacity": 72,
+          "system_count": 72
+        },
+        {
+          "atom_count_max": 64,
+          "atom_count_min": 64,
+          "predicted_budget_fraction": 0.0029253167519057667,
+          "predicted_peak_bytes": 211502618,
+          "resident_capacity": 2,
+          "system_count": 2
+        }
+      ],
+      "capacity_validation_indices": "omc_csp_hardware_calibration_v1/capacity_indices/OPT-OMC-AXOSOW-P512-INTRA-NARROW-v1.json",
+      "profile_sha256": "836028c2cf7b792c3915c59cb8e509687aca1556fb95c27c64309919289f591c",
+      "systems": 512
+    },
+    "OPT-OMC-BOQQUT-P512-INTRA-WIDE-v1": {
+      "bucket_count": 3,
+      "buckets": [
+        {
+          "atom_count_max": 176,
+          "atom_count_min": 88,
+          "predicted_budget_fraction": 0.9978404281126878,
+          "predicted_peak_bytes": 72144619127,
+          "resident_capacity": 195,
+          "system_count": 231
+        },
+        {
+          "atom_count_max": 176,
+          "atom_count_min": 88,
+          "predicted_budget_fraction": 0.845880331806084,
+          "predicted_peak_bytes": 61157789007,
+          "resident_capacity": 279,
+          "system_count": 279
+        },
+        {
+          "atom_count_max": 88,
+          "atom_count_min": 88,
+          "predicted_budget_fraction": 0.005006348314442289,
+          "predicted_peak_bytes": 361962777,
+          "resident_capacity": 2,
+          "system_count": 2
+        }
+      ],
+      "capacity_validation_indices": "omc_csp_hardware_calibration_v1/capacity_indices/OPT-OMC-BOQQUT-P512-INTRA-WIDE-v1.json",
+      "profile_sha256": "6f2e7409a2ec98965859452df7c75889b88e4226d733c9d4da6dc1c3053767c2",
+      "systems": 512
+    },
+    "OPT-OMC-ROF-A-P512-INTRA-WIDE-v1": {
+      "bucket_count": 3,
+      "buckets": [
+        {
+          "atom_count_max": 296,
+          "atom_count_min": 148,
+          "predicted_budget_fraction": 0.921678091634906,
+          "predicted_peak_bytes": 66638024483,
+          "resident_capacity": 195,
+          "system_count": 195
+        },
+        {
+          "atom_count_max": 148,
+          "atom_count_min": 148,
+          "predicted_budget_fraction": 0.7704346067798091,
+          "predicted_peak_bytes": 55703005914,
+          "resident_capacity": 285,
+          "system_count": 285
+        },
+        {
+          "atom_count_max": 74,
+          "atom_count_min": 74,
+          "predicted_budget_fraction": 0.042235233135210826,
+          "predicted_peak_bytes": 3053639362,
+          "resident_capacity": 32,
+          "system_count": 32
+        }
+      ],
+      "capacity_validation_indices": "omc_csp_hardware_calibration_v1/capacity_indices/OPT-OMC-ROF-A-P512-INTRA-WIDE-v1.json",
+      "profile_sha256": "e4d308d55d211b98bb2758488859177003e4a02ac315aacb0621828014c6809e",
+      "systems": 512
+    }
+  }
+}

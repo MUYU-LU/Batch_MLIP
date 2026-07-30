@@ -1,0 +1,1984 @@
+{
+  "calibration_sha256": "3360044f76ebac7fe144412c75b166c9ab4df9a9d54f63c029d288ff4bb497b3",
+  "contract": {
+    "cell_filter": "FrechetCellFilter",
+    "cuda_allocator": "expandable_segments",
+    "cutoff_A": 6.0,
+    "deterministic": true,
+    "force_mode": "autograd",
+    "max_steps": 3,
+    "measured_executions": 1,
+    "mlip": "AtomBit-smooth-rms-fp32",
+    "neighbor_backend": "auto",
+    "optimizer": "BatchedBFGS",
+    "optimizer_dtype": "torch.float64",
+    "scheduling": "single_batch",
+    "skin_A": 0.5,
+    "warm_executions": 1
+  },
+  "hardware": {
+    "device_count": 1,
+    "device_name": "NVIDIA H100 80GB HBM3",
+    "device_type": "cuda",
+    "memory_safety_fraction": 0.85,
+    "total_memory_bytes": 85059715072
+  },
+  "matrix": [
+    {
+      "batch_size": 8,
+      "family": "GUFJOG",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "fit-GUFJOG-B8",
+      "pool_size": 64,
+      "split": "fit",
+      "workload_id": "OPT-OMC-GUFJOG-P64-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 32,
+      "family": "GUFJOG",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "fit-GUFJOG-B32",
+      "pool_size": 64,
+      "split": "fit",
+      "workload_id": "OPT-OMC-GUFJOG-P64-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 64,
+      "family": "GUFJOG",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "fit-GUFJOG-B64",
+      "pool_size": 64,
+      "split": "fit",
+      "workload_id": "OPT-OMC-GUFJOG-P64-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 8,
+      "family": "XATMOV",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "fit-XATMOV-B8",
+      "pool_size": 64,
+      "split": "fit",
+      "workload_id": "OPT-OMC-XATMOV-P64-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 32,
+      "family": "XATMOV",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "fit-XATMOV-B32",
+      "pool_size": 64,
+      "split": "fit",
+      "workload_id": "OPT-OMC-XATMOV-P64-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 64,
+      "family": "XATMOV",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "fit-XATMOV-B64",
+      "pool_size": 64,
+      "split": "fit",
+      "workload_id": "OPT-OMC-XATMOV-P64-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 8,
+      "family": "OBEQIX",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "fit-OBEQIX-B8",
+      "pool_size": 64,
+      "split": "fit",
+      "workload_id": "OPT-OMC-OBEQIX-P64-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 32,
+      "family": "OBEQIX",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "fit-OBEQIX-B32",
+      "pool_size": 64,
+      "split": "fit",
+      "workload_id": "OPT-OMC-OBEQIX-P64-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 64,
+      "family": "OBEQIX",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "fit-OBEQIX-B64",
+      "pool_size": 64,
+      "split": "fit",
+      "workload_id": "OPT-OMC-OBEQIX-P64-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 8,
+      "family": "ROF-B",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "fit-ROF-B-B8",
+      "pool_size": 64,
+      "split": "fit",
+      "workload_id": "OPT-OMC-ROF-B-P64-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 32,
+      "family": "ROF-B",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "fit-ROF-B-B32",
+      "pool_size": 64,
+      "split": "fit",
+      "workload_id": "OPT-OMC-ROF-B-P64-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 64,
+      "family": "ROF-B",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "fit-ROF-B-B64",
+      "pool_size": 64,
+      "split": "fit",
+      "workload_id": "OPT-OMC-ROF-B-P64-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 16,
+      "family": "AXOSOW",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "validation-AXOSOW-B16",
+      "pool_size": 64,
+      "split": "validation",
+      "workload_id": "OPT-OMC-AXOSOW-P64-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 64,
+      "family": "AXOSOW",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "validation-AXOSOW-B64",
+      "pool_size": 64,
+      "split": "validation",
+      "workload_id": "OPT-OMC-AXOSOW-P64-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 16,
+      "family": "BOQQUT",
+      "mixing": "INTRA-WIDE",
+      "observation_id": "validation-BOQQUT-B16",
+      "pool_size": 64,
+      "split": "validation",
+      "workload_id": "OPT-OMC-BOQQUT-P64-INTRA-WIDE-v1"
+    },
+    {
+      "batch_size": 64,
+      "family": "BOQQUT",
+      "mixing": "INTRA-WIDE",
+      "observation_id": "validation-BOQQUT-B64",
+      "pool_size": 64,
+      "split": "validation",
+      "workload_id": "OPT-OMC-BOQQUT-P64-INTRA-WIDE-v1"
+    },
+    {
+      "batch_size": 16,
+      "family": "ROF-A",
+      "mixing": "INTRA-WIDE",
+      "observation_id": "validation-ROF-A-B16",
+      "pool_size": 64,
+      "split": "validation",
+      "workload_id": "OPT-OMC-ROF-A-P64-INTRA-WIDE-v1"
+    },
+    {
+      "batch_size": 64,
+      "family": "ROF-A",
+      "mixing": "INTRA-WIDE",
+      "observation_id": "validation-ROF-A-B64",
+      "pool_size": 64,
+      "split": "validation",
+      "workload_id": "OPT-OMC-ROF-A-P64-INTRA-WIDE-v1"
+    },
+    {
+      "batch_size": 256,
+      "family": "GUFJOG",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "fit-GUFJOG-B256",
+      "pool_size": 512,
+      "split": "fit",
+      "workload_id": "OPT-OMC-GUFJOG-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 192,
+      "family": "XATMOV",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "fit-XATMOV-B192",
+      "pool_size": 512,
+      "split": "fit",
+      "workload_id": "OPT-OMC-XATMOV-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 128,
+      "family": "OBEQIX",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "fit-OBEQIX-B128",
+      "pool_size": 512,
+      "split": "fit",
+      "workload_id": "OPT-OMC-OBEQIX-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 128,
+      "family": "ROF-B",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "fit-ROF-B-B128",
+      "pool_size": 512,
+      "split": "fit",
+      "workload_id": "OPT-OMC-ROF-B-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 256,
+      "family": "AXOSOW",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "validation-AXOSOW-B256",
+      "pool_size": 512,
+      "split": "validation",
+      "workload_id": "OPT-OMC-AXOSOW-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 128,
+      "family": "BOQQUT",
+      "mixing": "INTRA-WIDE",
+      "observation_id": "validation-BOQQUT-B128",
+      "pool_size": 512,
+      "split": "validation",
+      "workload_id": "OPT-OMC-BOQQUT-P512-INTRA-WIDE-v1"
+    },
+    {
+      "batch_size": 256,
+      "family": "ROF-A",
+      "mixing": "INTRA-WIDE",
+      "observation_id": "validation-ROF-A-B256",
+      "pool_size": 512,
+      "split": "validation",
+      "workload_id": "OPT-OMC-ROF-A-P512-INTRA-WIDE-v1"
+    },
+    {
+      "batch_size": 512,
+      "family": "GUFJOG",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "fit-GUFJOG-B512",
+      "pool_size": 512,
+      "split": "fit",
+      "workload_id": "OPT-OMC-GUFJOG-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 320,
+      "family": "XATMOV",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "fit-XATMOV-B320",
+      "pool_size": 512,
+      "split": "fit",
+      "workload_id": "OPT-OMC-XATMOV-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 384,
+      "family": "AXOSOW",
+      "mixing": "INTRA-NARROW",
+      "observation_id": "validation-AXOSOW-B384",
+      "pool_size": 512,
+      "split": "validation",
+      "workload_id": "OPT-OMC-AXOSOW-P512-INTRA-NARROW-v1"
+    },
+    {
+      "batch_size": 256,
+      "family": "BOQQUT",
+      "mixing": "INTRA-WIDE",
+      "observation_id": "validation-BOQQUT-B256",
+      "pool_size": 512,
+      "split": "validation",
+      "workload_id": "OPT-OMC-BOQQUT-P512-INTRA-WIDE-v1"
+    }
+  ],
+  "models": {
+    "peak_allocated_bytes": {
+      "fit_error": {
+        "count": 18,
+        "max_absolute_relative_error": 0.002915171473302447,
+        "maximum_predicted_to_measured": 1.0029151714733024,
+        "mean_absolute_relative_error": 0.0019519117473811606,
+        "mean_relative_error": 0.0019519117473811606,
+        "minimum_predicted_to_measured": 1.0
+      },
+      "model": {
+        "coefficients": {
+          "fixed": 70186092.54925688,
+          "per_active_edge": 36918.667846159035,
+          "per_atom": 22500.302469112197,
+          "per_candidate_edge": 4608.893648001755,
+          "per_dense_linear_algebra_work": 0.0,
+          "per_dense_state_element": 14.567533361363417,
+          "per_linear_state_element": 0.0
+        },
+        "contract_id": "atombit-smooth-rms-fp32-bfgs-f64-frechet-h100-peak_allocated_bytes-v1",
+        "hardware": {
+          "device_count": 1,
+          "device_name": "NVIDIA H100 80GB HBM3",
+          "device_type": "cuda",
+          "memory_safety_fraction": 0.85,
+          "total_memory_bytes": 85059715072
+        },
+        "metric": "bytes",
+        "safety_factor": 1.0021762269501115
+      },
+      "validation_error": {
+        "count": 11,
+        "max_absolute_relative_error": 0.003157702232407189,
+        "maximum_predicted_to_measured": 1.002112845147471,
+        "mean_absolute_relative_error": 0.0014496101865871297,
+        "mean_relative_error": -0.00016736175245553447,
+        "minimum_predicted_to_measured": 0.9968422977675928
+      }
+    },
+    "peak_reserved_bytes": {
+      "fit_error": {
+        "count": 18,
+        "max_absolute_relative_error": 0.059212383161428184,
+        "maximum_predicted_to_measured": 1.0592123831614282,
+        "mean_absolute_relative_error": 0.022074515548048537,
+        "mean_relative_error": 0.022074515548048537,
+        "minimum_predicted_to_measured": 1.0000000000000002
+      },
+      "model": {
+        "coefficients": {
+          "fixed": 91137783.54766913,
+          "per_active_edge": 40257.73284522561,
+          "per_atom": 0.0,
+          "per_candidate_edge": 6214.359038373289,
+          "per_dense_linear_algebra_work": 0.0,
+          "per_dense_state_element": 9.488600713853076,
+          "per_linear_state_element": 0.0
+        },
+        "contract_id": "atombit-smooth-rms-fp32-bfgs-f64-frechet-h100-peak_reserved_bytes-v1",
+        "hardware": {
+          "device_count": 1,
+          "device_name": "NVIDIA H100 80GB HBM3",
+          "device_type": "cuda",
+          "memory_safety_fraction": 0.85,
+          "total_memory_bytes": 85059715072
+        },
+        "metric": "bytes",
+        "safety_factor": 1.02348460392138
+      },
+      "validation_error": {
+        "count": 11,
+        "max_absolute_relative_error": 0.06272972684626854,
+        "maximum_predicted_to_measured": 1.0627297268462685,
+        "mean_absolute_relative_error": 0.01739469853706085,
+        "mean_relative_error": 0.012416775925275065,
+        "minimum_predicted_to_measured": 0.986071917445236
+      }
+    },
+    "seconds_per_evaluation": {
+      "fit_error": {
+        "count": 18,
+        "max_absolute_relative_error": 0.3398323244760503,
+        "maximum_predicted_to_measured": 1.2632297618040185,
+        "mean_absolute_relative_error": 0.1737161242786237,
+        "mean_relative_error": 0.044814671009565,
+        "minimum_predicted_to_measured": 0.6601676755239497
+      },
+      "model": {
+        "coefficients": {
+          "fixed": 0.03475781166024284,
+          "per_active_edge": 0.0,
+          "per_atom": 0.0,
+          "per_candidate_edge": 5.148019591028093e-07,
+          "per_dense_linear_algebra_work": 0.0,
+          "per_dense_state_element": 0.0,
+          "per_linear_state_element": 0.0
+        },
+        "contract_id": "atombit-smooth-rms-fp32-bfgs-f64-frechet-h100-seconds_per_evaluation-v1",
+        "hardware": {
+          "device_count": 1,
+          "device_name": "NVIDIA H100 80GB HBM3",
+          "device_type": "cuda",
+          "memory_safety_fraction": 0.85,
+          "total_memory_bytes": 85059715072
+        },
+        "metric": "seconds",
+        "safety_factor": 1.0
+      },
+      "validation_error": {
+        "count": 11,
+        "max_absolute_relative_error": 0.2255860640317915,
+        "maximum_predicted_to_measured": 1.161831848672266,
+        "mean_absolute_relative_error": 0.08992317863322376,
+        "mean_relative_error": 0.019152707239281096,
+        "minimum_predicted_to_measured": 0.7744139359682085
+      }
+    }
+  },
+  "observations": {
+    "peak_allocated_bytes": [
+      {
+        "features": {
+          "active_edge_count": 12892,
+          "atom_count": 352,
+          "candidate_edge_count": 16448,
+          "dense_linear_algebra_work": 22425768,
+          "dense_state_elements": 159048,
+          "linear_state_elements": 0,
+          "system_count": 8
+        },
+        "measured_value": 633508352.0,
+        "observation_id": "fit-GUFJOG-B8",
+        "planning_profile_sha256": "9daf781ce950a0d415a728bdc1ef41a23b8e765f045bf895ce599178604389ec",
+        "predicted_value": 633561464.1838883,
+        "split": "fit",
+        "workload_id": "OPT-OMC-GUFJOG-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "cafea8289d75b38dbb2e50345f2455cbc0e6b3879db922e44a9c34d58229959b"
+      },
+      {
+        "features": {
+          "active_edge_count": 55908,
+          "atom_count": 1408,
+          "candidate_edge_count": 72264,
+          "dense_linear_algebra_work": 89703072,
+          "dense_state_elements": 636192,
+          "linear_state_elements": 0,
+          "system_count": 32
+        },
+        "measured_value": 2508267520.0,
+        "observation_id": "fit-GUFJOG-B32",
+        "planning_profile_sha256": "9daf781ce950a0d415a728bdc1ef41a23b8e765f045bf895ce599178604389ec",
+        "predicted_value": 2513698739.1380115,
+        "split": "fit",
+        "workload_id": "OPT-OMC-GUFJOG-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "cafea8289d75b38dbb2e50345f2455cbc0e6b3879db922e44a9c34d58229959b"
+      },
+      {
+        "features": {
+          "active_edge_count": 108380,
+          "atom_count": 2816,
+          "candidate_edge_count": 139848,
+          "dense_linear_algebra_work": 179406144,
+          "dense_state_elements": 1272384,
+          "linear_state_elements": 0,
+          "system_count": 64
+        },
+        "measured_value": 4798296576.0,
+        "observation_id": "fit-GUFJOG-B64",
+        "planning_profile_sha256": "9daf781ce950a0d415a728bdc1ef41a23b8e765f045bf895ce599178604389ec",
+        "predicted_value": 4808313479.553137,
+        "split": "fit",
+        "workload_id": "OPT-OMC-GUFJOG-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "cafea8289d75b38dbb2e50345f2455cbc0e6b3879db922e44a9c34d58229959b"
+      },
+      {
+        "features": {
+          "active_edge_count": 33168,
+          "atom_count": 704,
+          "candidate_edge_count": 43308,
+          "dense_linear_algebra_work": 162771336,
+          "dense_state_elements": 596232,
+          "linear_state_elements": 0,
+          "system_count": 8
+        },
+        "measured_value": 1522137600.0,
+        "observation_id": "fit-XATMOV-B8",
+        "planning_profile_sha256": "155a191303ad011b9167bf9acbc9716ce8f487e51003e8e1badaf9d5b4ba5cf3",
+        "predicted_value": 1522137600.0,
+        "split": "fit",
+        "workload_id": "OPT-OMC-XATMOV-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "4d91ffad65bb99069fafcb2238b0c5dda7ff81da933076e71df68a04defaf4d2"
+      },
+      {
+        "features": {
+          "active_edge_count": 118320,
+          "atom_count": 2816,
+          "candidate_edge_count": 152848,
+          "dense_linear_algebra_work": 651085344,
+          "dense_state_elements": 2384928,
+          "linear_state_elements": 0,
+          "system_count": 32
+        },
+        "measured_value": 5243780608.0,
+        "observation_id": "fit-XATMOV-B32",
+        "planning_profile_sha256": "155a191303ad011b9167bf9acbc9716ce8f487e51003e8e1badaf9d5b4ba5cf3",
+        "predicted_value": 5252371950.738331,
+        "split": "fit",
+        "workload_id": "OPT-OMC-XATMOV-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "4d91ffad65bb99069fafcb2238b0c5dda7ff81da933076e71df68a04defaf4d2"
+      },
+      {
+        "features": {
+          "active_edge_count": 241396,
+          "atom_count": 5632,
+          "candidate_edge_count": 313044,
+          "dense_linear_algebra_work": 1302170688,
+          "dense_state_elements": 4769856,
+          "linear_state_elements": 0,
+          "system_count": 64
+        },
+        "measured_value": 10613372416.0,
+        "observation_id": "fit-XATMOV-B64",
+        "planning_profile_sha256": "155a191303ad011b9167bf9acbc9716ce8f487e51003e8e1badaf9d5b4ba5cf3",
+        "predicted_value": 10644312216.502659,
+        "split": "fit",
+        "workload_id": "OPT-OMC-XATMOV-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "4d91ffad65bb99069fafcb2238b0c5dda7ff81da933076e71df68a04defaf4d2"
+      },
+      {
+        "features": {
+          "active_edge_count": 59344,
+          "atom_count": 1760,
+          "candidate_edge_count": 71944,
+          "dense_linear_algebra_work": 2395346472,
+          "dense_state_elements": 3580488,
+          "linear_state_elements": 0,
+          "system_count": 8
+        },
+        "measured_value": 2684945920.0,
+        "observation_id": "fit-OBEQIX-B8",
+        "planning_profile_sha256": "95c3d81678cf38edb8d069c8998314d74d3f542c2ed20d24df1c68473539ebd3",
+        "predicted_value": 2690271099.6701446,
+        "split": "fit",
+        "workload_id": "OPT-OMC-OBEQIX-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "3afcf550e906c73869ebb515f5d8b31e30bb59a7ec36cad4ff68a986e5b5a4d6"
+      },
+      {
+        "features": {
+          "active_edge_count": 240892,
+          "atom_count": 7040,
+          "candidate_edge_count": 293136,
+          "dense_linear_algebra_work": 9581385888,
+          "dense_state_elements": 14321952,
+          "linear_state_elements": 0,
+          "system_count": 32
+        },
+        "measured_value": 10688848384.0,
+        "observation_id": "fit-OBEQIX-B32",
+        "planning_profile_sha256": "95c3d81678cf38edb8d069c8998314d74d3f542c2ed20d24df1c68473539ebd3",
+        "predicted_value": 10704913852.721275,
+        "split": "fit",
+        "workload_id": "OPT-OMC-OBEQIX-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "3afcf550e906c73869ebb515f5d8b31e30bb59a7ec36cad4ff68a986e5b5a4d6"
+      },
+      {
+        "features": {
+          "active_edge_count": 479088,
+          "atom_count": 14080,
+          "candidate_edge_count": 583656,
+          "dense_linear_algebra_work": 19162771776,
+          "dense_state_elements": 28643904,
+          "linear_state_elements": 0,
+          "system_count": 64
+        },
+        "measured_value": 21182413312.0,
+        "observation_id": "fit-OBEQIX-B64",
+        "planning_profile_sha256": "95c3d81678cf38edb8d069c8998314d74d3f542c2ed20d24df1c68473539ebd3",
+        "predicted_value": 21227656433.448288,
+        "split": "fit",
+        "workload_id": "OPT-OMC-OBEQIX-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "3afcf550e906c73869ebb515f5d8b31e30bb59a7ec36cad4ff68a986e5b5a4d6"
+      },
+      {
+        "features": {
+          "active_edge_count": 82748,
+          "atom_count": 2368,
+          "candidate_edge_count": 102792,
+          "dense_linear_algebra_work": 5773874184,
+          "dense_state_elements": 6436872,
+          "linear_state_elements": 0,
+          "system_count": 8
+        },
+        "measured_value": 3744058368.0,
+        "observation_id": "fit-ROF-B-B8",
+        "planning_profile_sha256": "18e048ffed91c8b2fd7a5b9700df35fea73807dd1c8d0790eb23c3b4d638f04a",
+        "predicted_value": 3754091493.646423,
+        "split": "fit",
+        "workload_id": "OPT-OMC-ROF-B-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "86e5421f4b25e31f872fb6f27f7c68568d177eda4ef9403b1d50c2a5486ee696"
+      },
+      {
+        "features": {
+          "active_edge_count": 324352,
+          "atom_count": 9472,
+          "candidate_edge_count": 401256,
+          "dense_linear_algebra_work": 23095496736,
+          "dense_state_elements": 25747488,
+          "linear_state_elements": 0,
+          "system_count": 32
+        },
+        "measured_value": 14475301888.0,
+        "observation_id": "fit-ROF-B-B32",
+        "planning_profile_sha256": "18e048ffed91c8b2fd7a5b9700df35fea73807dd1c8d0790eb23c3b4d638f04a",
+        "predicted_value": 14513893268.480722,
+        "split": "fit",
+        "workload_id": "OPT-OMC-ROF-B-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "86e5421f4b25e31f872fb6f27f7c68568d177eda4ef9403b1d50c2a5486ee696"
+      },
+      {
+        "features": {
+          "active_edge_count": 624212,
+          "atom_count": 18944,
+          "candidate_edge_count": 764976,
+          "dense_linear_algebra_work": 46190993472,
+          "dense_state_elements": 51494976,
+          "linear_state_elements": 0,
+          "system_count": 64
+        },
+        "measured_value": 27817302528.0,
+        "observation_id": "fit-ROF-B-B64",
+        "planning_profile_sha256": "18e048ffed91c8b2fd7a5b9700df35fea73807dd1c8d0790eb23c3b4d638f04a",
+        "predicted_value": 27877892002.10926,
+        "split": "fit",
+        "workload_id": "OPT-OMC-ROF-B-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "86e5421f4b25e31f872fb6f27f7c68568d177eda4ef9403b1d50c2a5486ee696"
+      },
+      {
+        "features": {
+          "active_edge_count": 55000,
+          "atom_count": 1024,
+          "candidate_edge_count": 71360,
+          "dense_linear_algebra_work": 129929616,
+          "dense_state_elements": 646416,
+          "linear_state_elements": 0,
+          "system_count": 16
+        },
+        "measured_value": 2462216192.0,
+        "observation_id": "validation-AXOSOW-B16",
+        "planning_profile_sha256": "cce72a9140a82d4d9c0dd7cba85cfc306d0fc93aa1f9dac20aaa1616fb10de88",
+        "predicted_value": 2467418473.533292,
+        "split": "validation",
+        "workload_id": "OPT-OMC-AXOSOW-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "e782d6270d99b40ff02dc849b0a9a9a635ff4ea755a37c8a2f8f09ed41b7814e"
+      },
+      {
+        "features": {
+          "active_edge_count": 224360,
+          "atom_count": 4096,
+          "candidate_edge_count": 289704,
+          "dense_linear_algebra_work": 519718464,
+          "dense_state_elements": 2585664,
+          "linear_state_elements": 0,
+          "system_count": 64
+        },
+        "measured_value": 9823022592.0,
+        "observation_id": "validation-AXOSOW-B64",
+        "planning_profile_sha256": "cce72a9140a82d4d9c0dd7cba85cfc306d0fc93aa1f9dac20aaa1616fb10de88",
+        "predicted_value": 9839668173.348923,
+        "split": "validation",
+        "workload_id": "OPT-OMC-AXOSOW-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "e782d6270d99b40ff02dc849b0a9a9a635ff4ea755a37c8a2f8f09ed41b7814e"
+      },
+      {
+        "features": {
+          "active_edge_count": 94764,
+          "atom_count": 2112,
+          "candidate_edge_count": 119028,
+          "dense_linear_algebra_work": 1401604560,
+          "dense_state_elements": 2903184,
+          "linear_state_elements": 0,
+          "system_count": 16
+        },
+        "measured_value": 4212901376.0,
+        "observation_id": "validation-BOQQUT-B16",
+        "planning_profile_sha256": "2e6cd558ba0c0397869eee4db28376e5da44612cbd3025f9a398612d77112fe1",
+        "predicted_value": 4216302700.7174892,
+        "split": "validation",
+        "workload_id": "OPT-OMC-BOQQUT-P64-INTRA-WIDE-v1",
+        "workload_manifest_sha256": "913bfd58f9b7a889825c1280347733a9bd50859de2894781497f58f0920d8b58"
+      },
+      {
+        "features": {
+          "active_edge_count": 381824,
+          "atom_count": 8448,
+          "candidate_edge_count": 478312,
+          "dense_linear_algebra_work": 5606418240,
+          "dense_state_elements": 11612736,
+          "linear_state_elements": 0,
+          "system_count": 64
+        },
+        "measured_value": 16759761920.0,
+        "observation_id": "validation-BOQQUT-B64",
+        "planning_profile_sha256": "2e6cd558ba0c0397869eee4db28376e5da44612cbd3025f9a398612d77112fe1",
+        "predicted_value": 16766769197.775425,
+        "split": "validation",
+        "workload_id": "OPT-OMC-BOQQUT-P64-INTRA-WIDE-v1",
+        "workload_manifest_sha256": "913bfd58f9b7a889825c1280347733a9bd50859de2894781497f58f0920d8b58"
+      },
+      {
+        "features": {
+          "active_edge_count": 73574,
+          "atom_count": 2738,
+          "candidate_edge_count": 85586,
+          "dense_linear_algebra_work": 2959491222,
+          "dense_state_elements": 4732560,
+          "linear_state_elements": 0,
+          "system_count": 16
+        },
+        "measured_value": 3328078336.0,
+        "observation_id": "validation-ROF-A-B16",
+        "planning_profile_sha256": "65f96ed9646b46a1a46e2a66a52a49ecb76ae1de1c4cb5964fc597dad66990a0",
+        "predicted_value": 3318650941.000333,
+        "split": "validation",
+        "workload_id": "OPT-OMC-ROF-A-P64-INTRA-WIDE-v1",
+        "workload_manifest_sha256": "7e3c01ef45bb165137f58cf0384205222f5d1000f2b08312edec6c3574e7b0b3"
+      },
+      {
+        "features": {
+          "active_edge_count": 294520,
+          "atom_count": 10952,
+          "candidate_edge_count": 342012,
+          "dense_linear_algebra_work": 12373780536,
+          "dense_state_elements": 19324512,
+          "linear_state_elements": 0,
+          "system_count": 64
+        },
+        "measured_value": 13117518848.0,
+        "observation_id": "validation-ROF-A-B64",
+        "planning_profile_sha256": "65f96ed9646b46a1a46e2a66a52a49ecb76ae1de1c4cb5964fc597dad66990a0",
+        "predicted_value": 13076097629.450027,
+        "split": "validation",
+        "workload_id": "OPT-OMC-ROF-A-P64-INTRA-WIDE-v1",
+        "workload_manifest_sha256": "7e3c01ef45bb165137f58cf0384205222f5d1000f2b08312edec6c3574e7b0b3"
+      },
+      {
+        "features": {
+          "active_edge_count": 417400,
+          "atom_count": 11264,
+          "candidate_edge_count": 537304,
+          "dense_linear_algebra_work": 717624576,
+          "dense_state_elements": 5089536,
+          "linear_state_elements": 0,
+          "system_count": 256
+        },
+        "measured_value": 18282857472.0,
+        "observation_id": "fit-GUFJOG-B256",
+        "planning_profile_sha256": "50195be3bad519d0be41ace29193ff6340788d3fb2ada34853a4b350b2294f7e",
+        "predicted_value": 18323790571.174038,
+        "split": "fit",
+        "workload_id": "OPT-OMC-GUFJOG-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "c1c3bc7f53a625696322a58bbc2b73bc13fa61ea7f44de10ba1566cfed50ee5b"
+      },
+      {
+        "features": {
+          "active_edge_count": 733748,
+          "atom_count": 16896,
+          "candidate_edge_count": 948476,
+          "dense_linear_algebra_work": 3906512064,
+          "dense_state_elements": 14309568,
+          "linear_state_elements": 0,
+          "system_count": 192
+        },
+        "measured_value": 32119612416.0,
+        "observation_id": "fit-XATMOV-B192",
+        "planning_profile_sha256": "1a0bb4b725fcab46dc5c80a97440030ff03d8ec2220aff65be2ce881087a6686",
+        "predicted_value": 32189128752.743347,
+        "split": "fit",
+        "workload_id": "OPT-OMC-XATMOV-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "75ad70c61603bbd47256366a45f8eaf99eb7b351f00c5d7d23d9401e383ea091"
+      },
+      {
+        "features": {
+          "active_edge_count": 955184,
+          "atom_count": 28160,
+          "candidate_edge_count": 1166840,
+          "dense_linear_algebra_work": 38325543552,
+          "dense_state_elements": 57287808,
+          "linear_state_elements": 0,
+          "system_count": 128
+        },
+        "measured_value": 42179445248.0,
+        "observation_id": "fit-OBEQIX-B128",
+        "planning_profile_sha256": "2afc4a1a8e14d977693e0635593b21934dedf0d94b159de54caae71f622d7c72",
+        "predicted_value": 42272092859.87171,
+        "split": "fit",
+        "workload_id": "OPT-OMC-OBEQIX-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "e77e99d2f935c096dccda200d08eeee50cfd8b0d06bbc85c95dd41de21f2fc9b"
+      },
+      {
+        "features": {
+          "active_edge_count": 1247536,
+          "atom_count": 37888,
+          "candidate_edge_count": 1526832,
+          "dense_linear_algebra_work": 92381986944,
+          "dense_state_elements": 102989952,
+          "linear_state_elements": 0,
+          "system_count": 128
+        },
+        "measured_value": 55518456832.0,
+        "observation_id": "fit-ROF-B-B128",
+        "planning_profile_sha256": "a4f462a2a217e16fe44b20bd70993a34e3ffb8b04ef6f270cc9c8ef36974001f",
+        "predicted_value": 55638179007.039314,
+        "split": "fit",
+        "workload_id": "OPT-OMC-ROF-B-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "283e31725006510adbc4a8d113d9c77255f86fa8b1ec0a541cb880d92327c241"
+      },
+      {
+        "features": {
+          "active_edge_count": 912648,
+          "atom_count": 16384,
+          "candidate_edge_count": 1178248,
+          "dense_linear_algebra_work": 2078873856,
+          "dense_state_elements": 10342656,
+          "linear_state_elements": 0,
+          "system_count": 256
+        },
+        "measured_value": 39751361024.0,
+        "observation_id": "validation-AXOSOW-B256",
+        "planning_profile_sha256": "836028c2cf7b792c3915c59cb8e509687aca1556fb95c27c64309919289f591c",
+        "predicted_value": 39800092080.48017,
+        "split": "validation",
+        "workload_id": "OPT-OMC-AXOSOW-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "50b6fa8cfbf647c5b35d474ca0ec5238f5a216853023e6540e1fcdd39e3e0fb2"
+      },
+      {
+        "features": {
+          "active_edge_count": 735648,
+          "atom_count": 16456,
+          "candidate_edge_count": 920160,
+          "dense_linear_algebra_work": 10540297800,
+          "dense_state_elements": 22156272,
+          "linear_state_elements": 0,
+          "system_count": 128
+        },
+        "measured_value": 32235529216.0,
+        "observation_id": "validation-BOQQUT-B128",
+        "planning_profile_sha256": "6f2e7409a2ec98965859452df7c75889b88e4226d733c9d4da6dc1c3053767c2",
+        "predicted_value": 32233271634.648705,
+        "split": "validation",
+        "workload_id": "OPT-OMC-BOQQUT-P512-INTRA-WIDE-v1",
+        "workload_manifest_sha256": "8a1ed591978dde8e7f5f46018611501bf88c555a32c8329fa8e821d91127a4f4"
+      },
+      {
+        "features": {
+          "active_edge_count": 1239656,
+          "atom_count": 46472,
+          "candidate_edge_count": 1435878,
+          "dense_linear_algebra_work": 61012665072,
+          "dense_state_elements": 88185816,
+          "linear_state_elements": 0,
+          "system_count": 256
+        },
+        "measured_value": 55047355392.0,
+        "observation_id": "validation-ROF-A-B256",
+        "planning_profile_sha256": "e4d308d55d211b98bb2758488859177003e4a02ac315aacb0621828014c6809e",
+        "predicted_value": 54903951065.97305,
+        "split": "validation",
+        "workload_id": "OPT-OMC-ROF-A-P512-INTRA-WIDE-v1",
+        "workload_manifest_sha256": "f1a7f7983a5de0ac1229f9c772b5dff0819b84e078b5131578b6074e2d31ea55"
+      },
+      {
+        "features": {
+          "active_edge_count": 835404,
+          "atom_count": 22528,
+          "candidate_edge_count": 1074236,
+          "dense_linear_algebra_work": 1435249152,
+          "dense_state_elements": 10179072,
+          "linear_state_elements": 0,
+          "system_count": 512
+        },
+        "measured_value": 36517636608.0,
+        "observation_id": "fit-GUFJOG-B512",
+        "planning_profile_sha256": "50195be3bad519d0be41ace29193ff6340788d3fb2ada34853a4b350b2294f7e",
+        "predicted_value": 36597871472.12881,
+        "split": "fit",
+        "workload_id": "OPT-OMC-GUFJOG-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "c1c3bc7f53a625696322a58bbc2b73bc13fa61ea7f44de10ba1566cfed50ee5b"
+      },
+      {
+        "features": {
+          "active_edge_count": 1213852,
+          "atom_count": 28160,
+          "candidate_edge_count": 1568256,
+          "dense_linear_algebra_work": 6510853440,
+          "dense_state_elements": 23849280,
+          "linear_state_elements": 0,
+          "system_count": 320
+        },
+        "measured_value": 53094614528.0,
+        "observation_id": "fit-XATMOV-B320",
+        "planning_profile_sha256": "1a0bb4b725fcab46dc5c80a97440030ff03d8ec2220aff65be2ce881087a6686",
+        "predicted_value": 53208486006.32584,
+        "split": "fit",
+        "workload_id": "OPT-OMC-XATMOV-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "75ad70c61603bbd47256366a45f8eaf99eb7b351f00c5d7d23d9401e383ea091"
+      },
+      {
+        "features": {
+          "active_edge_count": 1383144,
+          "atom_count": 24576,
+          "candidate_edge_count": 1783472,
+          "dense_linear_algebra_work": 3118310784,
+          "dense_state_elements": 15513984,
+          "linear_state_elements": 0,
+          "system_count": 384
+        },
+        "measured_value": 60215895040.0,
+        "observation_id": "validation-AXOSOW-B384",
+        "planning_profile_sha256": "836028c2cf7b792c3915c59cb8e509687aca1556fb95c27c64309919289f591c",
+        "predicted_value": 60263683362.10188,
+        "split": "validation",
+        "workload_id": "OPT-OMC-AXOSOW-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "50b6fa8cfbf647c5b35d474ca0ec5238f5a216853023e6540e1fcdd39e3e0fb2"
+      },
+      {
+        "features": {
+          "active_edge_count": 1472140,
+          "atom_count": 33000,
+          "candidate_edge_count": 1841792,
+          "dense_linear_algebra_work": 21215103336,
+          "dense_state_elements": 44526384,
+          "linear_state_elements": 0,
+          "system_count": 256
+        },
+        "measured_value": 64454020608.0,
+        "observation_id": "validation-BOQQUT-B256",
+        "planning_profile_sha256": "6f2e7409a2ec98965859452df7c75889b88e4226d733c9d4da6dc1c3053767c2",
+        "predicted_value": 64439336893.131035,
+        "split": "validation",
+        "workload_id": "OPT-OMC-BOQQUT-P512-INTRA-WIDE-v1",
+        "workload_manifest_sha256": "8a1ed591978dde8e7f5f46018611501bf88c555a32c8329fa8e821d91127a4f4"
+      }
+    ],
+    "peak_reserved_bytes": [
+      {
+        "features": {
+          "active_edge_count": 12892,
+          "atom_count": 352,
+          "candidate_edge_count": 16448,
+          "dense_linear_algebra_work": 22425768,
+          "dense_state_elements": 159048,
+          "linear_state_elements": 0,
+          "system_count": 8
+        },
+        "measured_value": 713031680.0,
+        "observation_id": "fit-GUFJOG-B8",
+        "planning_profile_sha256": "9daf781ce950a0d415a728bdc1ef41a23b8e765f045bf895ce599178604389ec",
+        "predicted_value": 730628194.9225712,
+        "split": "fit",
+        "workload_id": "OPT-OMC-GUFJOG-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "cafea8289d75b38dbb2e50345f2455cbc0e6b3879db922e44a9c34d58229959b"
+      },
+      {
+        "features": {
+          "active_edge_count": 55908,
+          "atom_count": 1408,
+          "candidate_edge_count": 72264,
+          "dense_linear_algebra_work": 89703072,
+          "dense_state_elements": 636192,
+          "linear_state_elements": 0,
+          "system_count": 32
+        },
+        "measured_value": 2829058048.0,
+        "observation_id": "fit-GUFJOG-B32",
+        "planning_profile_sha256": "9daf781ce950a0d415a728bdc1ef41a23b8e765f045bf895ce599178604389ec",
+        "predicted_value": 2862664048.3123016,
+        "split": "fit",
+        "workload_id": "OPT-OMC-GUFJOG-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "cafea8289d75b38dbb2e50345f2455cbc0e6b3879db922e44a9c34d58229959b"
+      },
+      {
+        "features": {
+          "active_edge_count": 108380,
+          "atom_count": 2816,
+          "candidate_edge_count": 139848,
+          "dense_linear_algebra_work": 179406144,
+          "dense_state_elements": 1272384,
+          "linear_state_elements": 0,
+          "system_count": 64
+        },
+        "measured_value": 5393874944.0,
+        "observation_id": "fit-GUFJOG-B64",
+        "planning_profile_sha256": "9daf781ce950a0d415a728bdc1ef41a23b8e765f045bf895ce599178604389ec",
+        "predicted_value": 5460709679.307491,
+        "split": "fit",
+        "workload_id": "OPT-OMC-GUFJOG-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "cafea8289d75b38dbb2e50345f2455cbc0e6b3879db922e44a9c34d58229959b"
+      },
+      {
+        "features": {
+          "active_edge_count": 33168,
+          "atom_count": 704,
+          "candidate_edge_count": 43308,
+          "dense_linear_algebra_work": 162771336,
+          "dense_state_elements": 596232,
+          "linear_state_elements": 0,
+          "system_count": 8
+        },
+        "measured_value": 1721761792.0,
+        "observation_id": "fit-XATMOV-B8",
+        "planning_profile_sha256": "155a191303ad011b9167bf9acbc9716ce8f487e51003e8e1badaf9d5b4ba5cf3",
+        "predicted_value": 1741147029.1153166,
+        "split": "fit",
+        "workload_id": "OPT-OMC-XATMOV-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "4d91ffad65bb99069fafcb2238b0c5dda7ff81da933076e71df68a04defaf4d2"
+      },
+      {
+        "features": {
+          "active_edge_count": 118320,
+          "atom_count": 2816,
+          "candidate_edge_count": 152848,
+          "dense_linear_algebra_work": 651085344,
+          "dense_state_elements": 2384928,
+          "linear_state_elements": 0,
+          "system_count": 32
+        },
+        "measured_value": 5897191424.0,
+        "observation_id": "fit-XATMOV-B32",
+        "planning_profile_sha256": "155a191303ad011b9167bf9acbc9716ce8f487e51003e8e1badaf9d5b4ba5cf3",
+        "predicted_value": 5963757497.748249,
+        "split": "fit",
+        "workload_id": "OPT-OMC-XATMOV-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "4d91ffad65bb99069fafcb2238b0c5dda7ff81da933076e71df68a04defaf4d2"
+      },
+      {
+        "features": {
+          "active_edge_count": 241396,
+          "atom_count": 5632,
+          "candidate_edge_count": 313044,
+          "dense_linear_algebra_work": 1302170688,
+          "dense_state_elements": 4769856,
+          "linear_state_elements": 0,
+          "system_count": 64
+        },
+        "measured_value": 11869880320.0,
+        "observation_id": "fit-XATMOV-B64",
+        "planning_profile_sha256": "155a191303ad011b9167bf9acbc9716ce8f487e51003e8e1badaf9d5b4ba5cf3",
+        "predicted_value": 12076934642.830011,
+        "split": "fit",
+        "workload_id": "OPT-OMC-XATMOV-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "4d91ffad65bb99069fafcb2238b0c5dda7ff81da933076e71df68a04defaf4d2"
+      },
+      {
+        "features": {
+          "active_edge_count": 59344,
+          "atom_count": 1760,
+          "candidate_edge_count": 71944,
+          "dense_linear_algebra_work": 2395346472,
+          "dense_state_elements": 3580488,
+          "linear_state_elements": 0,
+          "system_count": 8
+        },
+        "measured_value": 3019898880.0,
+        "observation_id": "fit-OBEQIX-B8",
+        "planning_profile_sha256": "95c3d81678cf38edb8d069c8998314d74d3f542c2ed20d24df1c68473539ebd3",
+        "predicted_value": 3030796187.6955857,
+        "split": "fit",
+        "workload_id": "OPT-OMC-OBEQIX-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "3afcf550e906c73869ebb515f5d8b31e30bb59a7ec36cad4ff68a986e5b5a4d6"
+      },
+      {
+        "features": {
+          "active_edge_count": 240892,
+          "atom_count": 7040,
+          "candidate_edge_count": 293136,
+          "dense_linear_algebra_work": 9581385888,
+          "dense_state_elements": 14321952,
+          "linear_state_elements": 0,
+          "system_count": 32
+        },
+        "measured_value": 11534336000.0,
+        "observation_id": "fit-OBEQIX-B32",
+        "planning_profile_sha256": "95c3d81678cf38edb8d069c8998314d74d3f542c2ed20d24df1c68473539ebd3",
+        "predicted_value": 12022311953.03702,
+        "split": "fit",
+        "workload_id": "OPT-OMC-OBEQIX-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "3afcf550e906c73869ebb515f5d8b31e30bb59a7ec36cad4ff68a986e5b5a4d6"
+      },
+      {
+        "features": {
+          "active_edge_count": 479088,
+          "atom_count": 14080,
+          "candidate_edge_count": 583656,
+          "dense_linear_algebra_work": 19162771776,
+          "dense_state_elements": 28643904,
+          "linear_state_elements": 0,
+          "system_count": 64
+        },
+        "measured_value": 22850568192.0,
+        "observation_id": "fit-OBEQIX-B64",
+        "planning_profile_sha256": "95c3d81678cf38edb8d069c8998314d74d3f542c2ed20d24df1c68473539ebd3",
+        "predicted_value": 23823623495.225437,
+        "split": "fit",
+        "workload_id": "OPT-OMC-OBEQIX-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "3afcf550e906c73869ebb515f5d8b31e30bb59a7ec36cad4ff68a986e5b5a4d6"
+      },
+      {
+        "features": {
+          "active_edge_count": 82748,
+          "atom_count": 2368,
+          "candidate_edge_count": 102792,
+          "dense_linear_algebra_work": 5773874184,
+          "dense_state_elements": 6436872,
+          "linear_state_elements": 0,
+          "system_count": 8
+        },
+        "measured_value": 4049600512.0,
+        "observation_id": "fit-ROF-B-B8",
+        "planning_profile_sha256": "18e048ffed91c8b2fd7a5b9700df35fea73807dd1c8d0790eb23c3b4d638f04a",
+        "predicted_value": 4219057324.240758,
+        "split": "fit",
+        "workload_id": "OPT-OMC-ROF-B-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "86e5421f4b25e31f872fb6f27f7c68568d177eda4ef9403b1d50c2a5486ee696"
+      },
+      {
+        "features": {
+          "active_edge_count": 324352,
+          "atom_count": 9472,
+          "candidate_edge_count": 401256,
+          "dense_linear_algebra_work": 23095496736,
+          "dense_state_elements": 25747488,
+          "linear_state_elements": 0,
+          "system_count": 32
+        },
+        "measured_value": 16240345088.0,
+        "observation_id": "fit-ROF-B-B32",
+        "planning_profile_sha256": "18e048ffed91c8b2fd7a5b9700df35fea73807dd1c8d0790eb23c3b4d638f04a",
+        "predicted_value": 16259762593.374554,
+        "split": "fit",
+        "workload_id": "OPT-OMC-ROF-B-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "86e5421f4b25e31f872fb6f27f7c68568d177eda4ef9403b1d50c2a5486ee696"
+      },
+      {
+        "features": {
+          "active_edge_count": 624212,
+          "atom_count": 18944,
+          "candidate_edge_count": 764976,
+          "dense_linear_algebra_work": 46190993472,
+          "dense_state_elements": 51494976,
+          "linear_state_elements": 0,
+          "system_count": 64
+        },
+        "measured_value": 31178358784.0,
+        "observation_id": "fit-ROF-B-B64",
+        "planning_profile_sha256": "18e048ffed91c8b2fd7a5b9700df35fea73807dd1c8d0790eb23c3b4d638f04a",
+        "predicted_value": 31178358784.000004,
+        "split": "fit",
+        "workload_id": "OPT-OMC-ROF-B-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "86e5421f4b25e31f872fb6f27f7c68568d177eda4ef9403b1d50c2a5486ee696"
+      },
+      {
+        "features": {
+          "active_edge_count": 55000,
+          "atom_count": 1024,
+          "candidate_edge_count": 71360,
+          "dense_linear_algebra_work": 129929616,
+          "dense_state_elements": 646416,
+          "linear_state_elements": 0,
+          "system_count": 16
+        },
+        "measured_value": 2795503616.0,
+        "observation_id": "validation-AXOSOW-B16",
+        "planning_profile_sha256": "cce72a9140a82d4d9c0dd7cba85cfc306d0fc93aa1f9dac20aaa1616fb10de88",
+        "predicted_value": 2819601147.980928,
+        "split": "validation",
+        "workload_id": "OPT-OMC-AXOSOW-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "e782d6270d99b40ff02dc849b0a9a9a635ff4ea755a37c8a2f8f09ed41b7814e"
+      },
+      {
+        "features": {
+          "active_edge_count": 224360,
+          "atom_count": 4096,
+          "candidate_edge_count": 289704,
+          "dense_linear_algebra_work": 519718464,
+          "dense_state_elements": 2585664,
+          "linear_state_elements": 0,
+          "system_count": 64
+        },
+        "measured_value": 11043602432.0,
+        "observation_id": "validation-AXOSOW-B64",
+        "planning_profile_sha256": "cce72a9140a82d4d9c0dd7cba85cfc306d0fc93aa1f9dac20aaa1616fb10de88",
+        "predicted_value": 11205336379.776623,
+        "split": "validation",
+        "workload_id": "OPT-OMC-AXOSOW-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "e782d6270d99b40ff02dc849b0a9a9a635ff4ea755a37c8a2f8f09ed41b7814e"
+      },
+      {
+        "features": {
+          "active_edge_count": 94764,
+          "atom_count": 2112,
+          "candidate_edge_count": 119028,
+          "dense_linear_algebra_work": 1401604560,
+          "dense_state_elements": 2903184,
+          "linear_state_elements": 0,
+          "system_count": 16
+        },
+        "measured_value": 4737466368.0,
+        "observation_id": "validation-BOQQUT-B16",
+        "planning_profile_sha256": "2e6cd558ba0c0397869eee4db28376e5da44612cbd3025f9a398612d77112fe1",
+        "predicted_value": 4783103268.317215,
+        "split": "validation",
+        "workload_id": "OPT-OMC-BOQQUT-P64-INTRA-WIDE-v1",
+        "workload_manifest_sha256": "913bfd58f9b7a889825c1280347733a9bd50859de2894781497f58f0920d8b58"
+      },
+      {
+        "features": {
+          "active_edge_count": 381824,
+          "atom_count": 8448,
+          "candidate_edge_count": 478312,
+          "dense_linear_algebra_work": 5606418240,
+          "dense_state_elements": 11612736,
+          "linear_state_elements": 0,
+          "system_count": 64
+        },
+        "measured_value": 18821939200.0,
+        "observation_id": "validation-BOQQUT-B64",
+        "planning_profile_sha256": "2e6cd558ba0c0397869eee4db28376e5da44612cbd3025f9a398612d77112fe1",
+        "predicted_value": 18980621754.021255,
+        "split": "validation",
+        "workload_id": "OPT-OMC-BOQQUT-P64-INTRA-WIDE-v1",
+        "workload_manifest_sha256": "913bfd58f9b7a889825c1280347733a9bd50859de2894781497f58f0920d8b58"
+      },
+      {
+        "features": {
+          "active_edge_count": 73574,
+          "atom_count": 2738,
+          "candidate_edge_count": 85586,
+          "dense_linear_algebra_work": 2959491222,
+          "dense_state_elements": 4732560,
+          "linear_state_elements": 0,
+          "system_count": 16
+        },
+        "measured_value": 3611295744.0,
+        "observation_id": "validation-ROF-A-B16",
+        "planning_profile_sha256": "65f96ed9646b46a1a46e2a66a52a49ecb76ae1de1c4cb5964fc597dad66990a0",
+        "predicted_value": 3715072791.173579,
+        "split": "validation",
+        "workload_id": "OPT-OMC-ROF-A-P64-INTRA-WIDE-v1",
+        "workload_manifest_sha256": "7e3c01ef45bb165137f58cf0384205222f5d1000f2b08312edec6c3574e7b0b3"
+      },
+      {
+        "features": {
+          "active_edge_count": 294520,
+          "atom_count": 10952,
+          "candidate_edge_count": 342012,
+          "dense_linear_algebra_work": 12373780536,
+          "dense_state_elements": 19324512,
+          "linear_state_elements": 0,
+          "system_count": 64
+        },
+        "measured_value": 14797504512.0,
+        "observation_id": "validation-ROF-A-B64",
+        "planning_profile_sha256": "65f96ed9646b46a1a46e2a66a52a49ecb76ae1de1c4cb5964fc597dad66990a0",
+        "predicted_value": 14591403647.552372,
+        "split": "validation",
+        "workload_id": "OPT-OMC-ROF-A-P64-INTRA-WIDE-v1",
+        "workload_manifest_sha256": "7e3c01ef45bb165137f58cf0384205222f5d1000f2b08312edec6c3574e7b0b3"
+      },
+      {
+        "features": {
+          "active_edge_count": 417400,
+          "atom_count": 11264,
+          "candidate_edge_count": 537304,
+          "dense_linear_algebra_work": 717624576,
+          "dense_state_elements": 5089536,
+          "linear_state_elements": 0,
+          "system_count": 256
+        },
+        "measured_value": 19597885440.0,
+        "observation_id": "fit-GUFJOG-B256",
+        "planning_profile_sha256": "50195be3bad519d0be41ace29193ff6340788d3fb2ada34853a4b350b2294f7e",
+        "predicted_value": 20758322941.827053,
+        "split": "fit",
+        "workload_id": "OPT-OMC-GUFJOG-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "c1c3bc7f53a625696322a58bbc2b73bc13fa61ea7f44de10ba1566cfed50ee5b"
+      },
+      {
+        "features": {
+          "active_edge_count": 733748,
+          "atom_count": 16896,
+          "candidate_edge_count": 948476,
+          "dense_linear_algebra_work": 3906512064,
+          "dense_state_elements": 14309568,
+          "linear_state_elements": 0,
+          "system_count": 192
+        },
+        "measured_value": 36043751424.0,
+        "observation_id": "fit-XATMOV-B192",
+        "planning_profile_sha256": "1a0bb4b725fcab46dc5c80a97440030ff03d8ec2220aff65be2ce881087a6686",
+        "predicted_value": 36497580645.42902,
+        "split": "fit",
+        "workload_id": "OPT-OMC-XATMOV-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "75ad70c61603bbd47256366a45f8eaf99eb7b351f00c5d7d23d9401e383ea091"
+      },
+      {
+        "features": {
+          "active_edge_count": 955184,
+          "atom_count": 28160,
+          "candidate_edge_count": 1166840,
+          "dense_linear_algebra_work": 38325543552,
+          "dense_state_elements": 57287808,
+          "linear_state_elements": 0,
+          "system_count": 128
+        },
+        "measured_value": 47353692160.0,
+        "observation_id": "fit-OBEQIX-B128",
+        "planning_profile_sha256": "2afc4a1a8e14d977693e0635593b21934dedf0d94b159de54caae71f622d7c72",
+        "predicted_value": 47427686926.267624,
+        "split": "fit",
+        "workload_id": "OPT-OMC-OBEQIX-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "e77e99d2f935c096dccda200d08eeee50cfd8b0d06bbc85c95dd41de21f2fc9b"
+      },
+      {
+        "features": {
+          "active_edge_count": 1247536,
+          "atom_count": 37888,
+          "candidate_edge_count": 1526832,
+          "dense_linear_algebra_work": 92381986944,
+          "dense_state_elements": 102989952,
+          "linear_state_elements": 0,
+          "system_count": 128
+        },
+        "measured_value": 59859009536.0,
+        "observation_id": "fit-ROF-B-B128",
+        "planning_profile_sha256": "a4f462a2a217e16fe44b20bd70993a34e3ffb8b04ef6f270cc9c8ef36974001f",
+        "predicted_value": 62207006896.46731,
+        "split": "fit",
+        "workload_id": "OPT-OMC-ROF-B-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "283e31725006510adbc4a8d113d9c77255f86fa8b1ec0a541cb880d92327c241"
+      },
+      {
+        "features": {
+          "active_edge_count": 912648,
+          "atom_count": 16384,
+          "candidate_edge_count": 1178248,
+          "dense_linear_algebra_work": 2078873856,
+          "dense_state_elements": 10342656,
+          "linear_state_elements": 0,
+          "system_count": 256
+        },
+        "measured_value": 44600131584.0,
+        "observation_id": "validation-AXOSOW-B256",
+        "planning_profile_sha256": "836028c2cf7b792c3915c59cb8e509687aca1556fb95c27c64309919289f591c",
+        "predicted_value": 45291722334.99052,
+        "split": "validation",
+        "workload_id": "OPT-OMC-AXOSOW-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "50b6fa8cfbf647c5b35d474ca0ec5238f5a216853023e6540e1fcdd39e3e0fb2"
+      },
+      {
+        "features": {
+          "active_edge_count": 735648,
+          "atom_count": 16456,
+          "candidate_edge_count": 920160,
+          "dense_linear_algebra_work": 10540297800,
+          "dense_state_elements": 22156272,
+          "linear_state_elements": 0,
+          "system_count": 128
+        },
+        "measured_value": 36188454912.0,
+        "observation_id": "validation-BOQQUT-B128",
+        "planning_profile_sha256": "6f2e7409a2ec98965859452df7c75889b88e4226d733c9d4da6dc1c3053767c2",
+        "predicted_value": 36471971160.08034,
+        "split": "validation",
+        "workload_id": "OPT-OMC-BOQQUT-P512-INTRA-WIDE-v1",
+        "workload_manifest_sha256": "8a1ed591978dde8e7f5f46018611501bf88c555a32c8329fa8e821d91127a4f4"
+      },
+      {
+        "features": {
+          "active_edge_count": 1239656,
+          "atom_count": 46472,
+          "candidate_edge_count": 1435878,
+          "dense_linear_algebra_work": 61012665072,
+          "dense_state_elements": 88185816,
+          "linear_state_elements": 0,
+          "system_count": 256
+        },
+        "measured_value": 61993910272.0,
+        "observation_id": "validation-ROF-A-B256",
+        "planning_profile_sha256": "e4d308d55d211b98bb2758488859177003e4a02ac315aacb0621828014c6809e",
+        "predicted_value": 61160061689.613,
+        "split": "validation",
+        "workload_id": "OPT-OMC-ROF-A-P512-INTRA-WIDE-v1",
+        "workload_manifest_sha256": "f1a7f7983a5de0ac1229f9c772b5dff0819b84e078b5131578b6074e2d31ea55"
+      },
+      {
+        "features": {
+          "active_edge_count": 835404,
+          "atom_count": 22528,
+          "candidate_edge_count": 1074236,
+          "dense_linear_algebra_work": 1435249152,
+          "dense_state_elements": 10179072,
+          "linear_state_elements": 0,
+          "system_count": 512
+        },
+        "measured_value": 39424360448.0,
+        "observation_id": "fit-GUFJOG-B512",
+        "planning_profile_sha256": "50195be3bad519d0be41ace29193ff6340788d3fb2ada34853a4b350b2294f7e",
+        "predicted_value": 41445888447.99286,
+        "split": "fit",
+        "workload_id": "OPT-OMC-GUFJOG-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "c1c3bc7f53a625696322a58bbc2b73bc13fa61ea7f44de10ba1566cfed50ee5b"
+      },
+      {
+        "features": {
+          "active_edge_count": 1213852,
+          "atom_count": 28160,
+          "candidate_edge_count": 1568256,
+          "dense_linear_algebra_work": 6510853440,
+          "dense_state_elements": 23849280,
+          "linear_state_elements": 0,
+          "system_count": 320
+        },
+        "measured_value": 59540242432.0,
+        "observation_id": "fit-XATMOV-B320",
+        "planning_profile_sha256": "1a0bb4b725fcab46dc5c80a97440030ff03d8ec2220aff65be2ce881087a6686",
+        "predicted_value": 60314018796.75196,
+        "split": "fit",
+        "workload_id": "OPT-OMC-XATMOV-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "75ad70c61603bbd47256366a45f8eaf99eb7b351f00c5d7d23d9401e383ea091"
+      },
+      {
+        "features": {
+          "active_edge_count": 1383144,
+          "atom_count": 24576,
+          "candidate_edge_count": 1783472,
+          "dense_linear_algebra_work": 3118310784,
+          "dense_state_elements": 15513984,
+          "linear_state_elements": 0,
+          "system_count": 384
+        },
+        "measured_value": 64529367040.0,
+        "observation_id": "validation-AXOSOW-B384",
+        "planning_profile_sha256": "836028c2cf7b792c3915c59cb8e509687aca1556fb95c27c64309919289f591c",
+        "predicted_value": 68577276607.981804,
+        "split": "validation",
+        "workload_id": "OPT-OMC-AXOSOW-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "50b6fa8cfbf647c5b35d474ca0ec5238f5a216853023e6540e1fcdd39e3e0fb2"
+      },
+      {
+        "features": {
+          "active_edge_count": 1472140,
+          "atom_count": 33000,
+          "candidate_edge_count": 1841792,
+          "dense_linear_algebra_work": 21215103336,
+          "dense_state_elements": 44526384,
+          "linear_state_elements": 0,
+          "system_count": 256
+        },
+        "measured_value": 72330772480.0,
+        "observation_id": "validation-BOQQUT-B256",
+        "planning_profile_sha256": "6f2e7409a2ec98965859452df7c75889b88e4226d733c9d4da6dc1c3053767c2",
+        "predicted_value": 72896878733.54742,
+        "split": "validation",
+        "workload_id": "OPT-OMC-BOQQUT-P512-INTRA-WIDE-v1",
+        "workload_manifest_sha256": "8a1ed591978dde8e7f5f46018611501bf88c555a32c8329fa8e821d91127a4f4"
+      }
+    ],
+    "seconds_per_evaluation": [
+      {
+        "features": {
+          "active_edge_count": 12892,
+          "atom_count": 352,
+          "candidate_edge_count": 16448,
+          "dense_linear_algebra_work": 22425768,
+          "dense_state_elements": 159048,
+          "linear_state_elements": 0,
+          "system_count": 8
+        },
+        "measured_value": 0.04815913178026676,
+        "observation_id": "fit-GUFJOG-B8",
+        "planning_profile_sha256": "9daf781ce950a0d415a728bdc1ef41a23b8e765f045bf895ce599178604389ec",
+        "predicted_value": 0.043225274283565845,
+        "split": "fit",
+        "workload_id": "OPT-OMC-GUFJOG-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "cafea8289d75b38dbb2e50345f2455cbc0e6b3879db922e44a9c34d58229959b"
+      },
+      {
+        "features": {
+          "active_edge_count": 55908,
+          "atom_count": 1408,
+          "candidate_edge_count": 72264,
+          "dense_linear_algebra_work": 89703072,
+          "dense_state_elements": 636192,
+          "linear_state_elements": 0,
+          "system_count": 32
+        },
+        "measured_value": 0.08942701027262956,
+        "observation_id": "fit-GUFJOG-B32",
+        "planning_profile_sha256": "9daf781ce950a0d415a728bdc1ef41a23b8e765f045bf895ce599178604389ec",
+        "predicted_value": 0.07195946043284826,
+        "split": "fit",
+        "workload_id": "OPT-OMC-GUFJOG-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "cafea8289d75b38dbb2e50345f2455cbc0e6b3879db922e44a9c34d58229959b"
+      },
+      {
+        "features": {
+          "active_edge_count": 108380,
+          "atom_count": 2816,
+          "candidate_edge_count": 139848,
+          "dense_linear_algebra_work": 179406144,
+          "dense_state_elements": 1272384,
+          "linear_state_elements": 0,
+          "system_count": 64
+        },
+        "measured_value": 0.13074489764403552,
+        "observation_id": "fit-GUFJOG-B64",
+        "planning_profile_sha256": "9daf781ce950a0d415a728bdc1ef41a23b8e765f045bf895ce599178604389ec",
+        "predicted_value": 0.10675183603685251,
+        "split": "fit",
+        "workload_id": "OPT-OMC-GUFJOG-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "cafea8289d75b38dbb2e50345f2455cbc0e6b3879db922e44a9c34d58229959b"
+      },
+      {
+        "features": {
+          "active_edge_count": 33168,
+          "atom_count": 704,
+          "candidate_edge_count": 43308,
+          "dense_linear_algebra_work": 162771336,
+          "dense_state_elements": 596232,
+          "linear_state_elements": 0,
+          "system_count": 8
+        },
+        "measured_value": 0.0508236272726208,
+        "observation_id": "fit-XATMOV-B8",
+        "planning_profile_sha256": "155a191303ad011b9167bf9acbc9716ce8f487e51003e8e1badaf9d5b4ba5cf3",
+        "predicted_value": 0.057052854905067306,
+        "split": "fit",
+        "workload_id": "OPT-OMC-XATMOV-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "4d91ffad65bb99069fafcb2238b0c5dda7ff81da933076e71df68a04defaf4d2"
+      },
+      {
+        "features": {
+          "active_edge_count": 118320,
+          "atom_count": 2816,
+          "candidate_edge_count": 152848,
+          "dense_linear_algebra_work": 651085344,
+          "dense_state_elements": 2384928,
+          "linear_state_elements": 0,
+          "system_count": 32
+        },
+        "measured_value": 0.10598383122123778,
+        "observation_id": "fit-XATMOV-B32",
+        "planning_profile_sha256": "155a191303ad011b9167bf9acbc9716ce8f487e51003e8e1badaf9d5b4ba5cf3",
+        "predicted_value": 0.11344426150518905,
+        "split": "fit",
+        "workload_id": "OPT-OMC-XATMOV-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "4d91ffad65bb99069fafcb2238b0c5dda7ff81da933076e71df68a04defaf4d2"
+      },
+      {
+        "features": {
+          "active_edge_count": 241396,
+          "atom_count": 5632,
+          "candidate_edge_count": 313044,
+          "dense_linear_algebra_work": 1302170688,
+          "dense_state_elements": 4769856,
+          "linear_state_elements": 0,
+          "system_count": 64
+        },
+        "measured_value": 0.18261334719136357,
+        "observation_id": "fit-XATMOV-B64",
+        "planning_profile_sha256": "155a191303ad011b9167bf9acbc9716ce8f487e51003e8e1badaf9d5b4ba5cf3",
+        "predicted_value": 0.19591347614562266,
+        "split": "fit",
+        "workload_id": "OPT-OMC-XATMOV-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "4d91ffad65bb99069fafcb2238b0c5dda7ff81da933076e71df68a04defaf4d2"
+      },
+      {
+        "features": {
+          "active_edge_count": 59344,
+          "atom_count": 1760,
+          "candidate_edge_count": 71944,
+          "dense_linear_algebra_work": 2395346472,
+          "dense_state_elements": 3580488,
+          "linear_state_elements": 0,
+          "system_count": 8
+        },
+        "measured_value": 0.058124828967265785,
+        "observation_id": "fit-OBEQIX-B8",
+        "planning_profile_sha256": "95c3d81678cf38edb8d069c8998314d74d3f542c2ed20d24df1c68473539ebd3",
+        "predicted_value": 0.07179472380593535,
+        "split": "fit",
+        "workload_id": "OPT-OMC-OBEQIX-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "3afcf550e906c73869ebb515f5d8b31e30bb59a7ec36cad4ff68a986e5b5a4d6"
+      },
+      {
+        "features": {
+          "active_edge_count": 240892,
+          "atom_count": 7040,
+          "candidate_edge_count": 293136,
+          "dense_linear_algebra_work": 9581385888,
+          "dense_state_elements": 14321952,
+          "linear_state_elements": 0,
+          "system_count": 32
+        },
+        "measured_value": 0.16830684046726674,
+        "observation_id": "fit-OBEQIX-B32",
+        "planning_profile_sha256": "95c3d81678cf38edb8d069c8998314d74d3f542c2ed20d24df1c68473539ebd3",
+        "predicted_value": 0.18566479874380393,
+        "split": "fit",
+        "workload_id": "OPT-OMC-OBEQIX-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "3afcf550e906c73869ebb515f5d8b31e30bb59a7ec36cad4ff68a986e5b5a4d6"
+      },
+      {
+        "features": {
+          "active_edge_count": 479088,
+          "atom_count": 14080,
+          "candidate_edge_count": 583656,
+          "dense_linear_algebra_work": 19162771776,
+          "dense_state_elements": 28643904,
+          "linear_state_elements": 0,
+          "system_count": 64
+        },
+        "measured_value": 0.29207603994291276,
+        "observation_id": "fit-OBEQIX-B64",
+        "planning_profile_sha256": "95c3d81678cf38edb8d069c8998314d74d3f542c2ed20d24df1c68473539ebd3",
+        "predicted_value": 0.33522506390235207,
+        "split": "fit",
+        "workload_id": "OPT-OMC-OBEQIX-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "3afcf550e906c73869ebb515f5d8b31e30bb59a7ec36cad4ff68a986e5b5a4d6"
+      },
+      {
+        "features": {
+          "active_edge_count": 82748,
+          "atom_count": 2368,
+          "candidate_edge_count": 102792,
+          "dense_linear_algebra_work": 5773874184,
+          "dense_state_elements": 6436872,
+          "linear_state_elements": 0,
+          "system_count": 8
+        },
+        "measured_value": 0.07021008396986872,
+        "observation_id": "fit-ROF-B-B8",
+        "planning_profile_sha256": "18e048ffed91c8b2fd7a5b9700df35fea73807dd1c8d0790eb23c3b4d638f04a",
+        "predicted_value": 0.0876753346403388,
+        "split": "fit",
+        "workload_id": "OPT-OMC-ROF-B-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "86e5421f4b25e31f872fb6f27f7c68568d177eda4ef9403b1d50c2a5486ee696"
+      },
+      {
+        "features": {
+          "active_edge_count": 324352,
+          "atom_count": 9472,
+          "candidate_edge_count": 401256,
+          "dense_linear_algebra_work": 23095496736,
+          "dense_state_elements": 25747488,
+          "linear_state_elements": 0,
+          "system_count": 32
+        },
+        "measured_value": 0.19103823695331812,
+        "observation_id": "fit-ROF-B-B32",
+        "planning_profile_sha256": "18e048ffed91c8b2fd7a5b9700df35fea73807dd1c8d0790eb23c3b4d638f04a",
+        "predicted_value": 0.2413251865619997,
+        "split": "fit",
+        "workload_id": "OPT-OMC-ROF-B-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "86e5421f4b25e31f872fb6f27f7c68568d177eda4ef9403b1d50c2a5486ee696"
+      },
+      {
+        "features": {
+          "active_edge_count": 624212,
+          "atom_count": 18944,
+          "candidate_edge_count": 764976,
+          "dense_linear_algebra_work": 46190993472,
+          "dense_state_elements": 51494976,
+          "linear_state_elements": 0,
+          "system_count": 64
+        },
+        "measured_value": 0.3460860652849078,
+        "observation_id": "fit-ROF-B-B64",
+        "planning_profile_sha256": "18e048ffed91c8b2fd7a5b9700df35fea73807dd1c8d0790eb23c3b4d638f04a",
+        "predicted_value": 0.4285689551268735,
+        "split": "fit",
+        "workload_id": "OPT-OMC-ROF-B-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "86e5421f4b25e31f872fb6f27f7c68568d177eda4ef9403b1d50c2a5486ee696"
+      },
+      {
+        "features": {
+          "active_edge_count": 55000,
+          "atom_count": 1024,
+          "candidate_edge_count": 71360,
+          "dense_linear_algebra_work": 129929616,
+          "dense_state_elements": 646416,
+          "linear_state_elements": 0,
+          "system_count": 16
+        },
+        "measured_value": 0.06573121517430991,
+        "observation_id": "validation-AXOSOW-B16",
+        "planning_profile_sha256": "cce72a9140a82d4d9c0dd7cba85cfc306d0fc93aa1f9dac20aaa1616fb10de88",
+        "predicted_value": 0.07149407946181932,
+        "split": "validation",
+        "workload_id": "OPT-OMC-AXOSOW-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "e782d6270d99b40ff02dc849b0a9a9a635ff4ea755a37c8a2f8f09ed41b7814e"
+      },
+      {
+        "features": {
+          "active_edge_count": 224360,
+          "atom_count": 4096,
+          "candidate_edge_count": 289704,
+          "dense_linear_algebra_work": 519718464,
+          "dense_state_elements": 2585664,
+          "linear_state_elements": 0,
+          "system_count": 64
+        },
+        "measured_value": 0.17335332790389657,
+        "observation_id": "validation-AXOSOW-B64",
+        "planning_profile_sha256": "cce72a9140a82d4d9c0dd7cba85cfc306d0fc93aa1f9dac20aaa1616fb10de88",
+        "predicted_value": 0.1838979984201631,
+        "split": "validation",
+        "workload_id": "OPT-OMC-AXOSOW-P64-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "e782d6270d99b40ff02dc849b0a9a9a635ff4ea755a37c8a2f8f09ed41b7814e"
+      },
+      {
+        "features": {
+          "active_edge_count": 94764,
+          "atom_count": 2112,
+          "candidate_edge_count": 119028,
+          "dense_linear_algebra_work": 1401604560,
+          "dense_state_elements": 2903184,
+          "linear_state_elements": 0,
+          "system_count": 16
+        },
+        "measured_value": 0.08398766024038196,
+        "observation_id": "validation-BOQQUT-B16",
+        "planning_profile_sha256": "2e6cd558ba0c0397869eee4db28376e5da44612cbd3025f9a398612d77112fe1",
+        "predicted_value": 0.09603365924833202,
+        "split": "validation",
+        "workload_id": "OPT-OMC-BOQQUT-P64-INTRA-WIDE-v1",
+        "workload_manifest_sha256": "913bfd58f9b7a889825c1280347733a9bd50859de2894781497f58f0920d8b58"
+      },
+      {
+        "features": {
+          "active_edge_count": 381824,
+          "atom_count": 8448,
+          "candidate_edge_count": 478312,
+          "dense_linear_algebra_work": 5606418240,
+          "dense_state_elements": 11612736,
+          "linear_state_elements": 0,
+          "system_count": 64
+        },
+        "measured_value": 0.26163003873080015,
+        "observation_id": "validation-BOQQUT-B64",
+        "planning_profile_sha256": "2e6cd558ba0c0397869eee4db28376e5da44612cbd3025f9a398612d77112fe1",
+        "predicted_value": 0.2809937663226258,
+        "split": "validation",
+        "workload_id": "OPT-OMC-BOQQUT-P64-INTRA-WIDE-v1",
+        "workload_manifest_sha256": "913bfd58f9b7a889825c1280347733a9bd50859de2894781497f58f0920d8b58"
+      },
+      {
+        "features": {
+          "active_edge_count": 73574,
+          "atom_count": 2738,
+          "candidate_edge_count": 85586,
+          "dense_linear_algebra_work": 2959491222,
+          "dense_state_elements": 4732560,
+          "linear_state_elements": 0,
+          "system_count": 16
+        },
+        "measured_value": 0.08021089376416057,
+        "observation_id": "validation-ROF-A-B16",
+        "planning_profile_sha256": "65f96ed9646b46a1a46e2a66a52a49ecb76ae1de1c4cb5964fc597dad66990a0",
+        "predicted_value": 0.07881765213201589,
+        "split": "validation",
+        "workload_id": "OPT-OMC-ROF-A-P64-INTRA-WIDE-v1",
+        "workload_manifest_sha256": "7e3c01ef45bb165137f58cf0384205222f5d1000f2b08312edec6c3574e7b0b3"
+      },
+      {
+        "features": {
+          "active_edge_count": 294520,
+          "atom_count": 10952,
+          "candidate_edge_count": 342012,
+          "dense_linear_algebra_work": 12373780536,
+          "dense_state_elements": 19324512,
+          "linear_state_elements": 0,
+          "system_count": 64
+        },
+        "measured_value": 0.23529652855359018,
+        "observation_id": "validation-ROF-A-B64",
+        "planning_profile_sha256": "65f96ed9646b46a1a46e2a66a52a49ecb76ae1de1c4cb5964fc597dad66990a0",
+        "predicted_value": 0.21082625929691284,
+        "split": "validation",
+        "workload_id": "OPT-OMC-ROF-A-P64-INTRA-WIDE-v1",
+        "workload_manifest_sha256": "7e3c01ef45bb165137f58cf0384205222f5d1000f2b08312edec6c3574e7b0b3"
+      },
+      {
+        "features": {
+          "active_edge_count": 417400,
+          "atom_count": 11264,
+          "candidate_edge_count": 537304,
+          "dense_linear_algebra_work": 717624576,
+          "dense_state_elements": 5089536,
+          "linear_state_elements": 0,
+          "system_count": 256
+        },
+        "measured_value": 0.42975858075078577,
+        "observation_id": "fit-GUFJOG-B256",
+        "planning_profile_sha256": "50195be3bad519d0be41ace29193ff6340788d3fb2ada34853a4b350b2294f7e",
+        "predicted_value": 0.3113629634940187,
+        "split": "fit",
+        "workload_id": "OPT-OMC-GUFJOG-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "c1c3bc7f53a625696322a58bbc2b73bc13fa61ea7f44de10ba1566cfed50ee5b"
+      },
+      {
+        "features": {
+          "active_edge_count": 733748,
+          "atom_count": 16896,
+          "candidate_edge_count": 948476,
+          "dense_linear_algebra_work": 3906512064,
+          "dense_state_elements": 14309568,
+          "linear_state_elements": 0,
+          "system_count": 192
+        },
+        "measured_value": 0.4978402787819505,
+        "observation_id": "fit-XATMOV-B192",
+        "planning_profile_sha256": "1a0bb4b725fcab46dc5c80a97440030ff03d8ec2220aff65be2ce881087a6686",
+        "predicted_value": 0.5230351146222391,
+        "split": "fit",
+        "workload_id": "OPT-OMC-XATMOV-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "75ad70c61603bbd47256366a45f8eaf99eb7b351f00c5d7d23d9401e383ea091"
+      },
+      {
+        "features": {
+          "active_edge_count": 955184,
+          "atom_count": 28160,
+          "candidate_edge_count": 1166840,
+          "dense_linear_algebra_work": 38325543552,
+          "dense_state_elements": 57287808,
+          "linear_state_elements": 0,
+          "system_count": 128
+        },
+        "measured_value": 0.5205868784105405,
+        "observation_id": "fit-OBEQIX-B128",
+        "planning_profile_sha256": "2afc4a1a8e14d977693e0635593b21934dedf0d94b159de54caae71f622d7c72",
+        "predicted_value": 0.6354493296197649,
+        "split": "fit",
+        "workload_id": "OPT-OMC-OBEQIX-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "e77e99d2f935c096dccda200d08eeee50cfd8b0d06bbc85c95dd41de21f2fc9b"
+      },
+      {
+        "features": {
+          "active_edge_count": 1247536,
+          "atom_count": 37888,
+          "candidate_edge_count": 1526832,
+          "dense_linear_algebra_work": 92381986944,
+          "dense_state_elements": 102989952,
+          "linear_state_elements": 0,
+          "system_count": 128
+        },
+        "measured_value": 0.6877755575114861,
+        "observation_id": "fit-ROF-B-B128",
+        "planning_profile_sha256": "a4f462a2a217e16fe44b20bd70993a34e3ffb8b04ef6f270cc9c8ef36974001f",
+        "predicted_value": 0.8207739164811033,
+        "split": "fit",
+        "workload_id": "OPT-OMC-ROF-B-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "283e31725006510adbc4a8d113d9c77255f86fa8b1ec0a541cb880d92327c241"
+      },
+      {
+        "features": {
+          "active_edge_count": 912648,
+          "atom_count": 16384,
+          "candidate_edge_count": 1178248,
+          "dense_linear_algebra_work": 2078873856,
+          "dense_state_elements": 10342656,
+          "linear_state_elements": 0,
+          "system_count": 256
+        },
+        "measured_value": 0.6696372798178345,
+        "observation_id": "validation-AXOSOW-B256",
+        "planning_profile_sha256": "836028c2cf7b792c3915c59cb8e509687aca1556fb95c27c64309919289f591c",
+        "predicted_value": 0.6413221903692097,
+        "split": "validation",
+        "workload_id": "OPT-OMC-AXOSOW-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "50b6fa8cfbf647c5b35d474ca0ec5238f5a216853023e6540e1fcdd39e3e0fb2"
+      },
+      {
+        "features": {
+          "active_edge_count": 735648,
+          "atom_count": 16456,
+          "candidate_edge_count": 920160,
+          "dense_linear_algebra_work": 10540297800,
+          "dense_state_elements": 22156272,
+          "linear_state_elements": 0,
+          "system_count": 128
+        },
+        "measured_value": 0.656571322819218,
+        "observation_id": "validation-BOQQUT-B128",
+        "planning_profile_sha256": "6f2e7409a2ec98965859452df7c75889b88e4226d733c9d4da6dc1c3053767c2",
+        "predicted_value": 0.5084579823482839,
+        "split": "validation",
+        "workload_id": "OPT-OMC-BOQQUT-P512-INTRA-WIDE-v1",
+        "workload_manifest_sha256": "8a1ed591978dde8e7f5f46018611501bf88c555a32c8329fa8e821d91127a4f4"
+      },
+      {
+        "features": {
+          "active_edge_count": 1239656,
+          "atom_count": 46472,
+          "candidate_edge_count": 1435878,
+          "dense_linear_algebra_work": 61012665072,
+          "dense_state_elements": 88185816,
+          "linear_state_elements": 0,
+          "system_count": 256
+        },
+        "measured_value": 0.7647554074646905,
+        "observation_id": "validation-ROF-A-B256",
+        "planning_profile_sha256": "e4d308d55d211b98bb2758488859177003e4a02ac315aacb0621828014c6809e",
+        "predicted_value": 0.7739506190928664,
+        "split": "validation",
+        "workload_id": "OPT-OMC-ROF-A-P512-INTRA-WIDE-v1",
+        "workload_manifest_sha256": "f1a7f7983a5de0ac1229f9c772b5dff0819b84e078b5131578b6074e2d31ea55"
+      },
+      {
+        "features": {
+          "active_edge_count": 835404,
+          "atom_count": 22528,
+          "candidate_edge_count": 1074236,
+          "dense_linear_algebra_work": 1435249152,
+          "dense_state_elements": 10179072,
+          "linear_state_elements": 0,
+          "system_count": 512
+        },
+        "measured_value": 0.8903444242896512,
+        "observation_id": "fit-GUFJOG-B512",
+        "planning_profile_sha256": "50195be3bad519d0be41ace29193ff6340788d3fb2ada34853a4b350b2294f7e",
+        "predicted_value": 0.5877766089990083,
+        "split": "fit",
+        "workload_id": "OPT-OMC-GUFJOG-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "c1c3bc7f53a625696322a58bbc2b73bc13fa61ea7f44de10ba1566cfed50ee5b"
+      },
+      {
+        "features": {
+          "active_edge_count": 1213852,
+          "atom_count": 28160,
+          "candidate_edge_count": 1568256,
+          "dense_linear_algebra_work": 6510853440,
+          "dense_state_elements": 23849280,
+          "linear_state_elements": 0,
+          "system_count": 320
+        },
+        "measured_value": 0.899198571452871,
+        "observation_id": "fit-XATMOV-B320",
+        "planning_profile_sha256": "1a0bb4b725fcab46dc5c80a97440030ff03d8ec2220aff65be2ce881087a6686",
+        "predicted_value": 0.8420990728349781,
+        "split": "fit",
+        "workload_id": "OPT-OMC-XATMOV-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "75ad70c61603bbd47256366a45f8eaf99eb7b351f00c5d7d23d9401e383ea091"
+      },
+      {
+        "features": {
+          "active_edge_count": 1383144,
+          "atom_count": 24576,
+          "candidate_edge_count": 1783472,
+          "dense_linear_algebra_work": 3118310784,
+          "dense_state_elements": 15513984,
+          "linear_state_elements": 0,
+          "system_count": 384
+        },
+        "measured_value": 0.8988508030306548,
+        "observation_id": "validation-AXOSOW-B384",
+        "planning_profile_sha256": "836028c2cf7b792c3915c59cb8e509687aca1556fb95c27c64309919289f591c",
+        "predicted_value": 0.9528926912652483,
+        "split": "validation",
+        "workload_id": "OPT-OMC-AXOSOW-P512-INTRA-NARROW-v1",
+        "workload_manifest_sha256": "50b6fa8cfbf647c5b35d474ca0ec5238f5a216853023e6540e1fcdd39e3e0fb2"
+      },
+      {
+        "features": {
+          "active_edge_count": 1472140,
+          "atom_count": 33000,
+          "candidate_edge_count": 1841792,
+          "dense_linear_algebra_work": 21215103336,
+          "dense_state_elements": 44526384,
+          "linear_state_elements": 0,
+          "system_count": 256
+        },
+        "measured_value": 0.8460053342860192,
+        "observation_id": "validation-BOQQUT-B256",
+        "planning_profile_sha256": "6f2e7409a2ec98965859452df7c75889b88e4226d733c9d4da6dc1c3053767c2",
+        "predicted_value": 0.9829159415201242,
+        "split": "validation",
+        "workload_id": "OPT-OMC-BOQQUT-P512-INTRA-WIDE-v1",
+        "workload_manifest_sha256": "8a1ed591978dde8e7f5f46018611501bf88c555a32c8329fa8e821d91127a4f4"
+      }
+    ]
+  },
+  "schema_version": 1,
+  "status": "fit_complete"
+}

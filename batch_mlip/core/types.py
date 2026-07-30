@@ -87,6 +87,26 @@ class RelaxationResult:
 
         return self.state.to_ase(self.evaluation, wrap=False)
 
+    @property
+    def schedule(self) -> dict[str, Any] | None:
+        """Return the compact scheduling decision when one was recorded."""
+
+        scheduling = self.metadata.get("scheduling")
+        if not isinstance(scheduling, dict):
+            return None
+        summary = scheduling.get("summary")
+        return dict(summary) if isinstance(summary, dict) else None
+
+    @property
+    def execution_policy(self) -> dict[str, Any] | None:
+        """Return the detailed task-to-execution decision when recorded."""
+
+        scheduling = self.metadata.get("scheduling")
+        if not isinstance(scheduling, dict):
+            return None
+        manifest = scheduling.get("policy_manifest")
+        return dict(manifest) if isinstance(manifest, dict) else None
+
 
 @dataclass
 class MDResult:

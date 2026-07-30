@@ -1,0 +1,811 @@
+{
+  "construction_id": "omc-csp-scheduler-epoch1-v2",
+  "construction_sha256": "16337463225baf362840bea21e598d295c7dde41c7aa3819ec1c226bf7f7469a",
+  "excluded_families": {
+    "XIFZOF": "contains Si, absent from AtomBit smooth-rms checkpoint"
+  },
+  "family_count": 22,
+  "pool_sizes": [
+    64,
+    512,
+    2048
+  ],
+  "replication": false,
+  "scheduler_matrix": {
+    "development": {
+      "all_family_p512": [
+        "BOQWIN",
+        "GUFJOG",
+        "HAMTIZ",
+        "KONTIQ",
+        "NACJAF",
+        "OBEQUJ",
+        "PAHYON",
+        "SOXLEX",
+        "UJIRIO",
+        "XAFPAY",
+        "XATMOV",
+        "rof-b"
+      ],
+      "mixed_p512": true,
+      "selected_intra_family_extreme_pool_families": [
+        "GUFJOG",
+        "KONTIQ",
+        "BOQWIN",
+        "XAFPAY",
+        "rof-b"
+      ]
+    },
+    "test": {
+      "all_family_p64_p512_p2048": [
+        "JAYDUI",
+        "OBEQIX",
+        "XULDUD",
+        "rof-a",
+        "rof-c"
+      ],
+      "mixed_p512": true
+    },
+    "validation": {
+      "all_family_p512": [
+        "AXOSOW",
+        "BOQQUT",
+        "WICZUF",
+        "WIDBAO",
+        "XAFQIH"
+      ],
+      "mixed_p512": true,
+      "selected_intra_family_extreme_pool_families": [
+        "BOQQUT",
+        "WIDBAO"
+      ]
+    }
+  },
+  "scheduler_splits": {
+    "development": [
+      "BOQWIN",
+      "GUFJOG",
+      "HAMTIZ",
+      "KONTIQ",
+      "NACJAF",
+      "OBEQUJ",
+      "PAHYON",
+      "SOXLEX",
+      "UJIRIO",
+      "XAFPAY",
+      "XATMOV",
+      "rof-b"
+    ],
+    "test": [
+      "JAYDUI",
+      "OBEQIX",
+      "XULDUD",
+      "rof-a",
+      "rof-c"
+    ],
+    "validation": [
+      "AXOSOW",
+      "BOQQUT",
+      "WICZUF",
+      "WIDBAO",
+      "XAFQIH"
+    ]
+  },
+  "schema_version": 1,
+  "selection_seed": 20260729,
+  "source_construction_id": "omc-csp-unique-pools-v1",
+  "source_construction_sha256": "48c6b87ce74b2af0ec13e6830cd048b05c985f7605662a091cd7bdf26f7982c1",
+  "source_directory": "/public/home/lmy/Batch_imple_project/omc_csp_workloads_v1",
+  "workload_count": 69,
+  "workloads": {
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-BOQWIN-P2048-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 2048,
+      "manifest_sha256": "ee66812745790bd453a6fdf66ce8b923dd073b41aaeb742e55fa40e84c4fba65",
+      "parent_pool_id": null,
+      "scheduler_split": "development",
+      "source_families": [
+        "BOQWIN"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-BOQWIN-P512-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 512,
+      "manifest_sha256": "a3436f5c6669d491ee025097b42aceaaafb38625b3214ee19ddc4cf9f34b798a",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-BOQWIN-P2048-INTRA-NARROW-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "BOQWIN"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-BOQWIN-P64-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 64,
+      "manifest_sha256": "224b55d446c5c703b2acc206edb755b5bc5bcbedefb03fee677df3dc1984140c",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-BOQWIN-P512-INTRA-NARROW-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "BOQWIN"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-GUFJOG-P2048-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 2048,
+      "manifest_sha256": "f5165a27a811586c695f283287d9b12ed89e615bd40315c55dbeba3210c25b56",
+      "parent_pool_id": null,
+      "scheduler_split": "development",
+      "source_families": [
+        "GUFJOG"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-GUFJOG-P512-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 512,
+      "manifest_sha256": "720a686a2084920e9ac56f1e9d1cc16d743abe4e57e7fbcc4c16963d862c38a6",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-GUFJOG-P2048-INTRA-NARROW-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "GUFJOG"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-GUFJOG-P64-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 64,
+      "manifest_sha256": "d5d9669c3c45b6e2c575e0b3939ebfb555101970541532440f5101520488bacd",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-GUFJOG-P512-INTRA-NARROW-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "GUFJOG"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-HAMTIZ-P2048-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 2048,
+      "manifest_sha256": "acda56387957606498008eef3c3840e2a7edecef8a625508b131502f74f6e4e4",
+      "parent_pool_id": null,
+      "scheduler_split": "development",
+      "source_families": [
+        "HAMTIZ"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-HAMTIZ-P512-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 512,
+      "manifest_sha256": "84d72eaaecc1c15d45ccb71fc15a4b12445a582d9845995d4408e315ed3c6d0f",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-HAMTIZ-P2048-INTRA-NARROW-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "HAMTIZ"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-HAMTIZ-P64-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 64,
+      "manifest_sha256": "cd0cf0434a45d7b7db321cbc3872cdb65d3a646ea676d99922ce6744c7b1089f",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-HAMTIZ-P512-INTRA-NARROW-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "HAMTIZ"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-KONTIQ-P2048-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 2048,
+      "manifest_sha256": "72ee686564b4d8911b0dd4bdf35b7c5329cbbf4e97c77451ba77fa550c1ee126",
+      "parent_pool_id": null,
+      "scheduler_split": "development",
+      "source_families": [
+        "KONTIQ"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-KONTIQ-P512-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 512,
+      "manifest_sha256": "e9139a225724b2e2f075681f47967ee39f0b556db42f83cddf2cf7785f74dc02",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-KONTIQ-P2048-INTRA-NARROW-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "KONTIQ"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-KONTIQ-P64-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 64,
+      "manifest_sha256": "26231f7b80081272d87a5c706f2ea02edf6a6186c19c55ce255e770e24da5692",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-KONTIQ-P512-INTRA-NARROW-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "KONTIQ"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-MIX-ALL-P512-INTER-WIDE-v2": {
+      "family_scope": "inter",
+      "jobs": 512,
+      "manifest_sha256": "57750bd663b46ba432f63ceca4e38c428451b8d3fbf1fa301f4dd4fe8050f30b",
+      "parent_pool_id": null,
+      "scheduler_split": "development",
+      "source_families": [
+        "BOQWIN",
+        "GUFJOG",
+        "HAMTIZ",
+        "KONTIQ",
+        "NACJAF",
+        "OBEQUJ",
+        "PAHYON",
+        "SOXLEX",
+        "UJIRIO",
+        "XAFPAY",
+        "XATMOV",
+        "rof-b"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-NACJAF-P2048-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 2048,
+      "manifest_sha256": "490059ddfb96f68511ff11647a951486e4b638e958d3d8f89de70e86aed3d4e6",
+      "parent_pool_id": null,
+      "scheduler_split": "development",
+      "source_families": [
+        "NACJAF"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-NACJAF-P512-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 512,
+      "manifest_sha256": "d6767589f59a887e7e2462ea755e9f544a1a10012440e229f978d809b22a8509",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-NACJAF-P2048-INTRA-NARROW-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "NACJAF"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-NACJAF-P64-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 64,
+      "manifest_sha256": "6f0611f92e359c154c2e4d62239507be46c1be4bedb13981c6b4c769833c2237",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-NACJAF-P512-INTRA-NARROW-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "NACJAF"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-OBEQUJ-P2048-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 2048,
+      "manifest_sha256": "b0633470cd07d46f315527126f9eaa581737ce6f2f52655c81917a8b001e58c3",
+      "parent_pool_id": null,
+      "scheduler_split": "development",
+      "source_families": [
+        "OBEQUJ"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-OBEQUJ-P512-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 512,
+      "manifest_sha256": "bfb0b0f9d9aa8dfa6b4902c2765fb3b611231746aa639cba954f9ee321c2c345",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-OBEQUJ-P2048-INTRA-NARROW-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "OBEQUJ"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-OBEQUJ-P64-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 64,
+      "manifest_sha256": "238af17a96f4984f093155821b5fae7b0fa850f769a17a7e3684483cb25b9276",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-OBEQUJ-P512-INTRA-NARROW-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "OBEQUJ"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-PAHYON-P2048-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 2048,
+      "manifest_sha256": "de073e2c6d61bc2d9c5db3c3fe3d3457d191310aab731f4a73313954ad95bf5a",
+      "parent_pool_id": null,
+      "scheduler_split": "development",
+      "source_families": [
+        "PAHYON"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-PAHYON-P512-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 512,
+      "manifest_sha256": "f97ecd10e69ffed88cfcac20bfd26c5e5e8a7b3e075757e9632a8711b48ed596",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-PAHYON-P2048-INTRA-NARROW-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "PAHYON"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-PAHYON-P64-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 64,
+      "manifest_sha256": "4fa4a83751dee406c11391d0eef541ed80f2933e18369bb0726b2971b58eeb0f",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-PAHYON-P512-INTRA-NARROW-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "PAHYON"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-ROF-B-P2048-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 2048,
+      "manifest_sha256": "14b331901219b5cd2445ed7405102c74633c3346cb3662cad176666c3ab30039",
+      "parent_pool_id": null,
+      "scheduler_split": "development",
+      "source_families": [
+        "rof-b"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-ROF-B-P512-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 512,
+      "manifest_sha256": "25270eb5ce542de672845ef3852ed14000682883ad8aacd7a76c77585a30eeb4",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-ROF-B-P2048-INTRA-NARROW-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "rof-b"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-ROF-B-P64-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 64,
+      "manifest_sha256": "562f246b4277f3488c0c0d5e59d84813ce32d33e058e78f1c5edae52ae8841dd",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-ROF-B-P512-INTRA-NARROW-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "rof-b"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-SOXLEX-P2048-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 2048,
+      "manifest_sha256": "30a5b8012b9a6f4ea4825b9ef0e1ddc9c1d84bfa0e67fd6e09941ff6575ca849",
+      "parent_pool_id": null,
+      "scheduler_split": "development",
+      "source_families": [
+        "SOXLEX"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-SOXLEX-P512-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 512,
+      "manifest_sha256": "5fa39b22d657fa519d2cdb101b96e82833dae20de34bc024fb2c44d266986a7f",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-SOXLEX-P2048-INTRA-NARROW-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "SOXLEX"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-SOXLEX-P64-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 64,
+      "manifest_sha256": "538d2c407d345f1d3c71c0dd7b3ef3951c361740d616d83c94faf8300bc4421a",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-SOXLEX-P512-INTRA-NARROW-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "SOXLEX"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-UJIRIO-P2048-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 2048,
+      "manifest_sha256": "4f6bce33f0646f966f30934b994b1553bed6b6b184f031e0ce854f5d7855939b",
+      "parent_pool_id": null,
+      "scheduler_split": "development",
+      "source_families": [
+        "UJIRIO"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-UJIRIO-P512-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 512,
+      "manifest_sha256": "5fe833a8ed547207fcaf526da1b1e690bb27397c479fcb28b97c61ce2d3ec080",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-UJIRIO-P2048-INTRA-NARROW-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "UJIRIO"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-UJIRIO-P64-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 64,
+      "manifest_sha256": "0489d2bc1ea3a04b97a71480e34e133de2063967d8120a2e49fbb8b42353d405",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-UJIRIO-P512-INTRA-NARROW-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "UJIRIO"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-XAFPAY-P2048-INTRA-WIDE-v2": {
+      "family_scope": "intra",
+      "jobs": 2048,
+      "manifest_sha256": "c0f616dcb893a507667b5f158b28212387b6b752ce55d217b3bdbea00f8708b9",
+      "parent_pool_id": null,
+      "scheduler_split": "development",
+      "source_families": [
+        "XAFPAY"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-XAFPAY-P512-INTRA-WIDE-v2": {
+      "family_scope": "intra",
+      "jobs": 512,
+      "manifest_sha256": "cfbcf1a8c45cc08484b2f152aa4e6c6a05b7e69ab74a3399f9ba9c4a136b4578",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-XAFPAY-P2048-INTRA-WIDE-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "XAFPAY"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-XAFPAY-P64-INTRA-WIDE-v2": {
+      "family_scope": "intra",
+      "jobs": 64,
+      "manifest_sha256": "c06c33e1e772ebab613cf313af34880f79e056e27b959e1e670cf16e7a0db6e4",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-XAFPAY-P512-INTRA-WIDE-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "XAFPAY"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-XATMOV-P2048-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 2048,
+      "manifest_sha256": "cf0e469dd0db78333b3a384cdbf4c8cc30220d80bd0c3b2332444478521b8aaa",
+      "parent_pool_id": null,
+      "scheduler_split": "development",
+      "source_families": [
+        "XATMOV"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-XATMOV-P512-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 512,
+      "manifest_sha256": "9cbb3c1a51fc3e8155f6674eab423289761673ba5bbbf3f3eb8bbc1777116007",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-XATMOV-P2048-INTRA-NARROW-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "XATMOV"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-DEVELOPMENT-XATMOV-P64-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 64,
+      "manifest_sha256": "cf9a6a6778460dd473081414e775048f9e6c6a859ef1e7490a009f3f307f189d",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-DEVELOPMENT-XATMOV-P512-INTRA-NARROW-v2",
+      "scheduler_split": "development",
+      "source_families": [
+        "XATMOV"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-TEST-JAYDUI-P2048-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 2048,
+      "manifest_sha256": "398fe84812ff6f59ce96e4cb8ee95c0a82eef95b0bb41730dfa0d28f0fe9a03b",
+      "parent_pool_id": null,
+      "scheduler_split": "test",
+      "source_families": [
+        "JAYDUI"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-TEST-JAYDUI-P512-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 512,
+      "manifest_sha256": "eaaaa99b824ee22097db5f6d0f60b7bf401c198a2f0f6d92335f80c3d748a66e",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-TEST-JAYDUI-P2048-INTRA-NARROW-v2",
+      "scheduler_split": "test",
+      "source_families": [
+        "JAYDUI"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-TEST-JAYDUI-P64-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 64,
+      "manifest_sha256": "4f5aaa2c55fceb6f9ec08b49941574ca2c4ff7907d072dbbf237c12504680efc",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-TEST-JAYDUI-P512-INTRA-NARROW-v2",
+      "scheduler_split": "test",
+      "source_families": [
+        "JAYDUI"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-TEST-MIX-ALL-P512-INTER-WIDE-v2": {
+      "family_scope": "inter",
+      "jobs": 512,
+      "manifest_sha256": "44e2765119b44947ee9d6231e1616b2ef1f70d4e6622071595370fc6cc3e9ca5",
+      "parent_pool_id": null,
+      "scheduler_split": "test",
+      "source_families": [
+        "JAYDUI",
+        "OBEQIX",
+        "XULDUD",
+        "rof-a",
+        "rof-c"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 2048,
+      "manifest_sha256": "68dacfd500f151612ef193f1cc930085c146cc46b681e9025dd936e579436e47",
+      "parent_pool_id": null,
+      "scheduler_split": "test",
+      "source_families": [
+        "OBEQIX"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-TEST-OBEQIX-P512-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 512,
+      "manifest_sha256": "ed8ec42a4f812a480c698667d897cb14b38a750d1731f2a1d076682ce828c789",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2",
+      "scheduler_split": "test",
+      "source_families": [
+        "OBEQIX"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-TEST-OBEQIX-P64-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 64,
+      "manifest_sha256": "ba0aeb321b8b8e27608020d2e72641f0554d0e2827bb8e9e4c0d435d7885ef1a",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-TEST-OBEQIX-P512-INTRA-NARROW-v2",
+      "scheduler_split": "test",
+      "source_families": [
+        "OBEQIX"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2": {
+      "family_scope": "intra",
+      "jobs": 2048,
+      "manifest_sha256": "53442cc94cad00a06f2243ae479f068c60ebf91c00c98d882ba667238b9a379a",
+      "parent_pool_id": null,
+      "scheduler_split": "test",
+      "source_families": [
+        "rof-a"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-TEST-ROF-A-P512-INTRA-WIDE-v2": {
+      "family_scope": "intra",
+      "jobs": 512,
+      "manifest_sha256": "188d909ce01dc93773569b08c1439f68e1ab07863edb1a7c1d1ee3ed6a299d95",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2",
+      "scheduler_split": "test",
+      "source_families": [
+        "rof-a"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-TEST-ROF-A-P64-INTRA-WIDE-v2": {
+      "family_scope": "intra",
+      "jobs": 64,
+      "manifest_sha256": "aa60966e68589c2b0c5d59cb35a8a1cc2c482fba5f205edf9555cc3a7132fa0c",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-TEST-ROF-A-P512-INTRA-WIDE-v2",
+      "scheduler_split": "test",
+      "source_families": [
+        "rof-a"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2": {
+      "family_scope": "intra",
+      "jobs": 2048,
+      "manifest_sha256": "a8aa05178634172b53197afee1325e5a37e2e9fbc2921aaa332a4c4209627da8",
+      "parent_pool_id": null,
+      "scheduler_split": "test",
+      "source_families": [
+        "rof-c"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-TEST-ROF-C-P512-INTRA-WIDE-v2": {
+      "family_scope": "intra",
+      "jobs": 512,
+      "manifest_sha256": "e2b98f1e0b8913dc5428d666c072cfa4a383115a3c4102f2c4ad8ea80e62a0fb",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2",
+      "scheduler_split": "test",
+      "source_families": [
+        "rof-c"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-TEST-ROF-C-P64-INTRA-WIDE-v2": {
+      "family_scope": "intra",
+      "jobs": 64,
+      "manifest_sha256": "181b3a656d44df6b99f34a64f79003da4cf03d7ebc78d1d220c529eaadc5fd03",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-TEST-ROF-C-P512-INTRA-WIDE-v2",
+      "scheduler_split": "test",
+      "source_families": [
+        "rof-c"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2": {
+      "family_scope": "intra",
+      "jobs": 2048,
+      "manifest_sha256": "ec9d6f04a1f9674c433336c423fa3c489241315caf3d4bb504750224fbac29dd",
+      "parent_pool_id": null,
+      "scheduler_split": "test",
+      "source_families": [
+        "XULDUD"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-TEST-XULDUD-P512-INTRA-WIDE-v2": {
+      "family_scope": "intra",
+      "jobs": 512,
+      "manifest_sha256": "00bdfba239a364b1f2d53e751620a0dec95a46dda7b1bc493cc832b5e53b0dea",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2",
+      "scheduler_split": "test",
+      "source_families": [
+        "XULDUD"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-TEST-XULDUD-P64-INTRA-WIDE-v2": {
+      "family_scope": "intra",
+      "jobs": 64,
+      "manifest_sha256": "a7b7e2e3eb54356b40c2186c0893e0bd5dee961b86c088c3b7e9c39c17860798",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-TEST-XULDUD-P512-INTRA-WIDE-v2",
+      "scheduler_split": "test",
+      "source_families": [
+        "XULDUD"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-AXOSOW-P2048-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 2048,
+      "manifest_sha256": "5cc74fed26c7af42da8f44d3bf2c55b234b3861990376902a40186791b7b19a9",
+      "parent_pool_id": null,
+      "scheduler_split": "validation",
+      "source_families": [
+        "AXOSOW"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-AXOSOW-P512-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 512,
+      "manifest_sha256": "4ee912b283f0fac2e80949d9cd5b89c9184cde161b663c9d44303d40a11ac3bd",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-VALIDATION-AXOSOW-P2048-INTRA-NARROW-v2",
+      "scheduler_split": "validation",
+      "source_families": [
+        "AXOSOW"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-AXOSOW-P64-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 64,
+      "manifest_sha256": "ee178f98307646b36e9e685c9e06855be579a7388beb76726fa9424e7c072ba2",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-VALIDATION-AXOSOW-P512-INTRA-NARROW-v2",
+      "scheduler_split": "validation",
+      "source_families": [
+        "AXOSOW"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P2048-INTRA-WIDE-v2": {
+      "family_scope": "intra",
+      "jobs": 2048,
+      "manifest_sha256": "4b2eafd60048b0fd98f76f88965f06266f4856bd37fe1da2278452e3a7089033",
+      "parent_pool_id": null,
+      "scheduler_split": "validation",
+      "source_families": [
+        "BOQQUT"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P512-INTRA-WIDE-v2": {
+      "family_scope": "intra",
+      "jobs": 512,
+      "manifest_sha256": "5db744d39669bbe61f7029723b174712999df8bb7f36cbc8f7c476c9a97cef0f",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P2048-INTRA-WIDE-v2",
+      "scheduler_split": "validation",
+      "source_families": [
+        "BOQQUT"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P64-INTRA-WIDE-v2": {
+      "family_scope": "intra",
+      "jobs": 64,
+      "manifest_sha256": "b0019f0911d7ec3cd40a5de49c916bd27ea40aad7643deb08396c331d39947ec",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-VALIDATION-BOQQUT-P512-INTRA-WIDE-v2",
+      "scheduler_split": "validation",
+      "source_families": [
+        "BOQQUT"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-MIX-ALL-P512-INTER-WIDE-v2": {
+      "family_scope": "inter",
+      "jobs": 512,
+      "manifest_sha256": "bdc6f476c12f14ae82dbd248eec426f0696f7e7beaded33005c64554dd98842e",
+      "parent_pool_id": null,
+      "scheduler_split": "validation",
+      "source_families": [
+        "AXOSOW",
+        "BOQQUT",
+        "WICZUF",
+        "WIDBAO",
+        "XAFQIH"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-WICZUF-P2048-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 2048,
+      "manifest_sha256": "6c1e10c286d6799351e42c8276c82c69de4663754ae3607a5a8deec943ccead6",
+      "parent_pool_id": null,
+      "scheduler_split": "validation",
+      "source_families": [
+        "WICZUF"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-WICZUF-P512-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 512,
+      "manifest_sha256": "81beecbfed8bb0e7f471075ff746060741bc8b2a8cb6ec8c7c46e6caa4d11cb3",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-VALIDATION-WICZUF-P2048-INTRA-NARROW-v2",
+      "scheduler_split": "validation",
+      "source_families": [
+        "WICZUF"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-WICZUF-P64-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 64,
+      "manifest_sha256": "b37ce4b239b4068cfeed5e0cd759310c63d76b3bd70faacb066ae35d2d5d4c30",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-VALIDATION-WICZUF-P512-INTRA-NARROW-v2",
+      "scheduler_split": "validation",
+      "source_families": [
+        "WICZUF"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P2048-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 2048,
+      "manifest_sha256": "fcd5b640f376fa5b12eedcb0a6b2f95ba185284154721401a408c31689a504d6",
+      "parent_pool_id": null,
+      "scheduler_split": "validation",
+      "source_families": [
+        "WIDBAO"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P512-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 512,
+      "manifest_sha256": "ee163e6c89cca46fb8286678db86db18a09f238e2489b00726ef1865982a019e",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P2048-INTRA-NARROW-v2",
+      "scheduler_split": "validation",
+      "source_families": [
+        "WIDBAO"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P64-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 64,
+      "manifest_sha256": "4f99afdc53c0f3830d942f1b79b048eec578b1403e5f68834b767d9c28d9f8a6",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-VALIDATION-WIDBAO-P512-INTRA-NARROW-v2",
+      "scheduler_split": "validation",
+      "source_families": [
+        "WIDBAO"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-XAFQIH-P2048-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 2048,
+      "manifest_sha256": "24952adcbe4c92ca977d05959c79249fb2145f151ed12b359d5a5d8f8bbf5ba0",
+      "parent_pool_id": null,
+      "scheduler_split": "validation",
+      "source_families": [
+        "XAFQIH"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-XAFQIH-P512-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 512,
+      "manifest_sha256": "d57413ef0f97ee16387075c5358ef6a5e6e98cfe5e3756cb2fa14807de426369",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-VALIDATION-XAFQIH-P2048-INTRA-NARROW-v2",
+      "scheduler_split": "validation",
+      "source_families": [
+        "XAFQIH"
+      ]
+    },
+    "OPT-OMC-SCHED-E1-VALIDATION-XAFQIH-P64-INTRA-NARROW-v2": {
+      "family_scope": "intra",
+      "jobs": 64,
+      "manifest_sha256": "cb14cd19951969b5ed656f8513d639240fab85668f8fbe1e8e3bf726adc682c1",
+      "parent_pool_id": "OPT-OMC-SCHED-E1-VALIDATION-XAFQIH-P512-INTRA-NARROW-v2",
+      "scheduler_split": "validation",
+      "source_families": [
+        "XAFQIH"
+      ]
+    }
+  }
+}

@@ -1,0 +1,158 @@
+schema_version: 1
+baseline_id: scheduler-v1
+status: algorithm_frozen_interface_patch_pending_commit
+
+provenance:
+  implementation_commit: 4ee8b18f2cc140bf52bfb1700cf1a937b4232a51
+  implementation_commit_role: >-
+    Last committed scheduler algorithm. The local unified-auto-scheduling
+    patch changes the default route and reporting but not the deterministic
+    scheduling decisions for scheduling=auto.
+  refill_policy:
+    path: batch_mlip/planning/data/refill_policy_v2.json
+    policy_id: atombit-smooth-rms-bfgs-h100-refill-v2
+    sha256: 08b1ba6a3c67715c8695fd9813585bb8a8c36bec701d679369601ffc4f1e222b
+  capacity_policy:
+    path: batch_mlip/planning/data/capacity_policy_v1.json
+    policy_id: omc-csp-atombit-h100-capacity-v1
+    sha256: d8ed5cbbfd63d6e845eb3d552f628169a0c4e99f996f820c81299bdeafaf46fb
+  experiment_directory_count: 86
+  experiment_directory_names_sha256: 8d8f217ae9c5d8caf6274e5dbecfb54096075818c4d3035ea2fdb4004f1105b3
+
+objective:
+  primary: minimize_total_makespan
+  constraints:
+    - scientific_correctness
+    - convergence_contract
+    - no_runtime_failure
+    - peak_reserved_memory_within_budget
+  memory_safety_fraction: 0.85
+
+reproducibility_contract:
+  process_seed: 20260729
+  optimization_seed_robustness: [20260729, 20260730, 20260731]
+  python_hash_seed_before_interpreter: true
+  python_random_seeded: true
+  numpy_global_rng_seeded: true
+  torch_cpu_and_cuda_rngs_seeded: true
+  torch_deterministic_algorithms: true
+  cublas_workspace_config: ":4096:8"
+  cudnn_benchmark: false
+  cudnn_deterministic: true
+  allow_tf32: false
+  cpu_threads_per_worker: 1
+  interop_threads_per_worker: 1
+  md_randomness: per_job_manifest_seed
+  identical_for_tensor_and_mps: true
+
+inputs_owned_by_user:
+  - structures
+  - calculator_and_checkpoint
+  - optimizer
+  - cell_filter_and_physical_parameters
+  - convergence_parameters
+  - available_devices
+
+automatic_decisions:
+  workload_profile:
+    fields:
+      - atom_count
+      - candidate_edge_count
+      - optimizer_dimension_squared
+    timing_pilot: false
+  bucketing:
+    cost_ratio_max: 2.0
+  memory:
+    exact_contract_capacity: signed_offline_peak_reserved_bytes_model
+    mismatch_fallback: representative_forward
+    representative_forward_max_systems: 4
+    resident_count_cap: 256
+    safety_fraction: 0.85
+    optimization_growth_margin: 1.10
+    dense_bfgs_state_reserved: true
+  optimization:
+    active_compaction: true
+    optimizer_selection: false
+  decision_manifest:
+    path: metadata.scheduling.policy_manifest
+    application_domain_inference: false
+    observed_duration_telemetry: true
+    unsupported_action_fallbacks_recorded: true
+  single_device_refill:
+    selector: exact_evidence_match
+    supported_policy_artifact: atombit-smooth-rms-bfgs-h100-refill-v2
+    fallback: active_drain
+  multi_device:
+    refill: false
+    refill_reason: no_accepted_multi_gpu_scientific_policy
+    target_execution_chunks_per_device: 2
+    assignment: largest_cost_first_work_stealing
+    optimizer_state_migration: false
+  external_baseline_dispatch:
+    automatic_mps_fallback: false
+
+refill_contract:
+  model: AtomBit_smooth_rms_fp32_epoch5
+  model_state_sha256: 200b8a378d848c00b9a690583e34e49dacad79975cf3c7c4c92c39a0e24d620d
+  optimizer: BatchedBFGS
+  optimizer_dtype: float64
+  cell_filter: FrechetCellFilter
+  force_mode: autograd
+  cutoff_A: 6.0
+  skin_A: 0.5
+  hardware: NVIDIA_H100_80GB_HBM3
+  torch: 2.9.1+cu128
+  cuda: "12.8"
+  deterministic: true
+  allocator: expandable_segments
+  accepted_pool_sizes:
+    - 128
+    - 256
+    - 512
+  exact_resident_and_workload_descriptor_match_required: true
+
+accepted_priors:
+  - deterministic_memory_scheduler
+  - active_batch_compaction
+  - variable_cell_compaction
+  - topology_preserving_compaction
+  - grouped_bfgs_linear_algebra
+  - cuda_dense_production
+  - allocator_aware_launcher
+  - refill_memory_control
+  - refill_offline_predictor
+  - refill_cross_family_validation
+  - refill_pool_multigpu_transfer_single_gpu_records
+  - multi_gpu_resident_packing
+  - process_worker_autoscheduler
+  - signed_offline_hardware_capacity
+
+explicit_negative_priors:
+  - universal_refill
+  - threshold_refill_as_default
+  - blockwise_convergence_checks_as_default
+  - heterogeneous_arena_as_default
+  - nearest_chemical_family_throughput_table
+  - online_timing_autotuning_as_production_default
+  - multi_gpu_refill_extrapolated_from_single_gpu
+
+baseline_comparisons:
+  primary: cuda_mps_ase_pool
+  reference_only: ase_serial
+  required_scope:
+    - same_initial_structures
+    - same_model_and_checkpoint
+    - same_optimizer_and_parameters
+    - same_hardware_allocation
+    - same_convergence_limits
+    - cold_and_production_times_reported_separately
+
+limitations:
+  - Refill evidence is contract-specific rather than a general predictor.
+  - Supplied devices are treated as available execution resources; their external opportunity cost is not modeled.
+  - Multi-GPU execution may change chunk membership and numerical reduction order.
+  - The signed offline capacity policy has sparse strict endpoint-tolerance
+    exceptions relative to the probe-backed tensor schedule.
+  - Cache skin is not selected automatically.
+  - MD uses separate execution paths and is not covered by scheduler v1.
+  - Historical timings are not eligible as chemical-transfer training labels.

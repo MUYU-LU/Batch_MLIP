@@ -1,0 +1,71 @@
+schema_version: 1
+id: omc-csp-hardware-calibration
+date: 2026-07-29
+status: complete
+
+hypothesis: >-
+  Offline layered features can predict peak memory for unseen OMC families
+  closely enough to choose safe resident capacities without a per-user timing
+  pilot. Runtime prediction is evaluated separately as an informational prior.
+
+contract:
+  mlip: AtomBit-smooth-rms-fp32
+  optimizer: BatchedBFGS
+  optimizer_dtype: torch.float64
+  cell_filter: FrechetCellFilter
+  cutoff_A: 6.0
+  skin_A: 0.5
+  force_mode: autograd
+  neighbor_backend: auto
+  hardware: NVIDIA H100 80GB HBM3
+  memory_fraction: 0.85
+  cuda_allocator: expandable_segments
+  deterministic: true
+
+matrix:
+  fit:
+    family_count: 12
+    points: 42
+  validation:
+    family_count: 6
+    points: 20
+  untouched_final:
+    families: [UJIRIO112, WIDBAO100, XAFQIH124, XULDUD52-104]
+    resident_batch_sizes:
+      UJIRIO112: [128, 286]
+      WIDBAO100: [128, 364]
+      XAFQIH124: [128, 293]
+      XULDUD52-104: [128, 207]
+    points: 8
+  timing_repeats: 1
+  warm_executions_per_point: 1
+  measured_executions_per_point: 1
+  optimizer_steps_per_execution: 3
+
+metrics:
+  - peak_allocated_bytes
+  - peak_reserved_bytes
+  - production_seconds_per_model_evaluation
+  - fit_mean_absolute_relative_error
+  - heldout_mean_absolute_relative_error
+  - heldout_max_absolute_relative_error
+
+gates:
+  no_oom: true
+  memory_underprediction_after_safety_scale: false
+  heldout_memory_max_absolute_relative_error: 0.10
+  heldout_runtime_mean_absolute_relative_error: 0.15
+  result:
+    no_oom: passed
+    heldout_reserved_memory_max_absolute_relative_error: 0.072459
+    heldout_runtime_mean_absolute_relative_error: 0.234372
+    heldout_runtime_gate: failed_informational_only
+    untouched_final_capacity_tests_without_oom: passed
+
+compatibility:
+  checkpoint_elements: [H, B, C, N, O, F, P, S, Cl, Br, I]
+  excluded_after_preflight:
+    - workload: COSTBAND-03
+      reason: contains Si, which is absent from the checkpoint element map
+    - workload: MIX-ALL
+      reason: contains Si, which is absent from the checkpoint element map

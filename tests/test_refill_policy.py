@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 import torch
+from ase import Atoms
 
 from batch_mlip import (
     AtomBitBatchCalculator,
@@ -13,6 +14,7 @@ from batch_mlip import (
     RefillPrediction,
     load_refill_policy,
     model_state_sha256,
+    relax,
 )
 from batch_mlip.interfaces.api import _apply_offline_refill_policy
 from batch_mlip.planning.auto import (
@@ -185,6 +187,25 @@ def test_offline_refill_policy_preserves_waves_on_active_prediction(
         chunk.refill_prediction == prediction.to_dict()
         for chunk in selected.chunks
     )
+
+
+def test_manual_refill_arguments_preserve_single_batch_execution():
+    result = relax(
+        [
+            Atoms("H", positions=[[0.2, 0.0, 0.0]]),
+            Atoms("H", positions=[[0.1, 0.0, 0.0]]),
+        ],
+        _calculator(),
+        optimizer="bfgs",
+        refill_batch_size=1,
+        fmax=1e-30,
+        max_steps=0,
+    )
+
+    summary = result.metadata["scheduling"]["summary"]
+    assert summary["strategy"] == "manual"
+    assert summary["batch_mode"] == "refill"
+    assert summary["resident_capacities"] == [1]
 
 
 def test_refill_policy_artifact_is_canonical_json():

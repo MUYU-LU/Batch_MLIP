@@ -1,36 +1,48 @@
 # Roadmap
 
-## P0 — production correctness
+The authoritative project logic and evidence boundary are maintained in
+[`research/project/`](../research/project/README.md). This roadmap lists only
+work that remains after scheduler v1; completed chronological experiments stay
+in `experiments/`.
 
-- Validate real checkpoints against the existing ASE calculator.
-- Add finite-difference force and stress utilities to the CLI.
-- Add exact restart/resume for optimizer internal state.
-- Add dataset-level failure summaries and NaN/overflow guards.
+## P0 — Freeze scheduler v1
 
-## P1 — throughput
+- Commit and tag the validated automatic-default interface.
+- Preserve the refill-policy artifact hash and complete evidence registry.
+- Keep CUDA MPS as the primary independent-job baseline.
+- Do not import historical timings into the next planner fit.
 
-- Follow the decision-gated [workload-aware performance strategy](workload-aware-performance.md)
-  for neighbor caching, refill, resident planning, and multi-GPU experiments.
-- GPU-native periodic cell-list neighbour construction.
-- Active-batch compaction after graphs converge.
-- Atom-count/edge-count bucketing and adaptive batch sizing.
-- CUDA timing and peak-memory instrumentation.
-- `torch.compile` compatibility and graph-break reports.
+## P1 — OMC-CSP workload benchmark
 
-## P2 — broader simulation capability
+- Freeze exact unique CIF identities without modifying the source collection.
+- Construct nested `P64/P512/P2048` pools for every nonempty CSP family.
+- Construct balanced inter-family wide-cost pools and eligible narrow-cost
+  pools from the same selected CIFs.
+- Validate hashes, uniqueness, nesting, family coverage, and workload
+  descriptors.
+- Collect paired scheduler-v1 and CUDA-MPS labels under one
+  hardware/model/numerical contract.
 
-- Frechet/log-strain variable-cell FIRE.
-- Fully anisotropic MTK NPT dynamics.
-- General constraints and RATTLE.
-- Persistent cross-call multi-GPU worker service.
-- Replica and ensemble workflows.
+## P2 — OMC-CSP policy validation
 
-## P3 — model/science experiments
+- Validate memory, work, horizon, and topology-volatility decisions across
+  held-out CSP families.
+- Add productive-wave adaptation without repeating optimization jobs.
+- Select only execution parameters; keep the user’s MLIP and optimizer fixed.
+- Compare scheduler v1, CUDA MPS, zero-shot, adaptive, and a bounded oracle.
+- Report family-level regret, total makespan, peak reserved memory, failures,
+  and endpoint equivalence.
 
-- Conservative-versus-direct force comparisons.
-- Mixed-precision error budgets.
-- Cutoff smoothness and neighbour-skin sensitivity.
-- Long-time stability across chemistries and phases.
-- Uncertainty-driven active learning hooks.
+## P3 — Conformer and application extension
 
-Each roadmap item should enter through the experiment protocol in `AGENTS.md`, not as an unbenchmarked rewrite.
+- Construct the nonperiodic molecular conformer workload separately; do not
+  infer its policy from OMC-CSP labels.
+- Revisit chemical parent selection only for transfer beyond available
+  workload families.
+- Extend the same planner contract separately to static phonons and
+  equation-of-state workloads.
+- Validate task-aware NVE/NVT/NPT scheduling only after long-horizon drift,
+  thermostat/barostat, restart, and stress gates pass.
+
+New acceleration mechanisms enter through `AGENTS.md`; they do not alter the
+frozen comparison baseline during held-out planner evaluation.

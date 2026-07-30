@@ -1,17 +1,23 @@
 from __future__ import annotations
 
+import hashlib
+
 import numpy as np
 import pytest
 import torch
 from ase import Atoms
+from ase.io import write
 
 from batch_mlip import (
     AutoSchedulerConfig,
     BatchCalculator,
+    BatchedFIRE,
     BatchEvaluation,
     BatchExecutor,
+    planning_profile_from_manifest,
     relax,
 )
+from batch_mlip.workloads import WorkloadJob, WorkloadManifest
 
 
 class ExecutorQuadraticCalculator(BatchCalculator):
@@ -67,6 +73,65 @@ def _config(tmp_path) -> AutoSchedulerConfig:
         multi_gpu_cold_start_jobs=1,
         multi_gpu_process_cpu_threads=1,
     )
+
+
+def _manifest_workload(tmp_path):
+    systems = _systems()
+    jobs = []
+    for index, atoms in enumerate(systems):
+        source_path = f"executor-{index}.extxyz"
+        path = tmp_path / source_path
+        write(path, atoms)
+        jobs.append(
+            WorkloadJob(
+                system_id=f"executor-system-{index}",
+                group_id="executor",
+                duplicate_group=f"executor-system-{index}",
+                order=index,
+                dataset_id="executor-test",
+                source_path=source_path,
+                source_sha256=hashlib.sha256(
+                    path.read_bytes()
+                ).hexdigest(),
+                normalized_structure_sha256=hashlib.sha256(
+                    f"executor-normalized-{index}".encode()
+                ).hexdigest(),
+                frame_index=0,
+                atom_count=len(atoms),
+                species=tuple(atoms.get_chemical_symbols()),
+                chemical_formula=atoms.get_chemical_formula(),
+                pbc=(False, False, False),
+                cell_A=tuple(float(value) for value in atoms.cell.array.flat),
+                volume_A3=0.0,
+                constraints=(),
+                topology_edge_counts={"active": 0, "candidate": 0},
+            )
+        )
+    manifest = WorkloadManifest(
+        workload_id="executor-source-backed-test",
+        version=1,
+        family="test",
+        operation="optimization",
+        cell_mode="fixed",
+        arrival_mode="closed",
+        jobs=tuple(jobs),
+        metadata={},
+    ).seal()
+    profile = planning_profile_from_manifest(
+        manifest,
+        model_id="executor-quadratic-test",
+        cutoff_A=2.5,
+        active_edge_key="active",
+        candidate_edge_key="candidate",
+        force_mode="unspecified",
+        model_dtype="torch.float64",
+        optimizer=BatchedFIRE(),
+        variable_cell=False,
+        cell_method=None,
+        skin_A=0.0,
+        neighbor_backend="auto",
+    )
+    return systems, manifest, profile
 
 
 def test_batch_executor_reuses_workers_and_restores_input_order(tmp_path):
@@ -151,6 +216,93 @@ def test_batch_executor_reuses_workers_and_restores_input_order(tmp_path):
     assert executor.shutdown_metadata["wall_seconds"] < 1.0
     with pytest.raises(RuntimeError, match="closed"):
         executor.relax(systems)
+
+
+def test_batch_executor_prefetches_manifests_and_reuses_worker_generation(
+    tmp_path,
+):
+    systems, manifest, profile = _manifest_workload(tmp_path)
+    config = AutoSchedulerConfig(
+        cache_path=tmp_path / "manifest-executor-cache.json",
+        cache_enabled=False,
+        max_batch_size=2,
+        manifest_loader_processes=1,
+        manifest_prefetch_chunks_per_worker=1,
+        multi_gpu_process_cpu_threads=1,
+        multi_gpu_target_chunks_per_device=2,
+    )
+    options = {
+        "fmax": 1e-5,
+        "max_steps": 500,
+        "dt_start": 0.05,
+        "dt_max": 0.5,
+    }
+    reference = relax(
+        systems,
+        ExecutorQuadraticCalculator(),
+        optimizer="fire",
+        **options,
+    )
+
+    with BatchExecutor(
+        ExecutorQuadraticCalculator(),
+        devices=["cpu:0", "cpu:1"],
+        auto_config=config,
+        startup_timeout_seconds=30.0,
+        run_timeout_seconds=30.0,
+    ) as executor:
+        first = executor.relax_manifest(
+            manifest,
+            tmp_path,
+            profile,
+            optimizer="fire",
+            **options,
+        )
+        worker_pids = executor.worker_pids
+        second = executor.relax_manifest(
+            manifest,
+            tmp_path,
+            profile,
+            optimizer="fire",
+            **options,
+        )
+
+        assert executor.worker_generation == 1
+        assert executor.worker_pids == worker_pids
+        assert first.metadata["scheduling"][
+            "worker_startup_seconds_this_call"
+        ] > 0.0
+        schedule = second.metadata["scheduling"]
+        assert schedule["decision"] == (
+            "persistent_manifest_deterministic_memory_plan"
+        )
+        assert schedule["worker_startup_seconds_this_call"] == 0.0
+        assert schedule["executor_call"] == 2
+        materialization = schedule["structure_materialization"]
+        assert materialization["mode"] == "manifest_global_prefetch"
+        assert materialization["total_loader_processes"] == 2
+        assert materialization["maximum_buffered_chunks"] == 4
+        assert materialization["materializer_generation"] == 1
+        assert not materialization["materializer_generation_restarted"]
+        assert materialization["chunk_count"] == 4
+        assert materialization["dispatch_wait_seconds"] >= 0.0
+        assert all(
+            chunk["input"]["mode"] == "manifest_global_prefetch"
+            for worker in schedule["workers"]
+            for chunk in worker["chunks"]
+        )
+        torch.testing.assert_close(
+            first.evaluation.energy,
+            second.evaluation.energy,
+        )
+        torch.testing.assert_close(
+            reference.evaluation.energy,
+            second.evaluation.energy,
+        )
+        torch.testing.assert_close(
+            reference.evaluation.forces,
+            second.evaluation.forces,
+        )
 
 
 def test_batch_executor_reuses_native_generation_across_optimizers(tmp_path):
@@ -307,3 +459,11 @@ def test_batch_executor_rejects_invalid_shutdown_timeout():
             devices=["cpu:0"],
             shutdown_timeout_seconds=0.0,
         )
+
+
+def test_manifest_prefetch_depth_must_be_non_negative():
+    with pytest.raises(
+        ValueError,
+        match="manifest_prefetch_chunks_per_worker",
+    ):
+        AutoSchedulerConfig(manifest_prefetch_chunks_per_worker=-1)

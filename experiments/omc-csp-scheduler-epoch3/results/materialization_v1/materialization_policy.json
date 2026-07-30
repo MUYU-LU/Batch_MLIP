@@ -1,0 +1,85 @@
+{
+  "automatic_policy": {
+    "available_cpu_gate": "active_workers * (4 loader processes + 1 compute thread)",
+    "minimum_atoms_per_active_worker": 32000.0,
+    "minimum_pool_size": 2048,
+    "policy_id": "manifest-loader-process-policy-v1",
+    "selected_parallel_processes_per_worker": 4,
+    "serial_processes_per_worker": 1
+  },
+  "automatic_validation": [
+    {
+      "active_worker_count": 7,
+      "atoms_per_worker": 53988.28571428572,
+      "current_serial_external_seconds": 132.86048129107803,
+      "external_seconds": 130.64262423338369,
+      "loader_processes": 4,
+      "mps_external_seconds": 441.2566,
+      "speedup_over_current_serial": 1.0169765194989677,
+      "speedup_over_mps": 3.37758524516261,
+      "total_atoms": 377918,
+      "workload": "ROF-A-P2048"
+    },
+    {
+      "active_worker_count": 7,
+      "atoms_per_worker": 22746.285714285714,
+      "current_serial_external_seconds": 74.4816973078996,
+      "external_seconds": 75.62324241036549,
+      "loader_processes": 1,
+      "mps_external_seconds": 160.8228,
+      "speedup_over_current_serial": 0.9849048379032551,
+      "speedup_over_mps": 2.1266319040818646,
+      "total_atoms": 159224,
+      "workload": "XULDUD-P2048"
+    }
+  ],
+  "implementation": {
+    "deterministic_order": true,
+    "loader_lifetime": "one pool per persistent GPU worker",
+    "start_method": "spawn",
+    "thread_screen_result": "1, 2, 4, and 8 threads did not improve CIF loading",
+    "worker_cleanup_verified": true
+  },
+  "loader_screen": [
+    {
+      "loader4_external_seconds": 110.09385916404426,
+      "serial_external_seconds": 132.86048129107803,
+      "speedup": 1.2067928429424077,
+      "workload": "ROF-A-P2048"
+    },
+    {
+      "loader4_external_seconds": 85.0898288669996,
+      "serial_external_seconds": 94.16532296873629,
+      "speedup": 1.1066578017911193,
+      "workload": "ROF-C-P2048"
+    },
+    {
+      "loader4_external_seconds": 152.925425,
+      "serial_external_seconds": 177.668,
+      "speedup": 1.161795038333227,
+      "workload": "XAFPAY-P2048"
+    },
+    {
+      "loader4_external_seconds": 148.16413,
+      "serial_external_seconds": 159.829,
+      "speedup": 1.0787293793713768,
+      "workload": "BOQWIN-P2048"
+    },
+    {
+      "loader4_external_seconds": 76.27210813900456,
+      "serial_external_seconds": 74.4816973078996,
+      "speedup": 0.9765260083300442,
+      "workload": "XULDUD-P2048"
+    }
+  ],
+  "profiling_validation": {
+    "rofa_critical_worker_materialization_loader4_seconds": 17.822778230998665,
+    "rofa_critical_worker_materialization_serial_seconds": 57.59468894917518,
+    "rofa_critical_worker_materialization_speedup": 3.2315213825082743,
+    "rofa_worker_run_loader4_seconds": 69.5517549100332,
+    "rofa_worker_run_serial_seconds": 98.05142374103889,
+    "rofa_worker_run_speedup": 1.4097620378935178
+  },
+  "schema_version": 1,
+  "timing_repeats": 1
+}

@@ -23,12 +23,60 @@ runtime:
   dtype: float32
   skin: 0.5
   neighbor_backend: auto  # auto | matscipy | cuda_dense
+  reproducibility:
+    seed: 20260729
+    deterministic_algorithms: true
+    deterministic_warn_only: false
+    cublas_workspace_config: ":4096:8"
+    cudnn_benchmark: false
+    cudnn_deterministic: true
+    allow_tf32: false
+    cpu_threads: 1
+    interop_threads: 1
 ```
 
 `auto` uses the CPU backend for small rebuilds and the integrated dense CUDA
 backend above a cutoff-aware work threshold. `matscipy` forces CPU construction
 (with ASE fallback outside matscipy's validated fully periodic path), while
 `cuda_dense` requires CUDA and raises for unsupported degenerate periodic cells.
+
+The reproducibility block seeds Python, NumPy, and PyTorch and fixes the
+supported deterministic library controls. For strict controlled experiments,
+set `PYTHONHASHSEED` and `CUBLAS_WORKSPACE_CONFIG` before starting Python; see
+[`reproducibility.md`](reproducibility.md).
+
+## Automatic capacity
+
+The Python API uses `AutoSchedulerConfig` for automatic relaxation capacity:
+
+```python
+AutoSchedulerConfig(
+    memory_safety_fraction=0.85,
+    memory_growth_margin=1.10,
+    offline_hardware_capacity_enabled=True,
+    manifest_loader_processes="auto",
+    manifest_prefetch_chunks_per_worker=1,
+)
+```
+
+For a signed manifest and matching planning profile, the packaged offline
+capacity policy is selected only when its complete model/task/graph/allocator/
+software/H100 contract matches. It performs no representative model forward.
+An unmatched or disabled policy uses the bounded representative-probe path.
+Both paths retain the outer workload buckets and apply the same memory-growth
+margin.
+
+For signed file-backed workloads, `manifest_loader_processes="auto"` selects
+either one or four worker-local CIF parsing processes from pool size, total
+atom-record pressure per active GPU, and available host CPUs. It does not run a
+timing sweep. A positive integer is an explicit expert override. The process
+pool uses `spawn` and is closed deterministically with its GPU worker.
+
+`manifest_prefetch_chunks_per_worker=1` is used by
+`BatchExecutor.relax_manifest`: at most one extra chunk per active worker is
+materialized in a global host-side queue while GPUs execute the current wave.
+The chunks are not assigned to a device until it becomes idle. Set the value to
+zero to disable overlap without disabling persistent GPU workers.
 
 ## Model
 

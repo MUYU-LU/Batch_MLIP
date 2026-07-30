@@ -11,6 +11,7 @@ from .multi_gpu import (
     ParallelWorkerError,
     PersistentTaskExecution,
     PersistentTaskPool,
+    PersistentTaskSource,
     TaskResult,
     TaskWorker,
     TaskWorkerResult,
@@ -19,6 +20,13 @@ from .multi_gpu import (
     balance_work,
     run_parallel_task_workers,
     run_parallel_workers,
+)
+from .reproducibility import (
+    ReproducibilityConfig,
+    active_reproducibility_state,
+    configure_reproducibility,
+    configure_reproducibility_from_environment,
+    reproducibility_environment,
 )
 
 __all__ = [
@@ -29,6 +37,7 @@ __all__ = [
     "ParallelWorkerError",
     "PersistentTaskExecution",
     "PersistentTaskPool",
+    "PersistentTaskSource",
     "TaskResult",
     "TaskWorker",
     "TaskWorkerResult",
@@ -38,4 +47,9 @@ __all__ = [
     "run_parallel_task_workers",
     "run_parallel_workers",
     "select_cuda_allocator",
+    "ReproducibilityConfig",
+    "active_reproducibility_state",
+    "configure_reproducibility",
+    "configure_reproducibility_from_environment",
+    "reproducibility_environment",
 ]

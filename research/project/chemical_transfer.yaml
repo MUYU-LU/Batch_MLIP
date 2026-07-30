@@ -1,0 +1,262 @@
+schema_version: 1
+study_id: chemical-transfer-v1
+status: protocol_defined_sources_unresolved
+purpose: >-
+  Test whether prior mechanism knowledge and contract-consistent execution
+  experience select safe low-regret plans for chemically unseen organic
+  molecular-crystal and molecular relaxation pools.
+
+source_domains:
+  molecular_crystals:
+    expected_records: 320000
+    source_path: null
+    source_hash: null
+    unit_of_selection: canonical_parent_molecular_identity
+    initial_scope:
+      - neutral
+      - single_component
+      - ordered
+      - MLIP_supported_elements
+  molecules:
+    expected_records: 23000
+    source_path: null
+    source_hash: null
+    unit_of_selection: canonical_parent_molecule
+    initial_scope:
+      - neutral
+      - single_component
+      - MLIP_supported_elements
+
+parent_selection:
+  target_per_domain: 200
+  selection_uses_performance_labels: false
+  deduplicate_before_selection: true
+  molecular_views:
+    - morgan_fingerprint
+    - erg
+    - mqn42
+    - elemental_composition
+    - molecular_weight
+    - rotatable_bonds
+  crystal_views:
+    - atoms_per_cell
+    - molecules_per_cell
+    - Z_prime
+    - density
+    - volume_per_molecule
+    - lattice_anisotropy
+    - space_group_family
+    - candidate_edges_at_model_cutoff
+    - edge_density
+    - intermolecular_contact_statistics
+  workload_views:
+    - predicted_resident_memory
+    - work_per_evaluation
+    - dense_bfgs_dimension_squared
+    - topology_volatility_proxy
+  method: density_aware_multiview_core_set_with_rare_and_extreme_quotas
+  full_pairwise_distance_matrix: forbidden
+  visualization:
+    method: UMAP
+    selection_from_two_dimensional_embedding: false
+    figure_panels:
+      - common_parent_molecular_chemical_space
+      - crystal_packing_and_computational_space
+
+feasibility_gate:
+  parents_per_domain: 40
+  maximum_pool_size: 64
+  must_establish:
+    - source_cleaning_success_rate
+    - MLIP_element_and_geometry_coverage
+    - candidate_generation_success_rate
+    - conformer_uniqueness_distribution
+    - runtime_and_storage_budget
+    - endpoint_validation
+  expansion_rule: freeze_generation_protocol_before_selecting_full_200_plus_200
+
+generated_workloads:
+  csp:
+    parents: 200
+    cell_mode: variable
+    numerical_method: BFGS_with_FrechetCellFilter
+    maximum_candidates_per_parent: 256
+    nested_pool_sizes: [8, 32, 64, 128, 256]
+    regenerate_per_execution_method: false
+    required_fields:
+      - parent_id
+      - candidate_id
+      - generation_seed
+      - generator_version
+      - space_group
+      - independent_molecule_count
+      - initial_cell
+      - initial_density
+      - initial_energy
+      - initial_max_force
+      - initial_max_stress
+      - atom_order
+      - structure_sha256
+  conformers:
+    parents: 200
+    cell_mode: nonperiodic_fixed
+    numerical_method: BFGS
+    maximum_unique_conformers_per_parent: 256
+    nested_pool_sizes: [8, 32, 64, 128, 256]
+    insufficient_unique_conformers: retain_actual_count_without_duplication
+    regenerate_per_execution_method: false
+    required_fields:
+      - parent_id
+      - conformer_id
+      - generation_seed
+      - generator_version
+      - torsion_signature
+      - initial_energy
+      - initial_max_force
+      - heavy_atom_rmsd
+      - atom_order
+      - structure_sha256
+
+parent_level_split_per_domain:
+  training: 120
+  validation: 40
+  test:
+    total: 40
+    interpolation: 20
+    chemical_cluster_ood: 20
+  descendants_must_remain_with_parent: true
+  freeze_before_execution_label_collection: true
+
+workload_representation:
+  memory_m:
+    - measured_representative_forward
+    - predicted_graph_memory
+    - numerical_state_memory
+  per_step_work_w:
+    - atoms
+    - active_edges
+    - candidate_edges
+    - force_and_stress_mode
+  horizon_h:
+    zero_shot:
+      - chemistry
+      - initial_force_and_stress_distribution
+      - packing_or_conformer_descriptors
+    productive_wave_update:
+      - completed_step_counts
+      - progress_rate
+      - active_occupancy
+  topology_volatility_v:
+    - atomic_displacement_rate
+    - cell_deformation_rate
+    - observed_neighbor_rebuild_interval
+
+planner_modes:
+  scheduler_v1:
+    role: frozen_baseline
+  zero_shot_transfer:
+    inputs:
+      - static_parent_descriptors
+      - static_pool_descriptors
+      - scheduler_v1_memory_probe
+    separate_timing_pilot: false
+  productive_wave_adaptive:
+    inputs:
+      - zero_shot_inputs
+      - telemetry_from_jobs_that_remain_in_final_results
+    repeated_pilot_jobs: false
+    role: adaptation_ablation
+
+planner_actions:
+  optimizer_selection: false
+  model_selection: false
+  allowed:
+    - resident_capacity
+    - bucket_boundaries
+    - accepted_cache_policy
+    - active_drain_or_evidence_supported_refill
+    - micro_pool_size
+    - active_device_count_up_to_user_supplied_limit
+    - worker_assignment
+
+bounded_oracle:
+  run_on_all_training_and_validation_parents: false
+  run_on_representative_test_subset: true
+  action_space_must_be_frozen_before_test: true
+  failed_or_oom_plan_is_not_retried_without_recording_failure: true
+
+baselines:
+  primary:
+    - cuda_mps_four_ase_jobs_per_gpu
+    - scheduler_v1
+    - zero_shot_transfer
+    - productive_wave_adaptive
+    - bounded_empirical_oracle
+  secondary:
+    - ase_serial
+    - fixed_batch
+    - largest_memory_fitting_batch
+    - static_cost_balanced_multi_gpu
+
+fairness_contract:
+  fixed:
+    - initial_structures
+    - model_checkpoint
+    - optimizer
+    - cell_filter
+    - precision
+    - deterministic_settings
+    - convergence_thresholds
+    - maximum_steps
+    - available_devices
+    - timing_scope
+  old_experiment_timing_labels_allowed_for_fit: false
+  old_experiment_use:
+    - define_mechanism_features
+    - define_safe_action_space
+    - define_negative_priors
+    - provide_frozen_scheduler_v1_baseline
+
+primary_metrics:
+  - total_makespan_including_startup_planning_and_adaptation
+  - planner_regret_vs_bounded_oracle
+  - peak_reserved_gpu_memory
+  - completed_accepted_jobs_per_second
+  - oom_and_runtime_failure_rate
+  - convergence_rate
+  - endpoint_equivalence_pass_rate
+
+diagnostic_metrics:
+  - production_execution_time
+  - gpu_seconds_per_accepted_job
+  - useful_atom_steps_per_second
+  - useful_edge_steps_per_second
+  - mean_active_occupancy
+  - neighbor_rebuild_interval
+  - cache_hit_rate
+  - compaction_time
+  - refill_time
+  - worker_idle_time
+  - load_imbalance
+  - peak_allocated_gpu_memory
+
+scientific_endpoints:
+  common:
+    - convergence_flag
+    - final_energy_per_atom
+    - final_max_force
+    - position_rmsd
+  csp:
+    - final_max_stress
+    - cell_rmsd
+    - volume_difference
+  conformers:
+    - heavy_atom_rmsd
+    - local_minimum_identity
+
+statistical_unit: parent_system
+reporting:
+  cluster_correlated_descendants_by_parent: true
+  report_median_and_parent_bootstrap_interval: true
+  report_interpolation_and_ood_test_separately: true
+  generation_and_execution_costs_separate: true

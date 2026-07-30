@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "status": "accepted_after_validation",
+  "refinement_id": "persistent_ase_bfgs_nonconverged_tail_recovery",
+  "title": "Persistent ASE-BFGS recovery for the nonconverged tensor tail",
+  "hypothesis": "Rerunning only tensor jobs that reach the 500-step limit with deterministic ASE BFGS from their frozen initial structures, using one persistent model process per assigned GPU, will satisfy convergence-count non-regression while retaining a lower full-process makespan than the complete four-workers-per-GPU MPS baseline.",
+  "mechanism": "Complete the normal tensor schedule first. Collect only nonconverged source IDs, dispatch their original structures across persistent per-GPU ASE-calculator workers, run the unchanged BFGS and FrechetCellFilter contract once, and replace those endpoint records unconditionally with the recovery records. Do not change optimizer, cutoff, precision, force threshold, or max steps within either attempt.",
+  "validation": "Implement and unit-test source-stable tail extraction, persistent worker reuse, endpoint replacement, timing, retry-count, and peak-memory telemetry. Run the frozen 10-workload validation split once against the unchanged MPS baseline. Accept only if coverage, contract, no-OOM, 85% memory, convergence-count non-regression, and full-process makespan non-regression all pass.",
+  "development_evidence": {
+    "workloads": 23,
+    "jobs": 17216,
+    "automatic_external_wins": 23,
+    "automatic_converged": 17072,
+    "mps_converged": 17132,
+    "automatic_nonconverged_tail": 144,
+    "workloads_failing_convergence_non_regression": 10,
+    "aggregate_convergence_difference": -60,
+    "batched_eigen_diagnostic": {
+      "KONTIQ_P64": "63/64 versus current 62/64 and MPS 63/64",
+      "ROF-B_P64": "62/64 versus current 62/64 and MPS 64/64",
+      "decision": "not robust across families"
+    },
+    "serial_eigen_diagnostic": {
+      "KONTIQ_P64": "62/64",
+      "ROF-B_P64": "62/64",
+      "decision": "rejected"
+    },
+    "tensor_B1_recovery_diagnostic": {
+      "jobs": 4,
+      "converged": 1,
+      "decision": "rejected as a universal recovery path"
+    }
+  },
+  "deferred_performance_refinement": {
+    "target": "structure_materialization_model_setup_and_output",
+    "aggregate_external_time_fraction": 0.3771,
+    "reason": "It is the largest avoidable full-process component, but a speed-only change cannot be selected before the frozen convergence gate is restored."
+  },
+  "validation_outcome": {
+    "workloads": 10,
+    "jobs": 7296,
+    "all_scientific_and_resource_gates_pass": true,
+    "automatic_external_wins": 10,
+    "automatic_converged": 7295,
+    "mps_converged": 7294,
+    "tail_recovery_attempted": 3,
+    "tail_recovery_converged": 2,
+    "median_external_speedup_over_mps": 1.467679237003815
+  },
+  "test_outcome": {
+    "method_changed_after_validation": false,
+    "workloads": 16,
+    "jobs": 13632,
+    "all_scientific_and_resource_gates_pass": true,
+    "automatic_converged": 13632,
+    "mps_converged": 13632,
+    "tail_recovery_attempted": 0
+  }
+}

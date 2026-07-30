@@ -1,0 +1,14 @@
+schema_version: 1
+name: omc-csp-policy-composition
+baseline_commit: 4ee8b18
+hypothesis: >-
+  The accepted scheduler mechanisms can be composed into one deterministic
+  variable-cell relaxation policy manifest without changing numerical
+  execution or claiming unsupported duration, cache, or refill prediction.
+performance_claim: none
+validation:
+  - homogeneous_single_wave_policy
+  - mixed_multi_wave_policy
+  - single_device_schedule_metadata
+  - multi_device_schedule_metadata
+  - existing_relaxation_correctness_suite

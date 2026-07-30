@@ -34,7 +34,12 @@ def _coefficient_of_variation(values: list[int | float]) -> float | None:
 
 @dataclass(frozen=True)
 class WorkloadJob:
-    """One immutable job identity and its structure-derived descriptors."""
+    """One immutable job identity plus legacy cached graph descriptors.
+
+    ``topology_edge_counts`` is not part of model-independent structure cost:
+    each key binds a cutoff and skin. New planners copy the requested values
+    into a separate planning-profile sidecar.
+    """
 
     system_id: str
     group_id: str
@@ -156,7 +161,12 @@ class WorkloadManifest:
 
 @dataclass(frozen=True)
 class TaskProfile:
-    """Compact planner input derived from one frozen workload manifest."""
+    """Legacy v1 aggregate mixing workload and optional graph descriptors.
+
+    Retained for historical controlled workloads. New execution planning uses
+    ``PlanningProfileBundle`` to keep structure, MLIP, task, policy, and
+    hardware layers explicit.
+    """
 
     workload_id: str
     workload_manifest_sha256: str
@@ -363,7 +373,10 @@ def write_workload_jobs_csv(path: str | Path, manifest: WorkloadManifest) -> Non
                     **{
                         name: (
                             json.dumps(values[name], sort_keys=True)
-                            if isinstance(values.get(name), (dict, list, tuple))
+                            if isinstance(
+                                values.get(name),
+                                dict | list | tuple,
+                            )
                             else values.get(name)
                         )
                         for name in fields

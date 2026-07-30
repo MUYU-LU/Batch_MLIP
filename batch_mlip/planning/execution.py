@@ -8,7 +8,7 @@ from typing import Any
 
 from ase import Atoms
 
-from .memory import BatchPlan, BatchPlanner
+from .memory import BatchPlan, BatchPlanner, SystemProfile
 
 
 @dataclass(frozen=True)
@@ -40,10 +40,18 @@ def plan_relaxation_execution(
     cutoff: float,
     skin: float = 0.0,
     supports_refill: bool = False,
+    system_profiles: Sequence[SystemProfile] | None = None,
 ) -> RelaxationSchedule:
     """Prefer one safe resident batch, otherwise execute planned queues."""
 
-    plan = planner.plan(systems, cutoff=cutoff, skin=skin)
+    if system_profiles is None:
+        plan = planner.plan(systems, cutoff=cutoff, skin=skin)
+    else:
+        if len(system_profiles) != len(systems):
+            raise ValueError(
+                "system profile count differs from relaxation workload"
+            )
+        plan = planner.plan_profiles(system_profiles)
     predicted = planner.estimate_profiles_bytes(plan.profiles)
     within_count_limit = (
         planner.max_batch_size is None

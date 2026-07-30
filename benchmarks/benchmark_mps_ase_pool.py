@@ -44,6 +44,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--measured-steps", type=int)
     parser.add_argument("--timestep-fs", type=float)
     parser.add_argument("--deterministic", action="store_true")
+    parser.add_argument("--seed", type=int, default=20260729)
     parser.add_argument(
         "--model-dtype",
         choices=("float32", "float64"),
@@ -189,12 +190,18 @@ def _worker_impl(
     sys.path[:0] = [str(repository_root), str(benchmark_dir)]
     from benchmark_production import load_manifest, load_production_model, synchronize
 
-    from batch_mlip import AseGraphBatch, initialize_maxwell_boltzmann
+    from batch_mlip import (
+        AseGraphBatch,
+        configure_reproducibility_from_environment,
+        initialize_maxwell_boltzmann,
+    )
     from batch_mlip.workloads import read_workload_manifest
 
-    torch.use_deterministic_algorithms(args.deterministic)
-    torch.set_num_threads(args.cpu_threads_per_worker)
-    torch.set_num_interop_threads(1)
+    reproducibility = configure_reproducibility_from_environment()
+    if reproducibility is None:
+        torch.use_deterministic_algorithms(args.deterministic)
+        torch.set_num_threads(args.cpu_threads_per_worker)
+        torch.set_num_interop_threads(1)
     start, stop = worker_bounds(args.pool_size, args.workers, worker_id)
     shard_size = stop - start
     systems = []
@@ -521,6 +528,7 @@ def _worker_impl(
         "timestep_fs": timestep_fs,
         "peak_memory_bytes": int(torch.cuda.max_memory_allocated(device)),
         "peak_reserved_memory_bytes": int(torch.cuda.max_memory_reserved(device)),
+        "reproducibility": reproducibility,
         **output,
     }
     result_path.write_text(json.dumps(result) + "\n", encoding="utf-8")
@@ -578,12 +586,25 @@ def _gpu_memory_monitor(
 
 def main() -> None:
     args = parse_args()
+    reproducibility = None
     if args.deterministic:
-        os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
-    thread_count = str(args.cpu_threads_per_worker)
-    os.environ["OMP_NUM_THREADS"] = thread_count
-    os.environ["MKL_NUM_THREADS"] = thread_count
-    os.environ["OPENBLAS_NUM_THREADS"] = thread_count
+        from batch_mlip import (
+            ReproducibilityConfig,
+            configure_reproducibility,
+        )
+
+        reproducibility = configure_reproducibility(
+            ReproducibilityConfig(
+                seed=args.seed,
+                cpu_threads=args.cpu_threads_per_worker,
+                interop_threads=1,
+            )
+        )
+    else:
+        thread_count = str(args.cpu_threads_per_worker)
+        os.environ["OMP_NUM_THREADS"] = thread_count
+        os.environ["MKL_NUM_THREADS"] = thread_count
+        os.environ["OPENBLAS_NUM_THREADS"] = thread_count
     args.output.parent.mkdir(parents=True, exist_ok=True)
     context = mp.get_context("spawn")
     barrier = context.Barrier(args.workers + 1)
@@ -747,6 +768,7 @@ def main() -> None:
             "cpu_threads_per_worker": args.cpu_threads_per_worker,
             "worker_start_interval_seconds": args.worker_start_interval,
             "deterministic_algorithms": args.deterministic,
+            "seed": args.seed,
             "cublas_workspace_config": os.environ.get("CUBLAS_WORKSPACE_CONFIG"),
             "cell_filter": "ASE FrechetCellFilter",
             "warmup_steps": resolved_md_parameters["warmup_steps"],
@@ -760,6 +782,7 @@ def main() -> None:
             "thermostat_damping_fs": 50.0 if args.task == "npt" else None,
             "barostat_damping_fs": 500.0 if args.task == "npt" else None,
         },
+        "reproducibility": reproducibility,
         "timing": {
             "wall_seconds": elapsed,
             "systems_per_second": args.pool_size / elapsed,

@@ -1,0 +1,844 @@
+{
+  "methods_per_workload": [
+    "current_auto",
+    "ase_cuda_mps_static_lpt"
+  ],
+  "runs": [
+    {
+      "gpus": "0",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-JAYDUI-P64-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-JAYDUI-P64-INTRA-NARROW-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-JAYDUI-P64-INTRA-NARROW-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 24.655599144287407,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-JAYDUI-P64-INTRA-NARROW-v2/ase_cuda_mps.log",
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-JAYDUI-P64-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-JAYDUI-P64-INTRA-NARROW-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 15.7601687326096,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-JAYDUI-P64-INTRA-NARROW-v2/current_auto.log",
+          "returncode": 0
+        }
+      },
+      "pool_size": 64,
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-JAYDUI-P64-INTRA-NARROW-v2",
+      "workload_manifest_sha256": "4f5aaa2c55fceb6f9ec08b49941574ca2c4ff7907d072dbbf237c12504680efc"
+    },
+    {
+      "gpus": "0",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-OBEQIX-P64-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-OBEQIX-P64-INTRA-NARROW-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-OBEQIX-P64-INTRA-NARROW-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 144.52720540203154,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-OBEQIX-P64-INTRA-NARROW-v2/ase_cuda_mps.log",
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-OBEQIX-P64-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-OBEQIX-P64-INTRA-NARROW-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 55.000597598962486,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-OBEQIX-P64-INTRA-NARROW-v2/current_auto.log",
+          "returncode": 0
+        }
+      },
+      "pool_size": 64,
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-OBEQIX-P64-INTRA-NARROW-v2",
+      "workload_manifest_sha256": "ba0aeb321b8b8e27608020d2e72641f0554d0e2827bb8e9e4c0d435d7885ef1a"
+    },
+    {
+      "gpus": "0",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-ROF-A-P64-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-A-P64-INTRA-WIDE-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-A-P64-INTRA-WIDE-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 77.01910137198865,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-A-P64-INTRA-WIDE-v2/ase_cuda_mps.log",
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-ROF-A-P64-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-A-P64-INTRA-WIDE-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 33.741953314282,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-A-P64-INTRA-WIDE-v2/current_auto.log",
+          "returncode": 0
+        }
+      },
+      "pool_size": 64,
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-ROF-A-P64-INTRA-WIDE-v2",
+      "workload_manifest_sha256": "aa60966e68589c2b0c5d59cb35a8a1cc2c482fba5f205edf9555cc3a7132fa0c"
+    },
+    {
+      "gpus": "0",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-ROF-C-P64-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-C-P64-INTRA-WIDE-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-C-P64-INTRA-WIDE-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 51.28231028979644,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-C-P64-INTRA-WIDE-v2/ase_cuda_mps.log",
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-ROF-C-P64-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-C-P64-INTRA-WIDE-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 28.17695733392611,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-C-P64-INTRA-WIDE-v2/current_auto.log",
+          "returncode": 0
+        }
+      },
+      "pool_size": 64,
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-ROF-C-P64-INTRA-WIDE-v2",
+      "workload_manifest_sha256": "181b3a656d44df6b99f34a64f79003da4cf03d7ebc78d1d220c529eaadc5fd03"
+    },
+    {
+      "gpus": "0",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-XULDUD-P64-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-XULDUD-P64-INTRA-WIDE-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-XULDUD-P64-INTRA-WIDE-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 47.583608224987984,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-XULDUD-P64-INTRA-WIDE-v2/ase_cuda_mps.log",
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-XULDUD-P64-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-XULDUD-P64-INTRA-WIDE-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 22.03679206315428,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-XULDUD-P64-INTRA-WIDE-v2/current_auto.log",
+          "returncode": 0
+        }
+      },
+      "pool_size": 64,
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-XULDUD-P64-INTRA-WIDE-v2",
+      "workload_manifest_sha256": "a7b7e2e3eb54356b40c2186c0893e0bd5dee961b86c088c3b7e9c39c17860798"
+    },
+    {
+      "gpus": "0,1,2,3",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-JAYDUI-P512-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0,1,2,3",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-JAYDUI-P512-INTRA-NARROW-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-JAYDUI-P512-INTRA-NARROW-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 44.30591941392049,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-JAYDUI-P512-INTRA-NARROW-v2/ase_cuda_mps.log",
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-JAYDUI-P512-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0,1,2,3",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-JAYDUI-P512-INTRA-NARROW-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 35.70138066774234,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-JAYDUI-P512-INTRA-NARROW-v2/current_auto.log",
+          "returncode": 0
+        }
+      },
+      "pool_size": 512,
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-JAYDUI-P512-INTRA-NARROW-v2",
+      "workload_manifest_sha256": "eaaaa99b824ee22097db5f6d0f60b7bf401c198a2f0f6d92335f80c3d748a66e"
+    },
+    {
+      "gpus": "0,1,2,3",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-MIX-ALL-P512-INTER-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0,1,2,3",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-MIX-ALL-P512-INTER-WIDE-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-MIX-ALL-P512-INTER-WIDE-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 149.22634598938748,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-MIX-ALL-P512-INTER-WIDE-v2/ase_cuda_mps.log",
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-MIX-ALL-P512-INTER-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0,1,2,3",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-MIX-ALL-P512-INTER-WIDE-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 100.54133667610586,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-MIX-ALL-P512-INTER-WIDE-v2/current_auto.log",
+          "returncode": 0
+        }
+      },
+      "pool_size": 512,
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-MIX-ALL-P512-INTER-WIDE-v2",
+      "workload_manifest_sha256": "44e2765119b44947ee9d6231e1616b2ef1f70d4e6622071595370fc6cc3e9ca5"
+    },
+    {
+      "gpus": "0,1,2,3",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-OBEQIX-P512-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0,1,2,3",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-OBEQIX-P512-INTRA-NARROW-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-OBEQIX-P512-INTRA-NARROW-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 283.2159726470709,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-OBEQIX-P512-INTRA-NARROW-v2/ase_cuda_mps.log",
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-OBEQIX-P512-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0,1,2,3",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-OBEQIX-P512-INTRA-NARROW-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 174.15925738587976,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-OBEQIX-P512-INTRA-NARROW-v2/current_auto.log",
+          "returncode": 0
+        }
+      },
+      "pool_size": 512,
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-OBEQIX-P512-INTRA-NARROW-v2",
+      "workload_manifest_sha256": "ed8ec42a4f812a480c698667d897cb14b38a750d1731f2a1d076682ce828c789"
+    },
+    {
+      "gpus": "0,1,2,3",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-ROF-A-P512-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0,1,2,3",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-A-P512-INTRA-WIDE-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-A-P512-INTRA-WIDE-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 178.20780910225585,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-A-P512-INTRA-WIDE-v2/ase_cuda_mps.log",
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-ROF-A-P512-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0,1,2,3",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-A-P512-INTRA-WIDE-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 126.9797375081107,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-A-P512-INTRA-WIDE-v2/current_auto.log",
+          "returncode": 0
+        }
+      },
+      "pool_size": 512,
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-ROF-A-P512-INTRA-WIDE-v2",
+      "workload_manifest_sha256": "188d909ce01dc93773569b08c1439f68e1ab07863edb1a7c1d1ee3ed6a299d95"
+    },
+    {
+      "gpus": "0,1,2,3",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-ROF-C-P512-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0,1,2,3",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-C-P512-INTRA-WIDE-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-C-P512-INTRA-WIDE-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 103.83500350872055,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-C-P512-INTRA-WIDE-v2/ase_cuda_mps.log",
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-ROF-C-P512-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0,1,2,3",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-C-P512-INTRA-WIDE-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 83.10995979001746,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-C-P512-INTRA-WIDE-v2/current_auto.log",
+          "returncode": 0
+        }
+      },
+      "pool_size": 512,
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-ROF-C-P512-INTRA-WIDE-v2",
+      "workload_manifest_sha256": "e2b98f1e0b8913dc5428d666c072cfa4a383115a3c4102f2c4ad8ea80e62a0fb"
+    },
+    {
+      "gpus": "0,1,2,3",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-XULDUD-P512-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0,1,2,3",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-XULDUD-P512-INTRA-WIDE-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-XULDUD-P512-INTRA-WIDE-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 88.519495354034,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-XULDUD-P512-INTRA-WIDE-v2/ase_cuda_mps.log",
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-XULDUD-P512-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0,1,2,3",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-XULDUD-P512-INTRA-WIDE-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 57.40030673611909,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-XULDUD-P512-INTRA-WIDE-v2/current_auto.log",
+          "returncode": 0
+        }
+      },
+      "pool_size": 512,
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-XULDUD-P512-INTRA-WIDE-v2",
+      "workload_manifest_sha256": "00bdfba239a364b1f2d53e751620a0dec95a46dda7b1bc493cc832b5e53b0dea"
+    },
+    {
+      "gpus": "0,1,2,3,4,5,6",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-JAYDUI-P2048-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0,1,2,3,4,5,6",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-JAYDUI-P2048-INTRA-NARROW-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-JAYDUI-P2048-INTRA-NARROW-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 74.12447676481679,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-JAYDUI-P2048-INTRA-NARROW-v2/ase_cuda_mps.log",
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-JAYDUI-P2048-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0,1,2,3,4,5,6",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-JAYDUI-P2048-INTRA-NARROW-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 115.34019384300336,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-JAYDUI-P2048-INTRA-NARROW-v2/current_auto.log",
+          "returncode": 0
+        }
+      },
+      "pool_size": 2048,
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-JAYDUI-P2048-INTRA-NARROW-v2",
+      "workload_manifest_sha256": "398fe84812ff6f59ce96e4cb8ee95c0a82eef95b0bb41730dfa0d28f0fe9a03b"
+    },
+    {
+      "gpus": "0,1,2,3,4,5,6",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0,1,2,3,4,5,6",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 656.2980142249726,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2/ase_cuda_mps.log",
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0,1,2,3,4,5,6",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 536.5977138108574,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2/current_auto.log",
+          "returncode": 0
+        }
+      },
+      "pool_size": 2048,
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2",
+      "workload_manifest_sha256": "68dacfd500f151612ef193f1cc930085c146cc46b681e9025dd936e579436e47"
+    },
+    {
+      "gpus": "0,1,2,3,4,5,6",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0,1,2,3,4,5,6",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 441.25656653987244,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2/ase_cuda_mps.log",
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0,1,2,3,4,5,6",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 418.9338857270777,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2/current_auto.log",
+          "returncode": 0
+        }
+      },
+      "pool_size": 2048,
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-ROF-A-P2048-INTRA-WIDE-v2",
+      "workload_manifest_sha256": "53442cc94cad00a06f2243ae479f068c60ebf91c00c98d882ba667238b9a379a"
+    },
+    {
+      "gpus": "0,1,2,3,4,5,6",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0,1,2,3,4,5,6",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 212.01317953225225,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2/ase_cuda_mps.log",
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0,1,2,3,4,5,6",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 215.9188707084395,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2/current_auto.log",
+          "returncode": 0
+        }
+      },
+      "pool_size": 2048,
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2",
+      "workload_manifest_sha256": "a8aa05178634172b53197afee1325e5a37e2e9fbc2921aaa332a4c4209627da8"
+    },
+    {
+      "gpus": "0,1,2,3,4,5,6",
+      "methods": {
+        "ase_cuda_mps": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/run_omc_csp_scheduler_mps.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--gpus",
+            "0,1,2,3,4,5,6",
+            "--runtime-dir",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2/mps_runtime",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2/ase_cuda_mps.json",
+            "--mps-session-config",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/existing_mps_sessions.json"
+          ],
+          "external_process_wall_seconds": 160.82275721384212,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2/ase_cuda_mps.log",
+          "returncode": 0
+        },
+        "current_auto": {
+          "command": [
+            "/public/home/lmy/.conda/envs/lmy/bin/python",
+            "/public/home/lmy/Batch_imple_project/omc_csp_hardware_calibration_v1/expanded/runner/benchmarks/benchmark_omc_csp_scheduler_auto.py",
+            "--manifest",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_workloads_v2/manifests/OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2.json",
+            "--dataset-dir",
+            "/public/home/lmy/Batch_imple_project/test_set",
+            "--checkpoint",
+            "/public/home/lmy/Batch_imple_project/AtomBit-OMC-s/checkpoints/smooth_rms_finetune/AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+            "--devices",
+            "0,1,2,3,4,5,6",
+            "--output",
+            "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2/current_auto.json",
+            "--tail-recovery",
+            "ase_bfgs"
+          ],
+          "external_process_wall_seconds": 138.71865361789241,
+          "log": "/public/home/lmy/Batch_imple_project/omc_csp_scheduler_epoch1/results/test_refined_v1/OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2/current_auto.log",
+          "returncode": 0
+        }
+      },
+      "pool_size": 2048,
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2",
+      "workload_manifest_sha256": "ec9d6f04a1f9674c433336c423fa3c489241315caf3d4bb504750224fbac29dd"
+    }
+  ],
+  "schema_version": 1,
+  "split": "test",
+  "status": "complete",
+  "workload_count": 16
+}
