@@ -102,6 +102,11 @@ def main() -> None:
         default="subdivide",
     )
     parser.add_argument(
+        "--target-chunks-per-device",
+        type=int,
+        default=AutoSchedulerConfig().multi_gpu_target_chunks_per_device,
+    )
+    parser.add_argument(
         "--manifest-loader-processes",
         type=_loader_process_count,
         default="auto",
@@ -111,10 +116,12 @@ def main() -> None:
         args.max_steps <= 0
         or args.fmax <= 0.0
         or args.manifest_prefetch_depth < 0
+        or args.target_chunks_per_device <= 0
     ):
         parser.error(
             "--max-steps and --fmax must be positive; "
-            "--manifest-prefetch-depth must be non-negative"
+            "--manifest-prefetch-depth must be non-negative; "
+            "--target-chunks-per-device must be positive"
         )
     if len(set(args.workload_id)) != len(args.workload_id):
         parser.error("--workload-id values must be unique")
@@ -156,6 +163,7 @@ def main() -> None:
         manifest_loader_processes=args.manifest_loader_processes,
         manifest_prefetch_chunks_per_worker=args.manifest_prefetch_depth,
         multi_gpu_dispatch_policy=args.multi_gpu_dispatch_policy,
+        multi_gpu_target_chunks_per_device=args.target_chunks_per_device,
     )
     relaxation_options = {
         "cell_filter": FrechetCellFilter(),
@@ -267,6 +275,9 @@ def main() -> None:
                 args.manifest_prefetch_depth
             ),
             "multi_gpu_dispatch_policy": args.multi_gpu_dispatch_policy,
+            "multi_gpu_target_chunks_per_device": (
+                args.target_chunks_per_device
+            ),
         },
         "reproducibility": reproducibility,
         "environment": environment_metadata(devices[0]),

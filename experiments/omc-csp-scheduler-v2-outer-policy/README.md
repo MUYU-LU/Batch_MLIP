@@ -33,4 +33,8 @@ selection boundary.
 
 ## Status
 
-Implementation in progress.
+`preserve_resident` is rejected as the universal persistent-throughput
+policy by the first paired seven-H100 sequence. The next bounded candidate is
+`subdivide` with one execution chunk per GPU, which retains persistent workers
+while measuring whether the second work-stealing wave is worth its smaller
+resident batches.
