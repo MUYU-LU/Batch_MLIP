@@ -1,0 +1,100 @@
+schema_version: 1
+id: t2-unique6000-auto-bfgs-vs-mps8
+date: 2026-07-31
+status: complete
+baseline_commit: 0776891
+
+hypothesis: >-
+  For all 6,000 unique T2 structures, the frozen automatic OMC-CSP workflow
+  completes variable-cell AtomBit BFGS faster than eight persistent ASE BFGS
+  CUDA-MPS workers per GPU on eight identical H100 GPUs.
+
+workload:
+  archive: /public/home/lmy/Batch_imple_project/T2_test.tgz
+  archive_sha256: cf018bd7ab2c8dc76e3301ae2459d3d08209e9bc0bb6e456019dcc6a809257b8
+  available_cifs: 6000
+  selected_cifs: 6000
+  synthetic_repetition: false
+  construction_seed: 20260728
+  construction_sha256: 39cb4450281a8399e07d9da32513696e40a7caefff41784c00e7bb0a35011691
+  workload_id: OPT-OMC-STRUCTURES-P6000-INTRA-WIDE-v1
+  manifest_sha256: a5019698bfb5229ea38bebf4c72d4a96b15a8ccd644eea4c38ba3042097dde4d
+
+contract:
+  mlip: AtomBit-smooth-rms-fp32
+  checkpoint_sha256: b27c372cb2c2848ae1e54a9ffd7a2aa0b0401d9cc0ed922e3be250ff63e44486
+  optimizer: BFGS
+  optimizer_dtype: float64
+  cell_filter: FrechetCellFilter
+  cutoff_A: 6.0
+  skin_A: 0.5
+  fmax_eV_per_A: 0.05
+  max_steps: 500
+  alpha_eV_per_A2: 70.0
+  max_step_A: 0.2
+  deterministic: true
+
+hardware:
+  gpu_model: NVIDIA H100 80GB HBM3
+  gpu_indices: [0, 1, 2, 3, 4, 5, 6, 7]
+  gpu_count: 8
+  memory_safety_fraction: 0.85
+
+methods:
+  automatic:
+    interface: BatchExecutor.relax_manifest
+    scheduler: frozen_omc_csp_v1_with_loader_policy_v2
+    target_chunks_per_device: 2
+    manifest_loader_processes: auto
+    executor_calls: 1
+    tail_recovery: ase_bfgs
+    workload_specific_overrides: none
+  mps:
+    optimizer: ASE BFGS
+    workers_per_gpu: 8
+    total_workers: 64
+    assignment: static_cost_balanced_lpt
+
+fairness:
+  timing_repeats: 1
+  same_signed_jobs: true
+  same_checkpoint: true
+  same_force_and_step_limits: true
+  cpu_threads_per_process: 1
+  full_process_makespan_reported: true
+
+results:
+  automatic:
+    execution_seconds: 442.157635259
+    full_script_seconds: 470.275725189
+    systems_per_second: 13.569821080858224
+    tensor_converged: 5998
+    final_converged: 5999
+    tail_recovery_seconds: 29.688515668000036
+    execution_chunks: 31
+    loader_processes_total: 32
+    peak_reserved_GiB: 61.66015625
+  mps:
+    production_makespan_seconds: 925.8103003269998
+    full_script_seconds: 976.8488611580001
+    systems_per_second: 6.480809295252793
+    converged: 5999
+    peak_sampled_device_GiB: 23.2109375
+  comparison:
+    production_speedup_over_mps: 2.093846688375501
+    full_script_speedup_over_mps: 2.0771832540695407
+    same_source_set: true
+    convergence_state_mismatches: 0
+    same_nonconverged_source: true
+
+conclusion: >-
+  Supported for this workload. The frozen automatic OMC-CSP workflow is
+  2.09x faster than eight ASE/MPS jobs per GPU while retaining exact source
+  coverage and the same 5,999/6,000 convergence result. It uses 2.66x more
+  peak GPU memory, converting otherwise idle H100 memory into throughput.
+
+limitations:
+  - One deterministic timing trial, as requested.
+  - One T2 workload and one AtomBit checkpoint.
+  - BFGS trajectories are schedule-sensitive, so endpoint differences are
+    recorded as diagnostics rather than required to be bitwise identical.

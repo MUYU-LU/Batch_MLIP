@@ -1,0 +1,216 @@
+{
+  "artifacts": {
+    "automatic": {
+      "path": "/public/home/lmy/Batch_imple_project/t2_unique6000_auto_bfgs_vs_mps8/results/automatic/result.json",
+      "sha256": "e5d75d898dd2c46194aa404c87289b4f03cd2eed4e0f1d8ecd24fcec9e510f38"
+    },
+    "mps": {
+      "path": "/public/home/lmy/Batch_imple_project/t2_unique6000_auto_bfgs_vs_mps8/results/mps/result.json",
+      "sha256": "4d48b18230f9fab73b5e7224fcb14ed0638a550719d8c4c474bf1788492e85d4"
+    }
+  },
+  "automatic": {
+    "active_gpu_count": 8,
+    "capacity_policy": {
+      "cost_model_contract_id": "atombit-smooth-rms-fp32-bfgs-f64-frechet-h100-peak_reserved_bytes-v1",
+      "memory_model": "peak_reserved_bytes",
+      "mode": "offline_hardware_model",
+      "policy_id": "omc-csp-atombit-h100-capacity-v1",
+      "policy_sha256": "d8ed5cbbfd63d6e845eb3d552f628169a0c4e99f996f820c81299bdeafaf46fb",
+      "reason": "signed execution and hardware contracts matched",
+      "source_calibration_sha256": "d27468326e2b7f464b37c8739d3d3bd219425081bdb96dabf0f250928c78b297"
+    },
+    "dispatch_policy": "subdivide",
+    "execution_chunks": 31,
+    "execution_seconds": 442.157635259,
+    "final_converged": 5999,
+    "graph_evaluations": 726315,
+    "initial_materialization_wait_seconds": 8.6784563719998,
+    "loader_policy": {
+      "active_worker_count": 8,
+      "atoms_per_worker": 117875.0,
+      "automatic_thresholds": {
+        "large": {
+          "minimum_atoms_per_worker": 32000.0,
+          "minimum_pool_size": 2048,
+          "process_count": 4
+        },
+        "medium": {
+          "minimum_atoms_per_worker": 3000.0,
+          "minimum_pool_size": 512,
+          "process_count": 2
+        }
+      },
+      "available_cpu_count": 128,
+      "policy_id": "manifest-loader-process-policy-v2",
+      "pool_size": 6000,
+      "process_count": 4,
+      "reason": "large-pool atom-record and host-CPU gates passed",
+      "requested": "auto",
+      "required_cpu_count": 40,
+      "total_atoms": 943000
+    },
+    "model_calls": 11967,
+    "peak_allocated_GiB": 54.75132131576538,
+    "peak_reserved_GiB": 61.66015625,
+    "pending_work_stealing": true,
+    "prefetch_hit_rate": 1.0,
+    "production_run_seconds": 381.4311206089999,
+    "resident_plan_chunks": 31,
+    "script_seconds": 470.275725189,
+    "systems_per_second_execution": 13.569821080858224,
+    "systems_per_second_script": 12.758472697242981,
+    "tail_attempted": 2,
+    "tail_recovered": 1,
+    "tail_recovery_seconds": 29.688515668000036,
+    "target_chunks_per_device": 2,
+    "tensor_converged": 5998,
+    "tensor_execution_seconds": 412.469119591,
+    "total_loader_processes": 32,
+    "worker_max_over_mean": 1.112701763300936,
+    "worker_task_seconds": [
+      323.03792759400017,
+      323.9612228210001,
+      334.176936155,
+      312.98041286500006,
+      374.27801899300016,
+      325.42392625800017,
+      338.9266798840001,
+      358.1642840669999
+    ]
+  },
+  "comparison": {
+    "automatic_nonconverged": [
+      "OPT-OMC-STRUCTURES-P6000-INTRA-WIDE-v1:05533"
+    ],
+    "automatic_peak_reserved_over_mps_peak_sampled": 2.656512958599798,
+    "convergence_state_mismatch_count": 0,
+    "endpoint_diagnostics": {
+      "automatic_only_sources": [],
+      "automatic_record_count": 6000,
+      "common_source_count": 6000,
+      "convergence_categories": {
+        "automatic_only_converged": 0,
+        "both_converged": 5999,
+        "mps_only_converged": 0,
+        "neither_converged": 1
+      },
+      "convergence_state_mismatch_count": 0,
+      "metrics": {
+        "absolute_energy_eV": {
+          "max": 6.095024108886719,
+          "mean": 0.11340588927268982,
+          "min": 0.0,
+          "p50": 0.00185394287109375,
+          "p95": 0.6808099746704102
+        },
+        "absolute_max_force_eV_per_A": {
+          "max": 0.023911597207188606,
+          "mean": 0.003170247183491786,
+          "min": 0.0,
+          "p50": 0.002083413302898407,
+          "p95": 0.009904876351356506
+        },
+        "absolute_max_stress_eV_per_A3": {
+          "max": 0.003147310868371278,
+          "mean": 0.00011355867196940987,
+          "min": 0.0,
+          "p50": 3.076624125242233e-05,
+          "p95": 0.0005321039934642613
+        },
+        "absolute_step_difference": {
+          "max": 385.0,
+          "mean": 11.968833333333333,
+          "min": 0.0,
+          "p50": 1.0,
+          "p95": 80.0
+        },
+        "max_cell_component_A": {
+          "max": 3.704048791742828,
+          "mean": 0.060926094261948435,
+          "min": 0.0,
+          "p50": 0.0008203454630404394,
+          "p95": 0.32457887710536326
+        },
+        "max_position_component_A": {
+          "max": 5.590025785130861,
+          "mean": 0.1685403305479929,
+          "min": 0.0,
+          "p50": 0.006439364434891903,
+          "p95": 1.2309407724081076
+        },
+        "max_stress_component_eV_per_A3": {
+          "max": 0.005632757442072034,
+          "mean": 0.00021890983692924874,
+          "min": 0.0,
+          "p50": 6.762365228496492e-05,
+          "p95": 0.001034012224408798
+        }
+      },
+      "mps_only_sources": [],
+      "mps_record_count": 6000,
+      "same_source_set": true,
+      "threshold_gate_applied": false,
+      "threshold_gate_reason": "The frozen epoch contract requires endpoint retention and convergence-count non-regression but does not declare cross-optimizer endpoint tolerances."
+    },
+    "full_script_speedup_over_mps": 2.0771832540695407,
+    "mps_nonconverged": [
+      "OPT-OMC-STRUCTURES-P6000-INTRA-WIDE-v1:05533"
+    ],
+    "production_speedup_over_mps": 2.093846688375501,
+    "same_source_set": true
+  },
+  "hardware": {
+    "gpu_count": 8,
+    "gpu_model": "NVIDIA H100 80GB HBM3",
+    "mps_total_workers": 64,
+    "mps_workers_per_gpu": 8
+  },
+  "interpretation": {
+    "endpoint_note": "Schedule-sensitive BFGS trajectories are diagnostics, not an equality gate across implementations.",
+    "limitation": "One deterministic timing trial on one T2 workload and AtomBit checkpoint.",
+    "result": "automatic_faster_with_equal_convergence_coverage"
+  },
+  "mps": {
+    "converged": 5999,
+    "jobs_per_gpu": [
+      752,
+      748,
+      752,
+      748,
+      749,
+      749,
+      751,
+      751
+    ],
+    "model_evaluations": 725215,
+    "optimizer_steps": 719215,
+    "peak_sampled_device_GiB": 23.2109375,
+    "production_makespan_seconds": 925.8103003269998,
+    "script_seconds": 976.8488611580001,
+    "systems_per_second_production": 6.480809295252793,
+    "systems_per_second_script": 6.142198899517918,
+    "worker_max_over_mean": 1.0322067480919543,
+    "worker_wall_seconds": [
+      901.5406153619997,
+      913.3236943759998,
+      880.8063392839999,
+      876.5830551450003,
+      884.1251674810001,
+      873.908828099,
+      925.8103003269998,
+      919.288535915
+    ]
+  },
+  "publication_grade": false,
+  "schema_version": 1,
+  "status": "complete",
+  "timing_trials_per_configuration": 1,
+  "workload": {
+    "id": "OPT-OMC-STRUCTURES-P6000-INTRA-WIDE-v1",
+    "jobs": 6000,
+    "manifest_sha256": "a5019698bfb5229ea38bebf4c72d4a96b15a8ccd644eea4c38ba3042097dde4d",
+    "synthetic_repetition": false,
+    "unique_sources": 6000
+  }
+}
