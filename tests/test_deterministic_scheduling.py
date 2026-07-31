@@ -21,6 +21,7 @@ from batch_mlip import (
 from batch_mlip.interfaces.api import (
     _parallel_deterministic_chunk_policy,
     _parallel_deterministic_chunks,
+    _parallel_deterministic_dispatch_order,
     _reserved_incremental_bytes,
 )
 
@@ -260,6 +261,55 @@ def test_parallel_chunks_split_only_enough_to_occupy_devices():
     assert sorted(
         index for chunk in chunks for index in chunk.indices
     ) == list(range(8))
+
+
+def test_parallel_dispatch_can_stratify_only_the_initial_wave():
+    config = AutoSchedulerConfig(max_batch_size=2)
+    probe = DeterministicMemoryProbe(
+        memory_budget_bytes=None,
+        baseline_allocated_bytes=None,
+        peak_allocated_bytes=None,
+        peak_reserved_bytes=None,
+        probe_indices=(),
+        probe_model_work=0,
+        model_bytes_per_work=0.0,
+    )
+    plan = plan_deterministic_relaxation(
+        _workload(8),
+        probe,
+        BatchedFIRE(),
+        {},
+        torch.float64,
+        config,
+    )
+    chunks = _parallel_deterministic_chunks(
+        replace(
+            plan,
+            chunks=(
+                replace(plan.chunks[0], bucket_index=0),
+                replace(plan.chunks[1], bucket_index=0),
+                replace(plan.chunks[2], bucket_index=1),
+                replace(plan.chunks[3], bucket_index=2),
+            ),
+        ),
+        device_count=2,
+        target_chunks_per_device=2,
+    )
+
+    cost_order = _parallel_deterministic_dispatch_order(
+        chunks,
+        worker_count=3,
+        queue_policy="cost_descending",
+    )
+    stratified = _parallel_deterministic_dispatch_order(
+        chunks,
+        worker_count=3,
+        queue_policy="bucket_stratified",
+    )
+
+    assert cost_order == (0, 1, 2, 3)
+    assert stratified == (0, 2, 3, 1)
+    assert sorted(stratified) == list(range(len(chunks)))
 
 
 def test_parallel_chunks_preserve_heterogeneous_resident_batches():

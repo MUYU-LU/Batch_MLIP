@@ -189,6 +189,22 @@ def test_parallel_task_workers_execute_every_task_once():
     assert execution.end_to_end_wall_seconds >= execution.run_wall_seconds
 
 
+def test_parallel_task_workers_honor_explicit_initial_dispatch_order():
+    execution = run_parallel_task_workers(
+        [0, 1, 2, 3],
+        [1.0, 5.0, 2.0, 4.0],
+        ["cpu:0", "cpu:1"],
+        StubTaskPreparer(),
+        dispatch_order=(0, 2, 1, 3),
+        startup_timeout_seconds=30.0,
+        run_timeout_seconds=30.0,
+    )
+
+    assert [
+        worker.task_indices[0] for worker in execution.worker_results
+    ] == [0, 2]
+
+
 def test_parallel_task_workers_propagate_worker_failure():
     with pytest.raises(ParallelWorkerError, match="intentional task failure"):
         run_parallel_task_workers(
@@ -269,6 +285,42 @@ def test_persistent_task_pool_resolves_bounded_source_without_preassignment():
     assert [
         worker.task_indices[0] for worker in execution.worker_results
     ] == [1, 3]
+
+
+def test_persistent_task_pool_honors_explicit_dispatch_order():
+    source = StubTaskSource((0, 1, 2, 3, 4))
+    dispatch_order = (4, 0, 3, 2, 1)
+    with PersistentTaskPool(
+        ["cpu:0", "cpu:1"],
+        StubTaskPreparer(),
+        startup_timeout_seconds=30.0,
+        run_timeout_seconds=30.0,
+    ) as pool:
+        execution = pool.execute_source(
+            source,
+            [1.0, 5.0, 2.0, 4.0, 3.0],
+            dispatch_order=dispatch_order,
+        )
+
+    assert source.prepared_order == dispatch_order
+    assert [
+        worker.task_indices[0] for worker in execution.worker_results
+    ] == [4, 0]
+
+
+def test_persistent_task_pool_rejects_invalid_dispatch_order():
+    with PersistentTaskPool(
+        ["cpu:0"],
+        StubTaskPreparer(),
+        startup_timeout_seconds=30.0,
+        run_timeout_seconds=30.0,
+    ) as pool:
+        with pytest.raises(ValueError, match="must be a permutation"):
+            pool.execute(
+                [0, 1],
+                [1.0, 2.0],
+                dispatch_order=(0, 0),
+            )
 
 
 def test_persistent_task_pool_uses_bounded_descriptor_sharing():

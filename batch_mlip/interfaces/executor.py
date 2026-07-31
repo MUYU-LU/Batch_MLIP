@@ -54,6 +54,7 @@ from .api import (
     _offload_relaxation_result,
     _parallel_deterministic_chunk_policy,
     _parallel_deterministic_chunks,
+    _parallel_deterministic_dispatch_order,
     _validate_manifest_planning_profile,
     relax,
 )
@@ -646,10 +647,16 @@ class BatchExecutor:
             )
             for chunk in production_chunks
         ]
+        dispatch_order = _parallel_deterministic_dispatch_order(
+            pending_chunks,
+            worker_count=active_worker_count,
+            queue_policy=config.multi_gpu_queue_policy,
+        )
         production_execution = (
             self._pool.execute(
                 production_tasks,
                 [chunk.cost for chunk in production_chunks],
+                dispatch_order=dispatch_order,
             )
             if production_tasks
             else None
@@ -707,6 +714,14 @@ class BatchExecutor:
                 dispatch_policy=config.multi_gpu_dispatch_policy,
             ),
             "multi_gpu_dispatch_policy": config.multi_gpu_dispatch_policy,
+            "multi_gpu_queue_policy": config.multi_gpu_queue_policy,
+            "initial_dispatch_chunk_indices": list(
+                dispatch_order[:active_worker_count]
+            ),
+            "initial_dispatch_bucket_indices": [
+                pending_chunks[index].bucket_index
+                for index in dispatch_order[:active_worker_count]
+            ],
             "target_chunks_per_device": (
                 config.multi_gpu_target_chunks_per_device
             ),
@@ -936,6 +951,11 @@ class BatchExecutor:
             )
             for chunk in pending_chunks
         )
+        dispatch_order = _parallel_deterministic_dispatch_order(
+            pending_chunks,
+            worker_count=active_worker_count,
+            queue_policy=config.multi_gpu_queue_policy,
+        )
         task_source = _ManifestExecutorTaskSource(
             provider=provider,
             chunks=production_chunks,
@@ -949,6 +969,7 @@ class BatchExecutor:
             prefetch_depth=(
                 config.manifest_prefetch_chunks_per_worker
             ),
+            dispatch_order=dispatch_order,
         )
         indexed_results = [
             (chunk.indices, task_result.payload)
@@ -1031,6 +1052,14 @@ class BatchExecutor:
                 )
             ),
             "multi_gpu_dispatch_policy": config.multi_gpu_dispatch_policy,
+            "multi_gpu_queue_policy": config.multi_gpu_queue_policy,
+            "initial_dispatch_chunk_indices": list(
+                dispatch_order[:active_worker_count]
+            ),
+            "initial_dispatch_bucket_indices": [
+                pending_chunks[index].bucket_index
+                for index in dispatch_order[:active_worker_count]
+            ],
             "target_chunks_per_device": (
                 config.multi_gpu_target_chunks_per_device
             ),

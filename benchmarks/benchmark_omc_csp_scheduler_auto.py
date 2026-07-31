@@ -115,6 +115,17 @@ def main() -> None:
     parser.add_argument("--fmax", type=float, default=0.05)
     parser.add_argument("--max-steps", type=int, default=500)
     parser.add_argument("--executor-calls", type=int, default=0)
+    parser.add_argument("--target-chunks-per-device", type=int, default=2)
+    parser.add_argument(
+        "--multi-gpu-dispatch-policy",
+        choices=("subdivide", "preserve_resident"),
+        default="subdivide",
+    )
+    parser.add_argument(
+        "--multi-gpu-queue-policy",
+        choices=("cost_descending", "bucket_stratified"),
+        default=AutoSchedulerConfig().multi_gpu_queue_policy,
+    )
     parser.add_argument("--manifest-prefetch-depth", type=int, default=1)
     parser.add_argument(
         "--manifest-loader-processes",
@@ -141,12 +152,13 @@ def main() -> None:
         args.max_steps <= 0
         or args.fmax <= 0.0
         or args.executor_calls < 0
+        or args.target_chunks_per_device <= 0
         or args.manifest_prefetch_depth < 0
     ):
         parser.error(
             "--max-steps and --fmax must be positive; "
-            "--executor-calls and --manifest-prefetch-depth must be "
-            "non-negative"
+            "--target-chunks-per-device must be positive; --executor-calls "
+            "and --manifest-prefetch-depth must be non-negative"
         )
     if args.materialization == "manifest_lazy" and args.planning_profile is None:
         parser.error("--planning-profile is required with manifest_lazy")
@@ -221,6 +233,11 @@ def main() -> None:
                 manifest_prefetch_chunks_per_worker=(
                     args.manifest_prefetch_depth
                 ),
+                multi_gpu_target_chunks_per_device=(
+                    args.target_chunks_per_device
+                ),
+                multi_gpu_dispatch_policy=args.multi_gpu_dispatch_policy,
+                multi_gpu_queue_policy=args.multi_gpu_queue_policy,
             )
             if args.executor_calls:
                 with BatchExecutor(
@@ -452,6 +469,13 @@ def main() -> None:
             "manifest_prefetch_chunks_per_worker": (
                 args.manifest_prefetch_depth
             ),
+            "target_chunks_per_device": (
+                args.target_chunks_per_device
+            ),
+            "multi_gpu_dispatch_policy": (
+                args.multi_gpu_dispatch_policy
+            ),
+            "multi_gpu_queue_policy": args.multi_gpu_queue_policy,
             "planning_profile_sha256": (
                 None
                 if planning_profile is None

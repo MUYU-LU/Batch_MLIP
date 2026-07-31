@@ -1541,6 +1541,55 @@ def _parallel_deterministic_chunk_policy(
     return "minimum_parts_for_device_occupancy"
 
 
+def _parallel_deterministic_dispatch_order(
+    chunks: Sequence[_PendingAutoChunk],
+    *,
+    worker_count: int,
+    queue_policy: Literal[
+        "cost_descending",
+        "bucket_stratified",
+    ],
+) -> tuple[int, ...]:
+    """Order one initial wave, then retain descending-cost work stealing."""
+
+    if worker_count <= 0:
+        raise ValueError("worker_count must be positive")
+    if queue_policy not in ("cost_descending", "bucket_stratified"):
+        raise ValueError(
+            "queue_policy must be 'cost_descending' or 'bucket_stratified'"
+        )
+    cost_order = tuple(
+        sorted(
+            range(len(chunks)),
+            key=lambda index: (-chunks[index].estimated_cost, index),
+        )
+    )
+    if queue_policy == "cost_descending" or not cost_order:
+        return cost_order
+
+    representatives = []
+    seen_buckets = set()
+    for index in cost_order:
+        bucket_index = chunks[index].bucket_index
+        if bucket_index in seen_buckets:
+            continue
+        representatives.append(index)
+        seen_buckets.add(bucket_index)
+        if len(representatives) == worker_count:
+            break
+    initial_wave = representatives[:worker_count]
+    selected = set(initial_wave)
+    for index in cost_order:
+        if len(initial_wave) == min(worker_count, len(cost_order)):
+            break
+        if index not in selected:
+            initial_wave.append(index)
+            selected.add(index)
+    return tuple(initial_wave) + tuple(
+        index for index in cost_order if index not in selected
+    )
+
+
 def _execute_multi_device_deterministic_relaxation(
     systems: list[Atoms],
     calculator: BatchCalculator,
@@ -1637,6 +1686,11 @@ def _execute_multi_device_deterministic_provider_relaxation(
     )
     worker_count = min(len(devices), len(chunks))
     worker_devices = devices[:worker_count]
+    dispatch_order = _parallel_deterministic_dispatch_order(
+        chunks,
+        worker_count=worker_count,
+        queue_policy=config.multi_gpu_queue_policy,
+    )
     loader_decision = select_manifest_loader_processes(
         [profile.atom_count for profile in workload.profiles],
         active_worker_count=worker_count,
@@ -1701,6 +1755,7 @@ def _execute_multi_device_deterministic_provider_relaxation(
             [chunk.estimated_cost for chunk in chunks],
             [str(device) for device in worker_devices],
             process_preparer,
+            dispatch_order=dispatch_order,
             worker_environment=(allocator_plan.environment() if has_cuda_workers else None),
         )
         task_results = {task.task_index: task for task in execution.task_results}
@@ -1768,8 +1823,8 @@ def _execute_multi_device_deterministic_provider_relaxation(
         worker_run_seconds = execution.run_wall_seconds
     else:
         queue: PriorityQueue[tuple[float, int, _PendingAutoChunk]] = PriorityQueue()
-        for serial, chunk in enumerate(chunks):
-            queue.put((-chunk.estimated_cost, serial, chunk))
+        for priority, chunk_index in enumerate(dispatch_order):
+            queue.put((priority, chunk_index, chunks[chunk_index]))
         worker_calculators = [
             calculator if device == calculator.device else calculator.clone_to(device)
             for device in worker_devices
@@ -1935,6 +1990,11 @@ def _execute_multi_device_deterministic_provider_relaxation(
             dispatch_policy=config.multi_gpu_dispatch_policy,
         ),
         "multi_gpu_dispatch_policy": config.multi_gpu_dispatch_policy,
+        "multi_gpu_queue_policy": config.multi_gpu_queue_policy,
+        "initial_dispatch_chunk_indices": list(dispatch_order[:worker_count]),
+        "initial_dispatch_bucket_indices": [
+            chunks[index].bucket_index for index in dispatch_order[:worker_count]
+        ],
         "target_chunks_per_device": (config.multi_gpu_target_chunks_per_device),
         "resident_plan_chunk_count": len(plan.chunks),
         "execution_chunk_count": len(chunks),

@@ -33,6 +33,7 @@ def test_auto_scheduler_uses_cross_family_calibrated_defaults():
     assert config.memory_growth_margin == 1.10
     assert config.multi_gpu_target_chunks_per_device == 2
     assert config.multi_gpu_dispatch_policy == "subdivide"
+    assert config.multi_gpu_queue_policy == "bucket_stratified"
 
     with pytest.raises(
         ValueError,
@@ -45,6 +46,12 @@ def test_auto_scheduler_uses_cross_family_calibrated_defaults():
         match="multi_gpu_dispatch_policy must be",
     ):
         AutoSchedulerConfig(multi_gpu_dispatch_policy="invalid")
+
+    with pytest.raises(
+        ValueError,
+        match="multi_gpu_queue_policy must be",
+    ):
+        AutoSchedulerConfig(multi_gpu_queue_policy="invalid")
 
 
 def test_memory_calibration_recovers_synthetic_peak_model():

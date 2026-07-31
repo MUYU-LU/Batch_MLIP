@@ -102,6 +102,11 @@ def main() -> None:
         default="subdivide",
     )
     parser.add_argument(
+        "--multi-gpu-queue-policy",
+        choices=("cost_descending", "bucket_stratified"),
+        default=AutoSchedulerConfig().multi_gpu_queue_policy,
+    )
+    parser.add_argument(
         "--target-chunks-per-device",
         type=int,
         default=AutoSchedulerConfig().multi_gpu_target_chunks_per_device,
@@ -163,6 +168,7 @@ def main() -> None:
         manifest_loader_processes=args.manifest_loader_processes,
         manifest_prefetch_chunks_per_worker=args.manifest_prefetch_depth,
         multi_gpu_dispatch_policy=args.multi_gpu_dispatch_policy,
+        multi_gpu_queue_policy=args.multi_gpu_queue_policy,
         multi_gpu_target_chunks_per_device=args.target_chunks_per_device,
     )
     relaxation_options = {
@@ -275,6 +281,7 @@ def main() -> None:
                 args.manifest_prefetch_depth
             ),
             "multi_gpu_dispatch_policy": args.multi_gpu_dispatch_policy,
+            "multi_gpu_queue_policy": args.multi_gpu_queue_policy,
             "multi_gpu_target_chunks_per_device": (
                 args.target_chunks_per_device
             ),

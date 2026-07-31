@@ -76,6 +76,10 @@ class AutoSchedulerConfig:
         "subdivide",
         "preserve_resident",
     ] = "subdivide"
+    multi_gpu_queue_policy: Literal[
+        "cost_descending",
+        "bucket_stratified",
+    ] = "bucket_stratified"
     cuda_allocator_policy: Literal[
         "auto", "native", "expandable_segments"
     ] = "auto"
@@ -140,6 +144,14 @@ class AutoSchedulerConfig:
             raise ValueError(
                 "multi_gpu_dispatch_policy must be 'subdivide' or "
                 "'preserve_resident'"
+            )
+        if self.multi_gpu_queue_policy not in (
+            "cost_descending",
+            "bucket_stratified",
+        ):
+            raise ValueError(
+                "multi_gpu_queue_policy must be 'cost_descending' or "
+                "'bucket_stratified'"
             )
         if self.cuda_allocator_policy not in (
             "auto",

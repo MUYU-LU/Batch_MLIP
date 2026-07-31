@@ -7,22 +7,24 @@ persistent ASE BFGS CUDA-MPS workers per GPU.
 
 | Method | Execution/makespan (s) | Full script (s) | Systems/s | Converged | Peak GPU memory (GiB) |
 |---|---:|---:|---:|---:|---:|
+| Automatic batching, bucket-stratified outer scheduling | 358.35 | 362.21 | 16.74 | 5,999/6,000 | 61.66 reserved |
 | Automatic batching, neighbour-control v2 | 364.90 | 368.82 | 16.44 | 5,999/6,000 | 61.66 reserved |
 | Automatic batching | 442.16 | 470.28 | 13.57 | 5,999/6,000 | 61.66 reserved |
 | ASE/CUDA-MPS, 64 workers | 925.81 | 976.85 | 6.48 | 5,999/6,000 | 23.21 sampled |
 | ASE/CUDA-MPS, 128 workers | 741.25 | 811.32 | 8.09 | 5,999/6,000 | 39.13 sampled |
 
-The automatic workflow is 2.094x faster by production makespan and 2.077x
-faster by full-script time than MPS8. Against MPS16, the corresponding
-speedups are 1.676x and 1.725x. Doubling MPS concurrency improves its
-production makespan by only 1.249x while increasing sampled peak GPU memory
-by 1.686x, demonstrating diminishing returns beyond eight workers per GPU.
+The current automatic workflow is 2.584x faster by matched execution/makespan
+and 2.697x faster by full-script time than MPS8. Against MPS16, the
+corresponding speedups are 2.068x and 2.240x. Doubling MPS concurrency
+improves its production makespan by only 1.249x while increasing sampled peak
+GPU memory by 1.686x, demonstrating diminishing returns beyond eight workers
+per GPU.
 
 The automatic workflow selected the signed offline H100 capacity model, 31
-memory-safe execution chunks, work stealing, and four CIF loader processes
-per GPU without workload-specific overrides. Tensor execution first converged
-5,998 jobs; the frozen ASE tail recovery recovered one additional job in
-29.69 seconds. All three methods leave the same source unconverged.
+memory-safe execution chunks, bucket-stratified work stealing, and four CIF
+loader processes per GPU without workload-specific overrides. Tensor
+execution first converged 5,998 jobs; the frozen ASE tail recovery recovered one additional job in
+29.92 seconds. All three methods leave the same source unconverged.
 
 The two MPS configurations have bitwise-identical endpoint records. Batched
 and ASE BFGS have identical source coverage and convergence flags but their
@@ -79,3 +81,32 @@ positions, and cells are bitwise identical to the matched baseline. Against
 MPS16, the optimized automatic execution is 2.031x faster; full-script speedup
 is 2.200x. Worker max/mean time also falls from 1.118 to 1.060, leaving only a
 16.45 s ideal-balance upper bound for the next outer-scheduler refinement.
+
+## Bucket-stratified outer scheduling
+
+The accepted outer policy keeps the 31 memory-safe resident chunks unchanged.
+Instead of filling the initial eight-GPU wave entirely from bucket 1, it first
+exposes the largest pending chunk from each workload bucket, fills the remaining
+initial slots by descending predicted cost, and then resumes the original
+descending-cost work-stealing queue. Single-bucket workloads therefore retain
+the original order exactly.
+
+On P6000, the initial chunk indices changed from `0..7` to
+`[0, 8, 21, 28, 1, 2, 3, 4]`, covering buckets
+`[1, 0, 2, 3, 1, 1, 1, 1]`. Production time fell from 300.184 s to
+297.365 s, a conservative 1.009x outer-scheduler speedup. Full execution fell
+from 364.900 s to 358.351 s (1.018x), but this larger value includes startup
+and tail-recovery timing variation. Worker max/mean fell from 1.060 to 1.052,
+and the ideal-balance gap fell from 16.45 s to 14.15 s.
+
+Resident chunks, 61.66 GiB peak reserved memory, 11,967 model calls, 726,315
+graph evaluations, convergence, and all serialized endpoints are unchanged.
+The canonical endpoint SHA-256 is
+`0e03ce30c9a41d93ca3f52582bedbad4d8a94b424ee56ab0f64e8a6a70c00d38`
+for both queue policies.
+
+Two granularity candidates were rejected. Global subdivision to 40 chunks made
+production 3.04% slower and increased summed GPU work 3.51%. Tail-only
+subdivision to 39 chunks made production 0.93% slower, increased summed GPU
+work 3.49%, and changed a small set of schedule-sensitive BFGS endpoints. The
+accepted policy improves balance without changing numerical batch composition.

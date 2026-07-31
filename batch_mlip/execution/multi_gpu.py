@@ -140,6 +140,28 @@ class ParallelWorkerError(RuntimeError):
     """Raised when a child process fails during preparation or execution."""
 
 
+def _task_dispatch_order(
+    costs: Sequence[float],
+    dispatch_order: Sequence[int] | None,
+) -> tuple[int, ...]:
+    if dispatch_order is None:
+        return tuple(
+            sorted(
+                range(len(costs)),
+                key=lambda index: (-costs[index], index),
+            )
+        )
+    normalized = tuple(dispatch_order)
+    if any(
+        isinstance(index, bool) or not isinstance(index, int)
+        for index in normalized
+    ):
+        raise TypeError("dispatch_order must contain integer task indices")
+    if sorted(normalized) != list(range(len(costs))):
+        raise ValueError("dispatch_order must be a permutation of task indices")
+    return normalized
+
+
 def _normalize_worker_environment(
     environment: Mapping[str, str | None] | None,
 ) -> tuple[tuple[str, str | None], ...]:
@@ -459,6 +481,7 @@ def run_parallel_task_workers(
     devices: Sequence[str],
     prepare: TaskWorkerPreparer,
     *,
+    dispatch_order: Sequence[int] | None = None,
     worker_environment: Mapping[str, str | None] | None = None,
     start_method: str = "spawn",
     startup_timeout_seconds: float = 1800.0,
@@ -466,9 +489,10 @@ def run_parallel_task_workers(
 ) -> MultiGPUTaskExecution:
     """Execute a shared pending queue with one persistent process per device.
 
-    Tasks are inserted in descending estimated-cost order. Workers pull the next
-    pending item only after completing their current item, providing work
-    stealing without migrating active optimizer state.
+    Tasks use descending estimated-cost order unless an explicit deterministic
+    dispatch permutation is supplied. Workers pull the next pending item only
+    after completing their current item, providing work stealing without
+    migrating active optimizer state.
     """
 
     normalized_tasks = tuple(tasks)
@@ -500,9 +524,9 @@ def run_parallel_task_workers(
         TaskWorker(worker_id=index, device=device)
         for index, device in enumerate(normalized_devices)
     )
-    ordered_task_indices = sorted(
-        range(len(normalized_tasks)),
-        key=lambda index: (-normalized_costs[index], index),
+    ordered_task_indices = _task_dispatch_order(
+        normalized_costs,
+        dispatch_order,
     )
     initial_items = tuple(
         (task_index, normalized_tasks[task_index])
@@ -850,12 +874,15 @@ class PersistentTaskPool:
         self,
         tasks: Sequence[Any],
         costs: Sequence[float],
+        *,
+        dispatch_order: Sequence[int] | None = None,
     ) -> PersistentTaskExecution:
         normalized_tasks = tuple(tasks)
         return self._execute(
             task_count=len(normalized_tasks),
             costs=costs,
             resolve_task=normalized_tasks.__getitem__,
+            dispatch_order=dispatch_order,
         )
 
     def execute_source(
@@ -864,6 +891,7 @@ class PersistentTaskPool:
         costs: Sequence[float],
         *,
         prefetch_depth: int = 1,
+        dispatch_order: Sequence[int] | None = None,
     ) -> PersistentTaskExecution:
         """Execute a bounded lazy source without binding prefetched tasks."""
 
@@ -882,6 +910,7 @@ class PersistentTaskPool:
                 source.task_count,
                 len(self._workers) * (1 + prefetch_depth),
             ),
+            dispatch_order=dispatch_order,
         )
 
     def _execute(
@@ -892,6 +921,7 @@ class PersistentTaskPool:
         resolve_task: Callable[[int], Any],
         source: PersistentTaskSource | None = None,
         prefetch_capacity: int = 0,
+        dispatch_order: Sequence[int] | None = None,
     ) -> PersistentTaskExecution:
         normalized_costs = tuple(float(cost) for cost in costs)
         if self._closed:
@@ -909,9 +939,9 @@ class PersistentTaskPool:
             self._call_id += 1
             call_id = self._call_id
             pending = deque(
-                sorted(
-                    range(task_count),
-                    key=lambda index: (-normalized_costs[index], index),
+                _task_dispatch_order(
+                    normalized_costs,
+                    dispatch_order,
                 )
             )
             started = time.perf_counter()

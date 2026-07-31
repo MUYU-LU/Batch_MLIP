@@ -12,6 +12,10 @@
       "path": "/public/home/lmy/Batch_imple_project/t2_unique6000_auto_bfgs_vs_mps8/results/automatic_neighbor_control_v2/result.json",
       "sha256": "2f254b5e9801c2574ac69418db3f251d22e5b888a05a6746b8566c2cb77ff5e2"
     },
+    "automatic_outer_bucket_v1": {
+      "path": "/public/home/lmy/Batch_imple_project/t2_unique6000_auto_bfgs_vs_mps8/results/automatic_outer_bucket_v1/result.json",
+      "sha256": "b2b96bce66e3d16503b4a4263d34e6a406cfb49095bcf45dbd0c403122cdfd82"
+    },
     "mps": {
       "path": "/public/home/lmy/Batch_imple_project/t2_unique6000_auto_bfgs_vs_mps8/results/mps/result.json",
       "sha256": "4d48b18230f9fab73b5e7224fcb14ed0638a550719d8c4c474bf1788492e85d4"
@@ -188,6 +192,39 @@
     },
     "worker_ideal_gap_seconds": 16.44912277975027,
     "worker_max_over_mean": 1.0597016969755293
+  },
+  "automatic_outer_scheduling_v1": {
+    "accepted_policy": "bucket_stratified",
+    "bitwise_equal_to_neighbor_control_v2": true,
+    "canonical_endpoint_sha256": "0e03ce30c9a41d93ca3f52582bedbad4d8a94b424ee56ab0f64e8a6a70c00d38",
+    "execution_seconds": 358.3512774209994,
+    "execution_speedup_over_cost_descending": 1.0182746824320816,
+    "final_converged": 5999,
+    "graph_evaluations": 726315,
+    "initial_dispatch_bucket_indices": [1, 0, 2, 3, 1, 1, 1, 1],
+    "initial_dispatch_chunk_indices": [0, 8, 21, 28, 1, 2, 3, 4],
+    "model_evaluations": 11967,
+    "peak_reserved_GiB": 61.66015625,
+    "production_run_seconds": 297.3646323230023,
+    "production_speedup_over_cost_descending": 1.0094809701139458,
+    "resident_chunk_count": 31,
+    "summed_worker_seconds": 2196.2882525820023,
+    "worker_ideal_gap_seconds": 14.150579245246263,
+    "worker_max_over_mean": 1.0515436140173697,
+    "rejected_candidates": {
+      "global_subdivision_40_chunks": {
+        "production_run_seconds": 309.31329430999904,
+        "production_change_fraction": 0.03041255792060535,
+        "summed_worker_seconds": 2281.528986223002,
+        "summed_work_change_fraction": 0.035095254960842324
+      },
+      "tail_subdivision_39_chunks": {
+        "production_run_seconds": 302.9895765700021,
+        "production_change_fraction": 0.009346391571582136,
+        "summed_worker_seconds": 2281.1686332759964,
+        "summed_work_change_fraction": 0.03493176909556661
+      }
+    }
   },
   "comparison": {
     "automatic_full_script_speedup_over_mps16": 1.725195527417322,

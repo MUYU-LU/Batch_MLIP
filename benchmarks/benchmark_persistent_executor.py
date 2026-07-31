@@ -146,6 +146,11 @@ def main() -> None:
         default="subdivide",
     )
     parser.add_argument(
+        "--multi-gpu-queue-policy",
+        choices=("cost_descending", "bucket_stratified"),
+        default=AutoSchedulerConfig().multi_gpu_queue_policy,
+    )
+    parser.add_argument(
         "--cold-start-jobs",
         type=int,
         default=AutoSchedulerConfig().multi_gpu_cold_start_jobs,
@@ -263,6 +268,7 @@ def main() -> None:
         "multi_gpu_worker_backend": "process",
         "multi_gpu_process_cpu_threads": 1,
         "multi_gpu_dispatch_policy": args.multi_gpu_dispatch_policy,
+        "multi_gpu_queue_policy": args.multi_gpu_queue_policy,
     }
     if not args.automatic_capacity:
         config_options.update(
@@ -379,6 +385,8 @@ def main() -> None:
         ),
         "automatic_capacity": args.automatic_capacity,
         "memory_growth_margin_override": args.memory_growth_margin,
+        "multi_gpu_dispatch_policy": args.multi_gpu_dispatch_policy,
+        "multi_gpu_queue_policy": args.multi_gpu_queue_policy,
         "target_chunks_per_device_override": (
             args.target_chunks_per_device
         ),
