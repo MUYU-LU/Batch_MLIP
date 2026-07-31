@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import torch
 from ase import Atoms
-from batch_mlip.toy_models import PairHarmonicModel, QuadraticWellModel
 
 from batch_mlip import AseGraphBatch, AtomBitBatchCalculator
+from batch_mlip.toy_models import PairHarmonicModel, QuadraticWellModel
 
 
 def _pair_potential() -> AtomBitBatchCalculator:
@@ -44,6 +44,40 @@ def test_skin_avoids_unnecessary_rebuilds():
     state.positions[0, 0] += 0.11
     potential(state)
     assert state.neighbor_rebuild_count == 2
+
+
+def test_cached_evaluation_validates_only_after_graph_mutation(monkeypatch):
+    state = AseGraphBatch.from_ase(
+        [Atoms("H2", positions=[[0, 0, 0], [1, 0, 0]])],
+        cutoff=2.0,
+        skin=0.4,
+        device="cpu",
+        dtype=torch.float64,
+    )
+    potential = AtomBitBatchCalculator(
+        QuadraticWellModel(),
+        cutoff=2.0,
+        skin=0.4,
+        device="cpu",
+        dtype=torch.float64,
+    )
+    original = state.assert_graph_integrity
+    validation_calls = 0
+
+    def counted_validation():
+        nonlocal validation_calls
+        validation_calls += 1
+        original()
+
+    monkeypatch.setattr(state, "assert_graph_integrity", counted_validation)
+
+    potential(state)
+    assert validation_calls == 0
+
+    state.positions[0, 0] += 0.21
+    potential(state)
+    assert state.neighbor_rebuild_count == 2
+    assert validation_calls == 1
 
 
 def test_neighbor_construction_can_be_deferred_until_evaluation():
@@ -218,6 +252,38 @@ def test_heterogeneous_cache_rebuilds_only_invalid_system():
         state.edge_index[:, state.system_idx[state.edge_index[0]] == 1],
         second_edges,
     )
+
+
+def test_vectorized_cache_validity_handles_mixed_periodicity():
+    systems = [
+        Atoms("H2", positions=[[0.0, 0.0, 0.0], [1.0, 0.0, 0.0]]),
+        Atoms(
+            "H2",
+            positions=[[1.0, 2.0, 0.0], [2.0, 2.0, 0.0]],
+            cell=[10.0, 10.0, 0.0],
+            pbc=[True, True, False],
+        ),
+        Atoms(
+            "H2",
+            scaled_positions=[[0.1, 0.2, 0.3], [0.2, 0.2, 0.3]],
+            cell=[10.0, 10.0, 10.0],
+            pbc=True,
+        ),
+    ]
+    state = AseGraphBatch.from_ase(
+        systems,
+        cutoff=2.0,
+        skin=0.4,
+        device="cpu",
+        dtype=torch.float64,
+    )
+
+    state.positions[0, 0] += 0.21
+    state.cells[1, 0, 0] -= 0.01
+    state.cells[2] *= 0.99
+    state.positions[state.atom_slice(2)] *= 0.99
+
+    assert state.neighbor_list_invalid_systems().tolist() == [True, True, False]
 
 
 def test_select_systems_preserves_and_remaps_neighbor_cache():

@@ -58,8 +58,12 @@ def test_profiled_refill_bfgs_preserves_results_and_reports_runtime_phases():
     expected_phases = {
         "calculator.graph_view",
         "calculator.neighbor_update",
+        "graph.cache_selection",
+        "graph.cache_validity",
         "graph.geometry_to_host",
+        "graph.integrity_check",
         "graph.neighbor_search",
+        "graph.rebuild_prepare",
         "graph.to_device",
         "model.autograd",
         "model.forward",

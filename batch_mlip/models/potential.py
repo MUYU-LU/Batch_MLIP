@@ -106,7 +106,6 @@ class AtomBitBatchCalculator(BatchCalculator):
             atoms=state.n_atoms,
         ):
             self._update_neighbors(state, neighbor_policy)
-            state.assert_graph_integrity()
         rebuilt = state.neighbor_rebuild_count - rebuilds_before
 
         # ``auto`` needs a position graph because direct-force availability is

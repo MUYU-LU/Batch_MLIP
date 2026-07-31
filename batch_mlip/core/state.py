@@ -16,7 +16,7 @@ from ..profiling.runtime import profile_event, profile_phase
 from .cell_neighbors import CellListUnsupportedError, cell_list_neighbor_blocks
 from .dense_neighbors import DenseNeighborUnsupportedError, dense_neighbor_blocks
 from .external_neighbors import nvalchemi_neighbor_blocks
-from .math_utils import scatter_sum
+from .math_utils import scatter_max, scatter_sum
 from .neighbors import (
     NeighborBackend,
     neighbor_list,
@@ -234,49 +234,108 @@ class AseGraphBatch:
         valid = self._neighbor_reference_valid
         if valid is None:
             valid = torch.ones(self.n_systems, device=self.device, dtype=torch.bool)
-        else:
-            invalid = ~valid.clone()
+        invalid = ~valid.clone()
 
-        for system_id in range(self.n_systems):
-            if not bool(valid[system_id]):
-                continue
-            atom_slice = self.atom_slice(system_id)
-            positions = self.positions[atom_slice]
-            reference_positions = self._neighbor_reference_positions[atom_slice]
-            cell = self.cells[system_id]
-            reference_cell = self._neighbor_reference_cells[system_id]
-            periodic = self.pbc[system_id]
+        displacements = torch.linalg.vector_norm(
+            self.positions - self._neighbor_reference_positions,
+            dim=-1,
+        )
+        maximum_displacement = scatter_max(
+            displacements,
+            self.system_idx,
+            self.n_systems,
+        )
+        periodic_any = self.pbc.any(dim=1)
+        periodic_all = self.pbc.all(dim=1)
 
-            if not bool(periodic.any()):
-                displacement = torch.linalg.vector_norm(
-                    positions - reference_positions, dim=-1
-                ).max()
-                invalid[system_id] = displacement > 0.5 * self.skin
-                continue
+        nonperiodic = valid & ~periodic_any
+        invalid[nonperiodic] = (
+            maximum_displacement[nonperiodic] > 0.5 * self.skin
+        )
 
-            if not bool(periodic.all()):
-                if not torch.equal(cell, reference_cell):
-                    continue
-                displacement = torch.linalg.vector_norm(
-                    positions - reference_positions, dim=-1
-                ).max()
-                invalid[system_id] = displacement > 0.5 * self.skin
-                continue
+        partially_periodic = valid & periodic_any & ~periodic_all
+        unchanged_cell = torch.eq(
+            self.cells,
+            self._neighbor_reference_cells,
+        ).all(dim=(1, 2))
+        invalid[partially_periodic] = (
+            ~unchanged_cell[partially_periodic]
+            | (
+                maximum_displacement[partially_periodic]
+                > 0.5 * self.skin
+            )
+        )
 
+        fully_periodic = valid & periodic_all
+        fully_periodic_ids = torch.nonzero(
+            fully_periodic,
+            as_tuple=False,
+        ).flatten()
+        if fully_periodic_ids.numel():
+            # A single batched 3x3 solve replaces several scalar CUDA
+            # synchronizations per resident structure.
+            invalid[fully_periodic_ids] = True
+            atom_mask = fully_periodic[self.system_idx]
+            atom_system_ids = self.system_idx[atom_mask]
+            local_system_ids = torch.full(
+                (self.n_systems,),
+                -1,
+                device=self.device,
+                dtype=torch.long,
+            )
+            local_system_ids[fully_periodic_ids] = torch.arange(
+                fully_periodic_ids.numel(),
+                device=self.device,
+                dtype=torch.long,
+            )
+            atom_local_system_ids = local_system_ids[atom_system_ids]
+            reference_cells = self._neighbor_reference_cells[
+                fully_periodic_ids
+            ]
+            current_cells = self.cells[fully_periodic_ids]
+            identity = torch.eye(
+                3,
+                device=self.device,
+                dtype=self.dtype,
+            ).expand(fully_periodic_ids.numel(), -1, -1)
             try:
-                reference_fractional = torch.linalg.solve(
-                    reference_cell.transpose(0, 1),
-                    reference_positions.transpose(0, 1),
-                ).transpose(0, 1)
-                affine_positions = reference_fractional @ cell
-                non_affine = torch.linalg.vector_norm(positions - affine_positions, dim=-1).max()
-                inverse_deformation = torch.linalg.solve(cell, reference_cell)
-                inverse_stretch = torch.linalg.svdvals(inverse_deformation).max()
+                reference_inverse = torch.linalg.solve(
+                    reference_cells,
+                    identity,
+                )
+                reference_fractional = torch.bmm(
+                    self._neighbor_reference_positions[atom_mask].unsqueeze(1),
+                    reference_inverse[atom_local_system_ids],
+                ).squeeze(1)
+                affine_positions = torch.bmm(
+                    reference_fractional.unsqueeze(1),
+                    current_cells[atom_local_system_ids],
+                ).squeeze(1)
+                non_affine = torch.linalg.vector_norm(
+                    self.positions[atom_mask] - affine_positions,
+                    dim=-1,
+                )
+                maximum_non_affine = scatter_max(
+                    non_affine,
+                    atom_system_ids,
+                    self.n_systems,
+                )[fully_periodic_ids]
+                inverse_deformation = torch.linalg.solve(
+                    current_cells,
+                    reference_cells,
+                )
+                inverse_stretch = torch.linalg.svdvals(
+                    inverse_deformation
+                ).amax(dim=1)
+                reference_distance_bound = (
+                    self.cutoff + 2.0 * maximum_non_affine
+                ) * inverse_stretch
+                invalid[fully_periodic_ids] = (
+                    reference_distance_bound > self.cutoff + self.skin
+                )
             except RuntimeError:
-                continue
-
-            reference_distance_bound = (self.cutoff + 2.0 * non_affine) * inverse_stretch
-            invalid[system_id] = reference_distance_bound > (self.cutoff + self.skin)
+                # Singular or non-finite cells are conservatively rebuilt.
+                pass
         return invalid
 
     def neighbor_list_needs_rebuild(self) -> bool:
@@ -285,8 +344,23 @@ class AseGraphBatch:
     def ensure_neighbor_list(self) -> bool:
         """Rebuild only when required; return whether a rebuild occurred."""
 
-        invalid = self.neighbor_list_invalid_systems()
-        system_ids = torch.nonzero(invalid, as_tuple=False).flatten().tolist()
+        with profile_phase(
+            "graph.cache_validity",
+            device=self.device,
+            systems=self.n_systems,
+            atoms=self.n_atoms,
+        ):
+            invalid = self.neighbor_list_invalid_systems()
+        with profile_phase(
+            "graph.cache_selection",
+            device=self.device,
+            systems=self.n_systems,
+            atoms=self.n_atoms,
+        ):
+            system_ids = torch.nonzero(
+                invalid,
+                as_tuple=False,
+            ).flatten().tolist()
         if system_ids:
             self.rebuild_neighbor_list(system_ids)
             return True
@@ -316,37 +390,54 @@ class AseGraphBatch:
             )
         rebuild_set = set(ids)
 
-        selected_atom_blocks = [
-            torch.arange(
-                self.ptr[value],
-                self.ptr[value + 1],
+        with profile_phase(
+            "graph.rebuild_prepare",
+            device=self.device,
+            systems=len(ids),
+            atoms=self.n_atoms,
+        ):
+            selected_atom_blocks = [
+                torch.arange(
+                    self.ptr[value],
+                    self.ptr[value + 1],
+                    device=self.device,
+                    dtype=torch.long,
+                )
+                for value in ids
+            ]
+            selected_atom_ids = torch.cat(selected_atom_blocks)
+            selected_graph_ids = torch.as_tensor(
+                ids,
                 device=self.device,
                 dtype=torch.long,
             )
-            for value in ids
-        ]
-        selected_atom_ids = torch.cat(selected_atom_blocks)
-        selected_graph_ids = torch.as_tensor(ids, device=self.device, dtype=torch.long)
-        edge_counts = torch.bincount(self.system_idx[self.edge_index[0]], minlength=self.n_systems)
-        edge_ptr = (
-            torch.cat(
-                (
-                    torch.zeros(1, device=self.device, dtype=torch.long),
-                    edge_counts.cumsum(dim=0),
-                )
+            edge_counts = torch.bincount(
+                self.system_idx[self.edge_index[0]],
+                minlength=self.n_systems,
             )
-            .cpu()
-            .tolist()
-        )
-        resolved_backend = resolve_neighbor_backend(
-            self.neighbor_backend,
-            device=self.device,
-            counts=self.counts[selected_graph_ids],
-            cutoff=self.cutoff + self.skin,
-            cells=self.cells[selected_graph_ids],
-            pbc=self.pbc[selected_graph_ids],
-            positions=self.positions[selected_atom_ids],
-        )
+            edge_ptr = (
+                torch.cat(
+                    (
+                        torch.zeros(
+                            1,
+                            device=self.device,
+                            dtype=torch.long,
+                        ),
+                        edge_counts.cumsum(dim=0),
+                    )
+                )
+                .cpu()
+                .tolist()
+            )
+            resolved_backend = resolve_neighbor_backend(
+                self.neighbor_backend,
+                device=self.device,
+                counts=self.counts[selected_graph_ids],
+                cutoff=self.cutoff + self.skin,
+                cells=self.cells[selected_graph_ids],
+                pbc=self.pbc[selected_graph_ids],
+                positions=self.positions[selected_atom_ids],
+            )
         rebuilt_edges: dict[int, np.ndarray | torch.Tensor] = {}
         rebuilt_shifts: dict[int, np.ndarray | torch.Tensor] = {}
 
@@ -491,6 +582,13 @@ class AseGraphBatch:
                 self._neighbor_reference_cells[system_id] = self.cells[system_id]
                 self._neighbor_reference_valid[system_id] = True
             self.neighbor_rebuild_count += 1
+        with profile_phase(
+            "graph.integrity_check",
+            device=self.device,
+            systems=self.n_systems,
+            atoms=self.n_atoms,
+            edges=self.edge_index.shape[1],
+        ):
             self.assert_graph_integrity()
         profile_event(
             "neighbor_rebuild",

@@ -8,6 +8,10 @@
       "path": "/public/home/lmy/Batch_imple_project/t2_unique6000_auto_bfgs_vs_mps8/results/automatic_profiled/result.json",
       "sha256": "ff4f26dba67c52d7fbb8710d2af777959723dfdb1992358629d9232cc5ec0108"
     },
+    "automatic_neighbor_control_v2": {
+      "path": "/public/home/lmy/Batch_imple_project/t2_unique6000_auto_bfgs_vs_mps8/results/automatic_neighbor_control_v2/result.json",
+      "sha256": "2f254b5e9801c2574ac69418db3f251d22e5b888a05a6746b8566c2cb77ff5e2"
+    },
     "mps": {
       "path": "/public/home/lmy/Batch_imple_project/t2_unique6000_auto_bfgs_vs_mps8/results/mps/result.json",
       "sha256": "4d48b18230f9fab73b5e7224fcb14ed0638a550719d8c4c474bf1788492e85d4"
@@ -126,6 +130,64 @@
     "worker_ideal_gap_fraction_of_production": 0.10350164166329986,
     "worker_ideal_gap_seconds": 39.76616326174599,
     "worker_max_over_mean": 1.1179751830138793
+  },
+  "automatic_neighbor_control_v2": {
+    "bitwise_equal_to_profiled_baseline": true,
+    "chunk_count": 31,
+    "convergence_state_mismatches": 0,
+    "converged": 5999,
+    "execution_reduction_fraction": 0.1827736741210636,
+    "execution_seconds": 364.900033214999,
+    "execution_speedup_over_profiled_baseline": 1.223651231407026,
+    "full_script_seconds": 368.82135118800215,
+    "matched_profiled_baseline_execution_seconds": 446.5103749839982,
+    "matched_profiled_baseline_production_seconds": 384.2080436860015,
+    "mps16_full_script_speedup": 2.1997576201477593,
+    "mps16_speedup_over_automatic_execution": 2.031365022749282,
+    "neighbor_rebuild_calls_by_backend": {
+      "cuda_cell": 1,
+      "cuda_dense": 5939,
+      "matscipy": 1626
+    },
+    "neighbor_subphase_seconds": {
+      "cache_selection": 0.94581068790704,
+      "cache_validity": 24.305714238405223,
+      "geometry_to_host": 0.199944319985807,
+      "graph_assembly": 7.197528286218644,
+      "integrity_check": 2.5042832968235014,
+      "neighbor_search": 56.07296970629691,
+      "rebuild_prepare": 11.784267008900644
+    },
+    "neighbor_update_reduction_fraction": 0.8257051714286318,
+    "neighbor_update_seconds": 103.08588937568666,
+    "neighbor_update_speedup": 5.737404879976295,
+    "peak_reserved_GiB": 61.66015625,
+    "planned_chunks_equal_to_baseline": true,
+    "production_reduction_fraction": 0.21869429219881198,
+    "production_run_seconds": 300.18393751500116,
+    "production_speedup_over_profiled_baseline": 1.2799087348462852,
+    "summed_chunk_work_reduction_fraction": 0.18260300830967513,
+    "summed_chunk_work_seconds": 2204.1749046419973,
+    "top_level_phase_fraction": {
+      "calculator_graph_view": 0.0041534760093293235,
+      "model_autograd": 0.5192070420121525,
+      "model_forward": 0.2399684990369383,
+      "neighbor_update": 0.046768470668361005,
+      "optimizer_bfgs_update": 0.09323822001209597,
+      "scheduler_active_compaction": 0.04182669215411501,
+      "unprofiled": 0.05483760010700785
+    },
+    "top_level_phase_seconds": {
+      "calculator_graph_view": 9.154987586796285,
+      "model_autograd": 1144.4231323165898,
+      "model_forward": 528.9325434818267,
+      "neighbor_update": 103.08588937568666,
+      "optimizer_bfgs_update": 205.5133447041512,
+      "scheduler_active_compaction": 92.19334519028664,
+      "unprofiled": 120.87166198666
+    },
+    "worker_ideal_gap_seconds": 16.44912277975027,
+    "worker_max_over_mean": 1.0597016969755293
   },
   "comparison": {
     "automatic_full_script_speedup_over_mps16": 1.725195527417322,

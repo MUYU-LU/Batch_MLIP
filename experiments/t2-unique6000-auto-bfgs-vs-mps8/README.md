@@ -5,8 +5,9 @@ workload contains 6,000 unique structures and is executed on eight H100 GPUs
 with the frozen automatic OMC-CSP workflow and with both eight and sixteen
 persistent ASE BFGS CUDA-MPS workers per GPU.
 
-| Method | Production time (s) | Full script (s) | Systems/s | Converged | Peak GPU memory (GiB) |
+| Method | Execution/makespan (s) | Full script (s) | Systems/s | Converged | Peak GPU memory (GiB) |
 |---|---:|---:|---:|---:|---:|
+| Automatic batching, neighbour-control v2 | 364.90 | 368.82 | 16.44 | 5,999/6,000 | 61.66 reserved |
 | Automatic batching | 442.16 | 470.28 | 13.57 | 5,999/6,000 | 61.66 reserved |
 | ASE/CUDA-MPS, 64 workers | 925.81 | 976.85 | 6.48 | 5,999/6,000 | 23.21 sampled |
 | ASE/CUDA-MPS, 128 workers | 741.25 | 811.32 | 8.09 | 5,999/6,000 | 39.13 sampled |
@@ -55,3 +56,26 @@ Worker time has a 1.118 max/mean ratio. Perfectly balancing the same measured
 chunk work would remove at most 39.77 s, or 10.35% of the measured production
 makespan. This is the next outer-scheduler opportunity, but it is an upper
 bound rather than an expected speedup.
+
+## Neighbour-control v2
+
+The optimized implementation vectorizes fully periodic variable-cell cache
+validity and removes the redundant integrity scan on evaluations where graph
+topology did not change. Full integrity validation remains at graph creation,
+selection, replacement, concatenation, and neighbour-rebuild boundaries.
+
+With the same signed workload, 31 planned chunks, capacity model, and 61.66 GiB
+peak reserved memory, execution fell from 446.51 s for the matched profiled
+baseline to 364.90 s. Production time fell from 384.21 s to 300.18 s. This is a
+1.224x end-to-end execution speedup and a 1.280x production speedup.
+
+Summed neighbour-update work fell from 591.45 s to 103.09 s, an 82.57%
+reduction. The new neighbour-update decomposition is 56.07 s search, 24.31 s
+cache validity, 11.78 s rebuild preparation, 7.20 s graph assembly, 2.50 s
+mutation-boundary integrity validation, and 0.95 s invalid-system selection.
+
+All source IDs, convergence states, step counts, energies, forces, stresses,
+positions, and cells are bitwise identical to the matched baseline. Against
+MPS16, the optimized automatic execution is 2.031x faster; full-script speedup
+is 2.200x. Worker max/mean time also falls from 1.118 to 1.060, leaving only a
+16.45 s ideal-balance upper bound for the next outer-scheduler refinement.

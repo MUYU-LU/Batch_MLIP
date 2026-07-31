@@ -53,6 +53,12 @@ methods:
     purpose: worker phase attribution only
     configuration: identical to automatic
     samples_retained: false
+  automatic_neighbor_control_v2:
+    configuration: identical to automatic_profiled
+    changes:
+      - vectorized variable-cell cache validity
+      - integrity validation retained only at graph-mutation boundaries
+      - nested neighbour-control phase telemetry
   mps:
     optimizer: ASE BFGS
     workers_per_gpu: 8
@@ -120,13 +126,28 @@ results:
     neighbor_search_fraction_of_neighbor_update: 0.09550078467054307
     worker_max_over_mean: 1.1179751830138793
     ideal_balance_gap_seconds: 39.76616326174599
+  neighbor_control_v2:
+    execution_seconds: 364.900033214999
+    production_run_seconds: 300.18393751500116
+    full_script_seconds: 368.82135118800215
+    final_converged: 5999
+    peak_reserved_GiB: 61.66015625
+    execution_speedup_over_matched_profiled: 1.223651231407026
+    production_speedup_over_matched_profiled: 1.2799087348462852
+    neighbor_update_speedup: 5.737404879976295
+    neighbor_update_reduction_fraction: 0.8257051714286318
+    mps16_speedup_over_automatic_execution: 2.031365022749282
+    mps16_full_script_speedup: 2.1997576201477593
+    worker_max_over_mean: 1.0597016969755293
+    bitwise_equal_to_profiled_baseline: true
 
 conclusion: >-
-  Supported for this workload. The frozen automatic OMC-CSP workflow is
-  2.09x faster than MPS8 and 1.68x faster than the stronger MPS16 production
-  baseline while retaining exact source coverage and the same 5,999/6,000
-  convergence result. Doubling MPS workers improves production throughput by
-  only 1.25x while increasing sampled peak GPU memory by 1.69x.
+  Supported for this workload. Neighbour-control v2 is 1.224x faster than the
+  matched profiled automatic baseline and 2.031x faster than MPS16 by comparable
+  execution/makespan, while retaining bitwise-identical batched endpoints and
+  the same 5,999/6,000 convergence result. The optimization reduces summed
+  neighbour-update work by 82.57% without changing the resident plan or peak
+  reserved memory.
 
 limitations:
   - One deterministic timing trial, as requested.
