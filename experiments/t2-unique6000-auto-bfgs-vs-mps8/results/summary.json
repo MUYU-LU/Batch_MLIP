@@ -4,6 +4,10 @@
       "path": "/public/home/lmy/Batch_imple_project/t2_unique6000_auto_bfgs_vs_mps8/results/automatic/result.json",
       "sha256": "e5d75d898dd2c46194aa404c87289b4f03cd2eed4e0f1d8ecd24fcec9e510f38"
     },
+    "automatic_profiled": {
+      "path": "/public/home/lmy/Batch_imple_project/t2_unique6000_auto_bfgs_vs_mps8/results/automatic_profiled/result.json",
+      "sha256": "ff4f26dba67c52d7fbb8710d2af777959723dfdb1992358629d9232cc5ec0108"
+    },
     "mps": {
       "path": "/public/home/lmy/Batch_imple_project/t2_unique6000_auto_bfgs_vs_mps8/results/mps/result.json",
       "sha256": "4d48b18230f9fab73b5e7224fcb14ed0638a550719d8c4c474bf1788492e85d4"
@@ -82,6 +86,46 @@
       338.9266798840001,
       358.1642840669999
     ]
+  },
+  "automatic_profiled_hotspot": {
+    "accounting": "Top-level phase fractions are non-overlapping and use summed chunk work rather than critical-path wall time. Nested graph-neighbor-search time is diagnostic and is already included in calculator.neighbor_update.",
+    "backend_rebuild_calls": {
+      "cuda_cell": 1,
+      "cuda_dense": 5939,
+      "matscipy": 1626
+    },
+    "bitwise_equal_to_unprofiled": true,
+    "chunk_count": 31,
+    "convergence_state_mismatches": 0,
+    "execution_overhead_fraction": 0.0098443165466282,
+    "execution_seconds": 446.5103749839982,
+    "neighbor_search_fraction_of_neighbor_update": 0.09550078467054307,
+    "nested_neighbor_search_seconds": 56.483508,
+    "profiled_chunk_count": 31,
+    "production_overhead_fraction": 0.0072802740179352,
+    "production_run_seconds": 384.2080436860015,
+    "summed_chunk_work_seconds": 2696.5781952340003,
+    "top_level_phase_fraction": {
+      "calculator_graph_view": 0.003402876081481884,
+      "model_autograd": 0.42436883919521834,
+      "model_forward": 0.19607680842710384,
+      "neighbor_update": 0.21933185019670362,
+      "optimizer_bfgs_update": 0.07689820296119096,
+      "scheduler_active_compaction": 0.03458982447198134,
+      "unprofiled": 0.045331598666320035
+    },
+    "top_level_phase_seconds": {
+      "calculator_graph_view": 9.176121442407366,
+      "model_autograd": 1144.3437585105896,
+      "model_forward": 528.7364461956025,
+      "neighbor_update": 591.4454847607611,
+      "optimizer_bfgs_update": 207.36201735782618,
+      "scheduler_active_compaction": 93.2741664481163,
+      "unprofiled": 122.24020051869729
+    },
+    "worker_ideal_gap_fraction_of_production": 0.10350164166329986,
+    "worker_ideal_gap_seconds": 39.76616326174599,
+    "worker_max_over_mean": 1.1179751830138793
   },
   "comparison": {
     "automatic_full_script_speedup_over_mps16": 1.725195527417322,

@@ -44,6 +44,7 @@ from ..planning.deterministic import (
 )
 from ..planning.memory import HardwareCalibratedBatchPlanner
 from ..planning.profiles import PlanningProfileBundle
+from ..profiling import RuntimeProfiler
 from .api import (
     _combine_relaxation_results,
     _measure_representative_memory,
@@ -107,13 +108,14 @@ class _ExecutorWorkerRunner:
         if device.type == "cuda":
             torch.cuda.synchronize(device)
             torch.cuda.reset_peak_memory_stats(device)
-        result = relax(
-            task.systems,
-            self.calculator,
-            optimizer=task.optimizer.create(),
-            scheduling="single_batch",
-            **task.optimizer_kwargs,
-        )
+        with RuntimeProfiler(device=device) as profiler:
+            result = relax(
+                task.systems,
+                self.calculator,
+                optimizer=task.optimizer.create(),
+                scheduling="single_batch",
+                **task.optimizer_kwargs,
+            )
         if device.type == "cuda":
             torch.cuda.synchronize(device)
             peak_allocated = torch.cuda.max_memory_allocated(device)
@@ -124,6 +126,9 @@ class _ExecutorWorkerRunner:
         if result.state.device.type == "cuda":
             torch.cuda.synchronize(result.state.device)
             result = _offload_relaxation_result(result)
+        result.metadata["worker_runtime_profile"] = profiler.summary(
+            include_samples=False
+        )
         result.metadata["executor_worker"] = {
             **self.allocator_metadata,
             "pid": os.getpid(),
@@ -336,6 +341,9 @@ def _worker_records(
                     ),
                     "peak_reserved_bytes": worker_metadata.get(
                         "peak_reserved_bytes"
+                    ),
+                    "runtime_profile": task_result.payload.metadata.get(
+                        "worker_runtime_profile"
                     ),
                     "input": worker_metadata.get("input"),
                     "schedule": task_result.payload.metadata.get(

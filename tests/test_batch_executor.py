@@ -407,6 +407,13 @@ def test_batch_executor_deterministic_plan_dispatches_work_to_all_workers(
         for worker in schedule["workers"]
         for chunk in worker["chunks"]
     )
+    assert all(
+        chunk["runtime_profile"]["schema_version"] == 1
+        and chunk["runtime_profile"]["total_seconds"] >= 0.0
+        and "samples" not in chunk["runtime_profile"]
+        for worker in schedule["workers"]
+        for chunk in worker["chunks"]
+    )
     assert bool(result.converged.all())
 
 

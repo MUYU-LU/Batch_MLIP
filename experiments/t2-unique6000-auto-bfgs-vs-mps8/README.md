@@ -27,3 +27,31 @@ The two MPS configurations have bitwise-identical endpoint records. Batched
 and ASE BFGS have identical source coverage and convergence flags but their
 trajectories are not bitwise identical. Full endpoint distributions and raw
 artifact hashes are retained in `results/summary.json`.
+
+## Automatic hotspot profile
+
+A separate, identically configured automatic run recorded compact phase totals
+inside all 31 persistent-worker chunks. It took 446.51 s versus 442.16 s for
+the unprofiled execution, a 0.98% overhead, and produced bitwise-identical
+endpoint records and optimization steps.
+
+| Non-overlapping worker phase | Summed work (s) | Share |
+|---|---:|---:|
+| Model autograd | 1,144.34 | 42.44% |
+| Model forward | 528.74 | 19.61% |
+| Neighbour update | 591.45 | 21.93% |
+| BFGS update | 207.36 | 7.69% |
+| Active compaction | 93.27 | 3.46% |
+| Graph-view construction | 9.18 | 0.34% |
+| Unprofiled remainder | 122.24 | 4.53% |
+
+The model accounts for 62.04% of summed worker work. The largest
+framework-controlled phase is neighbour update at 21.93%, but actual neighbour
+search is only 56.48 s, or 9.55% of that phase. The remaining neighbour-update
+work is therefore the next inner-scheduler target, especially cache-validity,
+graph-repacking, integrity checks, and their host/device synchronization.
+
+Worker time has a 1.118 max/mean ratio. Perfectly balancing the same measured
+chunk work would remove at most 39.77 s, or 10.35% of the measured production
+makespan. This is the next outer-scheduler opportunity, but it is an upper
+bound rather than an expected speedup.

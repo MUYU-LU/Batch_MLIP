@@ -49,6 +49,10 @@ methods:
     executor_calls: 1
     tail_recovery: ase_bfgs
     workload_specific_overrides: none
+  automatic_profiled:
+    purpose: worker phase attribution only
+    configuration: identical to automatic
+    samples_retained: false
   mps:
     optimizer: ASE BFGS
     workers_per_gpu: 8
@@ -103,6 +107,19 @@ results:
     automatic_full_script_speedup_over_mps16: 1.725195527417322
     mps16_peak_memory_over_mps8: 1.6857960282733087
     mps8_mps16_endpoints_bitwise_equal: true
+  hotspot_profile:
+    execution_seconds: 446.5103749839982
+    execution_overhead_fraction: 0.0098443165466282
+    production_overhead_fraction: 0.0072802740179352
+    bitwise_equal_to_unprofiled: true
+    summed_chunk_work_seconds: 2696.5781952340003
+    model_forward_and_autograd_fraction: 0.6204456476223221
+    neighbor_update_fraction: 0.21933185019670362
+    bfgs_update_fraction: 0.07689820296119096
+    active_compaction_fraction: 0.03458982447198134
+    neighbor_search_fraction_of_neighbor_update: 0.09550078467054307
+    worker_max_over_mean: 1.1179751830138793
+    ideal_balance_gap_seconds: 39.76616326174599
 
 conclusion: >-
   Supported for this workload. The frozen automatic OMC-CSP workflow is
@@ -116,3 +133,4 @@ limitations:
   - One T2 workload and one AtomBit checkpoint.
   - BFGS trajectories are schedule-sensitive, so endpoint differences are
     recorded as diagnostics rather than required to be bitwise identical.
+  - Phase fractions are summed GPU work, not critical-path wall-time fractions.
