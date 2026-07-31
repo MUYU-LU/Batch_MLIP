@@ -54,6 +54,11 @@ methods:
     workers_per_gpu: 8
     total_workers: 64
     assignment: static_cost_balanced_lpt
+  mps16:
+    optimizer: ASE BFGS
+    workers_per_gpu: 16
+    total_workers: 128
+    assignment: static_cost_balanced_lpt
 
 fairness:
   timing_repeats: 1
@@ -80,18 +85,31 @@ results:
     systems_per_second: 6.480809295252793
     converged: 5999
     peak_sampled_device_GiB: 23.2109375
+  mps16:
+    production_makespan_seconds: 741.2451642730002
+    full_script_seconds: 811.3175777490005
+    systems_per_second: 8.0944878822713
+    converged: 5999
+    peak_sampled_device_GiB: 39.12890625
   comparison:
     production_speedup_over_mps: 2.093846688375501
     full_script_speedup_over_mps: 2.0771832540695407
     same_source_set: true
     convergence_state_mismatches: 0
     same_nonconverged_source: true
+    mps16_production_speedup_over_mps8: 1.2489933762131422
+    mps16_full_script_speedup_over_mps8: 1.2040277296447415
+    automatic_production_speedup_over_mps16: 1.6764273760393293
+    automatic_full_script_speedup_over_mps16: 1.725195527417322
+    mps16_peak_memory_over_mps8: 1.6857960282733087
+    mps8_mps16_endpoints_bitwise_equal: true
 
 conclusion: >-
   Supported for this workload. The frozen automatic OMC-CSP workflow is
-  2.09x faster than eight ASE/MPS jobs per GPU while retaining exact source
-  coverage and the same 5,999/6,000 convergence result. It uses 2.66x more
-  peak GPU memory, converting otherwise idle H100 memory into throughput.
+  2.09x faster than MPS8 and 1.68x faster than the stronger MPS16 production
+  baseline while retaining exact source coverage and the same 5,999/6,000
+  convergence result. Doubling MPS workers improves production throughput by
+  only 1.25x while increasing sampled peak GPU memory by 1.69x.
 
 limitations:
   - One deterministic timing trial, as requested.

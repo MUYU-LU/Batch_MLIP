@@ -7,6 +7,10 @@
     "mps": {
       "path": "/public/home/lmy/Batch_imple_project/t2_unique6000_auto_bfgs_vs_mps8/results/mps/result.json",
       "sha256": "4d48b18230f9fab73b5e7224fcb14ed0638a550719d8c4c474bf1788492e85d4"
+    },
+    "mps16": {
+      "path": "/public/home/lmy/Batch_imple_project/t2_unique6000_auto_bfgs_vs_mps8/results/mps16/result.json",
+      "sha256": "a007ff9722472512e2ed8fd849696558c794dd8320a4f7b4d84454d27bea09ab"
     }
   },
   "automatic": {
@@ -80,10 +84,80 @@
     ]
   },
   "comparison": {
+    "automatic_full_script_speedup_over_mps16": 1.725195527417322,
     "automatic_nonconverged": [
       "OPT-OMC-STRUCTURES-P6000-INTRA-WIDE-v1:05533"
     ],
     "automatic_peak_reserved_over_mps_peak_sampled": 2.656512958599798,
+    "automatic_production_speedup_over_mps16": 1.6764273760393293,
+    "automatic_vs_mps16_endpoints": {
+      "automatic_only_sources": [],
+      "automatic_record_count": 6000,
+      "common_source_count": 6000,
+      "convergence_categories": {
+        "automatic_only_converged": 0,
+        "both_converged": 5999,
+        "mps_only_converged": 0,
+        "neither_converged": 1
+      },
+      "convergence_state_mismatch_count": 0,
+      "metrics": {
+        "absolute_energy_eV": {
+          "max": 6.095024108886719,
+          "mean": 0.11340588927268982,
+          "min": 0.0,
+          "p50": 0.00185394287109375,
+          "p95": 0.6808099746704102
+        },
+        "absolute_max_force_eV_per_A": {
+          "max": 0.023911597207188606,
+          "mean": 0.003170247183491786,
+          "min": 0.0,
+          "p50": 0.002083413302898407,
+          "p95": 0.009904876351356506
+        },
+        "absolute_max_stress_eV_per_A3": {
+          "max": 0.003147310868371278,
+          "mean": 0.00011355867196940987,
+          "min": 0.0,
+          "p50": 3.076624125242233e-05,
+          "p95": 0.0005321039934642613
+        },
+        "absolute_step_difference": {
+          "max": 385.0,
+          "mean": 11.968833333333333,
+          "min": 0.0,
+          "p50": 1.0,
+          "p95": 80.0
+        },
+        "max_cell_component_A": {
+          "max": 3.704048791742828,
+          "mean": 0.060926094261948435,
+          "min": 0.0,
+          "p50": 0.0008203454630404394,
+          "p95": 0.32457887710536326
+        },
+        "max_position_component_A": {
+          "max": 5.590025785130861,
+          "mean": 0.1685403305479929,
+          "min": 0.0,
+          "p50": 0.006439364434891903,
+          "p95": 1.2309407724081076
+        },
+        "max_stress_component_eV_per_A3": {
+          "max": 0.005632757442072034,
+          "mean": 0.00021890983692924874,
+          "min": 0.0,
+          "p50": 6.762365228496492e-05,
+          "p95": 0.001034012224408798
+        }
+      },
+      "mps_only_sources": [],
+      "mps_record_count": 6000,
+      "same_source_set": true,
+      "threshold_gate_applied": false,
+      "threshold_gate_reason": "The frozen epoch contract requires endpoint retention and convergence-count non-regression but does not declare cross-optimizer endpoint tolerances."
+    },
     "convergence_state_mismatch_count": 0,
     "endpoint_diagnostics": {
       "automatic_only_sources": [],
@@ -154,6 +228,77 @@
       "threshold_gate_reason": "The frozen epoch contract requires endpoint retention and convergence-count non-regression but does not declare cross-optimizer endpoint tolerances."
     },
     "full_script_speedup_over_mps": 2.0771832540695407,
+    "mps16_full_script_speedup_over_mps8": 1.2040277296447415,
+    "mps16_peak_over_mps8_peak": 1.6857960282733087,
+    "mps16_production_speedup_over_mps8": 1.2489933762131422,
+    "mps8_vs_mps16_endpoints": {
+      "automatic_only_sources": [],
+      "automatic_record_count": 6000,
+      "common_source_count": 6000,
+      "convergence_categories": {
+        "automatic_only_converged": 0,
+        "both_converged": 5999,
+        "mps_only_converged": 0,
+        "neither_converged": 1
+      },
+      "convergence_state_mismatch_count": 0,
+      "metrics": {
+        "absolute_energy_eV": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 0.0
+        },
+        "absolute_max_force_eV_per_A": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 0.0
+        },
+        "absolute_max_stress_eV_per_A3": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 0.0
+        },
+        "absolute_step_difference": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 0.0
+        },
+        "max_cell_component_A": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 0.0
+        },
+        "max_position_component_A": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 0.0
+        },
+        "max_stress_component_eV_per_A3": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 0.0
+        }
+      },
+      "mps_only_sources": [],
+      "mps_record_count": 6000,
+      "same_source_set": true,
+      "threshold_gate_applied": false,
+      "threshold_gate_reason": "The frozen epoch contract requires endpoint retention and convergence-count non-regression but does not declare cross-optimizer endpoint tolerances."
+    },
     "mps_nonconverged": [
       "OPT-OMC-STRUCTURES-P6000-INTRA-WIDE-v1:05533"
     ],
@@ -163,12 +308,15 @@
   "hardware": {
     "gpu_count": 8,
     "gpu_model": "NVIDIA H100 80GB HBM3",
+    "mps16_total_workers": 128,
+    "mps16_workers_per_gpu": 16,
     "mps_total_workers": 64,
     "mps_workers_per_gpu": 8
   },
   "interpretation": {
     "endpoint_note": "Schedule-sensitive BFGS trajectories are diagnostics, not an equality gate across implementations.",
     "limitation": "One deterministic timing trial on one T2 workload and AtomBit checkpoint.",
+    "mps16_result": "MPS16 improves MPS8 but automatic batching remains faster in production and full-script accounting.",
     "result": "automatic_faster_with_equal_convergence_coverage"
   },
   "mps": {
@@ -200,6 +348,37 @@
       873.908828099,
       925.8103003269998,
       919.288535915
+    ]
+  },
+  "mps16": {
+    "converged": 5999,
+    "jobs_per_gpu": [
+      752,
+      748,
+      752,
+      748,
+      749,
+      749,
+      751,
+      751
+    ],
+    "model_evaluations": 725215,
+    "optimizer_steps": 719215,
+    "peak_sampled_device_GiB": 39.12890625,
+    "production_makespan_seconds": 741.2451642730002,
+    "script_seconds": 811.3175777490005,
+    "systems_per_second_production": 8.0944878822713,
+    "systems_per_second_script": 7.395377796012989,
+    "worker_max_over_mean": 1.0337191748423469,
+    "worker_wall_seconds": [
+      741.2451642730002,
+      716.7390164349999,
+      696.596513517,
+      722.1228455750006,
+      723.9881124789999,
+      700.1981893849998,
+      724.569185288,
+      711.0712208189998
     ]
   },
   "publication_grade": false,
