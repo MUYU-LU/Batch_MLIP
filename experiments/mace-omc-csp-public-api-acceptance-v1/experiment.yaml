@@ -1,7 +1,8 @@
 schema_version: 1
 id: mace-omc-csp-public-api-acceptance-v1
 date: 2026-08-02
-status: planned
+status: complete_accepted
+executed_git_head: ed6fe9a8aad0ab4af7fa233f409482492a68d3e9
 
 question: >-
   Does the one-call optimize_pool interface execute a chemically untouched,
@@ -49,7 +50,56 @@ acceptance_gates:
   maximum_peak_reserved_fraction: 0.85
   all_active_workers_acknowledge_shutdown: true
 
+results:
+  status: pass
+  decision: accept_public_omc_csp_workflow_v1
+  devices: [cuda:0, cuda:1, cuda:4, cuda:5, cuda:6, cuda:7]
+  active_gpu_count: 6
+  execution_chunks: 12
+  resident_capacities: [10, 73, 98, 99, 116, 256]
+  batch_mode: active_drain
+  active_compaction: true
+  work_stealing: true
+  converged: 2046
+  convergence_rate: 0.9990234375
+  maximum_converged_force_eV_per_A: 0.00999957787234205
+  maximum_final_force_including_unconverged_eV_per_A: 0.1663768947505228
+  maximum_final_stress_eV_per_A3: 0.004803206970498956
+  model_evaluations: 22128
+  graph_evaluations: 727583
+  production_seconds: 461.09796009000274
+  optimize_pool_and_shutdown_seconds: 515.2360372749972
+  full_script_seconds: 594.6272925880039
+  production_structures_per_second: 4.441572458052615
+  full_script_structures_per_second: 3.4441742340592265
+  peak_allocated_bytes: 42671335936
+  peak_reserved_bytes: 47141879808
+  peak_reserved_fraction: 0.5544936674709197
+  worker_time_max_over_mean: 1.1767213604785278
+  capacity_policy: omc-csp-mace-off23-small-h100-capacity-cached-expandable-v1
+  capacity_policy_sha256: 2c262092ef6d21d76a5b7bde6930dd767fd9646911e94fc1721bcab61b7a2c3f
+  probe_systems: 0
+  probe_model_forwards: 0
+  endpoint_sha256: 4389dcb1ef8b59cbe844c10662cde7afd387a3e9d37827675f829d195ed77afb
+  shutdown_acknowledged_workers: 6
+
+unconverged:
+  - system_id: OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2:01499
+    max_force_eV_per_A: 0.1663768947505228
+    max_stress_eV_per_A3: 0.002100927180634654
+  - system_id: OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2:01860
+    max_force_eV_per_A: 0.036004096578897124
+    max_stress_eV_per_A3: 0.0006129499054676177
+
+decision:
+  public_api: accepted_for_exact_contract
+  release_tag: mace-omc-csp-public-api-v1
+  mps_speed_claim_for_xuldud: not_tested
+  other_checkpoints_or_hardware: out_of_scope
+
 artifacts:
   remote_root: /public/home/lmy/Batch_imple_project/mace_omc_csp_public_api_acceptance_v1
-  result: null
-  relaxed_structures: null
+  result: results/acceptance-result.json
+  result_sha256: 98d36b1d0974841904d47040e89ff1d7f8082556a3148ee68b4e82f6f909cb66
+  raw_result_sha256: 6395af60c871b3df2f6828abff8be03a42a0be8bb9a57413ab4437bf5e6b03d4
+  relaxed_structures_sha256: 269580569a92a3feced7324f4c8cd93ac537064e2e614df3364b251e78feb7d8
