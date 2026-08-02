@@ -249,10 +249,25 @@ def select_hardware_capacity_policy(
         return _fallback("model state differs", policy)
     if model.training:
         return _fallback("model is not in evaluation mode", policy)
-    if getattr(calculator, "e0_dict", None) != {}:
+    if (
+        "e0_dict" in contract
+        and getattr(calculator, "e0_dict", None) != contract["e0_dict"]
+    ):
         return _fallback("E0 offsets differ", policy)
-    if getattr(calculator, "model_call_kwargs", None) != {}:
+    if (
+        "model_call_kwargs" in contract
+        and getattr(calculator, "model_call_kwargs", None)
+        != contract["model_call_kwargs"]
+    ):
         return _fallback("model call options differ", policy)
+    for attribute, expected in contract.get(
+        "calculator_attributes", {}
+    ).items():
+        if getattr(calculator, attribute, None) != expected:
+            return _fallback(
+                f"calculator attribute {attribute!r} differs",
+                policy,
+            )
 
     if type(optimizer).__name__ != contract["optimizer_type"]:
         return _fallback("optimizer type differs", policy)

@@ -42,6 +42,7 @@ class MACEBatchCalculator(BatchCalculator):
     """
 
     execution_policy_family = "mace"
+    force_mode = "native_mace"
 
     @classmethod
     def from_off(

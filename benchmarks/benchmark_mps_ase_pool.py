@@ -509,7 +509,13 @@ def _worker_impl(
 
     barrier.wait(timeout=600)
     started = time.perf_counter()
-    output = execute()
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            message=r"logm result may be inaccurate.*",
+            category=RuntimeWarning,
+        )
+        output = execute()
     synchronize(device)
     elapsed = time.perf_counter() - started
     result = {

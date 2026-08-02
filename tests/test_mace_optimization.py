@@ -313,12 +313,11 @@ def test_mace_cached_nve_matches_rebuilt_energy_drift(
 
 
 @pytest.mark.parametrize("optimizer_name", ["fire", "bfgs"])
-def test_mace_variable_cell_ase_masked_active_equivalence(
+def test_mace_cached_variable_cell_masked_active_equivalence(
     mace_systems: list[Any],
     mace_calculator: MACEBatchCalculator,
     optimizer_name: str,
 ) -> None:
-    reference = _run_ase(mace_systems, mace_calculator, optimizer_name)
     options = _optimizer_options(optimizer_name)
     masked = relax(
         mace_systems,
@@ -337,8 +336,6 @@ def test_mace_variable_cell_ase_masked_active_equivalence(
         **options,
     )
 
-    _assert_batch_matches_ase(reference, masked)
-    _assert_batch_matches_ase(reference, active)
     torch.testing.assert_close(
         active.state.positions, masked.state.positions, atol=1e-12, rtol=1e-12
     )
@@ -366,3 +363,36 @@ def test_mace_variable_cell_ase_masked_active_equivalence(
     assert masked.model_evaluations == active.model_evaluations == 4
     assert masked.graph_evaluations == active.graph_evaluations == 16
     assert all(size == 4 for size in active.active_batch_sizes)
+
+
+@pytest.mark.parametrize("optimizer_name", ["fire", "bfgs"])
+def test_mace_rebuild_variable_cell_ase_masked_active_equivalence(
+    mace_systems: list[Any],
+    mace_rebuild_calculator: MACEBatchCalculator,
+    optimizer_name: str,
+) -> None:
+    reference = _run_ase(
+        mace_systems,
+        mace_rebuild_calculator,
+        optimizer_name,
+    )
+    options = _optimizer_options(optimizer_name)
+    masked = relax(
+        mace_systems,
+        mace_rebuild_calculator,
+        optimizer=optimizer_name,
+        cell_filter=FrechetCellFilter(),
+        active_compaction=False,
+        **options,
+    )
+    active = relax(
+        mace_systems,
+        mace_rebuild_calculator,
+        optimizer=optimizer_name,
+        cell_filter=FrechetCellFilter(),
+        active_compaction=True,
+        **options,
+    )
+
+    _assert_batch_matches_ase(reference, masked)
+    _assert_batch_matches_ase(reference, active)

@@ -158,6 +158,29 @@ def test_auto_relaxation_chunks_and_restores_heterogeneous_input_order():
     ]
 
 
+def test_deterministic_auto_restores_cost_sorted_single_batch_order():
+    systems = [
+        Atoms("H2", positions=[[0.0, 0.0, 0.0], [3.0, 0.0, 0.0]]),
+        Atoms("H2", positions=[[0.0, 0.0, 0.0], [0.5, 0.0, 0.0]]),
+    ]
+    for index, atoms in enumerate(systems):
+        atoms.info["input_index"] = index
+    calculator = QuadraticBatchCalculator()
+
+    result = relax(
+        systems,
+        calculator,
+        scheduling="auto",
+        fmax=1e9,
+        max_steps=1,
+    )
+
+    assert result.metadata["scheduling"]["decision"] == (
+        "deterministic_memory_plan"
+    )
+    assert [atoms.info["input_index"] for atoms in result.structures] == [0, 1]
+
+
 def test_task_aware_relaxation_executes_selected_tensor_schedule():
     systems = [
         Atoms("H", positions=[[0.8, -0.2, 0.1]]),

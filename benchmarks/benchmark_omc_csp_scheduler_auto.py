@@ -37,6 +37,7 @@ from batch_mlip import (  # noqa: E402
     AutoSchedulerConfig,
     BatchExecutor,
     FrechetCellFilter,
+    MACEBatchCalculator,
     ReproducibilityConfig,
     RuntimeProfiler,
     configure_reproducibility,
@@ -144,10 +145,22 @@ def _relaxation_options(args: argparse.Namespace) -> dict[str, Any]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--mlip", choices=("atombit", "mace"), default="atombit")
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--dataset-dir", type=Path, required=True)
-    parser.add_argument("--checkpoint", type=Path, required=True)
+    parser.add_argument("--checkpoint", type=Path)
+    parser.add_argument("--mace-model", default="small")
+    parser.add_argument(
+        "--mace-graph-mode",
+        choices=("cached", "rebuild"),
+        default="rebuild",
+    )
     parser.add_argument("--planning-profile", type=Path)
+    parser.add_argument(
+        "--hardware-capacity-policy",
+        type=Path,
+        help="Signed exact-contract hardware-capacity policy.",
+    )
     parser.add_argument("--devices", required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--seed", type=int, default=20260729)
@@ -208,6 +221,10 @@ def main() -> None:
         parser.error("--planning-profile is required with manifest_lazy")
     if args.executor_calls and args.materialization != "manifest_lazy":
         parser.error("--executor-calls requires manifest_lazy")
+    if args.mlip == "atombit" and args.checkpoint is None:
+        parser.error("--checkpoint is required for AtomBit")
+    if args.mlip == "mace" and args.tail_recovery != "none":
+        parser.error("MACE tail recovery is not part of this benchmark contract")
 
     devices = _devices(args.devices)
     reproducibility = configure_reproducibility(
@@ -231,16 +248,48 @@ def main() -> None:
     else:
         planning_profile = read_planning_profile(args.planning_profile)
 
-    model, model_metadata = load_production_model(args.checkpoint)
-    calculator = AtomBitBatchCalculator(
-        model.to(device=devices[0], dtype=torch.float32).eval(),
-        cutoff=6.0,
-        skin=0.5,
-        device=devices[0],
-        dtype=torch.float32,
-        force_mode="autograd",
-        neighbor_backend="auto",
-    )
+    if args.mlip == "atombit":
+        model, model_metadata = load_production_model(args.checkpoint)
+        calculator = AtomBitBatchCalculator(
+            model.to(device=devices[0], dtype=torch.float32).eval(),
+            cutoff=6.0,
+            skin=0.5,
+            device=devices[0],
+            dtype=torch.float32,
+            force_mode="autograd",
+            neighbor_backend="auto",
+        )
+        model_descriptor = {
+            "kind": "checkpoint",
+            "path": str(args.checkpoint.resolve()),
+            "sha256": sha256_file(args.checkpoint),
+            **model_metadata,
+        }
+        force_mode = "autograd"
+    else:
+        calculator = MACEBatchCalculator.from_off(
+            model=args.mace_model,
+            device=devices[0],
+            dtype=torch.float64,
+            graph_mode=args.mace_graph_mode,
+            skin=0.5,
+            neighbor_backend="auto",
+        )
+        model_path = Path(args.mace_model).expanduser()
+        model_descriptor = {
+            "kind": "mace_off",
+            "model": args.mace_model,
+            "model_class": (
+                f"{type(calculator.model).__module__}."
+                f"{type(calculator.model).__qualname__}"
+            ),
+            "parameter_count": sum(
+                parameter.numel() for parameter in calculator.model.parameters()
+            ),
+            "path": str(model_path.resolve()) if model_path.is_file() else None,
+            "sha256": sha256_file(model_path) if model_path.is_file() else None,
+        }
+        force_mode = "native_mace"
     warmup_system = (
         systems[0]
         if systems is not None
@@ -285,6 +334,9 @@ def main() -> None:
                             args.dataset_dir,
                             planning_profile,
                             optimizer="bfgs",
+                            hardware_capacity_policy=(
+                                args.hardware_capacity_policy
+                            ),
                             **relaxation_options,
                         )
                         for device in devices:
@@ -311,6 +363,7 @@ def main() -> None:
                     planning_profile,
                     calculator,
                     optimizer="bfgs",
+                    hardware_capacity_policy=args.hardware_capacity_policy,
                     devices=devices,
                     auto_config=auto_config,
                     **relaxation_options,
@@ -445,22 +498,23 @@ def main() -> None:
         "schema_version": 1,
         "status": "complete",
         "method": method,
+        "mlip": args.mlip,
         "workload_id": manifest.workload_id,
         "workload_manifest_sha256": manifest.manifest_sha256,
         "pool_size": len(source_ids),
         "devices": [str(device) for device in devices],
-        "checkpoint": {
-            "path": str(args.checkpoint.resolve()),
-            "sha256": sha256_file(args.checkpoint),
-            **model_metadata,
-        },
+        "checkpoint": model_descriptor,
         "contract": {
             "optimizer": "BatchedBFGS",
             "optimizer_dtype": "torch.float64",
             "cell_filter": "FrechetCellFilter",
-            "cutoff_A": 6.0,
-            "skin_A": 0.5,
-            "force_mode": "autograd",
+            "cutoff_A": calculator.cutoff,
+            "skin_A": calculator.skin,
+            "force_mode": force_mode,
+            "model_dtype": str(calculator.dtype),
+            "mace_graph_mode": (
+                args.mace_graph_mode if args.mlip == "mace" else None
+            ),
             "fmax_eV_per_A": args.fmax,
             "smax_eV_per_A3": None,
             "max_steps": args.max_steps,
@@ -480,6 +534,11 @@ def main() -> None:
             ),
             "planning_profile_sha256": (
                 None if planning_profile is None else planning_profile.profile_sha256
+            ),
+            "hardware_capacity_policy": (
+                None
+                if args.hardware_capacity_policy is None
+                else str(args.hardware_capacity_policy.resolve())
             ),
             "benchmark_parent_prewarm_system_count": 1,
         },

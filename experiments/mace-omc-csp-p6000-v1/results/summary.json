@@ -1,0 +1,231 @@
+{
+  "artifacts": {
+    "mps16_sha256": "43f4500fa0a0ad0e0de745011b6cd8414e27fc9a4acd57e2cb6192cd57c6abdd",
+    "tensor_sha256": "bb34a120cd402682aa79459115d509e14abcb1aafa4ef253fd89ccea6e1de641"
+  },
+  "b1_long_horizon_diagnostics": {
+    "closer_endpoint_counts_by_max_position": {
+      "mps16": 2,
+      "tensor": 2
+    },
+    "records": [
+      {
+        "b1": {
+          "converged": true,
+          "energy_eV": -156769.6449026873,
+          "max_force_eV_per_A": 0.014532855762274423,
+          "steps": 2246
+        },
+        "b1_vs_mps16": {
+          "abs_energy_difference_eV": 0.698779825528618,
+          "max_abs_cell_difference_A": 1.3437634872180126,
+          "max_abs_position_difference_A": 2.3733960569393973
+        },
+        "b1_vs_tensor": {
+          "abs_energy_difference_eV": 0.5060761460335925,
+          "max_abs_cell_difference_A": 5.053984860568626,
+          "max_abs_position_difference_A": 7.897088573241783
+        },
+        "closer_endpoint_by_max_position": "mps16",
+        "source": "OPT-OMC-STRUCTURES-P6000-INTRA-WIDE-v1:00047"
+      },
+      {
+        "b1": {
+          "converged": true,
+          "energy_eV": -156765.39309174527,
+          "max_force_eV_per_A": 0.009581195789103448,
+          "steps": 505
+        },
+        "b1_vs_mps16": {
+          "abs_energy_difference_eV": 3.2921908085991163,
+          "max_abs_cell_difference_A": 3.6292977235042563,
+          "max_abs_position_difference_A": 15.245040792776042
+        },
+        "b1_vs_tensor": {
+          "abs_energy_difference_eV": 0.03371911004069261,
+          "max_abs_cell_difference_A": 0.8540856625409106,
+          "max_abs_position_difference_A": 1.1906897592000085
+        },
+        "closer_endpoint_by_max_position": "tensor",
+        "source": "OPT-OMC-STRUCTURES-P6000-INTRA-WIDE-v1:00150"
+      },
+      {
+        "b1": {
+          "converged": true,
+          "energy_eV": -156766.8270231787,
+          "max_force_eV_per_A": 0.010568265374553227,
+          "steps": 598
+        },
+        "b1_vs_mps16": {
+          "abs_energy_difference_eV": 2.2210786291980185,
+          "max_abs_cell_difference_A": 11.216910855113037,
+          "max_abs_position_difference_A": 15.89578121945725
+        },
+        "b1_vs_tensor": {
+          "abs_energy_difference_eV": 0.007280359975993633,
+          "max_abs_cell_difference_A": 0.03102553256409024,
+          "max_abs_position_difference_A": 0.10855560128660358
+        },
+        "closer_endpoint_by_max_position": "tensor",
+        "source": "OPT-OMC-STRUCTURES-P6000-INTRA-WIDE-v1:00275"
+      },
+      {
+        "b1": {
+          "converged": true,
+          "energy_eV": -235150.4524495473,
+          "max_force_eV_per_A": 0.010537759146599974,
+          "steps": 564
+        },
+        "b1_vs_mps16": {
+          "abs_energy_difference_eV": 0.0012288231519050896,
+          "max_abs_cell_difference_A": 0.0038938508757695445,
+          "max_abs_position_difference_A": 0.009728371897065102
+        },
+        "b1_vs_tensor": {
+          "abs_energy_difference_eV": 0.15026972963823937,
+          "max_abs_cell_difference_A": 8.116294263119249,
+          "max_abs_position_difference_A": 14.15745869744795
+        },
+        "closer_endpoint_by_max_position": "mps16",
+        "source": "OPT-OMC-STRUCTURES-P6000-INTRA-WIDE-v1:00521"
+      }
+    ]
+  },
+  "comparison": {
+    "common_converged_energy_difference_meV_per_atom": {
+      "max": 36.485459588985194,
+      "median": 0.005513984038059235,
+      "min": 0.0,
+      "p90": 1.8965157013356124,
+      "p95": 6.292257730598545,
+      "p99": 15.161668398707327
+    },
+    "common_nonconverged": 2,
+    "convergence_flag_mismatches": 73,
+    "convergence_rate_percentage_point_difference": 0.05,
+    "energy_difference_meV_per_atom": {
+      "max": 36.485459588985194,
+      "median": 0.005865604654663121,
+      "min": 0.0,
+      "p90": 2.3493405819507394,
+      "p95": 6.879154551097599,
+      "p99": 15.754999510204291
+    },
+    "execution_speedup_over_mps16": 1.4302068884253223,
+    "full_script_speedup_over_mps16": 1.4537444078815123,
+    "max_force_difference_eV_per_A": {
+      "max": 0.8469035846339998,
+      "median": 0.0008355630537375119,
+      "min": 1.2928285178515075e-10,
+      "p90": 0.002594056840127951,
+      "p95": 0.003466436348449504,
+      "p99": 0.010944717298294963
+    },
+    "mps16_only_converged": 35,
+    "tensor_only_converged": 38
+  },
+  "decision": {
+    "capacity_policy": "rejected_for_production",
+    "endpoint_claim": "schedule_sensitive_local_minima_not_identical",
+    "performance_evidence": "accepted_for_exact_contract",
+    "production_freeze": false,
+    "required_follow_up": [
+      "allocator_high_water_aware_capacity_margin",
+      "validated_mace_cached_graph_path"
+    ]
+  },
+  "mps16": {
+    "converged_count": 5960,
+    "full_script_seconds": 4652.834623327013,
+    "gpu_shard_max_over_mean": 1.0578269069157544,
+    "model_single_structure_calls": 3725609,
+    "peak_sampled_device_bytes": 38558236672,
+    "production_makespan_seconds": 4563.540074890014,
+    "step_distribution": {
+      "max": 3000.0,
+      "median": 479.0,
+      "min": 35.0,
+      "p90": 1076.1000000000004,
+      "p95": 1582.250000000001,
+      "p99": 2619.500000000011
+    },
+    "systems_per_second": 1.3147687763308633
+  },
+  "schema_version": 1,
+  "short_horizon_gate": {
+    "max_abs_cell_difference_A": 1.0734524380495714e-11,
+    "max_abs_energy_difference_eV": 2.9103830456733704e-11,
+    "max_abs_position_difference_A": 1.1759482276829658e-11,
+    "max_abs_stress_difference_eV_per_A3": 1.0877973868894664e-12,
+    "pool_size": 64
+  },
+  "status": "complete_with_capacity_rejection",
+  "tensor": {
+    "actual_reserved_over_predicted": 1.1375177613740521,
+    "converged_count": 5963,
+    "execution_chunk_count": 31,
+    "execution_seconds": 3190.8251259470126,
+    "full_script_seconds": 3200.5864291560138,
+    "memory_budget_bytes": 72265203712,
+    "model_batch_calls": 81695,
+    "peak_allocated_bytes": 59567314944,
+    "peak_reserved_bytes": 82155929600,
+    "peak_reserved_fraction_of_device": 0.9663370000077085,
+    "predicted_peak_bytes": 72223865323,
+    "resident_chunk_count": 31,
+    "step_distribution": {
+      "max": 3000.0,
+      "median": 479.0,
+      "min": 35.0,
+      "p90": 1082.1000000000004,
+      "p95": 1507.2000000000007,
+      "p99": 2596.01
+    },
+    "structure_graph_evaluations": 3707180,
+    "systems_per_second": 1.8803913605949325,
+    "worker_max_over_mean": 1.0532034881509764
+  },
+  "tensor_worker_phases": {
+    "graph.mace_atomic_data": {
+      "count": 81695,
+      "seconds": 5967.829421099481,
+      "worker_time_fraction": 0.2527148141594835
+    },
+    "graph.mace_collate": {
+      "count": 81695,
+      "seconds": 818.4328523562556,
+      "worker_time_fraction": 0.034657509722709506
+    },
+    "graph.state_to_ase": {
+      "count": 81695,
+      "seconds": 281.70914503706985,
+      "worker_time_fraction": 0.011929307828968415
+    },
+    "graph.to_device": {
+      "count": 81695,
+      "seconds": 188.44161638617513,
+      "worker_time_fraction": 0.007979783721125747
+    },
+    "model.forward": {
+      "count": 81695,
+      "seconds": 7780.756098699562,
+      "worker_time_fraction": 0.3294853442947209
+    },
+    "optimizer.bfgs_update": {
+      "count": 81664,
+      "seconds": 7644.595405286791,
+      "worker_time_fraction": 0.3237194582574998
+    },
+    "scheduler.active_compaction": {
+      "count": 5167,
+      "seconds": 88.29986680591105,
+      "worker_time_fraction": 0.0037391625758049596
+    }
+  },
+  "workload": {
+    "id": "OPT-OMC-STRUCTURES-P6000-INTRA-WIDE-MACE-OFF23-SMALL-v1",
+    "manifest_sha256": "75717c7cf79c6f7600e6acd094ab04d995e795706149a36b6b5e704e75510528",
+    "pool_size": 6000,
+    "same_source_coverage": true
+  }
+}

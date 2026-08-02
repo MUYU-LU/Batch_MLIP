@@ -1,0 +1,119 @@
+schema_version: 1
+id: mace-omc-csp-p6000-v1
+date: 2026-08-02
+status: complete_with_capacity_rejection
+git_head: 42bbfeac6af94961abcf5604fb3d222a2408e3c0
+working_tree_clean: false
+
+workload:
+  id: OPT-OMC-STRUCTURES-P6000-INTRA-WIDE-MACE-OFF23-SMALL-v1
+  source_id: OPT-OMC-STRUCTURES-P6000-INTRA-WIDE-v1
+  pool_size: 6000
+  unique_sources: 6000
+  synthetic_repetition: false
+  manifest_sha256: 75717c7cf79c6f7600e6acd094ab04d995e795706149a36b6b5e704e75510528
+  planning_profile_sha256: 39734d3f2eed65ffdfcee25308d9b0b6baeee7f53d8086c8e8795b8c1d64eb56
+
+contract:
+  model: MACE-OFF23-Small
+  model_file_sha256: 165cce4cfec5a34b9c64d4ebf95de15d71106bb584b7291c8470f0749977c46f
+  model_state_sha256: 2a7e1c92199cc71640d3ddc1a6dda2bbffffa397a7429790edcc3e5a45766526
+  model_dtype: float64
+  optimizer: BFGS
+  optimizer_dtype: float64
+  cell_filter: FrechetCellFilter
+  cutoff_A: 4.5
+  skin_A: 0.5
+  fmax_eV_per_A: 0.01
+  max_steps: 3000
+  max_step_A: 0.2
+  alpha_eV_per_A2: 70.0
+  tail_recovery: none
+  deterministic: true
+
+hardware:
+  gpu_model: NVIDIA H100 80GB HBM3
+  gpu_indices: [0, 1, 2, 3, 4, 5, 6, 7]
+  gpu_count: 8
+  nominal_memory_fraction: 0.85
+
+methods:
+  tensor:
+    interface: BatchExecutor.relax_manifest
+    resident_chunks: 31
+    resident_size_range: [109, 256]
+    capacity_policy: omc-csp-mace-off23-small-h100-capacity-v1
+    capacity_policy_sha256: 7a2b141e1f5029a094a18e0c5ceb412b550c73a8c324e72adfa5d34e35a003b1
+    outer_queue: bucket_stratified_work_stealing
+    inner_queue: active_drain
+    active_compaction: true
+    multi_gpu_refill: disabled
+    materialization: manifest_lazy_global_prefetch
+    mace_graph_mode: rebuild
+  mps16:
+    optimizer: ASE BFGS
+    workers_per_gpu: 16
+    total_workers: 128
+    assignment: static_cost_balanced_lpt
+
+fairness:
+  same_signed_jobs: true
+  same_model_file: true
+  same_force_and_step_limits: true
+  same_available_gpus: true
+  cpu_threads_per_process: 1
+  timing_repeats: 1
+
+results:
+  tensor:
+    execution_seconds: 3190.8251259470126
+    full_script_seconds: 3200.5864291560138
+    converged: 5963
+    model_batch_calls: 81695
+    structure_graph_evaluations: 3707180
+    peak_allocated_bytes: 59567314944
+    peak_reserved_bytes: 82155929600
+    peak_reserved_fraction: 0.9663370000077085
+  mps16:
+    production_makespan_seconds: 4563.540074890014
+    full_script_seconds: 4652.834623327013
+    converged: 5960
+    model_single_structure_calls: 3725609
+    peak_sampled_device_bytes: 38558236672
+  comparison:
+    execution_speedup: 1.4302068884253223
+    full_script_speedup: 1.4537444078815123
+    convergence_rate_percentage_point_difference: 0.05
+    convergence_flag_mismatches: 73
+    tensor_only_converged: 38
+    mps16_only_converged: 35
+    common_nonconverged: 2
+    endpoint_energy_difference_meV_per_atom_median: 0.005865604654663121
+    endpoint_energy_difference_meV_per_atom_p95: 6.879154551097599
+    endpoint_energy_difference_meV_per_atom_p99: 15.754999510204291
+    endpoint_energy_difference_meV_per_atom_max: 36.485459588985194
+
+correctness:
+  short_horizon_pool_size: 64
+  short_horizon_steps: 3
+  max_abs_energy_difference_eV: 2.9103830456733704e-11
+  max_abs_position_difference_A: 1.1759482276829658e-11
+  max_abs_cell_difference_A: 1.0734524380495714e-11
+  max_abs_stress_difference_eV_per_A3: 1.0877973868894664e-12
+  long_horizon_b1_diagnostics: 4
+  b1_closer_to_tensor_by_position: 2
+  b1_closer_to_mps16_by_position: 2
+
+decision:
+  performance_evidence: accepted_for_exact_contract
+  capacity_policy: rejected_for_production
+  production_policy_frozen: false
+  required_next_work:
+    - allocator_high_water_aware_capacity_margin
+    - validated_mace_cached_graph_path
+
+artifacts:
+  remote_root: /public/home/lmy/Batch_imple_project/mace_omc_csp_p6000_v1
+  tensor_result_sha256: bb34a120cd402682aa79459115d509e14abcb1aafa4ef253fd89ccea6e1de641
+  mps16_result_sha256: 43f4500fa0a0ad0e0de745011b6cd8414e27fc9a4acd57e2cb6192cd57c6abdd
+  summary_sha256: feb89dc333a48b40ac99be551a280fb5addce045af4e79f65c1e641fc24784d3

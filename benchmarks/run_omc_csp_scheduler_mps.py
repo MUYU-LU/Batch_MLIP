@@ -138,9 +138,11 @@ def _stop_mps(environment: dict[str, str]) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--mlip", choices=("atombit", "mace"), default="atombit")
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--dataset-dir", type=Path, required=True)
-    parser.add_argument("--checkpoint", type=Path, required=True)
+    parser.add_argument("--checkpoint", type=Path)
+    parser.add_argument("--mace-model", default="small")
     parser.add_argument("--gpus", required=True)
     parser.add_argument("--runtime-dir", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
@@ -160,6 +162,8 @@ def main() -> None:
     args = parser.parse_args()
     if args.workers_per_gpu <= 0 or args.fmax <= 0.0 or args.max_steps <= 0:
         parser.error("workers, fmax, and max steps must be positive")
+    if args.mlip == "atombit" and args.checkpoint is None:
+        parser.error("--checkpoint is required for AtomBit")
 
     started = time.perf_counter()
     manifest = read_workload_manifest(args.manifest)
@@ -238,7 +242,7 @@ def main() -> None:
                 sys.executable,
                 str(ROOT / "benchmarks" / "benchmark_mps_ase_pool.py"),
                 "--mlip",
-                "atombit",
+                args.mlip,
                 "--task",
                 "optimization",
                 "--optimizer",
@@ -252,7 +256,7 @@ def main() -> None:
                 "--gpu-index",
                 str(gpu),
                 "--cutoff",
-                "6.0",
+                "6.0" if args.mlip == "atombit" else "4.5",
                 "--fmax",
                 str(args.fmax),
                 "--max-steps",
@@ -265,20 +269,22 @@ def main() -> None:
                 "--seed",
                 "20260729",
                 "--model-dtype",
-                "float32",
+                "float32" if args.mlip == "atombit" else "float64",
                 "--optimizer-dtype",
                 "float64",
                 "--dataset-dir",
                 str(args.dataset_dir),
                 "--workload-manifest",
                 str(shard_path),
-                "--checkpoint",
-                str(args.checkpoint),
                 "--cpu-threads-per-worker",
                 "1",
                 "--output",
                 str(worker_output),
             ]
+            if args.mlip == "atombit":
+                command.extend(("--checkpoint", str(args.checkpoint)))
+            else:
+                command.extend(("--mace-model", args.mace_model))
             worker_environment = (
                 per_gpu_environment[gpu] if per_gpu_environment is not None else environment
             )
@@ -333,19 +339,38 @@ def main() -> None:
             if args.reuse_active_mps
             else "owned"
         ),
-        "checkpoint": {
-            "path": str(args.checkpoint.resolve()),
-            "sha256": sha256_file(args.checkpoint),
-        },
+        "mlip": args.mlip,
+        "checkpoint": (
+            {
+                "kind": "checkpoint",
+                "path": str(args.checkpoint.resolve()),
+                "sha256": sha256_file(args.checkpoint),
+            }
+            if args.mlip == "atombit"
+            else {
+                "kind": "mace_off",
+                "model": args.mace_model,
+                "path": (
+                    str(Path(args.mace_model).expanduser().resolve())
+                    if Path(args.mace_model).expanduser().is_file()
+                    else None
+                ),
+                "sha256": (
+                    sha256_file(Path(args.mace_model).expanduser())
+                    if Path(args.mace_model).expanduser().is_file()
+                    else None
+                ),
+            }
+        ),
         "contract": {
             "optimizer": "ASE BFGS",
             "cell_filter": "ASE FrechetCellFilter",
-            "cutoff_A": 6.0,
+            "cutoff_A": 6.0 if args.mlip == "atombit" else 4.5,
             "fmax_eV_per_A": args.fmax,
             "max_steps": args.max_steps,
             "max_step_A": 0.2,
             "alpha": 70.0,
-            "model_dtype": "float32",
+            "model_dtype": "float32" if args.mlip == "atombit" else "float64",
             "optimizer_dtype": "float64",
             "deterministic": True,
         },

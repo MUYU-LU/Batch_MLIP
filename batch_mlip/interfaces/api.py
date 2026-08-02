@@ -689,7 +689,9 @@ def _execute_relaxation_schedule(
             result = _offload_relaxation_result(result)
             _empty_device_cache(result_device)
         indexed_results.append((batch.system_indices, result))
-    if len(indexed_results) == 1:
+    if len(indexed_results) == 1 and indexed_results[0][0] == tuple(
+        range(len(systems))
+    ):
         result = indexed_results[0][1]
     else:
         result = _combine_relaxation_results(
@@ -1155,6 +1157,7 @@ def _execute_deterministic_relaxation(
     result = (
         indexed_results[0][1]
         if len(indexed_results) == 1
+        and indexed_results[0][0] == tuple(range(len(systems)))
         else _combine_relaxation_results(
             indexed_results,
             workload_size=len(systems),
