@@ -544,7 +544,7 @@ def test_automatic_profiler_populates_all_cost_layers():
         systems,
         calculator,
         BatchedBFGS(),
-        {"cell_filter": object()},
+        {"cell_filter": object(), "optimizer_dtype": "float64"},
         AutoSchedulerConfig(),
     )
 
@@ -559,4 +559,5 @@ def test_automatic_profiler_populates_all_cost_layers():
         <= profile.edge_count
     )
     assert profile.bound_cost.task_auxiliary.generalized_dimension == 15
+    assert profile.bound_cost.task_auxiliary.state_dtype == "torch.float64"
     assert profile.dof_squared == 15**2

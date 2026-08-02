@@ -113,6 +113,67 @@ The direct Python API is demonstrated by:
 python examples/python_api.py
 ```
 
+## Optimize a structure pool automatically
+
+`optimize_pool()` is the production entry point for an in-memory pool. The
+caller supplies structures, a native batch calculator, and devices; the
+function performs workload profiling, cost bucketing, resident-batch planning,
+multi-GPU assignment, active compaction/drain, result reassembly, and worker
+shutdown:
+
+```python
+import torch
+from ase.io import read
+
+from batch_mlip import (
+    MACEBatchCalculator,
+    ReproducibilityConfig,
+    configure_reproducibility,
+    optimize_pool,
+)
+
+
+def main():
+    # Install the frozen execution contract before MACE initializes CUDA.
+    configure_reproducibility(ReproducibilityConfig())
+    structures = read("candidates.extxyz", index=":")
+    calculator = MACEBatchCalculator.from_off(
+        model="small",
+        device="cuda:0",
+        dtype=torch.float64,
+        graph_mode="cached",
+        skin=0.5,
+    )
+    result = optimize_pool(
+        structures,
+        calculator,
+        optimizer="bfgs",
+        cell_filter="frechet",
+        devices=["cuda:0", "cuda:1", "cuda:2", "cuda:3"],
+        policy="auto",
+        fmax=0.01,
+        max_steps=3000,
+    )
+    print(result.structures)
+    print(result.converged)
+    print(result.schedule)
+    print(result.metadata["optimize_pool"]["capacity_planning"])
+
+
+if __name__ == "__main__":
+    main()
+```
+
+`policy="auto"` uses a packaged capacity model only when the checkpoint,
+adapter options, optimizer, cell filter, precision, allocator, PyTorch/CUDA
+versions, GPU model, and memory budget match its signed contract. Otherwise it
+automatically performs a representative memory probe and records the mismatch
+reason. Use `policy="probe"` to request that conservative path explicitly, or
+pass a signed `HardwareCapacityPolicy`/JSON path. `cell_filter=None` selects
+fixed-cell optimization. Because GPU workers use Python's spawn method, invoke
+the one-shot interface from a file-backed `__main__`; retain `BatchExecutor`
+directly when processing several pools with the same calculator and devices.
+
 ## Use a serialized complete model
 
 A YAML model factory can return any `torch.nn.Module` that accepts the generic graph fields. For a checkpoint containing the complete module:

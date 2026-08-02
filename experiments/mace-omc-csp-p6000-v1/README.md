@@ -110,6 +110,23 @@ linear algebra is now the largest framework-controlled phase, narrowly ahead
 of MACE forward evaluation; changing optimizer mathematics is outside this
 freeze.
 
+## Public-interface gate
+
+The file-backed `smoke_optimize_pool.py` gate passes the first 64 signed jobs
+as ordinary in-memory ASE structures to the public `optimize_pool(...)` API.
+On the same H100 host, exact calculator-model and hardware matching selected
+the packaged cached/expandable capacity policy without a memory probe
+(`probe.system_count=0`, `probe.model_forward_count=0`). The resulting
+single-GPU plan used automatic active drain with four queued chunk capacities
+`[1, 2, 18, 43]`. The worker acknowledged deterministic shutdown; the
+parent then force-reaped the process after the acknowledgement rather than
+leaving a persistent CUDA worker behind.
+
+The smoke result is stored in
+`results/optimize-pool-p64-smoke.json`. This is an interface and policy-routing
+gate, not an additional performance measurement; it deliberately runs only
+three BFGS steps.
+
 ## Decision
 
 Freeze this MACE OMC-CSP policy for the exact MACE-OFF23-Small, float64 BFGS,

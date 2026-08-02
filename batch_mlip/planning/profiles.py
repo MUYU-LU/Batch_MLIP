@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
@@ -130,16 +130,19 @@ class TaskAuxiliaryCostProfile:
         optimizer: object,
         variable_cell: bool,
         cell_method: object | None = None,
+        optimizer_options: Mapping[str, Any] | None = None,
     ) -> TaskAuxiliaryCostProfile:
         """Bind the current relaxation representation to one structure."""
 
         algorithm = _qualified_name(optimizer)
         name = algorithm.lower()
-        options = getattr(optimizer, "options", {})
+        defaults = getattr(optimizer, "options", {})
+        options = {
+            **(dict(defaults) if isinstance(defaults, Mapping) else {}),
+            **dict(optimizer_options or {}),
+        }
         requested_dtype = (
             options.get("optimizer_dtype")
-            if isinstance(options, Mapping)
-            else None
         )
         state_dtype = (
             "calculator_state_dtype"
@@ -553,6 +556,28 @@ class PlanningProfileBundle:
         profile = cls(**values)
         profile.verify()
         return profile
+
+
+def planning_profile_from_bound_costs(
+    systems: Sequence[BoundSystemCostProfile],
+    *,
+    workload_id: str = "in-memory-pool",
+) -> PlanningProfileBundle:
+    """Seal an in-memory cost profile for exact policy matching."""
+
+    ordered = tuple(systems)
+    identity = _canonical_sha256(
+        {
+            "workload_id": workload_id,
+            "systems": [system.to_dict() for system in ordered],
+        }
+    )
+    return PlanningProfileBundle(
+        workload_id=workload_id,
+        workload_manifest_sha256=identity,
+        structure_workload_sha256=identity,
+        systems=ordered,
+    ).seal()
 
 
 def planning_profile_from_manifest(

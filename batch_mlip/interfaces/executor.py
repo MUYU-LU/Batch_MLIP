@@ -36,6 +36,8 @@ from ..planning.auto import AutoSchedulerConfig, profile_auto_workload, profile_
 from ..planning.capacity_policy import (
     HardwareCapacityDecision,
     HardwareCapacityPolicy,
+    find_packaged_hardware_capacity_policy,
+    hardware_capacity_policy_matches_calculator,
     load_hardware_capacity_policy,
     select_hardware_capacity_policy,
 )
@@ -46,7 +48,10 @@ from ..planning.deterministic import (
     plan_hardware_calibrated_relaxation,
 )
 from ..planning.memory import HardwareCalibratedBatchPlanner
-from ..planning.profiles import PlanningProfileBundle
+from ..planning.profiles import (
+    PlanningProfileBundle,
+    planning_profile_from_bound_costs,
+)
 from ..profiling import RuntimeProfiler
 from .api import (
     _apply_offline_refill_policy,
@@ -157,6 +162,20 @@ class _ExecutorWorkerRunner:
             "input": task.input_metadata,
         }
         return result
+
+
+def _resolve_capacity_policy(
+    requested: HardwareCapacityPolicy | str | Path | None,
+    calculator: BatchCalculator,
+) -> tuple[HardwareCapacityPolicy | None, str]:
+    if isinstance(requested, HardwareCapacityPolicy):
+        return requested, "explicit policy object"
+    if requested is not None:
+        return load_hardware_capacity_policy(requested), "explicit policy path"
+    policy = find_packaged_hardware_capacity_policy(calculator)
+    if policy is None:
+        return None, "no packaged policy matches the exact calculator model"
+    return policy, "exact packaged calculator-model match"
 
 
 @dataclass
@@ -571,6 +590,9 @@ class BatchExecutor:
         *,
         optimizer: str | BatchOptimizer = "fire",
         auto_config: AutoSchedulerConfig | None = None,
+        hardware_capacity_policy: (
+            HardwareCapacityPolicy | str | Path | None
+        ) = None,
         **optimizer_kwargs: Any,
     ) -> RelaxationResult:
         if self._closed:
@@ -599,6 +621,14 @@ class BatchExecutor:
             variable_cell=options.get("cell_filter") is not None,
             policy=config.cuda_allocator_policy,
         )
+        if config.offline_hardware_capacity_enabled:
+            capacity_policy, policy_resolution = _resolve_capacity_policy(
+                hardware_capacity_policy,
+                self.calculator,
+            )
+        else:
+            capacity_policy = None
+            policy_resolution = "offline hardware-capacity policy is disabled"
 
         planning_started = time.perf_counter()
         workload = profile_auto_workload(
@@ -607,22 +637,72 @@ class BatchExecutor:
             resolved,
             options,
             config,
+            model_id=(
+                capacity_policy.contract["model_id"]
+                if capacity_policy is not None
+                and hardware_capacity_policy_matches_calculator(
+                    capacity_policy,
+                    self.calculator,
+                )
+                else None
+            ),
         )
-        probe = _measure_representative_memory(
-            normalized,
-            self.calculator,
-            options,
-            workload,
-            config,
+        bound_profiles = tuple(
+            profile.bound_cost for profile in workload.profiles
         )
-        plan = plan_deterministic_relaxation(
-            workload,
-            probe,
-            resolved,
-            options,
-            self.calculator.dtype,
-            config,
+        if any(profile is None for profile in bound_profiles):
+            raise RuntimeError("automatic workload lacks layered cost profiles")
+        planning_profile = planning_profile_from_bound_costs(
+            tuple(profile for profile in bound_profiles if profile is not None)
         )
+        if capacity_policy is not None:
+            capacity_decision = select_hardware_capacity_policy(
+                capacity_policy,
+                planning_profile,
+                self.calculator,
+                resolved,
+                options,
+                self.devices,
+                config,
+                allocator_policy=allocator_plan.selected_policy,
+            )
+        else:
+            capacity_decision = HardwareCapacityDecision(
+                mode="representative_probe_fallback",
+                reason=policy_resolution,
+            )
+        if capacity_decision.use_offline_model:
+            if capacity_decision.policy is None:
+                raise RuntimeError("offline capacity decision has no policy")
+            planner = HardwareCalibratedBatchPlanner(
+                capacity_decision.policy.model,
+                memory_budget_bytes=config.memory_budget_bytes,
+                max_batch_size=config.max_batch_size,
+                max_cost_ratio=config.max_cost_ratio,
+                prediction_margin=config.memory_growth_margin,
+            )
+            plan = plan_hardware_calibrated_relaxation(
+                workload,
+                planner,
+                memory_fraction=config.memory_safety_fraction,
+            )
+            probe = plan.probe
+        else:
+            probe = _measure_representative_memory(
+                normalized,
+                self.calculator,
+                options,
+                workload,
+                config,
+            )
+            plan = plan_deterministic_relaxation(
+                workload,
+                probe,
+                resolved,
+                options,
+                self.calculator.dtype,
+                config,
+            )
         if len(self.devices) == 1:
             plan = _apply_offline_refill_policy(
                 plan,
@@ -709,9 +789,64 @@ class BatchExecutor:
             calculator=self.calculator,
         )
         reassembly_seconds = time.perf_counter() - reassembly_started
+        work_stealing = len(pending_chunks) > active_worker_count
+        refill_reasons = [
+            str(prediction["reason"])
+            for chunk in pending_chunks
+            if (prediction := chunk.refill_prediction) is not None
+        ]
+        refill_fallback_reasons = (
+            ["multi-GPU refill has no accepted scientific policy"]
+            if len(self.devices) > 1
+            else []
+        )
         result.metadata["scheduling"] = {
             "policy": "auto",
             "decision": "persistent_deterministic_memory_plan",
+            "summary": scheduling_summary(
+                strategy="automatic",
+                devices=[str(device) for device in self.devices],
+                resident_capacities=[
+                    int(chunk.resident_capacity or len(chunk.indices))
+                    for chunk in pending_chunks
+                ],
+                active_compaction=bool(options.get("active_compaction", False)),
+                active_refill=[chunk.active_refill for chunk in pending_chunks],
+                memory_fraction=plan.memory_fraction,
+                work_stealing=work_stealing,
+                refill_reasons=[
+                    *refill_reasons,
+                    *refill_fallback_reasons,
+                ],
+            ),
+            "policy_manifest": compose_relaxation_policy_manifest(
+                plan,
+                self.calculator,
+                resolved,
+                options,
+                fully_periodic=all(bool(atoms.pbc.all()) for atoms in normalized),
+                available_devices=[str(device) for device in self.devices],
+                active_device_count=active_worker_count,
+                execution_chunk_sizes=[
+                    len(chunk.indices) for chunk in pending_chunks
+                ],
+                execution_resident_capacities=[
+                    int(chunk.resident_capacity or len(chunk.indices))
+                    for chunk in pending_chunks
+                ],
+                work_stealing=work_stealing,
+                outer_assignment=(
+                    "bucket_stratified_initial_then_cost_descending_work_stealing"
+                    if work_stealing
+                    and config.multi_gpu_queue_policy == "bucket_stratified"
+                    else None
+                ),
+                refill_fallback_reasons=refill_fallback_reasons,
+                observed_converged_steps=[
+                    int(step)
+                    for step in result.converged_step.detach().cpu().tolist()
+                ],
+            ),
             "devices": [str(device) for device in self.devices],
             "gpu_count": len(self.devices),
             "active_gpu_count": active_worker_count,
@@ -731,6 +866,8 @@ class BatchExecutor:
                 "peak_reserved_bytes": probe.peak_reserved_bytes,
                 "model_bytes_per_work": probe.model_bytes_per_work,
             },
+            "capacity_planning": capacity_decision.to_dict(),
+            "capacity_policy_resolution": policy_resolution,
             "parallel_chunk_policy": _parallel_deterministic_chunk_policy(
                 plan,
                 device_count=len(self.devices),
@@ -789,7 +926,7 @@ class BatchExecutor:
                 production_execution,
                 production_chunks,
             ),
-            "pending_work_stealing": len(self.devices) > 1,
+            "pending_work_stealing": work_stealing,
             "total_seconds": time.perf_counter() - total_started,
         }
         return result
@@ -853,28 +990,34 @@ class BatchExecutor:
             policy=config.cuda_allocator_policy,
         )
         if config.offline_hardware_capacity_enabled:
-            policy = (
-                hardware_capacity_policy
-                if isinstance(
-                    hardware_capacity_policy,
-                    HardwareCapacityPolicy,
-                )
-                else load_hardware_capacity_policy(hardware_capacity_policy)
-            )
-            capacity_decision = select_hardware_capacity_policy(
-                policy,
-                planning_profile,
+            policy, policy_resolution = _resolve_capacity_policy(
+                hardware_capacity_policy,
                 self.calculator,
-                resolved,
-                options,
-                self.devices,
-                config,
-                allocator_policy=allocator_plan.selected_policy,
+            )
+            capacity_decision = (
+                HardwareCapacityDecision(
+                    mode="representative_probe_fallback",
+                    reason=policy_resolution,
+                )
+                if policy is None
+                else select_hardware_capacity_policy(
+                    policy,
+                    planning_profile,
+                    self.calculator,
+                    resolved,
+                    options,
+                    self.devices,
+                    config,
+                    allocator_policy=allocator_plan.selected_policy,
+                )
             )
         else:
+            policy_resolution = (
+                "offline hardware-capacity policy is disabled"
+            )
             capacity_decision = HardwareCapacityDecision(
                 mode="representative_probe_fallback",
-                reason="offline hardware-capacity policy is disabled",
+                reason=policy_resolution,
             )
         if capacity_decision.use_offline_model:
             if capacity_decision.policy is None:
@@ -1126,6 +1269,7 @@ class BatchExecutor:
                 "model_bytes_per_work": probe.model_bytes_per_work,
             },
             "capacity_planning": capacity_decision.to_dict(),
+            "capacity_policy_resolution": policy_resolution,
             "parallel_chunk_policy": (
                 "bounded_source_backed_streaming_refill_micro_pools"
                 if streaming_refill

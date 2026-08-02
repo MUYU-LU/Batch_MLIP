@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+from dataclasses import replace
 from types import SimpleNamespace
 
 import numpy as np
@@ -16,6 +17,11 @@ from batch_mlip import (
     BatchedFIRE,
     BatchEvaluation,
     BatchExecutor,
+    HardwareBoundCostModel,
+    HardwareCapacityDecision,
+    HardwareCapacityPolicy,
+    HardwareCostProfile,
+    LayeredCostCoefficients,
     planning_profile_from_manifest,
     relax,
 )
@@ -76,6 +82,34 @@ def _config(tmp_path) -> AutoSchedulerConfig:
         multi_gpu_cold_start_jobs=1,
         multi_gpu_process_cpu_threads=1,
     )
+
+
+def _synthetic_capacity_policy() -> HardwareCapacityPolicy:
+    model = HardwareBoundCostModel(
+        contract_id="executor-in-memory-capacity-v1",
+        metric="bytes",
+        hardware=HardwareCostProfile(
+            device_type="cpu",
+            device_name="test",
+            total_memory_bytes=1_000_000,
+            memory_safety_fraction=0.85,
+            device_count=1,
+        ),
+        coefficients=LayeredCostCoefficients(
+            fixed=100.0,
+            per_atom=10.0,
+            per_dense_state_element=1.0,
+        ),
+    )
+    policy = HardwareCapacityPolicy(
+        policy_id="executor-in-memory-policy-v1",
+        source_calibration_sha256="b" * 64,
+        model_name="peak_reserved_bytes",
+        contract={"model_id": "executor-quadratic-test"},
+        model=model,
+        policy_sha256="",
+    )
+    return replace(policy, policy_sha256=policy.calculate_sha256())
 
 
 def test_cuda_executor_worker_releases_completed_chunk_before_return(
@@ -153,6 +187,65 @@ def test_cuda_executor_worker_releases_completed_chunk_before_return(
     assert result.metadata["executor_worker"][
         "post_cleanup_reserved_bytes"
     ] == 2
+
+
+def test_batch_executor_in_memory_uses_offline_capacity_without_probe(
+    tmp_path,
+    monkeypatch,
+):
+    policy = _synthetic_capacity_policy()
+    monkeypatch.setattr(
+        executor_module,
+        "find_packaged_hardware_capacity_policy",
+        lambda calculator: policy,
+    )
+    monkeypatch.setattr(
+        executor_module,
+        "hardware_capacity_policy_matches_calculator",
+        lambda policy, calculator: True,
+    )
+    monkeypatch.setattr(
+        executor_module,
+        "select_hardware_capacity_policy",
+        lambda *args, **kwargs: HardwareCapacityDecision(
+            mode="offline_hardware_model",
+            reason="test contract matched",
+            policy=policy,
+        ),
+    )
+    monkeypatch.setattr(
+        executor_module,
+        "_measure_representative_memory",
+        lambda *args, **kwargs: pytest.fail("offline policy ran a probe"),
+    )
+    config = AutoSchedulerConfig(
+        cache_path=tmp_path / "offline.json",
+        cache_enabled=False,
+        max_batch_size=2,
+        multi_gpu_process_cpu_threads=1,
+    )
+
+    with BatchExecutor(
+        ExecutorQuadraticCalculator(),
+        devices=["cpu:0", "cpu:1"],
+        auto_config=config,
+        startup_timeout_seconds=30.0,
+        run_timeout_seconds=30.0,
+    ) as executor:
+        result = executor.relax(
+            _systems(),
+            optimizer="fire",
+            fmax=1e-5,
+            max_steps=500,
+            dt_start=0.05,
+            dt_max=0.5,
+        )
+
+    capacity = result.metadata["scheduling"]["capacity_planning"]
+    assert bool(result.converged.all())
+    assert capacity["mode"] == "offline_hardware_model"
+    assert capacity["policy_id"] == policy.policy_id
+    assert result.metadata["scheduling"]["probe"]["model_forward_count"] == 0
 
 
 def _manifest_workload(tmp_path, systems=None, optimizer=None):

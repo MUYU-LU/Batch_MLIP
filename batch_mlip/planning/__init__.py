@@ -24,7 +24,10 @@ from .calibration import (
 from .capacity_policy import (
     HardwareCapacityDecision,
     HardwareCapacityPolicy,
+    find_packaged_hardware_capacity_policy,
+    hardware_capacity_policy_matches_calculator,
     load_hardware_capacity_policy,
+    load_packaged_hardware_capacity_policies,
     select_hardware_capacity_policy,
 )
 from .composition import compose_relaxation_policy_manifest
@@ -76,6 +79,7 @@ from .profiles import (
     PlanningProfileBundle,
     StructureCostProfile,
     TaskAuxiliaryCostProfile,
+    planning_profile_from_bound_costs,
     planning_profile_from_manifest,
     read_planning_profile,
     structure_workload_sha256,
@@ -133,6 +137,7 @@ __all__ = [
     "fit_hardware_cost_model",
     "load_hardware_cost_model",
     "load_hardware_capacity_policy",
+    "load_packaged_hardware_capacity_policies",
     "compose_relaxation_policy_manifest",
     "execution_fingerprint",
     "plan_relaxation_execution",
@@ -140,6 +145,7 @@ __all__ = [
     "plan_hardware_calibrated_relaxation",
     "plan_task_aware_relaxation",
     "planning_profile_from_manifest",
+    "planning_profile_from_bound_costs",
     "read_planning_profile",
     "structure_workload_sha256",
     "summarize_calibration_error",
@@ -156,4 +162,6 @@ __all__ = [
     "optimizer_dof_bytes",
     "select_probe_indices",
     "select_hardware_capacity_policy",
+    "find_packaged_hardware_capacity_policy",
+    "hardware_capacity_policy_matches_calculator",
 ]

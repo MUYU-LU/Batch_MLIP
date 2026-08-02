@@ -7,6 +7,7 @@ import pytest
 from batch_mlip import (
     AutoSchedulerConfig,
     load_hardware_capacity_policy,
+    load_packaged_hardware_capacity_policies,
     select_hardware_capacity_policy,
 )
 
@@ -24,6 +25,21 @@ def test_packaged_capacity_policy_is_signed_and_uses_accepted_calibration():
     )
     assert policy.model.hardware.memory_safety_fraction == 0.85
     assert policy.contract["maximum_validated_batch_size"] == 512
+
+
+def test_packaged_capacity_registry_includes_frozen_atombit_and_mace_policies():
+    policies = load_packaged_hardware_capacity_policies()
+
+    assert [policy.policy_id for policy in policies] == [
+        "omc-csp-atombit-h100-capacity-v1",
+        "omc-csp-mace-off23-small-h100-capacity-cached-expandable-v1",
+    ]
+    assert all(policy.verify() is None for policy in policies)
+    mace = policies[1]
+    assert mace.contract["model_id"] == "MACE-OFF23-Small"
+    assert mace.contract["calculator_attributes"]["graph_mode"] == "cached"
+    assert mace.contract["cuda_allocator"] == "expandable_segments"
+    assert mace.contract["maximum_validated_batch_size"] == 256
 
 
 def test_capacity_policy_rejects_modified_content(tmp_path):

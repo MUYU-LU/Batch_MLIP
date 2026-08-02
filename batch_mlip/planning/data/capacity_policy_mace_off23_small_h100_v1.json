@@ -1,0 +1,55 @@
+{
+  "contract": {
+    "calculator_attributes": {
+      "energy_units_to_eV": 1.0,
+      "graph_mode": "cached",
+      "head": "Default",
+      "length_units_to_A": 1.0
+    },
+    "calculator_type": "batch_mlip.models.mace.MACEBatchCalculator",
+    "cell_filter_type": "FrechetCellFilter",
+    "cpu_threads": 1,
+    "cuda": "12.8",
+    "cuda_allocator": "expandable_segments",
+    "cutoff_A": 4.5,
+    "force_mode": "native_mace",
+    "linear_algebra_backend": "auto",
+    "maximum_validated_batch_size": 256,
+    "model_dtype": "torch.float64",
+    "model_id": "MACE-OFF23-Small",
+    "model_parameter_count": 694320,
+    "model_state_sha256": "2a7e1c92199cc71640d3ddc1a6dda2bbffffa397a7429790edcc3e5a45766526",
+    "model_type": "mace.modules.models.ScaleShiftMACE",
+    "neighbor_backend": "auto",
+    "optimizer_dtype": "torch.float64",
+    "optimizer_type": "BatchedBFGS",
+    "skin_A": 0.5,
+    "torch": "2.9.1+cu128"
+  },
+  "model": {
+    "coefficients": {
+      "fixed": 1875638846.6248038,
+      "per_active_edge": 0.0,
+      "per_atom": 0.0,
+      "per_candidate_edge": 73619.54217201352,
+      "per_dense_linear_algebra_work": 0.0,
+      "per_dense_state_element": 0.0,
+      "per_linear_state_element": 0.0
+    },
+    "contract_id": "mace-off23-small-f64-bfgs-f64-frechet-h100-cached-expandable_segments-peak_reserved_bytes-v1",
+    "hardware": {
+      "device_count": 1,
+      "device_name": "NVIDIA H100 80GB HBM3",
+      "device_type": "cuda",
+      "memory_safety_fraction": 0.85,
+      "total_memory_bytes": 85017886720
+    },
+    "metric": "bytes",
+    "safety_factor": 1.0143314807467114
+  },
+  "model_name": "peak_reserved_bytes",
+  "policy_id": "omc-csp-mace-off23-small-h100-capacity-cached-expandable-v1",
+  "policy_sha256": "2c262092ef6d21d76a5b7bde6930dd767fd9646911e94fc1721bcab61b7a2c3f",
+  "schema_version": 1,
+  "source_calibration_sha256": "f33683a8dd1ca8782e49e60179876682ce32bb7e0e7e5d2aa7255473682346ed"
+}

@@ -1,0 +1,119 @@
+{
+  "allocator": {
+    "applied_to_workers": true,
+    "environment": {
+      "PYTORCH_ALLOC_CONF": "expandable_segments:True",
+      "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True"
+    },
+    "reason": "measured MACE variable-cell BFGS fragmentation policy",
+    "requested_policy": "auto",
+    "selected_policy": "expandable_segments"
+  },
+  "capacity_planning": {
+    "cost_model_contract_id": "mace-off23-small-f64-bfgs-f64-frechet-h100-cached-expandable_segments-peak_reserved_bytes-v1",
+    "memory_model": "peak_reserved_bytes",
+    "mode": "offline_hardware_model",
+    "policy_id": "omc-csp-mace-off23-small-h100-capacity-cached-expandable-v1",
+    "policy_sha256": "2c262092ef6d21d76a5b7bde6930dd767fd9646911e94fc1721bcab61b7a2c3f",
+    "reason": "signed execution and hardware contracts matched",
+    "source_calibration_sha256": "f33683a8dd1ca8782e49e60179876682ce32bb7e0e7e5d2aa7255473682346ed"
+  },
+  "capacity_policy_resolution": "exact packaged calculator-model match",
+  "converged_count": 0,
+  "interface": {
+    "allocator": {
+      "applied_to_workers": true,
+      "environment": {
+        "PYTORCH_ALLOC_CONF": "expandable_segments:True",
+        "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True"
+      },
+      "reason": "measured MACE variable-cell BFGS fragmentation policy",
+      "requested_policy": "auto",
+      "selected_policy": "expandable_segments"
+    },
+    "capacity_planning": {
+      "cost_model_contract_id": "mace-off23-small-f64-bfgs-f64-frechet-h100-cached-expandable_segments-peak_reserved_bytes-v1",
+      "memory_model": "peak_reserved_bytes",
+      "mode": "offline_hardware_model",
+      "policy_id": "omc-csp-mace-off23-small-h100-capacity-cached-expandable-v1",
+      "policy_sha256": "2c262092ef6d21d76a5b7bde6930dd767fd9646911e94fc1721bcab61b7a2c3f",
+      "reason": "signed execution and hardware contracts matched",
+      "source_calibration_sha256": "f33683a8dd1ca8782e49e60179876682ce32bb7e0e7e5d2aa7255473682346ed"
+    },
+    "devices": [
+      "cuda:0"
+    ],
+    "executor_shutdown": {
+      "acknowledged_worker_ids": [
+        0
+      ],
+      "forced_worker_count": 1,
+      "wall_seconds": 0.332970925985137
+    },
+    "requested_policy": "auto",
+    "schema_version": 1
+  },
+  "model_evaluations": 16,
+  "pool_size": 64,
+  "probe": {
+    "baseline_allocated_bytes": 0,
+    "device": "cuda:0",
+    "model_bytes_per_work": 0.0,
+    "model_forward_count": 0,
+    "peak_allocated_bytes": null,
+    "peak_reserved_bytes": null,
+    "system_count": 0,
+    "system_indices": []
+  },
+  "reproducibility": {
+    "config": {
+      "allow_tf32": false,
+      "cpu_threads": 1,
+      "cublas_workspace_config": ":4096:8",
+      "cudnn_benchmark": false,
+      "cudnn_deterministic": true,
+      "deterministic_algorithms": true,
+      "deterministic_warn_only": false,
+      "interop_threads": 1,
+      "seed": 20260729
+    },
+    "cpu_threads": 1,
+    "cublas_workspace_config": ":4096:8",
+    "cuda_matmul_allow_tf32": false,
+    "cudnn_allow_tf32": false,
+    "cudnn_benchmark": false,
+    "cudnn_deterministic": true,
+    "float32_matmul_precision": "highest",
+    "interop_threads": 1,
+    "numpy_global_rng_seeded": true,
+    "python_hash_seed": "20260729",
+    "python_hash_seed_preconfigured": true,
+    "python_random_seeded": true,
+    "torch_cpu_rng_seeded": true,
+    "torch_cuda_rngs_seeded": true,
+    "torch_deterministic_algorithms": true,
+    "torch_deterministic_warn_only": false
+  },
+  "schema_version": 1,
+  "status": "complete",
+  "summary": {
+    "active_compaction": true,
+    "batch_mode": "active_drain",
+    "device_count": 1,
+    "devices": [
+      "cuda:0"
+    ],
+    "memory_fraction": 0.85,
+    "refill_reasons": [
+      "pool fits in one resident batch"
+    ],
+    "resident_capacities": [
+      1,
+      2,
+      18,
+      43
+    ],
+    "strategy": "automatic",
+    "work_stealing": true
+  }
+}

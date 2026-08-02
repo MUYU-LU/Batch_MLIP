@@ -66,6 +66,13 @@ An unmatched or disabled policy uses the bounded representative-probe path.
 Both paths retain the outer workload buckets and apply the same memory-growth
 margin.
 
+`optimize_pool(..., policy="auto")` applies the same logic to ordinary
+in-memory ASE structures. It searches all packaged signed policies by exact
+calculator and model-state identity, then validates the complete runtime
+contract. It never borrows a capacity from a different MLIP, checkpoint,
+optimizer, graph mode, CUDA stack, or GPU. Use `policy="probe"` to force the
+fallback, or pass a signed policy object or JSON path explicitly.
+
 For signed file-backed workloads, `manifest_loader_processes="auto"` selects
 either one or four worker-local CIF parsing processes from pool size, total
 atom-record pressure per active GPU, and available host CPUs. It does not run a

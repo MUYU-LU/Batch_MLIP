@@ -23,7 +23,12 @@ from .profiles import (
 )
 from .refill_policy import model_state_sha256
 
-_POLICY_PATH = Path(__file__).with_name("data") / "capacity_policy_v1.json"
+_POLICY_DIRECTORY = Path(__file__).with_name("data")
+_POLICY_PATH = _POLICY_DIRECTORY / "capacity_policy_v1.json"
+_PACKAGED_POLICY_PATHS = (
+    _POLICY_PATH,
+    _POLICY_DIRECTORY / "capacity_policy_mace_off23_small_h100_v1.json",
+)
 _VALIDATED_MINIMUM_MEMORY_GROWTH_MARGIN = 1.10
 
 
@@ -148,6 +153,54 @@ def _load_packaged_hardware_capacity_policy() -> HardwareCapacityPolicy:
     return HardwareCapacityPolicy.from_dict(
         json.loads(_POLICY_PATH.read_text(encoding="utf-8"))
     )
+
+
+@lru_cache(maxsize=1)
+def load_packaged_hardware_capacity_policies() -> tuple[HardwareCapacityPolicy, ...]:
+    """Load every signed policy distributed with the package."""
+
+    return tuple(
+        HardwareCapacityPolicy.from_dict(
+            json.loads(path.read_text(encoding="utf-8"))
+        )
+        for path in _PACKAGED_POLICY_PATHS
+    )
+
+
+def hardware_capacity_policy_matches_calculator(
+    policy: HardwareCapacityPolicy,
+    calculator: BatchCalculator,
+) -> bool:
+    """Match immutable model identity before task and hardware selection."""
+
+    contract = policy.contract
+    if _qualified_name(calculator) != contract["calculator_type"]:
+        return False
+    model = getattr(calculator, "model", None)
+    if not isinstance(model, torch.nn.Module):
+        return False
+    if _qualified_name(model) != contract["model_type"]:
+        return False
+    if sum(parameter.numel() for parameter in model.parameters()) != contract[
+        "model_parameter_count"
+    ]:
+        return False
+    return model_state_sha256(model) == contract["model_state_sha256"]
+
+
+def find_packaged_hardware_capacity_policy(
+    calculator: BatchCalculator,
+) -> HardwareCapacityPolicy | None:
+    """Return the signed packaged policy for this exact model, if present."""
+
+    matches = [
+        policy
+        for policy in load_packaged_hardware_capacity_policies()
+        if hardware_capacity_policy_matches_calculator(policy, calculator)
+    ]
+    if len(matches) > 1:
+        raise RuntimeError("multiple packaged capacity policies match one model")
+    return None if not matches else matches[0]
 
 
 def load_hardware_capacity_policy(

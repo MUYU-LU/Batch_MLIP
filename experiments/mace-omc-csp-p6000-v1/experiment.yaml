@@ -69,6 +69,17 @@ methods:
     workers_per_gpu: 16
     total_workers: 128
     assignment: static_cost_balanced_lpt
+  public_api_smoke:
+    interface: optimize_pool
+    pool_size: 64
+    devices: [cuda:0]
+    max_steps: 3
+    capacity_mode: offline_hardware_model
+    capacity_policy: omc-csp-mace-off23-small-h100-capacity-cached-expandable-v1
+    memory_probe_systems: 0
+    memory_probe_model_forwards: 0
+    batch_mode: active_drain
+    resident_capacities: [1, 2, 18, 43]
 
 fairness:
   same_signed_jobs: true
@@ -153,3 +164,4 @@ artifacts:
   summary_sha256: feb89dc333a48b40ac99be551a280fb5addce045af4e79f65c1e641fc24784d3
   improvement_summary_sha256: 504a47f2f2aadff455f1842060ed548dc40ee850a73ded4e0bec863ed3239236
   bounded_improvement_summary_sha256: a577cd52a75b485c6de303e893699f51e4914bf6b3164efca086fc275e10b689
+  optimize_pool_p64_smoke_sha256: 28401d17cf950fb3f6ff5bf548f3fc4a1f6c4add1fabf5a7a13a83598871fad6

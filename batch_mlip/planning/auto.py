@@ -695,6 +695,8 @@ def profile_auto_workload(
     optimizer: object,
     optimizer_kwargs: Mapping[str, Any],
     config: AutoSchedulerConfig,
+    *,
+    model_id: str | None = None,
 ) -> AutoWorkloadPlan:
     """Profile topology once and group structures by relative execution cost."""
 
@@ -703,7 +705,7 @@ def profile_auto_workload(
     started = time.perf_counter()
     variable_cell = optimizer_kwargs.get("cell_filter") is not None
     profiles = []
-    model_id = (
+    resolved_model_id = model_id or (
         f"{type(calculator).__module__}.{type(calculator).__qualname__}"
     )
     force_mode = str(getattr(calculator, "force_mode", "unspecified"))
@@ -722,7 +724,7 @@ def profile_auto_workload(
             ),
             mlip_graph=MLIPGraphCostProfile(
                 index=index,
-                model_id=model_id,
+                model_id=resolved_model_id,
                 cutoff_A=calculator.cutoff,
                 active_edge_count=active_edges,
                 force_mode=force_mode,
@@ -734,6 +736,7 @@ def profile_auto_workload(
                 optimizer=optimizer,
                 variable_cell=variable_cell,
                 cell_method=optimizer_kwargs.get("cell_filter"),
+                optimizer_options=optimizer_kwargs,
             ),
             graph_execution=GraphExecutionCostProfile(
                 index=index,
