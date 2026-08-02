@@ -50,6 +50,8 @@ def _observation(
     profile_path: Path,
     result_path: Path,
     batch_size: int,
+    graph_mode: str,
+    allocator_policy: str,
 ) -> tuple[LayeredCalibrationObservation, dict[str, Any]]:
     profile = read_planning_profile(profile_path)
     result = json.loads(result_path.read_text(encoding="utf-8"))
@@ -59,6 +61,29 @@ def _observation(
         raise ValueError(f"capacity point {observation_id} did not complete")
     if int(result["batch_size"]) != batch_size:
         raise ValueError(f"capacity point {observation_id} has the wrong batch size")
+    measured_graph_mode = result.get("execution_contract", {}).get(
+        "mace_graph_mode"
+    )
+    if graph_mode == "cached" and measured_graph_mode != graph_mode:
+        raise ValueError(
+            f"capacity point {observation_id} is not a cached-graph run"
+        )
+    if measured_graph_mode is not None and measured_graph_mode != graph_mode:
+        raise ValueError(
+            f"capacity point {observation_id} has the wrong graph mode"
+        )
+    allocator_config = result.get("execution_contract", {}).get(
+        "cuda_allocator_config"
+    )
+    expected_allocator_config = (
+        "expandable_segments:True"
+        if allocator_policy == "expandable_segments"
+        else None
+    )
+    if allocator_config != expected_allocator_config:
+        raise ValueError(
+            f"capacity point {observation_id} has the wrong allocator policy"
+        )
     features = LayeredCostFeatures.from_profiles(profile.systems[:batch_size])
     observation = LayeredCalibrationObservation(
         observation_id=observation_id,
@@ -86,6 +111,16 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--t2-result", type=Path, required=True)
     parser.add_argument("--calibration-output", type=Path, required=True)
     parser.add_argument("--policy-output", type=Path, required=True)
+    parser.add_argument(
+        "--graph-mode",
+        choices=("cached", "rebuild"),
+        default="rebuild",
+    )
+    parser.add_argument(
+        "--allocator-policy",
+        choices=("native", "expandable_segments"),
+        default="native",
+    )
     return parser.parse_args()
 
 
@@ -106,6 +141,8 @@ def main() -> None:
             profile_path=profile,
             result_path=result,
             batch_size=batch_size,
+            graph_mode=args.graph_mode,
+            allocator_policy=args.allocator_policy,
         )
         observations.append(observation)
         sources[observation_id] = source
@@ -121,6 +158,7 @@ def main() -> None:
         observations,
         contract_id=(
             "mace-off23-small-f64-bfgs-f64-frechet-h100-"
+            f"{args.graph_mode}-{args.allocator_policy}-"
             "peak_reserved_bytes-v1"
         ),
         metric="bytes",
@@ -161,14 +199,14 @@ def main() -> None:
         "calculator_type": "batch_mlip.models.mace.MACEBatchCalculator",
         "calculator_attributes": {
             "energy_units_to_eV": 1.0,
-            "graph_mode": "rebuild",
+            "graph_mode": args.graph_mode,
             "head": "Default",
             "length_units_to_A": 1.0,
         },
         "cell_filter_type": "FrechetCellFilter",
         "cpu_threads": 1,
         "cuda": "12.8",
-        "cuda_allocator": "native",
+        "cuda_allocator": args.allocator_policy,
         "cutoff_A": 4.5,
         "force_mode": "native_mace",
         "linear_algebra_backend": "auto",
@@ -186,8 +224,13 @@ def main() -> None:
         "skin_A": 0.5,
         "torch": "2.9.1+cu128",
     }
+    policy_suffix = "" if args.graph_mode == "rebuild" else "-cached"
+    if args.allocator_policy == "expandable_segments":
+        policy_suffix += "-expandable"
     unsigned = HardwareCapacityPolicy(
-        policy_id="omc-csp-mace-off23-small-h100-capacity-v1",
+        policy_id=(
+            f"omc-csp-mace-off23-small-h100-capacity{policy_suffix}-v1"
+        ),
         source_calibration_sha256=calibration["calibration_sha256"],
         model_name="peak_reserved_bytes",
         contract=contract,

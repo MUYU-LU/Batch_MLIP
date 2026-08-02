@@ -1,8 +1,8 @@
 schema_version: 1
 id: mace-omc-csp-p6000-v1
 date: 2026-08-02
-status: complete_with_capacity_rejection
-git_head: 42bbfeac6af94961abcf5604fb3d222a2408e3c0
+status: complete_frozen
+git_head: 8eacbc0d2c2c8d980d586e00e084c8ee6261e800
 working_tree_clean: false
 
 workload:
@@ -38,7 +38,7 @@ hardware:
   nominal_memory_fraction: 0.85
 
 methods:
-  tensor:
+  tensor_rebuild_control:
     interface: BatchExecutor.relax_manifest
     resident_chunks: 31
     resident_size_range: [109, 256]
@@ -50,6 +50,20 @@ methods:
     multi_gpu_refill: disabled
     materialization: manifest_lazy_global_prefetch
     mace_graph_mode: rebuild
+  tensor_cached_accepted:
+    interface: BatchExecutor.relax_manifest
+    resident_chunks: 31
+    resident_size_range: [109, 256]
+    capacity_policy: omc-csp-mace-off23-small-h100-capacity-cached-expandable-v1
+    capacity_policy_sha256: 2c262092ef6d21d76a5b7bde6930dd767fd9646911e94fc1721bcab61b7a2c3f
+    outer_queue: bucket_stratified_work_stealing
+    inner_queue: active_drain
+    active_compaction: true
+    multi_gpu_refill: disabled
+    materialization: manifest_lazy_global_prefetch
+    mace_graph_mode: cached
+    cuda_allocator_policy: expandable_segments
+    persistent_chunk_cleanup: true
   mps16:
     optimizer: ASE BFGS
     workers_per_gpu: 16
@@ -65,7 +79,7 @@ fairness:
   timing_repeats: 1
 
 results:
-  tensor:
+  tensor_rebuild_control:
     execution_seconds: 3190.8251259470126
     full_script_seconds: 3200.5864291560138
     converged: 5963
@@ -74,6 +88,16 @@ results:
     peak_allocated_bytes: 59567314944
     peak_reserved_bytes: 82155929600
     peak_reserved_fraction: 0.9663370000077085
+  tensor_cached_accepted:
+    execution_seconds: 2340.531363296992
+    full_script_seconds: 2350.1269598809886
+    converged: 5946
+    model_batch_calls: 78307
+    structure_graph_evaluations: 3741929
+    peak_allocated_bytes: 59580846080
+    peak_reserved_bytes: 67471671296
+    peak_post_cleanup_reserved_bytes: 90177536
+    peak_reserved_fraction: 0.7936173656987365
   mps16:
     production_makespan_seconds: 4563.540074890014
     full_script_seconds: 4652.834623327013
@@ -81,17 +105,18 @@ results:
     model_single_structure_calls: 3725609
     peak_sampled_device_bytes: 38558236672
   comparison:
-    execution_speedup: 1.4302068884253223
-    full_script_speedup: 1.4537444078815123
-    convergence_rate_percentage_point_difference: 0.05
-    convergence_flag_mismatches: 73
-    tensor_only_converged: 38
-    mps16_only_converged: 35
-    common_nonconverged: 2
-    endpoint_energy_difference_meV_per_atom_median: 0.005865604654663121
-    endpoint_energy_difference_meV_per_atom_p95: 6.879154551097599
-    endpoint_energy_difference_meV_per_atom_p99: 15.754999510204291
-    endpoint_energy_difference_meV_per_atom_max: 36.485459588985194
+    execution_speedup_over_mps16: 1.9497880466175759
+    full_script_speedup_over_mps16: 1.9798226660752978
+    execution_speedup_over_rebuild: 1.3632909073486004
+    full_script_speedup_over_rebuild: 1.36187809586172
+    cached_vs_mps16_convergence_flag_mismatches: 88
+    cached_only_converged_vs_mps16: 37
+    mps16_only_converged_vs_cached: 51
+    cached_vs_mps16_common_nonconverged: 3
+    cached_vs_mps16_energy_difference_meV_per_atom_median: 0.0060179598327469675
+    cached_vs_mps16_energy_difference_meV_per_atom_p95: 6.676777210407677
+    cached_vs_mps16_energy_difference_meV_per_atom_p99: 16.2119937753327
+    cached_vs_mps16_energy_difference_meV_per_atom_max: 34.720203501912195
 
 correctness:
   short_horizon_pool_size: 64
@@ -103,17 +128,28 @@ correctness:
   long_horizon_b1_diagnostics: 4
   b1_closer_to_tensor_by_position: 2
   b1_closer_to_mps16_by_position: 2
+  cached_vs_rebuild_short_horizon_pool_size: 244
+  cached_vs_rebuild_short_horizon_steps: 3
+  cached_vs_rebuild_max_abs_energy_difference_eV: 0.0
+  cached_vs_rebuild_max_abs_position_difference_A: 3.552713678800501e-15
+  cached_vs_rebuild_max_abs_cell_difference_A: 1.7763568394002505e-15
+  cached_vs_rebuild_max_abs_force_difference_eV_per_A: 3.541056337041937e-13
+  cached_vs_rebuild_max_abs_stress_difference_eV_per_A3: 2.2432142948725087e-16
 
 decision:
   performance_evidence: accepted_for_exact_contract
-  capacity_policy: rejected_for_production
-  production_policy_frozen: false
-  required_next_work:
-    - allocator_high_water_aware_capacity_margin
-    - validated_mace_cached_graph_path
+  capacity_policy: accepted_for_exact_contract
+  cached_graph: accepted_for_mace_omc_csp
+  cuda_allocator: expandable_segments_for_mace_variable_cell_bfgs
+  persistent_chunk_cleanup: required
+  endpoint_claim: schedule_sensitive_local_minima_not_identical
+  production_policy_frozen: true
 
 artifacts:
   remote_root: /public/home/lmy/Batch_imple_project/mace_omc_csp_p6000_v1
-  tensor_result_sha256: bb34a120cd402682aa79459115d509e14abcb1aafa4ef253fd89ccea6e1de641
+  tensor_rebuild_result_sha256: bb34a120cd402682aa79459115d509e14abcb1aafa4ef253fd89ccea6e1de641
+  tensor_cached_result_sha256: 13696b0d373c8781c1cea0a56d87722e8089eb155ea7e3b4f6c75eb862b36837
   mps16_result_sha256: 43f4500fa0a0ad0e0de745011b6cd8414e27fc9a4acd57e2cb6192cd57c6abdd
   summary_sha256: feb89dc333a48b40ac99be551a280fb5addce045af4e79f65c1e641fc24784d3
+  improvement_summary_sha256: 504a47f2f2aadff455f1842060ed548dc40ee850a73ded4e0bec863ed3239236
+  bounded_improvement_summary_sha256: a577cd52a75b485c6de303e893699f51e4914bf6b3164efca086fc275e10b689

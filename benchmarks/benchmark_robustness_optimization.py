@@ -162,6 +162,11 @@ def main() -> None:
         ),
     )
     parser.add_argument("--mace-model", default="small")
+    parser.add_argument(
+        "--mace-graph-mode",
+        choices=("cached", "rebuild"),
+        default="rebuild",
+    )
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.batch_size <= 0:
@@ -269,7 +274,7 @@ def main() -> None:
             model=args.mace_model,
             device=device,
             dtype=torch.float64,
-            graph_mode="rebuild",
+            graph_mode=args.mace_graph_mode,
             skin=args.skin,
             neighbor_backend="auto",
         )
@@ -379,6 +384,9 @@ def main() -> None:
                     "PYTORCH_CUDA_ALLOC_CONF"
                 ),
             },
+            "mace_graph_mode": (
+                args.mace_graph_mode if args.mlip == "mace" else None
+            ),
         },
         "runtime_profile": runtime_profile,
         "timing_seconds": elapsed,

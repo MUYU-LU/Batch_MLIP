@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -18,6 +19,7 @@ from batch_mlip import (
     planning_profile_from_manifest,
     relax,
 )
+from batch_mlip.interfaces import executor as executor_module
 from batch_mlip.workloads import WorkloadJob, WorkloadManifest
 
 
@@ -74,6 +76,83 @@ def _config(tmp_path) -> AutoSchedulerConfig:
         multi_gpu_cold_start_jobs=1,
         multi_gpu_process_cpu_threads=1,
     )
+
+
+def test_cuda_executor_worker_releases_completed_chunk_before_return(
+    monkeypatch,
+):
+    events = []
+
+    class Profiler:
+        def __init__(self, **kwargs):
+            del kwargs
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            del args
+
+        def summary(self, *, include_samples):
+            assert not include_samples
+            return {"schema_version": 1}
+
+    gpu_result = SimpleNamespace(
+        state=SimpleNamespace(device=torch.device("cuda:0")),
+        metadata={},
+    )
+    cpu_result = SimpleNamespace(
+        state=SimpleNamespace(device=torch.device("cpu")),
+        metadata={},
+    )
+    monkeypatch.setattr(executor_module, "RuntimeProfiler", Profiler)
+    monkeypatch.setattr(
+        executor_module,
+        "relax",
+        lambda *args, **kwargs: gpu_result,
+    )
+    monkeypatch.setattr(torch.cuda, "synchronize", lambda *args: None)
+    monkeypatch.setattr(torch.cuda, "reset_peak_memory_stats", lambda *args: None)
+    monkeypatch.setattr(torch.cuda, "max_memory_allocated", lambda *args: 10)
+    monkeypatch.setattr(torch.cuda, "max_memory_reserved", lambda *args: 20)
+    monkeypatch.setattr(torch.cuda, "memory_allocated", lambda *args: 1)
+    monkeypatch.setattr(torch.cuda, "memory_reserved", lambda *args: 2)
+    monkeypatch.setattr(
+        executor_module,
+        "_offload_relaxation_result",
+        lambda result: events.append("offload") or cpu_result,
+    )
+    monkeypatch.setattr(
+        executor_module.gc,
+        "collect",
+        lambda: events.append("collect") or 0,
+    )
+    monkeypatch.setattr(
+        executor_module,
+        "_empty_device_cache",
+        lambda device: events.append(f"empty:{device}"),
+    )
+    runner = executor_module._ExecutorWorkerRunner(
+        calculator=SimpleNamespace(device=torch.device("cuda:0")),
+        allocator_metadata={},
+    )
+    task = executor_module._ExecutorRelaxTask(
+        systems=(),
+        optimizer=executor_module._OptimizerSpec.from_optimizer(BatchedFIRE()),
+        optimizer_kwargs={},
+    )
+
+    result = runner(task)
+
+    assert events == ["offload", "collect", "empty:cuda:0"]
+    assert result.metadata["executor_worker"]["peak_allocated_bytes"] == 10
+    assert result.metadata["executor_worker"]["peak_reserved_bytes"] == 20
+    assert result.metadata["executor_worker"][
+        "post_cleanup_allocated_bytes"
+    ] == 1
+    assert result.metadata["executor_worker"][
+        "post_cleanup_reserved_bytes"
+    ] == 2
 
 
 def _manifest_workload(tmp_path, systems=None, optimizer=None):

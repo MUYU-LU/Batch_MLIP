@@ -1,0 +1,146 @@
+{
+  "calibration_sha256": "f33683a8dd1ca8782e49e60179876682ce32bb7e0e7e5d2aa7255473682346ed",
+  "fit_error": {
+    "count": 3,
+    "max_absolute_relative_error": 0.03153613536960864,
+    "maximum_predicted_to_measured": 1.0315361353696086,
+    "mean_absolute_relative_error": 0.016587077408747503,
+    "mean_relative_error": 0.01658707740874743,
+    "minimum_predicted_to_measured": 0.9999999999999999
+  },
+  "model": {
+    "coefficients": {
+      "fixed": 1875638846.6248038,
+      "per_active_edge": 0.0,
+      "per_atom": 0.0,
+      "per_candidate_edge": 73619.54217201352,
+      "per_dense_linear_algebra_work": 0.0,
+      "per_dense_state_element": 0.0,
+      "per_linear_state_element": 0.0
+    },
+    "contract_id": "mace-off23-small-f64-bfgs-f64-frechet-h100-cached-expandable_segments-peak_reserved_bytes-v1",
+    "hardware": {
+      "device_count": 1,
+      "device_name": "NVIDIA H100 80GB HBM3",
+      "device_type": "cuda",
+      "memory_safety_fraction": 0.85,
+      "total_memory_bytes": 85017886720
+    },
+    "metric": "bytes",
+    "safety_factor": 1.0143314807467114
+  },
+  "observations": [
+    {
+      "features": {
+        "active_edge_count": 129920,
+        "atom_count": 8248,
+        "candidate_edge_count": 165142,
+        "dense_linear_algebra_work": 11089517976,
+        "dense_state_elements": 15102576,
+        "linear_state_elements": 0,
+        "system_count": 64
+      },
+      "measured_value": 13799260160.0,
+      "observation_id": "cross-mix-B64",
+      "planning_profile_sha256": "082bd68c16a362bfb44311dea5f0b12e1a9ee00abb105da74d2464b7f675116a",
+      "predicted_to_measured": 1.0315361353696086,
+      "predicted_value": 14234435496.406208,
+      "sources": {
+        "profile_path": "/public/home/lmy/Batch_imple_project/mace_omc_csp_p6000_v1/cross-mix-r192-profile.json",
+        "profile_sha256": "ec0e0a9f83a82c015860d33121669f9a8c422d1f1af0519eb7e4421586700ed4",
+        "result_path": "/public/home/lmy/Batch_imple_project/mace_omc_csp_p6000_v1/cached-expandable-capacity/mace_B64.json",
+        "result_sha256": "9ac15620fed464e673a89c77f8bdc042961b92a215d15582ee9974f51c20c631"
+      },
+      "split": "fit",
+      "workload_id": "OPT-RB-CROSS-MIX-R192-MACE-OFF23-SMALL-v1",
+      "workload_manifest_sha256": "495286200e749dfd9954dfd2b948ae3c7e695e282d18c64c1d3568c32e1f54ba"
+    },
+    {
+      "features": {
+        "active_edge_count": 288252,
+        "atom_count": 17594,
+        "candidate_edge_count": 372162,
+        "dense_linear_algebra_work": 24391967454,
+        "dense_state_elements": 33159744,
+        "linear_state_elements": 0,
+        "system_count": 128
+      },
+      "measured_value": 29693575168.0,
+      "observation_id": "cross-mix-B128",
+      "planning_profile_sha256": "082bd68c16a362bfb44311dea5f0b12e1a9ee00abb105da74d2464b7f675116a",
+      "predicted_to_measured": 0.9999999999999999,
+      "predicted_value": 29693575167.999996,
+      "sources": {
+        "profile_path": "/public/home/lmy/Batch_imple_project/mace_omc_csp_p6000_v1/cross-mix-r192-profile.json",
+        "profile_sha256": "ec0e0a9f83a82c015860d33121669f9a8c422d1f1af0519eb7e4421586700ed4",
+        "result_path": "/public/home/lmy/Batch_imple_project/mace_omc_csp_p6000_v1/cached-expandable-capacity/mace_B128.json",
+        "result_sha256": "b0f9595b9ed4ef51aa477a95158df23a5016a7a8850add99ed0a4a457f9cedf2"
+      },
+      "split": "fit",
+      "workload_id": "OPT-RB-CROSS-MIX-R192-MACE-OFF23-SMALL-v1",
+      "workload_manifest_sha256": "495286200e749dfd9954dfd2b948ae3c7e695e282d18c64c1d3568c32e1f54ba"
+    },
+    {
+      "features": {
+        "active_edge_count": 484070,
+        "atom_count": 28192,
+        "candidate_edge_count": 633396,
+        "dense_linear_algebra_work": 42608819232,
+        "dense_state_elements": 55990080,
+        "linear_state_elements": 0,
+        "system_count": 192
+      },
+      "measured_value": 48320479232.0,
+      "observation_id": "cross-mix-B192",
+      "planning_profile_sha256": "082bd68c16a362bfb44311dea5f0b12e1a9ee00abb105da74d2464b7f675116a",
+      "predicted_to_measured": 1.0182250968566338,
+      "predicted_value": 49201124646.16216,
+      "sources": {
+        "profile_path": "/public/home/lmy/Batch_imple_project/mace_omc_csp_p6000_v1/cross-mix-r192-profile.json",
+        "profile_sha256": "ec0e0a9f83a82c015860d33121669f9a8c422d1f1af0519eb7e4421586700ed4",
+        "result_path": "/public/home/lmy/Batch_imple_project/mace_omc_csp_p6000_v1/cached-expandable-capacity/mace_B192.json",
+        "result_sha256": "4e1cbf679340b69f269d45a01b1e3e48cddef4c52c2b499abe21d064d7fae8c1"
+      },
+      "split": "fit",
+      "workload_id": "OPT-RB-CROSS-MIX-R192-MACE-OFF23-SMALL-v1",
+      "workload_manifest_sha256": "495286200e749dfd9954dfd2b948ae3c7e695e282d18c64c1d3568c32e1f54ba"
+    },
+    {
+      "features": {
+        "active_edge_count": 763782,
+        "atom_count": 39606,
+        "candidate_edge_count": 978166,
+        "dense_linear_algebra_work": 35598357090,
+        "dense_state_elements": 63614448,
+        "linear_state_elements": 0,
+        "system_count": 256
+      },
+      "measured_value": 67620569088.0,
+      "observation_id": "t2-wide-B256",
+      "planning_profile_sha256": "39734d3f2eed65ffdfcee25308d9b0b6baeee7f53d8086c8e8795b8c1d64eb56",
+      "predicted_to_measured": 1.1083416499826007,
+      "predicted_value": 74946693115.75636,
+      "sources": {
+        "profile_path": "/public/home/lmy/Batch_imple_project/mace_omc_csp_p6000_v1/planning_profile.json",
+        "profile_sha256": "31fe6eab3477320cbb376ff2c9a9234b7b2cbd98692936d09d5cbe7873c68f4e",
+        "result_path": "/public/home/lmy/Batch_imple_project/mace_omc_csp_p6000_v1/cached-expandable-capacity/mace_T2_B256.json",
+        "result_sha256": "b002c3d44862562aa3efddbfce1ce806618df27ab6d7daaa6460020f73da69a6"
+      },
+      "split": "validation",
+      "workload_id": "OPT-OMC-STRUCTURES-P6000-INTRA-WIDE-MACE-OFF23-SMALL-v1",
+      "workload_manifest_sha256": "75717c7cf79c6f7600e6acd094ab04d995e795706149a36b6b5e704e75510528"
+    }
+  ],
+  "policy_id": "omc-csp-mace-off23-small-h100-capacity-cached-expandable-v1",
+  "policy_sha256": "2c262092ef6d21d76a5b7bde6930dd767fd9646911e94fc1721bcab61b7a2c3f",
+  "schema_version": 1,
+  "status": "fit_complete",
+  "validation_error": {
+    "count": 1,
+    "max_absolute_relative_error": 0.10834164998260065,
+    "maximum_predicted_to_measured": 1.1083416499826007,
+    "mean_absolute_relative_error": 0.10834164998260065,
+    "mean_relative_error": 0.10834164998260065,
+    "minimum_predicted_to_measured": 1.1083416499826007
+  }
+}

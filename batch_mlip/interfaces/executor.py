@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import gc
 import os
 import pickle
 import sys
@@ -50,6 +51,7 @@ from ..profiling import RuntimeProfiler
 from .api import (
     _apply_offline_refill_policy,
     _combine_relaxation_results,
+    _empty_device_cache,
     _measure_representative_memory,
     _measure_representative_provider_memory,
     _normalize_devices,
@@ -137,12 +139,21 @@ class _ExecutorWorkerRunner:
         if result.state.device.type == "cuda":
             torch.cuda.synchronize(result.state.device)
             result = _offload_relaxation_result(result)
+            gc.collect()
+            _empty_device_cache(device)
+            post_cleanup_allocated = torch.cuda.memory_allocated(device)
+            post_cleanup_reserved = torch.cuda.memory_reserved(device)
+        else:
+            post_cleanup_allocated = None
+            post_cleanup_reserved = None
         result.metadata["worker_runtime_profile"] = profiler.summary(include_samples=False)
         result.metadata["executor_worker"] = {
             **self.allocator_metadata,
             "pid": os.getpid(),
             "peak_allocated_bytes": peak_allocated,
             "peak_reserved_bytes": peak_reserved,
+            "post_cleanup_allocated_bytes": post_cleanup_allocated,
+            "post_cleanup_reserved_bytes": post_cleanup_reserved,
             "input": task.input_metadata,
         }
         return result
@@ -367,6 +378,12 @@ def _worker_records(
                     "completion_offset_seconds": task_result.completion_offset_seconds,
                     "peak_allocated_bytes": worker_metadata.get("peak_allocated_bytes"),
                     "peak_reserved_bytes": worker_metadata.get("peak_reserved_bytes"),
+                    "post_cleanup_allocated_bytes": worker_metadata.get(
+                        "post_cleanup_allocated_bytes"
+                    ),
+                    "post_cleanup_reserved_bytes": worker_metadata.get(
+                        "post_cleanup_reserved_bytes"
+                    ),
                     "runtime_profile": task_result.payload.metadata.get("worker_runtime_profile"),
                     "input": worker_metadata.get("input"),
                     "schedule": task_result.payload.metadata.get(

@@ -40,15 +40,28 @@ def test_auto_allocator_targets_measured_atombit_variable_cell_optimizers():
     assert fire.selected_policy == "expandable_segments"
 
 
-def test_auto_allocator_keeps_mace_native():
+def test_auto_allocator_targets_measured_mace_variable_cell_bfgs():
+    calculator = object.__new__(MACEBatchCalculator)
+
     plan = select_cuda_allocator(
-        object.__new__(MACEBatchCalculator),
+        calculator,
         BatchedBFGS(),
         variable_cell=True,
     )
+    fixed_cell = select_cuda_allocator(
+        calculator,
+        BatchedBFGS(),
+        variable_cell=False,
+    )
+    fire = select_cuda_allocator(
+        calculator,
+        BatchedFIRE(),
+        variable_cell=True,
+    )
 
-    assert plan.selected_policy == "native"
-    assert set(plan.environment().values()) == {None}
+    assert plan.selected_policy == "expandable_segments"
+    assert fixed_cell.selected_policy == "native"
+    assert fire.selected_policy == "native"
 
 
 def test_auto_allocator_uses_declared_calculator_policy_family():

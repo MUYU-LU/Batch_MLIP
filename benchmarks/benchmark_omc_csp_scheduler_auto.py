@@ -195,6 +195,11 @@ def main() -> None:
         default="auto",
     )
     parser.add_argument(
+        "--cuda-allocator-policy",
+        choices=("auto", "native", "expandable_segments"),
+        default="auto",
+    )
+    parser.add_argument(
         "--tail-recovery",
         choices=TAIL_RECOVERY_MODES,
         default="none",
@@ -312,6 +317,7 @@ def main() -> None:
             if planning_profile is None:  # pragma: no cover - CLI narrows this
                 raise RuntimeError("manifest_lazy requires a planning profile")
             auto_config = AutoSchedulerConfig(
+                cuda_allocator_policy=args.cuda_allocator_policy,
                 manifest_loader_processes=(args.manifest_loader_processes),
                 manifest_prefetch_chunks_per_worker=(args.manifest_prefetch_depth),
                 multi_gpu_target_chunks_per_device=(args.target_chunks_per_device),
@@ -540,6 +546,7 @@ def main() -> None:
                 if args.hardware_capacity_policy is None
                 else str(args.hardware_capacity_policy.resolve())
             ),
+            "cuda_allocator_policy": args.cuda_allocator_policy,
             "benchmark_parent_prewarm_system_count": 1,
         },
         "reproducibility": reproducibility,

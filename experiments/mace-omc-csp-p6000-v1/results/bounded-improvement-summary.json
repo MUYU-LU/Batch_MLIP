@@ -1,0 +1,141 @@
+{
+  "artifacts": {
+    "cached-auto-policy-gate-p64.json": "5db4244e26e9ee55c991880510333fbe5b140a075107b40c88585763ab1cb194",
+    "cached-expandable-capacity-calibration.json": "530f53d7422769a5fc37618d69727ca4e814233389ffa25a008efe73add5f2ed",
+    "cached-expandable-capacity-policy.json": "fb3efd5523702257a86d88c4df3fb51f20f5ae3616e407639addbe726d157adb",
+    "cached-expandable-policy-gate-p64.json": "172c972c6526ca5a3ee9330eb81464594fd45df4c870b6557114689a2b195d9d",
+    "chunk-b244-cached-expandable.json": "24c97b05b2526c558f9f42e264db766e807004a397e546acaf9974db6e71555c",
+    "chunk-b244-cached-native.json": "8e8a22c1a1badef0ffe95388aeb8c9a21986d229ee9ff470160b87923f00f6d2",
+    "chunk-b244-expandable.json": "d644457484fdff7680bb7dd4fe67d676b7ef6e47b3b96e300bad3fd17bb647c3",
+    "chunk-b244-native.json": "2a27ff4ad0a1d93b21308684e68399fdcff906846c9d0a2ba883c9653bc47168",
+    "chunk-b244-shortstate-cached.json": "0ab7461ba7bea8b4093b6b556083da804fc098346bc0aa67fffd8582bc528167",
+    "chunk-b244-shortstate-rebuild.json": "0a33452c2f63885b6b6b662544dbfb90cf989a6e3f8beb368bb225f9cce319ed",
+    "chunk-b256-cached-expandable.json": "22646cce566f6a15b89c5a2e3ccd37e31d1d23249f573a44753ff9456ab672d7",
+    "chunk-b256-cached-native.json": "24b3ff97c3e54c8f80ec89635c5c92ebe5ac1edaf4b18018df9ac9f4c4f6c67d",
+    "chunk-b256-expandable.json": "97c98f4ed21733b5881914fa9084430abaa67f8d01dd465c6f3115fac82354c7",
+    "chunk-b256-native.json": "6bc5572adefe9a5ddaf8afe52e478128272ac232185d2dffed246357c0f5e0a7",
+    "cleanup-p64-cached.json": "b768c4b8a3df2f250a6c1dad206abfcc1f935b88909047a9fb92c11450290d5e",
+    "cleanup-p64-rebuild.json": "aa91852109cbb2b70ddb6b78ba512f1c97ec2e5a5d49401370ec979f712df6d7"
+  },
+  "b244": {
+    "cached_expandable_endpoint_exact": true,
+    "cached_native_seconds": 111.00900857400848,
+    "cached_speedup_over_rebuild_native": 1.7255942123138648,
+    "long_horizon_energy_difference_meV_per_atom": {
+      "max": 4.41321153962433,
+      "median": 4.626560004670983e-08,
+      "p90": 0.0005269123705701256,
+      "p95": 0.045509597127776226,
+      "p99": 0.7967337851637813
+    },
+    "long_horizon_step_value_mismatches": 43,
+    "rebuild_expandable_endpoint_exact": true,
+    "rebuild_native_seconds": 191.55650271000923,
+    "short_horizon_cached_vs_rebuild_max_abs": {
+      "cells_A": 1.7763568394002505e-15,
+      "energy_eV": 0.0,
+      "forces_eV_per_A": 3.541056337041937e-13,
+      "max_force_metric_eV_per_A": 1.851852005074761e-13,
+      "positions_A": 3.552713678800501e-15,
+      "stress_eV_per_A3": 2.2432142948725087e-16
+    }
+  },
+  "b256": {
+    "cached_converged": 255,
+    "cached_expandable_endpoint_exact": true,
+    "cached_native_seconds": 363.6357950459933,
+    "cached_speedup_over_rebuild_native": 1.2809197256064435,
+    "energy_difference_meV_per_atom": {
+      "max": 14.616039658627098,
+      "median": 0.007018473416278341,
+      "p90": 1.0873497489544959,
+      "p95": 3.6770641994260824,
+      "p99": 7.973567851727037
+    },
+    "memory": {
+      "chunk-b256-cached-expandable.json": {
+        "peak_allocated_bytes": 37226525696,
+        "peak_reserved_bytes": 41513123840
+      },
+      "chunk-b256-cached-native.json": {
+        "peak_allocated_bytes": 37227861504,
+        "peak_reserved_bytes": 49943674880
+      },
+      "chunk-b256-expandable.json": {
+        "peak_allocated_bytes": 37217114112,
+        "peak_reserved_bytes": 41460695040
+      },
+      "chunk-b256-native.json": {
+        "peak_allocated_bytes": 37221260288,
+        "peak_reserved_bytes": 49916411904
+      }
+    },
+    "rebuild_converged": 256,
+    "rebuild_expandable_endpoint_exact": true,
+    "rebuild_native_seconds": 465.78826281099464
+  },
+  "capacity": {
+    "calibration_sha256": "f33683a8dd1ca8782e49e60179876682ce32bb7e0e7e5d2aa7255473682346ed",
+    "fit_error": {
+      "count": 3,
+      "max_absolute_relative_error": 0.03153613536960864,
+      "maximum_predicted_to_measured": 1.0315361353696086,
+      "mean_absolute_relative_error": 0.016587077408747503,
+      "mean_relative_error": 0.01658707740874743,
+      "minimum_predicted_to_measured": 0.9999999999999999
+    },
+    "p64_auto_policy_gate": {
+      "capacity_mode": "offline_hardware_model",
+      "maximum_post_cleanup_reserved_bytes": 90177536,
+      "policy_sha256": "2c262092ef6d21d76a5b7bde6930dd767fd9646911e94fc1721bcab61b7a2c3f",
+      "requested_allocator": "auto",
+      "selected_allocator": "expandable_segments"
+    },
+    "p64_policy_gate_selected_allocator": "expandable_segments",
+    "policy_sha256": "2c262092ef6d21d76a5b7bde6930dd767fd9646911e94fc1721bcab61b7a2c3f",
+    "validation_error": {
+      "count": 1,
+      "max_absolute_relative_error": 0.10834164998260065,
+      "maximum_predicted_to_measured": 1.1083416499826007,
+      "mean_absolute_relative_error": 0.10834164998260065,
+      "mean_relative_error": 0.10834164998260065,
+      "minimum_predicted_to_measured": 1.1083416499826007
+    }
+  },
+  "persistent_cleanup": {
+    "cached": {
+      "chunk_sizes": [
+        43,
+        18,
+        2,
+        1
+      ],
+      "execution_seconds": 36.30935040197801,
+      "maximum_post_cleanup_reserved_bytes": 127926272,
+      "peak_reserved_bytes": [
+        14411628544,
+        3275751424,
+        1189085184,
+        201326592
+      ]
+    },
+    "rebuild": {
+      "chunk_sizes": [
+        43,
+        18,
+        2,
+        1
+      ],
+      "execution_seconds": 43.86293362500146,
+      "maximum_post_cleanup_reserved_bytes": 127926272,
+      "peak_reserved_bytes": [
+        14411628544,
+        3275751424,
+        1189085184,
+        201326592
+      ]
+    }
+  },
+  "schema_version": 1,
+  "status": "complete"
+}

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import gc
 import math
 import os
 import pickle
@@ -1445,7 +1446,17 @@ class _ProcessAutoWorkerRunner:
         if result.state.device.type == "cuda":
             torch.cuda.synchronize(device)
             result = _offload_relaxation_result(result)
+            # Autograd-backed model calls can leave unreachable tensor cycles
+            # until Python's cyclic collector runs. Release them before asking
+            # the CUDA allocator to return inactive segments between chunks.
+            gc.collect()
             _empty_device_cache(device)
+            result.metadata["worker_post_cleanup_allocated_bytes"] = (
+                torch.cuda.memory_allocated(device)
+            )
+            result.metadata["worker_post_cleanup_reserved_bytes"] = (
+                torch.cuda.memory_reserved(device)
+            )
         result.metadata["worker_allocator"] = dict(self.allocator_metadata)
         result.metadata["worker_runtime_profile"] = profiler.summary()
         result.metadata["worker_materialization"] = {
@@ -2171,6 +2182,16 @@ def _execute_multi_device_deterministic_provider_relaxation(
                         "peak_reserved_bytes": task.payload.metadata.get(
                             "worker_peak_reserved_bytes"
                         ),
+                        "post_cleanup_allocated_bytes": (
+                            task.payload.metadata.get(
+                                "worker_post_cleanup_allocated_bytes"
+                            )
+                        ),
+                        "post_cleanup_reserved_bytes": (
+                            task.payload.metadata.get(
+                                "worker_post_cleanup_reserved_bytes"
+                            )
+                        ),
                         "runtime_profile": task.payload.metadata.get("worker_runtime_profile"),
                         "materialization_mode": materialization.get("mode"),
                         "materialization_seconds": materialization.get("seconds"),
@@ -2252,7 +2273,17 @@ def _execute_multi_device_deterministic_provider_relaxation(
                     wall_seconds = time.perf_counter() - chunk_started
                     if chunk_result.state.device.type == "cuda":
                         chunk_result = _offload_relaxation_result(chunk_result)
+                        gc.collect()
                         _empty_device_cache(device)
+                        post_cleanup_allocated = torch.cuda.memory_allocated(
+                            device
+                        )
+                        post_cleanup_reserved = torch.cuda.memory_reserved(
+                            device
+                        )
+                    else:
+                        post_cleanup_allocated = None
+                        post_cleanup_reserved = None
                     with result_lock:
                         indexed_results.append((chunk.indices, chunk_result))
                     completed.append(
@@ -2269,6 +2300,12 @@ def _execute_multi_device_deterministic_provider_relaxation(
                             "refill_prediction": chunk.refill_prediction,
                             "peak_allocated_bytes": peak_allocated,
                             "peak_reserved_bytes": peak_reserved,
+                            "post_cleanup_allocated_bytes": (
+                                post_cleanup_allocated
+                            ),
+                            "post_cleanup_reserved_bytes": (
+                                post_cleanup_reserved
+                            ),
                             "materialization_mode": provider.mode,
                             "materialization_seconds": (materialization_seconds),
                             "wall_seconds": wall_seconds,

@@ -27,6 +27,10 @@ _AUTO_ALLOCATOR_RULES = {
         "expandable_segments",
         "measured AtomBit variable-cell FIRE/BFGS fragmentation policy",
     ),
+    ("mace", "bfgs", True): (
+        "expandable_segments",
+        "measured MACE variable-cell BFGS fragmentation policy",
+    ),
 }
 
 
@@ -73,9 +77,9 @@ def select_cuda_allocator(
     """Choose only allocator modes supported by measured evidence.
 
     Expandable segments are automatic for measured AtomBit variable-cell FIRE
-    and BFGS workloads. Other combinations remain native until a matched
-    benchmark supports a broader rule. Explicit policies remain available for
-    controlled experiments.
+    and BFGS workloads and MACE variable-cell BFGS workloads. Other
+    combinations remain native until a matched benchmark supports a broader
+    rule. Explicit policies remain available for controlled experiments.
     """
 
     if policy not in ("auto", "native", "expandable_segments"):

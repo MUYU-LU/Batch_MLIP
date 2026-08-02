@@ -1,0 +1,126 @@
+{
+  "artifacts": {
+    "capacity_calibration_sha256": "530f53d7422769a5fc37618d69727ca4e814233389ffa25a008efe73add5f2ed",
+    "capacity_policy_sha256": "fb3efd5523702257a86d88c4df3fb51f20f5ae3616e407639addbe726d157adb",
+    "improved_sha256": "13696b0d373c8781c1cea0a56d87722e8089eb155ea7e3b4f6c75eb862b36837",
+    "mps16_sha256": "43f4500fa0a0ad0e0de745011b6cd8414e27fc9a4acd57e2cb6192cd57c6abdd",
+    "rebuild_sha256": "bb34a120cd402682aa79459115d509e14abcb1aafa4ef253fd89ccea6e1de641"
+  },
+  "capacity": {
+    "cost_model_contract_id": "mace-off23-small-f64-bfgs-f64-frechet-h100-cached-expandable_segments-peak_reserved_bytes-v1",
+    "memory_model": "peak_reserved_bytes",
+    "mode": "offline_hardware_model",
+    "policy_id": "omc-csp-mace-off23-small-h100-capacity-cached-expandable-v1",
+    "policy_sha256": "2c262092ef6d21d76a5b7bde6930dd767fd9646911e94fc1721bcab61b7a2c3f",
+    "reason": "signed execution and hardware contracts matched",
+    "source_calibration_sha256": "f33683a8dd1ca8782e49e60179876682ce32bb7e0e7e5d2aa7255473682346ed"
+  },
+  "convergence": {
+    "improved": 5946,
+    "improved_vs_mps16": {
+      "common_nonconverged": 3,
+      "convergence_flag_mismatches": 88,
+      "energy_difference_meV_per_atom": {
+        "max": 34.720203501912195,
+        "median": 0.0060179598327469675,
+        "p90": 2.046080096956959,
+        "p95": 6.676777210407677,
+        "p99": 16.2119937753327
+      },
+      "left_only_converged": 37,
+      "right_only_converged": 51
+    },
+    "improved_vs_rebuild": {
+      "common_nonconverged": 4,
+      "convergence_flag_mismatches": 83,
+      "energy_difference_meV_per_atom": {
+        "max": 33.18819542334455,
+        "median": 0.005321598149274232,
+        "p90": 2.11719789960784,
+        "p95": 6.650388955945946,
+        "p99": 15.469276919964457
+      },
+      "left_only_converged": 33,
+      "right_only_converged": 50
+    },
+    "mps16": 5960,
+    "rebuild": 5963
+  },
+  "decision": {
+    "cached_graph": "accepted_for_mace_omc_csp",
+    "expandable_segments": "accepted_for_mace_variable_cell_bfgs",
+    "mace_omc_csp_policy": "freeze_candidate",
+    "persistent_chunk_cleanup": "required"
+  },
+  "memory": {
+    "budget_bytes": 72265203712,
+    "peak_allocated_bytes": 59580846080,
+    "peak_reserved_bytes": 67471671296,
+    "peak_reserved_fraction_of_budget": 0.9336674890573371,
+    "peak_reserved_fraction_of_device": 0.7936173656987365,
+    "post_cleanup_reserved_bytes": 90177536,
+    "predicted_peak_bytes": 72244408759
+  },
+  "schema_version": 1,
+  "status": "accepted",
+  "timing": {
+    "improved_execution_seconds": 2340.531363296992,
+    "improved_full_script_seconds": 2350.1269598809886,
+    "mps16_full_script_seconds": 4652.834623327013,
+    "mps16_makespan_seconds": 4563.540074890014,
+    "rebuild_execution_seconds": 3190.8251259470126,
+    "rebuild_full_script_seconds": 3200.5864291560138,
+    "speedup_over_mps16_execution": 1.9497880466175759,
+    "speedup_over_mps16_full_script": 1.9798226660752978,
+    "speedup_over_rebuild_execution": 1.3632909073486004,
+    "speedup_over_rebuild_full_script": 1.36187809586172
+  },
+  "worker_phases": {
+    "calculator.neighbor_update": {
+      "count": 78307,
+      "seconds": 476.2122849557398,
+      "worker_time_fraction": 0.02774537869792693
+    },
+    "graph.cache_selection": {
+      "count": 78307,
+      "seconds": 6.053303681112818,
+      "worker_time_fraction": 0.0003526813740675338
+    },
+    "graph.cache_validity": {
+      "count": 78307,
+      "seconds": 169.43045173084727,
+      "worker_time_fraction": 0.009871463199799854
+    },
+    "graph.mace_tensor_state": {
+      "count": 78307,
+      "seconds": 32.844757249772556,
+      "worker_time_fraction": 0.0019136218382545883
+    },
+    "graph.neighbor_search": {
+      "count": 33594,
+      "seconds": 200.86012820601465,
+      "worker_time_fraction": 0.011702638714807603
+    },
+    "model.forward": {
+      "count": 78307,
+      "seconds": 7756.236954563141,
+      "worker_time_fraction": 0.45189874006549613
+    },
+    "optimizer.bfgs_update": {
+      "count": 78276,
+      "seconds": 7982.468496160509,
+      "worker_time_fraction": 0.46507958397341453
+    },
+    "scheduler.active_compaction": {
+      "count": 5163,
+      "seconds": 154.88565734970567,
+      "worker_time_fraction": 0.009024045270995769
+    }
+  },
+  "workload": {
+    "id": "OPT-OMC-STRUCTURES-P6000-INTRA-WIDE-MACE-OFF23-SMALL-v1",
+    "manifest_sha256": "75717c7cf79c6f7600e6acd094ab04d995e795706149a36b6b5e704e75510528",
+    "pool_size": 6000,
+    "same_source_coverage": true
+  }
+}
