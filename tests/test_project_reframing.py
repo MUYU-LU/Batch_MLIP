@@ -56,6 +56,11 @@ def test_v1_baseline_binds_the_shipped_refill_policy():
     ).hexdigest()
 
     assert baseline["baseline_id"] == "atombit-omc-csp-v1"
+    assert baseline["status"] == "frozen"
+    assert (
+        baseline["provenance"]["implementation_commit"]
+        == "6b86516530d4768d85a56d77e5deaba8acde23df"
+    )
     assert hashlib.sha256(payload).hexdigest() == policy["sha256"]
     assert baseline["provenance"]["experiment_directory_count"] == len(
         experiment_dirs

@@ -7,6 +7,9 @@ generic Batch MLIP framework. `baseline_v1.yaml` is the machine-readable
 authority. Individual experiment documents provide provenance but do not
 override this decision.
 
+The tested implementation commit is
+`6b86516530d4768d85a56d77e5deaba8acde23df`.
+
 The freeze fixes execution policy, not scientific inputs. Users continue to
 choose structures, AtomBit checkpoint, optimizer, cell treatment, convergence
 criteria, and devices.

@@ -1,12 +1,12 @@
 schema_version: 1
 baseline_id: atombit-omc-csp-v1
-status: implementation_freeze_pending_commit
+status: frozen
 
 provenance:
-  implementation_commit: pending
+  implementation_commit: 6b86516530d4768d85a56d77e5deaba8acde23df
   implementation_commit_role: >-
-    This field is replaced by the tested implementation commit in the freeze
-    metadata commit. Numerical code does not change in that second commit.
+    Tested AtomBit OMC-CSP v1 implementation. The following metadata-only
+    commit records this hash without changing numerical code.
   refill_policy:
     path: batch_mlip/planning/data/refill_policy_v2.json
     policy_id: atombit-smooth-rms-bfgs-h100-refill-v2
