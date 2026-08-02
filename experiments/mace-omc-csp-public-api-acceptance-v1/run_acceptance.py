@@ -112,6 +112,7 @@ def _worker_summary(scheduling: dict[str, Any]) -> tuple[list[dict[str, Any]], i
         for chunk in chunks:
             allocated = int(chunk.get("peak_allocated_bytes") or 0)
             reserved = int(chunk.get("peak_reserved_bytes") or 0)
+            predicted = chunk.get("predicted_peak_bytes")
             peak_allocated = max(peak_allocated, allocated)
             peak_reserved = max(peak_reserved, reserved)
             chunk_rows.append(
@@ -120,7 +121,9 @@ def _worker_summary(scheduling: dict[str, Any]) -> tuple[list[dict[str, Any]], i
                     "system_count": int(chunk["system_count"]),
                     "resident_capacity": int(chunk["resident_capacity"]),
                     "wall_seconds": float(chunk["wall_seconds"]),
-                    "predicted_peak_bytes": int(chunk["predicted_peak_bytes"]),
+                    "predicted_peak_bytes": (
+                        None if predicted is None else int(predicted)
+                    ),
                     "peak_allocated_bytes": allocated,
                     "peak_reserved_bytes": reserved,
                     "post_cleanup_reserved_bytes": int(
@@ -263,6 +266,25 @@ def main() -> None:
         temporary_structures.replace(args.structures_output)
 
         scheduling = result.metadata["scheduling"]
+        raw_result_path = args.output.with_name("raw-result.json")
+        _write_json(
+            raw_result_path,
+            {
+                "schema_version": 1,
+                "status": "optimization_complete",
+                "git_head": payload["git_head"],
+                "workload_id": manifest.workload_id,
+                "manifest_sha256": manifest.manifest_sha256,
+                "optimization_and_shutdown_seconds": optimization_seconds,
+                "scheduling": scheduling,
+                "interface": result.metadata["optimize_pool"],
+                "records": records,
+                "endpoint_sha256": endpoint_sha256,
+                "relaxed_structures_sha256": _sha256_file(
+                    args.structures_output
+                ),
+            },
+        )
         workers, peak_allocated, peak_reserved = _worker_summary(scheduling)
         memory_fraction = peak_reserved / _DEVICE_MEMORY_BYTES
         capacity = scheduling["capacity_planning"]
@@ -346,6 +368,8 @@ def main() -> None:
                     "maximum_final_force_eV_per_A": float(max_force.max()),
                     "maximum_final_stress_eV_per_A3": float(max_stress.max()),
                     "endpoint_sha256": endpoint_sha256,
+                    "raw_result_path": str(raw_result_path),
+                    "raw_result_sha256": _sha256_file(raw_result_path),
                     "relaxed_structures_path": str(args.structures_output),
                     "relaxed_structures_sha256": _sha256_file(args.structures_output),
                 },
