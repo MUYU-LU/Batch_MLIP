@@ -1,0 +1,100 @@
+schema_version: 1
+id: t2-p6000-strict-bfgs-vs-mps16-v1
+date: 2026-08-02
+status: complete_production_stress
+git_head: 9dd272821f8f93d1e19842a2ee751a3b9ddf30c1
+working_tree_clean: false
+
+workload:
+  id: OPT-OMC-STRUCTURES-P6000-INTRA-WIDE-v1
+  pool_size: 6000
+  unique_sources: 6000
+  synthetic_repetition: false
+  manifest_sha256: a5019698bfb5229ea38bebf4c72d4a96b15a8ccd644eea4c38ba3042097dde4d
+
+contract:
+  model: AtomBit-OMC-s smooth_rms fp32 epoch5
+  checkpoint_sha256: b27c372cb2c2848ae1e54a9ffd7a2aa0b0401d9cc0ed922e3be250ff63e44486
+  optimizer: BFGS
+  optimizer_dtype: float64
+  cell_filter: FrechetCellFilter
+  cutoff_A: 6.0
+  skin_A: 0.5
+  fmax_eV_per_A: 0.01
+  max_steps: 3000
+  max_step_A: 0.2
+  alpha_eV_per_A2: 70.0
+  tail_recovery: none
+  deterministic: true
+
+hardware:
+  gpu_model: NVIDIA H100 80GB HBM3
+  gpu_indices: [0, 1, 2, 3, 4, 5, 6, 7]
+  gpu_count: 8
+  nominal_memory_fraction: 0.85
+
+methods:
+  automatic:
+    interface: BatchExecutor.relax_manifest
+    resident_chunks: 31
+    outer_queue: bucket_stratified_work_stealing
+    inner_queue: active_drain
+    multi_gpu_refill: disabled
+    materialization: manifest_lazy_global_prefetch
+  mps16:
+    optimizer: ASE BFGS
+    workers_per_gpu: 16
+    total_workers: 128
+    assignment: static_cost_balanced_lpt
+
+fairness:
+  same_signed_jobs: true
+  same_checkpoint: true
+  same_force_and_step_limits: true
+  cpu_threads_per_process: 1
+  timing_repeats: 1
+
+results:
+  automatic:
+    execution_seconds: 2245.0894825949945
+    production_seconds: 2209.692819791002
+    full_script_seconds: 2248.968469561005
+    converged: 5986
+    model_batch_calls: 69957
+    structure_graph_evaluations: 3827420
+    peak_reserved_bytes: 76684460032
+    max_step_count: 14
+  mps16:
+    production_makespan_seconds: 4706.150795802998
+    full_script_seconds: 4775.346419976006
+    converged: 5985
+    model_single_structure_calls: 3807979
+    peak_sampled_device_bytes: 77703675904
+    max_step_count: 15
+  comparison:
+    execution_speedup: 2.0961974265557455
+    production_speedup: 2.129776027533147
+    full_script_speedup: 2.123349653233754
+    convergence_flag_mismatches: 27
+    endpoint_energy_difference_meV_per_atom_median: 0.00286102294921875
+    endpoint_energy_difference_meV_per_atom_p95: 4.0615952533224355
+    endpoint_energy_difference_meV_per_atom_p99: 14.237331307452658
+    endpoint_energy_difference_meV_per_atom_max: 30.83955723306407
+
+decision:
+  production_execution_default: automatic_active_drain
+  strict_policy_frozen: false
+  required_next_work:
+    - horizon_aware_memory_guard
+    - tail_safe_bfgs_linear_algebra
+    - max_step_endpoint_policy
+    - comparable_device_memory_sampling
+
+code_sha256:
+  batch_mlip/interfaces/api.py: 7e3a58e235ca051abdbf94cb969bb261e6fad24b752bc68af5858a1cfc6688b7
+  batch_mlip/interfaces/executor.py: c1c0c6e93b74e3eb27c202862ac4762ad5a4ca2609e13e48a445640f554a1753
+  batch_mlip/optimization/bfgs.py: 9a71d6a14c6808bb3fa009418aa6a809b8b81d28661f96ba4b45c39991dbb2b3
+  batch_mlip/core/neighbors.py: e24952b93dfd82a13e5a8dd4d6afcb81bcf1d32c03a9c5c73787bb0e0a40d061
+  benchmarks/benchmark_omc_csp_scheduler_auto.py: 07968f2df777fed243f0098aca447177819e68e6c48368b267d9f538be405cea
+  benchmarks/run_omc_csp_scheduler_mps.py: a78313f7007dd075cdfc0916b0acc3e5249f12cdc39a492b3e7832a8310e5c65
+  benchmarks/benchmark_mps_ase_pool.py: e0a3f8f1f6ba7f54f91c4ffa6228a80a8c6277dcae02738192d3024de0d52ac3

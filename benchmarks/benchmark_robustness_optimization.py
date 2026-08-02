@@ -122,9 +122,16 @@ def main() -> None:
     parser.add_argument("--batch-size", type=int, default=64)
     parser.add_argument(
         "--refill-storage",
-        choices=("repack", "slots", "arena"),
+        choices=("repack", "slots", "arena", "compatible_slots"),
         default="repack",
     )
+    parser.add_argument(
+        "--refill-policy",
+        choices=("drain", "immediate", "threshold"),
+        default="immediate",
+    )
+    parser.add_argument("--refill-low-watermark", type=float, default=0.8)
+    parser.add_argument("--refill-min-chunk", type=int)
     parser.add_argument("--refill-interval", type=int, default=1)
     parser.add_argument("--convergence-check-interval", type=int, default=1)
     parser.add_argument("--refill-tail-compaction-threshold", type=float)
@@ -163,6 +170,10 @@ def main() -> None:
         parser.error("CPU thread count must be positive")
     if args.refill_interval <= 0:
         parser.error("refill interval must be positive")
+    if not 0.0 <= args.refill_low_watermark < 1.0:
+        parser.error("refill low watermark must be in [0, 1)")
+    if args.refill_min_chunk is not None and args.refill_min_chunk <= 0:
+        parser.error("refill minimum chunk must be positive")
     if args.convergence_check_interval <= 0:
         parser.error("convergence check interval must be positive")
     if args.convergence_check_interval != 1 and (
@@ -235,9 +246,12 @@ def main() -> None:
                 model_dtype=torch.float32,
                 neighbor_backend="auto",
                 refill=args.method == "refill",
-                refill_policy="immediate",
+                refill_policy=args.refill_policy,
                 refill_storage=args.refill_storage,
-                refill_min_chunk=1 if args.method == "refill" else None,
+                refill_low_watermark=args.refill_low_watermark,
+                refill_min_chunk=(
+                    args.refill_min_chunk if args.method == "refill" else None
+                ),
                 refill_interval=args.refill_interval,
                 convergence_check_interval=args.convergence_check_interval,
                 refill_tail_compaction_threshold=args.refill_tail_compaction_threshold,
@@ -269,9 +283,12 @@ def main() -> None:
                 batch_size=args.batch_size,
                 active_compaction=True,
                 refill=args.method == "refill",
-                refill_policy="immediate",
+                refill_policy=args.refill_policy,
                 refill_storage=args.refill_storage,
-                refill_min_chunk=1 if args.method == "refill" else None,
+                refill_low_watermark=args.refill_low_watermark,
+                refill_min_chunk=(
+                    args.refill_min_chunk if args.method == "refill" else None
+                ),
                 refill_interval=args.refill_interval,
                 refill_tail_compaction_threshold=args.refill_tail_compaction_threshold,
                 linear_algebra_backend=args.linear_algebra_backend,
@@ -317,6 +334,13 @@ def main() -> None:
         "job_limit": args.job_limit,
         "batch_size": None if args.method == "ase" else args.batch_size,
         "refill_storage": (args.refill_storage if args.method == "refill" else None),
+        "refill_policy": (args.refill_policy if args.method == "refill" else None),
+        "refill_low_watermark": (
+            args.refill_low_watermark if args.method == "refill" else None
+        ),
+        "refill_min_chunk": (
+            args.refill_min_chunk if args.method == "refill" else None
+        ),
         "refill_interval": (args.refill_interval if args.method == "refill" else None),
         "convergence_check_interval": (
             args.convergence_check_interval if args.method == "refill" else None

@@ -7,7 +7,6 @@ from ase import Atoms, units
 from ase.calculators.lj import LennardJones
 from ase.constraints import FixAtoms
 from ase.md.nose_hoover_chain import IsotropicMTKNPT
-from batch_mlip.toy_models import QuadraticWellModel
 
 from batch_mlip import (
     ASECalculatorAdapter,
@@ -22,6 +21,7 @@ from batch_mlip import (
     batched_velocity_verlet,
     initialize_maxwell_boltzmann,
 )
+from batch_mlip.toy_models import QuadraticWellModel
 
 
 class ZeroForceCalculator(BatchCalculator):

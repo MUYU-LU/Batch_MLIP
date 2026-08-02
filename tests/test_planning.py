@@ -428,13 +428,17 @@ def _auto_observation(
     )
 
 
-def _auto_bucket(count: int = 64) -> AutoWorkloadBucket:
+def _auto_bucket(
+    count: int = 64,
+    *,
+    homogeneous_atom_count: bool = True,
+) -> AutoWorkloadBucket:
     return AutoWorkloadBucket(
         system_indices=tuple(range(count)),
         mean_atom_count=46.0,
         mean_edge_count=1_000.0,
         mean_dof_squared=20_000.0,
-        homogeneous_atom_count=True,
+        homogeneous_atom_count=homogeneous_atom_count,
     )
 
 
@@ -618,6 +622,32 @@ def test_online_controller_enables_refill_only_after_growth_stops():
     assert action.system_count == 32
     assert action.resident_capacity == 8
     assert action.refill_storage == "slots"
+
+
+def test_online_controller_rejects_refill_for_mixed_atom_count_bucket():
+    controller = OnlineCapacityController(
+        bucket=_auto_bucket(homogeneous_atom_count=False),
+        fingerprint="fingerprint",
+        config=AutoSchedulerConfig(
+            cache_enabled=False,
+            initial_batch_size=8,
+            max_batch_size=8,
+            refill_min_capacity=8,
+            refill_occupancy_threshold=0.7,
+        ),
+        cached_policy=None,
+        supports_refill=True,
+    )
+
+    controller.observe(
+        _auto_observation(8, throughput=100.0, occupancy=0.5),
+        remaining=32,
+    )
+    action = controller.next_action(32)
+
+    assert not action.active_refill
+    assert action.system_count == 8
+    assert controller.cached_result().active_refill is False
 
 
 def test_auto_policy_cache_matches_only_compatible_fingerprints(tmp_path):

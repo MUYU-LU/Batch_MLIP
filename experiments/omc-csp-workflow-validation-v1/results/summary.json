@@ -1,0 +1,398 @@
+{
+  "automatic": {
+    "auto-jaydui-p64-g1": {
+      "active_gpu_count": 1,
+      "active_refill": false,
+      "capacity_mode": "offline_hardware_model",
+      "converged_count": 64,
+      "coverage_unique": true,
+      "execution_chunks": 2,
+      "execution_seconds": 8.800101663000532,
+      "loader_policy": {
+        "active_worker_count": 1,
+        "atoms_per_worker": 2816.0,
+        "automatic_thresholds": {
+          "large": {
+            "minimum_atoms_per_worker": 32000.0,
+            "minimum_pool_size": 2048,
+            "process_count": 4
+          },
+          "medium": {
+            "minimum_atoms_per_worker": 3000.0,
+            "minimum_pool_size": 512,
+            "process_count": 2
+          }
+        },
+        "available_cpu_count": 128,
+        "effective_process_count": 1,
+        "policy_id": "manifest-loader-process-policy-v2",
+        "pool_size": 64,
+        "process_count": 1,
+        "reason": "pool is below the validated two-process loading regime",
+        "requested": "auto",
+        "required_cpu_count": 2,
+        "total_atoms": 2816,
+        "worker_backend": "process"
+      },
+      "materialization_worker_fraction": 0.20353912299272112,
+      "materialization_worker_seconds": 0.9010904889873927,
+      "maximum_predicted_peak_bytes": 9548149187,
+      "maximum_reserved_bytes": 4263510016,
+      "maximum_reserved_fraction": 0.05014838853900884,
+      "memory_gate": true,
+      "model_evaluation_events": 63,
+      "neighbor_backend": "auto",
+      "neighbor_rebuild_events": 9,
+      "neighbor_rebuild_fraction": 0.14285714285714285,
+      "optimization_pilot_runs": 0,
+      "optimization_pilot_telemetry_present": false,
+      "parent_reported_maximum_reserved_bytes": 278921216,
+      "phase_worker_seconds": {
+        "calculator.graph_view": 0.024643328130245206,
+        "calculator.neighbor_update": 0.16566707134246825,
+        "graph.backend_selection": 0.0055795198678970336,
+        "graph.cache_selection": 0.0041863999851048,
+        "graph.cache_validity": 0.12781344044208526,
+        "graph.geometry_to_host": 0.0008161280006170273,
+        "graph.integrity_check": 0.0028771840333938594,
+        "graph.neighbor_search": 0.09333036875724793,
+        "graph.rebuild_prepare": 0.009174783945083618,
+        "graph.to_device": 0.005964384078979492,
+        "model.autograd": 1.008392894744873,
+        "model.forward": 0.6792014083862303,
+        "optimizer.bfgs_apply_displacement": 0.12204777586460111,
+        "optimizer.bfgs_cholesky": 0.05001571169495584,
+        "optimizer.bfgs_hessian_update": 0.04193097588140518,
+        "optimizer.bfgs_history_pack": 0.018283520065248013,
+        "optimizer.bfgs_history_store": 0.02109852806478739,
+        "optimizer.bfgs_linear_algebra": 0.16110355150699615,
+        "optimizer.bfgs_solve": 0.00936348797380924,
+        "optimizer.bfgs_update": 0.3817201271057129,
+        "scheduler.active_compaction": 0.017735072255134585
+      },
+      "pool_size": 64,
+      "refill_reasons": [
+        "multi-GPU refill has no accepted scientific policy"
+      ],
+      "resident_capacities": [
+        32
+      ],
+      "resident_plan_chunks": 1,
+      "script_seconds": 10.078845914002159,
+      "selected_neighbor_backend_rebuilds": {
+        "cuda_dense": 2,
+        "matscipy": 7
+      },
+      "source_order_equal": true,
+      "systems_per_second": 7.272643254689196,
+      "worker_backend": "process",
+      "worker_run_seconds": 4.440908424992813,
+      "worker_startup_fraction": 0.4204052934482016,
+      "worker_startup_seconds": 3.6996093220077455,
+      "worker_tail_fraction": 0.0,
+      "worker_wall_max_over_mean": 1.0,
+      "worker_wall_seconds": [
+        4.427111976008746
+      ],
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-JAYDUI-P64-INTRA-NARROW-v2"
+    },
+    "auto-mix-p512-g8": {
+      "active_gpu_count": 8,
+      "active_refill": false,
+      "capacity_mode": "offline_hardware_model",
+      "converged_count": 512,
+      "coverage_unique": true,
+      "execution_chunks": 16,
+      "execution_seconds": 50.31624112201098,
+      "loader_policy": {
+        "active_worker_count": 8,
+        "atoms_per_worker": 8183.25,
+        "automatic_thresholds": {
+          "large": {
+            "minimum_atoms_per_worker": 32000.0,
+            "minimum_pool_size": 2048,
+            "process_count": 4
+          },
+          "medium": {
+            "minimum_atoms_per_worker": 3000.0,
+            "minimum_pool_size": 512,
+            "process_count": 2
+          }
+        },
+        "available_cpu_count": 128,
+        "effective_process_count": 2,
+        "policy_id": "manifest-loader-process-policy-v2",
+        "pool_size": 512,
+        "process_count": 2,
+        "reason": "medium-pool atom-record and host-CPU gates passed",
+        "requested": "auto",
+        "required_cpu_count": 24,
+        "total_atoms": 65466,
+        "worker_backend": "process"
+      },
+      "materialization_worker_fraction": 0.2115864820991149,
+      "materialization_worker_seconds": 33.849326458002906,
+      "maximum_predicted_peak_bytes": 53535037286,
+      "maximum_reserved_bytes": 8189378560,
+      "maximum_reserved_fraction": 0.09632536017945377,
+      "memory_gate": true,
+      "model_evaluation_events": 1909,
+      "neighbor_backend": "auto",
+      "neighbor_rebuild_events": 515,
+      "neighbor_rebuild_fraction": 0.26977475117862754,
+      "optimization_pilot_runs": 0,
+      "optimization_pilot_telemetry_present": false,
+      "parent_reported_maximum_reserved_bytes": 278921216,
+      "phase_worker_seconds": {
+        "calculator.graph_view": 0.8024956475794316,
+        "calculator.neighbor_update": 7.678089920043943,
+        "graph.backend_selection": 0.12166131186485288,
+        "graph.cache_selection": 0.1351639679633081,
+        "graph.cache_validity": 3.9076204478740686,
+        "graph.geometry_to_host": 0.02628985598683357,
+        "graph.integrity_check": 0.168975807979703,
+        "graph.neighbor_search": 3.265726277828217,
+        "graph.rebuild_prepare": 0.4576572483777999,
+        "graph.to_device": 0.18444784044474366,
+        "model.autograd": 46.81552185058594,
+        "model.forward": 24.982090467452995,
+        "optimizer.bfgs_apply_displacement": 3.8094670045375816,
+        "optimizer.bfgs_cholesky": 4.260914400056006,
+        "optimizer.bfgs_hessian_update": 2.2957878718832503,
+        "optimizer.bfgs_history_pack": 1.0586044483780859,
+        "optimizer.bfgs_history_store": 0.8547823999300601,
+        "optimizer.bfgs_linear_algebra": 10.032114616751672,
+        "optimizer.bfgs_solve": 0.5213760002255439,
+        "optimizer.bfgs_update": 17.484470328330993,
+        "scheduler.active_compaction": 1.0958380463123318
+      },
+      "pool_size": 512,
+      "refill_reasons": [
+        "multi-GPU refill has no accepted scientific policy"
+      ],
+      "resident_capacities": [
+        22,
+        23,
+        33,
+        34,
+        52
+      ],
+      "resident_plan_chunks": 4,
+      "script_seconds": 51.73294835900015,
+      "selected_neighbor_backend_rebuilds": {
+        "cuda_cell": 254,
+        "cuda_dense": 49,
+        "matscipy": 212
+      },
+      "source_order_equal": true,
+      "systems_per_second": 10.175640878229757,
+      "worker_backend": "process",
+      "worker_run_seconds": 22.21182831999613,
+      "worker_startup_fraction": 0.5010312271710576,
+      "worker_startup_seconds": 25.210008035995997,
+      "worker_tail_fraction": 0.09966482214238148,
+      "worker_wall_max_over_mean": 1.1106974653367845,
+      "worker_wall_seconds": [
+        21.00038887700066,
+        18.961757734999992,
+        19.955255244,
+        20.883358313003555,
+        17.875352172995917,
+        22.039378084999043,
+        17.052201683007297,
+        22.21098952498869
+      ],
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-MIX-ALL-P512-INTER-WIDE-v2"
+    },
+    "auto-obeqix-p2048-g8": {
+      "active_gpu_count": 8,
+      "active_refill": false,
+      "capacity_mode": "offline_hardware_model",
+      "converged_count": 2048,
+      "coverage_unique": true,
+      "execution_chunks": 16,
+      "execution_seconds": 155.32287597299728,
+      "loader_policy": {
+        "active_worker_count": 8,
+        "atoms_per_worker": 56320.0,
+        "automatic_thresholds": {
+          "large": {
+            "minimum_atoms_per_worker": 32000.0,
+            "minimum_pool_size": 2048,
+            "process_count": 4
+          },
+          "medium": {
+            "minimum_atoms_per_worker": 3000.0,
+            "minimum_pool_size": 512,
+            "process_count": 2
+          }
+        },
+        "available_cpu_count": 128,
+        "effective_process_count": 4,
+        "policy_id": "manifest-loader-process-policy-v2",
+        "pool_size": 2048,
+        "process_count": 4,
+        "reason": "large-pool atom-record and host-CPU gates passed",
+        "requested": "auto",
+        "required_cpu_count": 40,
+        "total_atoms": 450560,
+        "worker_backend": "process"
+      },
+      "materialization_worker_fraction": 0.15652716554633167,
+      "materialization_worker_seconds": 126.00424614199437,
+      "maximum_predicted_peak_bytes": 72217137337,
+      "maximum_reserved_bytes": 66228060160,
+      "maximum_reserved_fraction": 0.7789897245754546,
+      "memory_gate": true,
+      "model_evaluation_events": 3754,
+      "neighbor_backend": "auto",
+      "neighbor_rebuild_events": 2092,
+      "neighbor_rebuild_fraction": 0.5572722429408631,
+      "optimization_pilot_runs": 0,
+      "optimization_pilot_telemetry_present": false,
+      "parent_reported_maximum_reserved_bytes": 455081984,
+      "phase_worker_seconds": {
+        "calculator.graph_view": 2.909366016566753,
+        "calculator.neighbor_update": 26.68083167898655,
+        "graph.backend_selection": 0.4747188798040151,
+        "graph.cache_selection": 0.3019384961649776,
+        "graph.cache_validity": 8.001698333382606,
+        "graph.geometry_to_host": 0.02872892796993256,
+        "graph.integrity_check": 0.6817382721900941,
+        "graph.neighbor_search": 13.835396367311478,
+        "graph.rebuild_prepare": 2.279967264056206,
+        "graph.to_device": 1.406297791160643,
+        "model.autograd": 358.1411582775116,
+        "model.forward": 167.83966973209382,
+        "optimizer.bfgs_apply_displacement": 7.836845694780351,
+        "optimizer.bfgs_cholesky": 10.695640319257972,
+        "optimizer.bfgs_hessian_update": 5.115901145434474,
+        "optimizer.bfgs_history_pack": 2.434814913034439,
+        "optimizer.bfgs_history_store": 5.647146304637191,
+        "optimizer.bfgs_linear_algebra": 26.433283925652503,
+        "optimizer.bfgs_solve": 0.6320732803940774,
+        "optimizer.bfgs_update": 57.91919263768195,
+        "scheduler.active_compaction": 14.826328825712201
+      },
+      "pool_size": 2048,
+      "refill_reasons": [
+        "multi-GPU refill has no accepted scientific policy"
+      ],
+      "resident_capacities": [
+        65,
+        66,
+        77,
+        78,
+        81,
+        82,
+        85,
+        119,
+        146,
+        176,
+        182,
+        189,
+        196,
+        204,
+        217
+      ],
+      "resident_plan_chunks": 12,
+      "script_seconds": 157.89964051199786,
+      "selected_neighbor_backend_rebuilds": {
+        "cuda_cell": 1004,
+        "cuda_dense": 860,
+        "matscipy": 228
+      },
+      "source_order_equal": true,
+      "systems_per_second": 13.185437027035494,
+      "worker_backend": "process",
+      "worker_run_seconds": 124.95294763399579,
+      "worker_startup_fraction": 0.1678484077293634,
+      "worker_startup_seconds": 26.07069741601299,
+      "worker_tail_fraction": 0.19469397458357945,
+      "worker_wall_max_over_mean": 1.241763961076665,
+      "worker_wall_seconds": [
+        124.95237748000363,
+        102.3039598470059,
+        112.73009945599188,
+        100.38621418700495,
+        92.0166613820038,
+        94.34981737700582,
+        96.37385518501105,
+        81.8862348840048
+      ],
+      "workload_id": "OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2"
+    }
+  },
+  "issues": [
+    {
+      "component": "API routing / inner scheduler",
+      "finding": "A source-backed workload assigned one GPU used the multi-GPU path and unconditionally disabled refill.",
+      "severity": "high"
+    },
+    {
+      "component": "outer scheduler",
+      "finding": "The one-GPU small pool split one memory-safe resident batch into multiple execution chunks.",
+      "severity": "medium"
+    },
+    {
+      "component": "runtime telemetry",
+      "finding": "The nonpersistent source-backed result omitted the explicit optimization_pilot_runs field.",
+      "severity": "low"
+    },
+    {
+      "component": "memory telemetry",
+      "finding": "Top-level source-backed peak_memory reported the parent CUDA context rather than process-worker peaks.",
+      "severity": "high"
+    },
+    {
+      "component": "worker lifecycle",
+      "finding": "Cold worker startup consumed more than 40% of mixed-P512 automatic execution time.",
+      "severity": "high"
+    },
+    {
+      "component": "outer scheduler",
+      "finding": "The mixed P512 outer scheduler fragmented each safe resident plan into four execution chunks on average.",
+      "severity": "medium"
+    },
+    {
+      "component": "execution-chunk memory telemetry",
+      "finding": "Subdivided mixed-P512 chunks retained the parent resident-batch peak prediction instead of a child prediction.",
+      "severity": "medium"
+    },
+    {
+      "component": "batched BFGS versus ASE endpoint equivalence",
+      "finding": "11 mixed-P512 endpoints exceeded 5 meV/atom versus ASE BFGS under MPS; the same current endpoints remain within 5 meV/atom of the frozen automatic scheduler result.",
+      "severity": "high"
+    },
+    {
+      "component": "outer scheduler tail balance",
+      "finding": "The slowest OBEQIX P2048 worker exceeded mean worker time by more than 20%.",
+      "severity": "medium"
+    }
+  ],
+  "mixed_p512_current_vs_frozen_automatic": {
+    "common_endpoint_count": 512,
+    "current_execution_seconds": 50.31624112201098,
+    "energy_5meV_per_atom_failures": 0,
+    "frozen_execution_seconds": 51.52970750397071,
+    "maximum_energy_delta_eV_per_atom": 0.0004982861605557528
+  },
+  "mixed_p512_vs_mps8": {
+    "automatic_converged_count": 512,
+    "automatic_execution_seconds": 50.31624112201098,
+    "automatic_full_script_speedup_over_mps": 1.6835088215275436,
+    "automatic_peak_reserved_bytes": 8189378560,
+    "automatic_worker_run_seconds": 22.21182831999613,
+    "automatic_worker_run_speedup_over_mps_production": 2.260284128965912,
+    "common_endpoint_count": 512,
+    "energy_5meV_per_atom_failures": 11,
+    "energy_5meV_per_atom_gate": false,
+    "maximum_energy_delta_eV_per_atom": 0.019220627271212064,
+    "mixed_scope_mps_production_over_auto_cold_execution": 0.9977900158571363,
+    "mps_converged_count": 512,
+    "mps_peak_memory_bytes_nvidia_smi": 11315183616,
+    "mps_production_makespan_seconds": 50.20504302700283
+  },
+  "schema_version": 1,
+  "status": "complete"
+}

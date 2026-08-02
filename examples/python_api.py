@@ -2,7 +2,6 @@
 
 import torch
 from ase.io import read, write
-from batch_mlip.toy_models import QuadraticWellModel
 
 from batch_mlip import (
     AseGraphBatch,
@@ -10,6 +9,7 @@ from batch_mlip import (
     JSONLReporter,
     batched_fire_relax,
 )
+from batch_mlip.toy_models import QuadraticWellModel
 
 systems = read("data/demo.extxyz", index=":")
 state = AseGraphBatch.from_ase(

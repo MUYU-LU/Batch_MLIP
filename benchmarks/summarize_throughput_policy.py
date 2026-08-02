@@ -77,7 +77,7 @@ def _point(
         if not isinstance(reserved, int) or reserved > 0.85 * total:
             reasons.append("reserved_above_85_percent")
     seconds = data.get("timing_seconds")
-    if not isinstance(seconds, (int, float)) or seconds <= 0:
+    if not isinstance(seconds, int | float) or seconds <= 0:
         reasons.append("invalid_timing")
     return {
         "capacity": capacity,
@@ -238,7 +238,7 @@ def summarize(matrix_path: Path, raw_dir: Path) -> dict[str, Any]:
                     )
                 for point in points:
                     throughput = point.get("systems_per_second")
-                    if isinstance(throughput, (int, float)):
+                    if isinstance(throughput, int | float):
                         point["atoms_per_second"] = throughput * profile["atom_count_mean"]
                 valid = [point for point in points if point["valid"]]
                 selected = None

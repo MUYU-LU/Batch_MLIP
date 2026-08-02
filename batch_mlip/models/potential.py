@@ -29,6 +29,8 @@ class AtomBitBatchCalculator(BatchCalculator):
     ``force_mode='autograd'`` is recommended for conservative NVE dynamics.
     """
 
+    execution_policy_family = "atombit"
+
     def __init__(
         self,
         model: torch.nn.Module,

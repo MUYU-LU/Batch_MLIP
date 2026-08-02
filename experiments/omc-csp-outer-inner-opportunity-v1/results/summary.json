@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "status": "completed_passive_analysis",
+  "runs": [
+    {
+      "workload": "OBEQIX-P2048",
+      "gpu_count": 2,
+      "execution_seconds": 339.1429102770053,
+      "production_run_seconds": 328.1787644559954,
+      "resident_slot_seconds": 105061.77235320857,
+      "empty_slot_fraction": 0.2859859901491454,
+      "refill_opportunity_fraction": 0.2570320707923087,
+      "incompatible_pending_fraction": 0.0,
+      "unavoidable_slot_tail_fraction": 0.028838783922831914,
+      "materialization_gpu_fraction": 0.029293179201994346,
+      "unavoidable_idle_gpu_fraction": 0.022838075822557538
+    },
+    {
+      "workload": "OBEQIX-P2048",
+      "gpu_count": 4,
+      "execution_seconds": 190.9830025840056,
+      "production_run_seconds": 173.97310758799722,
+      "resident_slot_seconds": 106346.1808985334,
+      "empty_slot_fraction": 0.2866419116967184,
+      "refill_opportunity_fraction": 0.21227804622066902,
+      "incompatible_pending_fraction": 0.0,
+      "unavoidable_slot_tail_fraction": 0.0743084068235646,
+      "materialization_gpu_fraction": 0.04710155468484887,
+      "unavoidable_idle_gpu_fraction": 0.04749584574339815
+    },
+    {
+      "workload": "OBEQIX-P2048",
+      "gpu_count": 8,
+      "execution_seconds": 138.97984843500308,
+      "production_run_seconds": 109.63754348500515,
+      "resident_slot_seconds": 89077.32241904645,
+      "empty_slot_fraction": 0.28938504445203966,
+      "refill_opportunity_fraction": 0.21556139058108947,
+      "incompatible_pending_fraction": 0.0,
+      "unavoidable_slot_tail_fraction": 0.0738013462349301,
+      "materialization_gpu_fraction": 0.07573799488461569,
+      "unavoidable_idle_gpu_fraction": 0.17623850694577587
+    },
+    {
+      "workload": "MIX-P512",
+      "gpu_count": 8,
+      "execution_seconds": 49.40026678099821,
+      "production_run_seconds": 24.2141011049971,
+      "resident_slot_seconds": 3924.0330985753826,
+      "empty_slot_fraction": 0.4858300369743589,
+      "refill_opportunity_fraction": 0.12472893775042218,
+      "incompatible_pending_fraction": 0.1583557303180418,
+      "unavoidable_slot_tail_fraction": 0.2014352247535831,
+      "materialization_gpu_fraction": 0.1749740517882596,
+      "unavoidable_idle_gpu_fraction": 0.13539013312544073
+    }
+  ],
+  "interpretation": {
+    "speedup_prediction": false,
+    "outer_ready_idle_is_material": false,
+    "homogeneous_compatible_refill_opportunity_is_material": true,
+    "heterogeneous_cross_shape_refill_is_supported": false
+  }
+}

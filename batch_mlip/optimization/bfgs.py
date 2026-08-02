@@ -26,10 +26,15 @@ from .refill import (
     global_atom_ids as _global_atom_ids,
 )
 from .refill import (
+    match_compatible_slots as _match_compatible_slots,
+)
+from .refill import (
     refill_insert_count as _refill_insert_count,
 )
 
-_REFILL_STORAGE_MODES = _REFILL_STORAGE_MODES | frozenset(("arena",))
+_REFILL_STORAGE_MODES = _REFILL_STORAGE_MODES | frozenset(
+    ("arena", "compatible_slots")
+)
 
 
 @dataclass
@@ -459,7 +464,9 @@ def batched_bfgs_relax(
     equal-size resident slots and safely falls back to repacking otherwise.
     ``refill_storage="arena"`` uses reusable compact double buffers for
     heterogeneous batches. It is an explicit BFGS-only experimental mode and
-    is not selected by the automatic planner. A
+    is not selected by the automatic planner. ``compatible_slots`` searches
+    the pending queue deterministically for a complete equal-atom replacement
+    cohort before falling back to repacking. A
     ``convergence_check_interval`` above one delays convergence retirement to
     global scheduler boundaries and therefore may add up to one interval minus
     one BFGS steps per resident job.
@@ -708,6 +715,11 @@ def batched_bfgs_relax(
 
         if active_compaction and bool(newly_converged.any()):
             systems_before = active_state.n_systems
+            cell_dof = 0 if active_filter is None else 9
+            removed_shape_counts: dict[tuple[int, int], int] = defaultdict(int)
+            for atom_count in active_state.counts[newly_converged].detach().cpu().tolist():
+                generalized_dimension = 3 * int(atom_count) + cell_dof
+                removed_shape_counts[(int(atom_count), generalized_dimension)] += 1
             with profile_phase(
                 "scheduler.active_compaction",
                 device=device,
@@ -749,6 +761,16 @@ def batched_bfgs_relax(
                 systems_after=active_state.n_systems,
                 removed=systems_before - active_state.n_systems,
             )
+            for (atom_count, generalized_dimension), slot_count in sorted(
+                removed_shape_counts.items()
+            ):
+                profile_event(
+                    "active_compaction_slots",
+                    scheduler_step=step,
+                    atom_count=atom_count,
+                    generalized_dimension=generalized_dimension,
+                    slots=slot_count,
+                )
 
         with profile_phase(
             "optimizer.bfgs_update",
@@ -898,7 +920,7 @@ def _batched_bfgs_refill_relax(
     capacity = min(refill_batch_size, n_systems)
     device, dtype = state.device, state.dtype
     active_system_ids = torch.arange(capacity, device=device, dtype=torch.long)
-    next_pending = capacity
+    pending_ids = list(range(capacity, n_systems))
     active_atom_ids = _global_atom_ids(state, active_system_ids)
     active_state = (
         state
@@ -968,7 +990,7 @@ def _batched_bfgs_refill_relax(
         _profile_optimizer_evaluation(
             active_state,
             scheduler_step=current_scheduler_step,
-            pending_systems=n_systems - next_pending,
+            pending_systems=len(pending_ids),
         )
         return current
 
@@ -1113,7 +1135,7 @@ def _batched_bfgs_refill_relax(
             refill_due = bool(resident_finished.any()) and (
                 interval_due or not bool((~resident_finished).any())
             )
-        elif next_pending < n_systems:
+        elif pending_ids:
             refill_due = bool(resident_finished.any())
         else:
             tail_limit = max(
@@ -1130,7 +1152,7 @@ def _batched_bfgs_refill_relax(
             for system_id in active_system_ids[resident_finished].tolist():
                 histories[system_id] = None
 
-            pending_before = n_systems - next_pending
+            pending_before = len(pending_ids)
             insert_count = _refill_insert_count(
                 policy=refill_policy,
                 capacity=capacity,
@@ -1139,23 +1161,47 @@ def _batched_bfgs_refill_relax(
                 low_watermark=refill_low_watermark,
                 min_chunk=refill_min_chunk,
             )
-            refill_stop = next_pending + insert_count
-            refill_ids = torch.arange(
-                next_pending,
-                refill_stop,
+            destination_list = finished_local.tolist()
+            compatible_assignment = None
+            compatible_assignment_accepted = False
+            if (
+                refill_storage == "compatible_slots"
+                and insert_count == len(destination_list)
+                and insert_count > 0
+            ):
+                compatible_assignment = _match_compatible_slots(
+                    destination_list,
+                    [int(active_state.counts[value]) for value in destination_list],
+                    pending_ids,
+                    [int(state.counts[value]) for value in pending_ids],
+                )
+                compatible_assignment_accepted = compatible_assignment.complete
+            if compatible_assignment_accepted:
+                source_list = list(compatible_assignment.source_ids)
+                selected_sources = set(source_list)
+                pending_ids = [
+                    value for value in pending_ids if value not in selected_sources
+                ]
+            else:
+                source_list = pending_ids[:insert_count]
+                del pending_ids[:insert_count]
+            refill_ids = torch.as_tensor(
+                source_list,
                 device=device,
                 dtype=torch.long,
             )
-            next_pending = refill_stop
             slot_counts_match = insert_count == finished_local.numel() and all(
                 int(active_state.counts[destination]) == int(state.counts[source_id])
                 for destination, source_id in zip(
-                    finished_local.tolist(),
-                    refill_ids.tolist(),
+                    destination_list,
+                    source_list,
                     strict=True,
                 )
             )
-            use_slot_swap = refill_storage == "slots" and slot_counts_match
+            use_slot_swap = (
+                refill_storage in {"slots", "compatible_slots"}
+                and slot_counts_match
+            )
             use_arena = refill_storage == "arena"
             with profile_phase(
                 (
@@ -1172,8 +1218,6 @@ def _batched_bfgs_refill_relax(
                 atoms=active_state.n_atoms,
             ):
                 if use_slot_swap:
-                    destination_list = finished_local.tolist()
-                    source_list = refill_ids.tolist()
                     active_state.replace_systems_from_(
                         destination_list,
                         state,
@@ -1344,15 +1388,23 @@ def _batched_bfgs_refill_relax(
                 survivors=ready_count,
                 inserted=refill_ids.numel(),
                 triggered=bool(refill_ids.numel()),
+                requested_storage=refill_storage,
+                compatible_match_attempted=compatible_assignment is not None,
+                compatible_match_complete=compatible_assignment_accepted,
+                compatible_match_count=(
+                    0
+                    if compatible_assignment is None
+                    else len(compatible_assignment.source_ids)
+                ),
                 storage=(
                     "slots"
                     if use_slot_swap
                     else ("arena" if use_arena else "repack")
                 ),
                 systems_after=active_state.n_systems,
-                pending_after=n_systems - next_pending,
+                pending_after=len(pending_ids),
             )
-            if refill_tail_compaction_threshold is not None and next_pending == n_systems:
+            if refill_tail_compaction_threshold is not None and not pending_ids:
                 tail_reference_size = active_state.n_systems
 
         with profile_phase(

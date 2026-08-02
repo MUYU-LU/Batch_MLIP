@@ -1,0 +1,60 @@
+id: omc-csp-workflow-validation-v1
+description: >-
+  End-to-end validation and first remediation of the OMC-CSP automatic workflow across a
+  small homogeneous pool, a medium chemically mixed pool, and a large dense
+  homogeneous pool, with an MPS8 comparison on the mixed workload.
+hypothesis: >-
+  The automatic workflow preserves exact job coverage and order, remains below
+  85 percent peak reserved H100 memory, uses the signed offline capacity model,
+  selects graph and outer scheduling without a timing pilot, and outperforms an
+  eight-worker-per-GPU ASE CUDA-MPS baseline on the held-out mixed P512 pool.
+  Validation must also expose any production API path that bypasses an accepted
+  inner policy.
+status: complete_with_bounded_limitations
+frozen_contract:
+  model: AtomBit smooth-rms fp32 epoch 5
+  optimizer: BatchedBFGS
+  optimizer_dtype: float64
+  cell_filter: FrechetCellFilter
+  cutoff_A: 6.0
+  skin_A: 0.5
+  fmax_eV_per_A: 0.05
+  smax_eV_per_A3: null
+  max_steps: 500
+  deterministic_seed: 20260729
+  memory_fraction: 0.85
+  scheduler_overrides: none
+workloads:
+  - id: OPT-OMC-SCHED-E1-TEST-JAYDUI-P64-INTRA-NARROW-v2
+    regime: small_pool_small_system_homogeneous
+    devices: [0]
+    baseline: decision_and_correctness
+  - id: OPT-OMC-SCHED-E1-TEST-MIX-ALL-P512-INTER-WIDE-v2
+    regime: medium_pool_mixed_systems
+    devices: [0, 1, 2, 3, 4, 5, 6, 7]
+    baseline: ASE_CUDA_MPS_8_workers_per_GPU
+  - id: OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2
+    regime: large_pool_large_system_homogeneous
+    devices: [0, 1, 2, 3, 4, 5, 6, 7]
+    baseline: decision_memory_and_scalability
+required_gates:
+  - exact_job_coverage
+  - manifest_order_preserved
+  - peak_reserved_fraction_at_most_0_85
+  - no_optimization_pilot
+  - deterministic_contract_recorded
+  - scheduler_decisions_reported
+  - convergence_and_endpoint_comparison_on_mixed_pool
+  - makespan_and_full_script_time_reported
+  - every_bypassed_or_fallback_policy_reported_as_an_issue
+repeats: 1
+result:
+  automatic_convergence: [64/64, 512/512, 2048/2048]
+  final_execution_seconds: [3.547, 50.242, 137.227]
+  final_peak_worker_reserved_GB: [8.46, 8.19, 66.23]
+  mixed_p512_full_script_speedup_over_mps: 1.682
+  mixed_p512_cold_execution_speedup_over_warm_mps: 0.999
+  mixed_p512_vs_ase_energy_5meV_per_atom_failures: 2
+  b1_vs_ase_energy_5meV_per_atom_failures: 0
+  accepted_fix_count: 4
+  bounded_limitation_count: 4

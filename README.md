@@ -646,6 +646,7 @@ result = relax(
     devices=["cuda:0", "cuda:1", "cuda:2", "cuda:3"],  # omit for one GPU
     cell_filter=FrechetCellFilter(),
     fmax=0.05,
+    smax=None,
 )
 print(result.schedule)
 ```
@@ -668,27 +669,30 @@ result = relax_manifest(
     devices=["cuda:0", "cuda:1", "cuda:2", "cuda:3"],
     cell_filter=FrechetCellFilter(),
     fmax=0.05,
+    smax=None,  # use ASE FrechetCellFilter convergence semantics
 )
 ```
 
 `relax_manifest` verifies the manifest/profile binding, plans without a timing
-pilot, and sends immutable source references to persistent GPU workers. Each
-worker materializes only its assigned chunks. Results retain manifest order,
-and the returned object is the same `OptimizationResult` used by `relax`.
-This path is the accepted default for signed large-pool OMC-CSP workloads;
-ordinary in-memory use remains unchanged.
+pilot, and keeps source loading bounded. One-GPU calls materialize each planned
+resident batch directly without an outer worker process. Multi-GPU CUDA calls
+use a global prefetch queue so unassigned CIF chunks can load while the current
+GPU wave runs, then dispatch complete cost-balanced chunks to isolated CUDA
+workers. Results retain manifest order, and the returned object is the same
+`OptimizationResult` used by `relax`. This path is the accepted default for
+signed large-pool OMC-CSP workloads; ordinary in-memory use remains unchanged.
 
 Manifest loading also has a bounded CPU-process policy. The default
-`manifest_loader_processes="auto"` keeps one loader for pools below 2,048 jobs,
-for fewer than 32,000 atom-records per active GPU, or when the host cannot
-supply five CPU threads per GPU worker. Otherwise, it uses four `spawn`
-processes per worker. This preserves ordering, avoids forking an initialized
-CUDA process, and requires no timing pilot. Pass a positive integer to override
-the offline decision.
+`manifest_loader_processes="auto"` uses one process below the validated medium
+gate, two at pool size at least 512 with at least 3,000 atom-records per active
+GPU, and four at pool size at least 2,048 with at least 32,000 atom-records per
+active GPU, subject to available host CPUs. This preserves ordering, avoids
+forking an initialized CUDA process, and requires no timing pilot. Pass a
+positive integer to override the offline decision.
 
-For consecutive pools, prefer `BatchExecutor.relax_manifest`. It overlaps the
-next globally unassigned CIF chunks with the current GPU wave and avoids
-restarting model-owning workers. Set
+For consecutive pools, prefer `BatchExecutor.relax_manifest`. The ordinary
+entry point closes its workers after one pool; the executor retains them across
+pools while using the same global prefetch queue. Set
 `manifest_prefetch_chunks_per_worker=0` to retain persistence while disabling
 the overlap buffer.
 
@@ -753,6 +757,15 @@ active drain. Every productive chunk reports the refill decision, predicted
 peak, actual allocated peak, actual reserved peak, and resident count in
 `result.metadata["scheduling"]`.
 
+For a mixed outer bucket, the scheduler may extract an exact optimizer-shape
+subgroup only when that subgroup spans more than one memory-safe resident wave
+and independently matches accepted refill evidence. Variable-cell full BFGS
+uses `(atom_count, (3N + 9)^2)` as this compatibility key. Accepted subgroups
+retain submitted order and use fixed slots; unmatched structures remain in
+their original active-drain chunks. Thus exact-shape extraction cannot
+fragment a mixed bucket unless refill has a predicted payback, and it never
+requires a timing pilot or trial relaxation.
+
 The packaged refill policy currently applies to current-process single-GPU
 automatic scheduling. Multi-GPU automatic execution continues to shard
 memory-safe active-drain chunks; per-worker refill is not inferred from
@@ -773,16 +786,19 @@ are not used for refill selection.
 
 `AutoSchedulerConfig` exposes the 0.85 memory fraction, safety margin, offline
 capacity-policy enable flag, probe size, and absolute-budget test override.
-Multiple homogeneous GPUs share the same plan and pull memory-safe chunks from
-one largest-work-first queue. Active optimizer states never migrate between
-GPUs. Automatic execution uses threads for short queues. When at least eight
+Multiple homogeneous GPUs share the same plan. The first dispatch wave is
+bucket-stratified so one expensive bucket cannot occupy every GPU; remaining
+memory-safe chunks are pulled in descending predicted-cost order. Active
+optimizer states never migrate between GPUs. In-memory automatic execution
+uses threads for short queues. When at least eight
 pending chunks per active device can amortize spawn startup, it uses one
 isolated persistent process per GPU; each process keeps its calculator and
 optimizer alive while pulling later chunks. Override this conservative rule with
 `AutoSchedulerConfig(multi_gpu_worker_backend="process" | "thread")`.
 Non-serializable custom adapters fall back to threads during preflight, before
-any production job starts. In-process MPS dispatch remains a future execution
-layer.
+any production job starts. Signed multi-GPU manifest workloads instead use
+the bounded global-prefetch process executor directly; in-process MPS dispatch
+remains a future execution layer.
 
 The former production-learning controller is retained only for controlled
 experiments as `scheduling="autotune"`. That explicit mode grows capacities
@@ -983,13 +999,18 @@ Implemented:
 - `FixAtoms` for fixed-cell optimization and MD;
 - per-system time steps, temperatures, friction, and FIRE parameters;
 - finite-difference-validated strain-gradient stress calculation.
+- exact Matscipy, CUDA dense-pair, and CUDA periodic cell-list neighbour
+  construction with per-rebuild automatic backend selection;
+- deterministic multi-GPU chunking, bucket-stratified initial dispatch,
+  pending work stealing, and bounded global manifest prefetch;
+- persistent model-owning GPU workers through `BatchExecutor`.
 
 Not yet implemented:
 
 - anisotropic or partially periodic NPT cell dynamics;
 - SHAKE/RATTLE or general ASE constraints;
-- GPU-native periodic neighbour lists;
-- multi-GPU sharding.
+- a validated multi-GPU refill policy;
+- automatic recovery/repacking after an unexpected production OOM.
 
 These are tracked in `docs/roadmap.md` and designed as controlled experiments rather than hidden behavior.
 

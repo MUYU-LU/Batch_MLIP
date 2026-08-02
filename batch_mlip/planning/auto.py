@@ -80,6 +80,13 @@ class AutoSchedulerConfig:
         "cost_descending",
         "bucket_stratified",
     ] = "bucket_stratified"
+    # Non-disabled values expose measured experiments only. They are never
+    # selected by the automatic production policy.
+    manifest_multi_gpu_refill_policy: Literal[
+        "disabled",
+        "local_compatible",
+        "streaming_compatible",
+    ] = "disabled"
     cuda_allocator_policy: Literal[
         "auto", "native", "expandable_segments"
     ] = "auto"
@@ -152,6 +159,15 @@ class AutoSchedulerConfig:
             raise ValueError(
                 "multi_gpu_queue_policy must be 'cost_descending' or "
                 "'bucket_stratified'"
+            )
+        if self.manifest_multi_gpu_refill_policy not in (
+            "disabled",
+            "local_compatible",
+            "streaming_compatible",
+        ):
+            raise ValueError(
+                "manifest_multi_gpu_refill_policy must be 'disabled' or "
+                "'local_compatible' or 'streaming_compatible'"
             )
         if self.cuda_allocator_policy not in (
             "auto",
@@ -757,6 +773,12 @@ class OnlineCapacityController:
     _request_refill: bool = field(init=False, default=False)
     _refill_won: bool = field(init=False, default=False)
 
+    @property
+    def refill_eligible(self) -> bool:
+        """Return whether fixed-slot refill is valid for this bucket."""
+
+        return self.supports_refill and self.bucket.homogeneous_atom_count
+
     def __post_init__(self) -> None:
         if self.cached_policy is None:
             self._next_capacity = min(
@@ -776,7 +798,7 @@ class OnlineCapacityController:
                 self.cached_policy.capacity_source == "memory_extrapolated"
             )
             self._request_refill = (
-                self.cached_policy.active_refill and self.supports_refill
+                self.cached_policy.active_refill and self.refill_eligible
             )
 
     @property
@@ -918,7 +940,7 @@ class OnlineCapacityController:
             * self.config.refill_min_pending_factor
         )
         self._request_refill = (
-            self.supports_refill
+            self.refill_eligible
             and self._next_capacity >= self.config.refill_min_capacity
             and enough_pending
             and observation.mean_active_occupancy
@@ -937,7 +959,7 @@ class OnlineCapacityController:
             key=lambda observation: observation.throughput,
             default=self.observations[-1],
         )
-        use_refill = self._refill_won
+        use_refill = self._refill_won and self.refill_eligible
         extrapolate_capacity = self._exploring and not use_refill
         selected_capacity = (
             min(

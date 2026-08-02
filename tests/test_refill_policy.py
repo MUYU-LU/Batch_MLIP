@@ -95,6 +95,57 @@ def _plan() -> DeterministicRelaxationPlan:
     )
 
 
+def _mixed_plan() -> DeterministicRelaxationPlan:
+    profiles = tuple(
+        SystemProfile(
+            index=index,
+            atom_count=1 if index % 2 == 0 else 2,
+            edge_count=0 if index % 2 == 0 else 4,
+            dof_squared=9 if index % 2 == 0 else 36,
+        )
+        for index in range(6)
+    )
+    workload = AutoWorkloadPlan(
+        profiles=profiles,
+        buckets=(
+            AutoWorkloadBucket(
+                system_indices=(0, 1, 2, 3, 4, 5),
+                mean_atom_count=1.5,
+                mean_edge_count=2.0,
+                mean_dof_squared=22.5,
+                homogeneous_atom_count=False,
+            ),
+        ),
+        profiling_seconds=0.0,
+        fingerprint="mixed-test",
+        fingerprint_fields={},
+    )
+    probe = DeterministicMemoryProbe(
+        memory_budget_bytes=1000,
+        baseline_allocated_bytes=0,
+        peak_allocated_bytes=100,
+        peak_reserved_bytes=100,
+        probe_indices=(0,),
+        probe_model_work=1,
+        model_bytes_per_work=1.0,
+    )
+    return DeterministicRelaxationPlan(
+        workload=workload,
+        probe=probe,
+        chunks=tuple(
+            DeterministicRelaxationChunk(
+                system_indices=(start, start + 1),
+                bucket_index=0,
+                predicted_peak_bytes=900 - 10 * start,
+                estimated_cost=2.0,
+            )
+            for start in (0, 2, 4)
+        ),
+        memory_fraction=0.85,
+        memory_growth_margin=1.1,
+    )
+
+
 def test_model_state_hash_is_stable_and_value_sensitive():
     model = QuadraticWellModel()
     first = model_state_sha256(model)
@@ -187,6 +238,132 @@ def test_offline_refill_policy_preserves_waves_on_active_prediction(
         chunk.refill_prediction == prediction.to_dict()
         for chunk in selected.chunks
     )
+
+
+def test_offline_refill_policy_extracts_only_accepted_exact_shape_group(
+    monkeypatch,
+):
+    def predict(*args, **kwargs):
+        if kwargs["homogeneous_atom_count"] and kwargs["mean_atom_count"] == 1.0:
+            return RefillPrediction(
+                mode="refill",
+                reason="validated exact-shape evidence",
+                policy_id="test",
+                matched_family="small-shape",
+                predicted_speedup=1.2,
+                evidence_split="fit",
+            )
+        return RefillPrediction(mode="active", reason="fallback")
+
+    monkeypatch.setattr("batch_mlip.interfaces.api.predict_refill", predict)
+
+    selected = _apply_offline_refill_policy(
+        _mixed_plan(),
+        _calculator(),
+        BatchedBFGS(),
+        {},
+        AutoSchedulerConfig(),
+    )
+
+    assert [chunk.system_indices for chunk in selected.chunks] == [
+        (0, 2, 4),
+        (1,),
+        (3,),
+        (5,),
+    ]
+    refill = selected.chunks[0]
+    assert refill.active_refill
+    assert refill.resident_capacity == 1
+    assert refill.refill_storage == "slots"
+    assert refill.refill_prediction["parent_bucket_homogeneous"] is False
+    assert refill.refill_prediction["shape_atom_count"] == 1
+    assert refill.refill_prediction["shape_dof_squared"] == 9
+    assert all(not chunk.active_refill for chunk in selected.chunks[1:])
+    scheduled = [index for chunk in selected.chunks for index in chunk.system_indices]
+    assert sorted(scheduled) == list(range(6))
+    assert len(scheduled) == len(set(scheduled))
+
+
+def test_offline_refill_policy_preserves_mixed_chunks_when_no_shape_is_accepted(
+    monkeypatch,
+):
+    prediction = RefillPrediction(mode="active", reason="fallback")
+    monkeypatch.setattr(
+        "batch_mlip.interfaces.api.predict_refill",
+        lambda *args, **kwargs: prediction,
+    )
+
+    original = _mixed_plan()
+    selected = _apply_offline_refill_policy(
+        original,
+        _calculator(),
+        BatchedBFGS(),
+        {},
+        AutoSchedulerConfig(),
+    )
+
+    assert [chunk.system_indices for chunk in selected.chunks] == [
+        chunk.system_indices for chunk in original.chunks
+    ]
+    assert all(not chunk.active_refill for chunk in selected.chunks)
+
+
+def test_offline_refill_policy_requires_exact_dof_shape_for_whole_bucket(
+    monkeypatch,
+):
+    original = _plan()
+    profiles = tuple(
+        SystemProfile(
+            index=profile.index,
+            atom_count=profile.atom_count,
+            edge_count=profile.edge_count,
+            dof_squared=9 if profile.index % 2 == 0 else 16,
+        )
+        for profile in original.workload.profiles
+    )
+    workload = AutoWorkloadPlan(
+        profiles=profiles,
+        buckets=original.workload.buckets,
+        profiling_seconds=0.0,
+        fingerprint="dof-mixed-test",
+        fingerprint_fields={},
+    )
+    calls = []
+
+    def predict(*args, **kwargs):
+        calls.append(kwargs)
+        return RefillPrediction(mode="active", reason="fallback")
+
+    monkeypatch.setattr("batch_mlip.interfaces.api.predict_refill", predict)
+    _apply_offline_refill_policy(
+        DeterministicRelaxationPlan(
+            workload=workload,
+            probe=original.probe,
+            chunks=(
+                DeterministicRelaxationChunk(
+                    system_indices=(0, 1),
+                    bucket_index=0,
+                    predicted_peak_bytes=900,
+                    estimated_cost=2.0,
+                ),
+                DeterministicRelaxationChunk(
+                    system_indices=(2, 3),
+                    bucket_index=0,
+                    predicted_peak_bytes=850,
+                    estimated_cost=2.0,
+                ),
+            ),
+            memory_fraction=original.memory_fraction,
+            memory_growth_margin=original.memory_growth_margin,
+        ),
+        _calculator(),
+        BatchedBFGS(),
+        {},
+        AutoSchedulerConfig(),
+    )
+
+    assert calls[0]["homogeneous_atom_count"] is False
+    assert all(call["homogeneous_atom_count"] is True for call in calls[1:])
 
 
 def test_manual_refill_arguments_preserve_single_batch_execution():

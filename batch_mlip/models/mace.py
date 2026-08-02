@@ -41,6 +41,8 @@ class MACEBatchCalculator(BatchCalculator):
     construction as a compatibility and validation path.
     """
 
+    execution_policy_family = "mace"
+
     @classmethod
     def from_off(
         cls,

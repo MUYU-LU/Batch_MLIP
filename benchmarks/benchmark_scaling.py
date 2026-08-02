@@ -10,9 +10,9 @@ from pathlib import Path
 import numpy as np
 import torch
 from ase import Atoms
-from batch_mlip.toy_models import PairHarmonicModel
 
 from batch_mlip import AseGraphBatch, AtomBitBatchCalculator
+from batch_mlip.toy_models import PairHarmonicModel
 
 
 def synchronize(device: torch.device) -> None:

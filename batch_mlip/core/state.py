@@ -20,7 +20,7 @@ from .math_utils import scatter_max, scatter_sum
 from .neighbors import (
     NeighborBackend,
     neighbor_list,
-    resolve_neighbor_backend,
+    resolve_neighbor_backend_decision,
     validate_neighbor_backend,
 )
 from .types import BatchEvaluation, GraphData
@@ -429,7 +429,25 @@ class AseGraphBatch:
                 .cpu()
                 .tolist()
             )
-            resolved_backend = resolve_neighbor_backend(
+            candidate_edges = None
+            mean_volume_per_atom = None
+            reference_valid = self._neighbor_reference_valid[selected_graph_ids]
+            selected_pbc = self.pbc[selected_graph_ids]
+            if bool(reference_valid.all()) and bool(selected_pbc.all()):
+                selected_counts = self.counts[selected_graph_ids]
+                volumes = torch.linalg.det(self.cells[selected_graph_ids]).abs()
+                if bool(torch.isfinite(volumes).all()) and bool((volumes > 0.0).all()):
+                    candidate_edges = int(edge_counts[selected_graph_ids].sum().item())
+                    mean_volume_per_atom = float(
+                        (volumes / selected_counts).mean().item()
+                    )
+        with profile_phase(
+            "graph.backend_selection",
+            device=self.device,
+            systems=len(ids),
+            atoms=selected_atom_ids.numel(),
+        ):
+            backend_decision = resolve_neighbor_backend_decision(
                 self.neighbor_backend,
                 device=self.device,
                 counts=self.counts[selected_graph_ids],
@@ -437,7 +455,11 @@ class AseGraphBatch:
                 cells=self.cells[selected_graph_ids],
                 pbc=self.pbc[selected_graph_ids],
                 positions=self.positions[selected_atom_ids],
+                candidate_edges=candidate_edges,
+                mean_volume_per_atom=mean_volume_per_atom,
             )
+            resolved_backend = backend_decision.backend
+        backend_fallback_reason = None
         rebuilt_edges: dict[int, np.ndarray | torch.Tensor] = {}
         rebuilt_shifts: dict[int, np.ndarray | torch.Tensor] = {}
 
@@ -469,6 +491,7 @@ class AseGraphBatch:
             except CellListUnsupportedError:
                 if self.neighbor_backend != "auto":
                     raise
+                backend_fallback_reason = "cuda_cell unsupported; used cuda_dense"
                 resolved_backend = "cuda_dense"
                 try:
                     with profile_phase(
@@ -495,10 +518,14 @@ class AseGraphBatch:
                         for graph_idx, values in rebuilt.items()
                     }
                 except DenseNeighborUnsupportedError:
+                    backend_fallback_reason = (
+                        "cuda_cell and cuda_dense unsupported; used matscipy"
+                    )
                     resolved_backend = "matscipy"
             except DenseNeighborUnsupportedError:
                 if self.neighbor_backend != "auto":
                     raise
+                backend_fallback_reason = "cuda_dense unsupported; used matscipy"
                 resolved_backend = "matscipy"
 
         if resolved_backend == "matscipy":
@@ -598,6 +625,13 @@ class AseGraphBatch:
             edges=self.edge_index.shape[1],
             rebuild_count=self.neighbor_rebuild_count,
             backend=resolved_backend,
+            selected_backend=backend_decision.backend,
+            backend_reason=backend_decision.reason,
+            backend_fallback_reason=backend_fallback_reason,
+            pair_work=backend_decision.pair_work,
+            candidate_reduction=backend_decision.candidate_reduction,
+            candidate_edges=backend_decision.candidate_edges,
+            mean_volume_per_atom=backend_decision.mean_volume_per_atom,
         )
 
     def assert_graph_integrity(self) -> None:

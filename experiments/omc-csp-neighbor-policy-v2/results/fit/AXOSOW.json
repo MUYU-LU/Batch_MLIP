@@ -1,0 +1,1913 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "baseline_commit": "9dd272821f8f93d1e19842a2ee751a3b9ddf30c1",
+  "resident_systems": 64,
+  "rebuilt_system_counts": [
+    1,
+    2,
+    4,
+    8,
+    16,
+    32,
+    64
+  ],
+  "candidate_cutoffs_A": [
+    6.0,
+    6.5
+  ],
+  "warmups": 1,
+  "timing_repeats": 3,
+  "families": [
+    {
+      "family": "AXOSOW",
+      "sample_count": 64,
+      "source_paths": [
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW01_exp_61_0_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C1_61_1177_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C1_61_1341_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C1_61_1514_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C1_61_1699_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C1_61_1870_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C1_61_2049_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C1_61_2233_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C1_61_2406_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C1_61_2584_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C1_61_2767_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C1_61_293_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C1_61_339_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C1_61_518_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C1_61_697_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C1_61_872_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C2_61_1043_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C2_61_1223_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C2_61_138_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C2_61_1564_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C2_61_1749_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C2_61_1930_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C2_61_2113_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C2_61_2289_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C2_61_2453_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C2_61_2644_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C2_61_2813_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C2_61_2988_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C2_61_376_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C2_61_551_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C2_61_731_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C2_61_909_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C3_61_1089_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C3_61_1262_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C3_61_1435_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C3_61_1612_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C3_61_1791_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C3_61_195_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C3_61_2142_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C3_61_2324_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C3_61_2495_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C3_61_2681_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C3_61_2856_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C3_61_3030_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C3_61_432_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C3_61_611_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C3_61_789_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C3_61_957_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C4_61_1138_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C4_61_1308_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C4_61_1478_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C4_61_1661_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C4_61_1834_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C4_61_1_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C4_61_2189_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C4_61_2362_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C4_61_2530_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C4_61_2719_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C4_61_2894_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C4_61_3073_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C4_61_470_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C4_61_646_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C4_61_823_z1_8.cif",
+        "/public/home/lmy/Batch_imple_project/test_set/AXOSOW/structures/AXOSOW_C4_61_9_z1_8.cif"
+      ],
+      "atom_counts": [
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64
+      ],
+      "cell_volumes_A3": [
+        646.68028016,
+        805.7061783460449,
+        811.11692402207,
+        886.1707472411516,
+        1202.714957258341,
+        1390.105771700879,
+        1148.7820592537935,
+        928.9063007872321,
+        759.3470149346462,
+        927.8079179597001,
+        976.4122540506859,
+        940.5632224136588,
+        926.622409950697,
+        869.7955127539809,
+        911.7774205012373,
+        842.7412258159972,
+        925.0954155242762,
+        1123.0234466851487,
+        917.0020211851706,
+        925.6643664150698,
+        636.6529822373211,
+        903.6550658115056,
+        831.4314881348971,
+        1065.8219596663846,
+        785.6866838610401,
+        981.2968262173249,
+        997.379263230069,
+        1331.9623523530652,
+        918.7041581352745,
+        1180.7986989010356,
+        1100.9434717554332,
+        1009.627635038922,
+        953.7106079332223,
+        824.848122856887,
+        1306.9269880315178,
+        868.7227425436979,
+        891.2177607791002,
+        865.4181848741106,
+        839.0981762564949,
+        1040.9132114487543,
+        840.8565853045934,
+        997.4796130645241,
+        1173.427965644974,
+        974.3230996195142,
+        917.3951865564892,
+        924.640115441083,
+        846.0033974957453,
+        970.2847264965413,
+        767.848147129974,
+        908.630112080139,
+        1506.35673919569,
+        888.5096789632815,
+        1011.0637065523017,
+        1119.2952685316068,
+        822.9566337658815,
+        990.816995137027,
+        772.3082842524931,
+        1214.2626709046629,
+        1616.1168391444946,
+        984.8474817069996,
+        1019.8814428520217,
+        1915.5523818775032,
+        1407.8022809696454,
+        891.9968068273953
+      ],
+      "points": [
+        {
+          "candidate_cutoff_A": 6.0,
+          "resident_systems": 64,
+          "rebuilt_systems": 1,
+          "policy_features": {
+            "system_count": 1,
+            "atom_count": 64,
+            "minimum_atoms_per_system": 64,
+            "maximum_atoms_per_system": 64,
+            "pair_work": 4096,
+            "candidate_edges": 5504,
+            "candidate_edges_per_atom": 86.0,
+            "candidate_edges_per_pair_work": 1.34375,
+            "minimum_volume_A3": 646.6802368164062,
+            "mean_volume_A3": 646.6802368164062,
+            "maximum_volume_A3": 646.6802368164062,
+            "mean_volume_per_atom_A3": 10.104378700256348,
+            "estimated_cell_candidate_reduction": 0.0
+          },
+          "fastest_explicit_backend": "cuda_cell",
+          "methods": {
+            "matscipy": {
+              "backend": "matscipy",
+              "resolved_backend": "matscipy",
+              "decision_reason": "legacy resolver",
+              "pair_work": 4096,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.00022862100013298914,
+                0.00019617100042523816,
+                0.00020565099839586765
+              ],
+              "median_selection_seconds": 0.00020565099839586765,
+              "rebuild_seconds": [
+                0.004799073998583481,
+                0.004759067000122741,
+                0.0047420690025319345
+              ],
+              "median_rebuild_seconds": 0.004759067000122741,
+              "rebuilt_systems_per_second": 210.12521991688897,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 34320384,
+              "peak_reserved_bytes": 54525952
+            },
+            "cuda_dense": {
+              "backend": "cuda_dense",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 4096,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.00020514700008789077,
+                0.00019668199820443988,
+                0.0001953590035554953
+              ],
+              "median_selection_seconds": 0.00019668199820443988,
+              "rebuild_seconds": [
+                0.007185877002484631,
+                0.00715608899918152,
+                0.0071138679995783605
+              ],
+              "median_rebuild_seconds": 0.00715608899918152,
+              "rebuilt_systems_per_second": 139.74113515278742,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 67875328,
+              "peak_reserved_bytes": 119537664
+            },
+            "cuda_cell": {
+              "backend": "cuda_cell",
+              "resolved_backend": "cuda_cell",
+              "decision_reason": "legacy resolver",
+              "pair_work": 4096,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.00021008000476285815,
+                0.00018963399634230882,
+                0.00018591799744172022
+              ],
+              "median_selection_seconds": 0.00018963399634230882,
+              "rebuild_seconds": [
+                0.004538512999715749,
+                0.0044481369986897334,
+                0.004412873997353017
+              ],
+              "median_rebuild_seconds": 0.0044481369986897334,
+              "rebuilt_systems_per_second": 224.81321962308382,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 80237568,
+              "peak_reserved_bytes": 1237319680
+            },
+            "auto": {
+              "backend": "auto",
+              "resolved_backend": "matscipy",
+              "decision_reason": "legacy resolver",
+              "pair_work": 4096,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0002313110016984865,
+                0.00021800600370625034,
+                0.00021879599808016792
+              ],
+              "median_selection_seconds": 0.00021879599808016792,
+              "rebuild_seconds": [
+                0.0047739139990881085,
+                0.004749053994601127,
+                0.00474786900304025
+              ],
+              "median_rebuild_seconds": 0.004749053994601127,
+              "rebuilt_systems_per_second": 210.56825235864474,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 67875328,
+              "peak_reserved_bytes": 119537664,
+              "regret_vs_fastest": 0.06765011869014659
+            }
+          }
+        },
+        {
+          "candidate_cutoff_A": 6.0,
+          "resident_systems": 64,
+          "rebuilt_systems": 2,
+          "policy_features": {
+            "system_count": 2,
+            "atom_count": 128,
+            "minimum_atoms_per_system": 64,
+            "maximum_atoms_per_system": 64,
+            "pair_work": 8192,
+            "candidate_edges": 10200,
+            "candidate_edges_per_atom": 79.6875,
+            "candidate_edges_per_pair_work": 1.2451171875,
+            "minimum_volume_A3": 646.6802368164062,
+            "mean_volume_A3": 726.1932373046875,
+            "maximum_volume_A3": 805.7061767578125,
+            "mean_volume_per_atom_A3": 11.346769332885742,
+            "estimated_cell_candidate_reduction": 0.0
+          },
+          "fastest_explicit_backend": "cuda_cell",
+          "methods": {
+            "matscipy": {
+              "backend": "matscipy",
+              "resolved_backend": "matscipy",
+              "decision_reason": "legacy resolver",
+              "pair_work": 8192,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.00026377200265415013,
+                0.00023543700081063434,
+                0.0002268699972773902
+              ],
+              "median_selection_seconds": 0.00023543700081063434,
+              "rebuild_seconds": [
+                0.00807559500390198,
+                0.008024800001294352,
+                0.008010551006009337
+              ],
+              "median_rebuild_seconds": 0.008024800001294352,
+              "rebuilt_systems_per_second": 249.2273950350678,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 68064256,
+              "peak_reserved_bytes": 88080384
+            },
+            "cuda_dense": {
+              "backend": "cuda_dense",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 8192,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.00024176100123440847,
+                0.00022915199951967224,
+                0.00022516700119012967
+              ],
+              "median_selection_seconds": 0.00022915199951967224,
+              "rebuild_seconds": [
+                0.00786953100032406,
+                0.007842095001251437,
+                0.00787136400322197
+              ],
+              "median_rebuild_seconds": 0.00786953100032406,
+              "rebuilt_systems_per_second": 254.14475143660303,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 68064768,
+              "peak_reserved_bytes": 121634816
+            },
+            "cuda_cell": {
+              "backend": "cuda_cell",
+              "resolved_backend": "cuda_cell",
+              "decision_reason": "legacy resolver",
+              "pair_work": 8192,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0002425540005788207,
+                0.0002391359957982786,
+                0.0002267460004077293
+              ],
+              "median_selection_seconds": 0.0002391359957982786,
+              "rebuild_seconds": [
+                0.00477536899416009,
+                0.0046975410004961304,
+                0.00473815399891464
+              ],
+              "median_rebuild_seconds": 0.00473815399891464,
+              "rebuilt_systems_per_second": 422.10531790611617,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 106612736,
+              "peak_reserved_bytes": 1237319680
+            },
+            "auto": {
+              "backend": "auto",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 8192,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0006251649974728934,
+                0.0005865530038136058,
+                0.0005895860012969933
+              ],
+              "median_selection_seconds": 0.0005895860012969933,
+              "rebuild_seconds": [
+                0.008225475998187903,
+                0.00817352100420976,
+                0.008198042996809818
+              ],
+              "median_rebuild_seconds": 0.008198042996809818,
+              "rebuilt_systems_per_second": 243.96066241397844,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 68064768,
+              "peak_reserved_bytes": 121634816,
+              "regret_vs_fastest": 0.7302187726882088
+            }
+          }
+        },
+        {
+          "candidate_cutoff_A": 6.0,
+          "resident_systems": 64,
+          "rebuilt_systems": 4,
+          "policy_features": {
+            "system_count": 4,
+            "atom_count": 256,
+            "minimum_atoms_per_system": 64,
+            "maximum_atoms_per_system": 64,
+            "pair_work": 16384,
+            "candidate_edges": 18992,
+            "candidate_edges_per_atom": 74.1875,
+            "candidate_edges_per_pair_work": 1.1591796875,
+            "minimum_volume_A3": 646.6802368164062,
+            "mean_volume_A3": 787.4185791015625,
+            "maximum_volume_A3": 886.1708374023438,
+            "mean_volume_per_atom_A3": 12.303415298461914,
+            "estimated_cell_candidate_reduction": 0.0
+          },
+          "fastest_explicit_backend": "cuda_cell",
+          "methods": {
+            "matscipy": {
+              "backend": "matscipy",
+              "resolved_backend": "matscipy",
+              "decision_reason": "legacy resolver",
+              "pair_work": 16384,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0003504679989418946,
+                0.0003245710031478666,
+                0.0003172729993821122
+              ],
+              "median_selection_seconds": 0.0003245710031478666,
+              "rebuild_seconds": [
+                0.013456606997351628,
+                0.013377167000726331,
+                0.01340313700347906
+              ],
+              "median_rebuild_seconds": 0.01340313700347906,
+              "rebuilt_systems_per_second": 298.43759703133065,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 68418560,
+              "peak_reserved_bytes": 88080384
+            },
+            "cuda_dense": {
+              "backend": "cuda_dense",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 16384,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.00032535900390939787,
+                0.00031614399631507695,
+                0.0003125570001429878
+              ],
+              "median_selection_seconds": 0.00031614399631507695,
+              "rebuild_seconds": [
+                0.00830954899720382,
+                0.008222845004638657,
+                0.008180438999261241
+              ],
+              "median_rebuild_seconds": 0.008222845004638657,
+              "rebuilt_systems_per_second": 486.4496409385714,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 68418560,
+              "peak_reserved_bytes": 123731968
+            },
+            "cuda_cell": {
+              "backend": "cuda_cell",
+              "resolved_backend": "cuda_cell",
+              "decision_reason": "legacy resolver",
+              "pair_work": 16384,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0003343029966345057,
+                0.0003197959958924912,
+                0.00031801599834579974
+              ],
+              "median_selection_seconds": 0.0003197959958924912,
+              "rebuild_seconds": [
+                0.007563553997897543,
+                0.00752852300502127,
+                0.007521061997977085
+              ],
+              "median_rebuild_seconds": 0.00752852300502127,
+              "rebuilt_systems_per_second": 531.3127153004826,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 132214784,
+              "peak_reserved_bytes": 1237319680
+            },
+            "auto": {
+              "backend": "auto",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 16384,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0008372630036319606,
+                0.0007927229962660931,
+                0.0007627270024386235
+              ],
+              "median_selection_seconds": 0.0007927229962660931,
+              "rebuild_seconds": [
+                0.008669959002872929,
+                0.008723981998628005,
+                0.00876479299768107
+              ],
+              "median_rebuild_seconds": 0.008723981998628005,
+              "rebuilt_systems_per_second": 458.5062189065805,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 68418560,
+              "peak_reserved_bytes": 123731968,
+              "regret_vs_fastest": 0.15879064098089413
+            }
+          }
+        },
+        {
+          "candidate_cutoff_A": 6.0,
+          "resident_systems": 64,
+          "rebuilt_systems": 8,
+          "policy_features": {
+            "system_count": 8,
+            "atom_count": 512,
+            "minimum_atoms_per_system": 64,
+            "maximum_atoms_per_system": 64,
+            "pair_work": 32768,
+            "candidate_edges": 31520,
+            "candidate_edges_per_atom": 61.5625,
+            "candidate_edges_per_pair_work": 0.9619140625,
+            "minimum_volume_A3": 646.6802368164062,
+            "mean_volume_A3": 977.52294921875,
+            "maximum_volume_A3": 1390.1058349609375,
+            "mean_volume_per_atom_A3": 15.273796081542969,
+            "estimated_cell_candidate_reduction": 0.0
+          },
+          "fastest_explicit_backend": "cuda_dense",
+          "methods": {
+            "matscipy": {
+              "backend": "matscipy",
+              "resolved_backend": "matscipy",
+              "decision_reason": "legacy resolver",
+              "pair_work": 32768,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0005128020056872629,
+                0.0004893599980277941,
+                0.00048502400022698566
+              ],
+              "median_selection_seconds": 0.0004893599980277941,
+              "rebuild_seconds": [
+                0.02293131000624271,
+                0.02291468600014923,
+                0.02293342699704226
+              ],
+              "median_rebuild_seconds": 0.02293131000624271,
+              "rebuilt_systems_per_second": 348.86798869415304,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 68925440,
+              "peak_reserved_bytes": 88080384
+            },
+            "cuda_dense": {
+              "backend": "cuda_dense",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 32768,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0005002110046916641,
+                0.0004881900022155605,
+                0.0004828949968214147
+              ],
+              "median_selection_seconds": 0.0004881900022155605,
+              "rebuild_seconds": [
+                0.009001223996165209,
+                0.00894005699956324,
+                0.008996058997581713
+              ],
+              "median_rebuild_seconds": 0.008996058997581713,
+              "rebuilt_systems_per_second": 889.2782942120022,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 68923392,
+              "peak_reserved_bytes": 127926272
+            },
+            "cuda_cell": {
+              "backend": "cuda_cell",
+              "resolved_backend": "cuda_cell",
+              "decision_reason": "legacy resolver",
+              "pair_work": 32768,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0005018880037823692,
+                0.0004887429968221113,
+                0.0004846779993386008
+              ],
+              "median_selection_seconds": 0.0004887429968221113,
+              "rebuild_seconds": [
+                0.013165042000764515,
+                0.01305361499544233,
+                0.013042087994108442
+              ],
+              "median_rebuild_seconds": 0.01305361499544233,
+              "rebuilt_systems_per_second": 612.8570516897579,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 184457728,
+              "peak_reserved_bytes": 1237319680
+            },
+            "auto": {
+              "backend": "auto",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 32768,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0012244969984749332,
+                0.001154568999481853,
+                0.001148852999904193
+              ],
+              "median_selection_seconds": 0.001154568999481853,
+              "rebuild_seconds": [
+                0.009685750002972782,
+                0.00956027299980633,
+                0.00955981999868527
+              ],
+              "median_rebuild_seconds": 0.00956027299980633,
+              "rebuilt_systems_per_second": 836.7961877408796,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 68923392,
+              "peak_reserved_bytes": 127926272,
+              "regret_vs_fastest": 0.06271790818360423
+            }
+          }
+        },
+        {
+          "candidate_cutoff_A": 6.0,
+          "resident_systems": 64,
+          "rebuilt_systems": 16,
+          "policy_features": {
+            "system_count": 16,
+            "atom_count": 1024,
+            "minimum_atoms_per_system": 64,
+            "maximum_atoms_per_system": 64,
+            "pair_work": 65536,
+            "candidate_edges": 65272,
+            "candidate_edges_per_atom": 63.7421875,
+            "candidate_edges_per_pair_work": 0.9959716796875,
+            "minimum_volume_A3": 646.6802368164062,
+            "mean_volume_A3": 935.953125,
+            "maximum_volume_A3": 1390.1058349609375,
+            "mean_volume_per_atom_A3": 14.624267578125,
+            "estimated_cell_candidate_reduction": 0.0
+          },
+          "fastest_explicit_backend": "cuda_dense",
+          "methods": {
+            "matscipy": {
+              "backend": "matscipy",
+              "resolved_backend": "matscipy",
+              "decision_reason": "legacy resolver",
+              "pair_work": 65536,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0008625519985798746,
+                0.0008406850029132329,
+                0.0008293630016851239
+              ],
+              "median_selection_seconds": 0.0008406850029132329,
+              "rebuild_seconds": [
+                0.04517211100028362,
+                0.045079464005539194,
+                0.04523151399916969
+              ],
+              "median_rebuild_seconds": 0.04517211100028362,
+              "rebuilt_systems_per_second": 354.20084750742643,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 70287872,
+              "peak_reserved_bytes": 88080384
+            },
+            "cuda_dense": {
+              "backend": "cuda_dense",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 65536,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.00085067000327399,
+                0.0008385330002056435,
+                0.00083080700278515
+              ],
+              "median_selection_seconds": 0.0008385330002056435,
+              "rebuild_seconds": [
+                0.010302681002940517,
+                0.010298203000274953,
+                0.010302094000508077
+              ],
+              "median_rebuild_seconds": 0.010302094000508077,
+              "rebuilt_systems_per_second": 1553.0823150333238,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 72416256,
+              "peak_reserved_bytes": 123731968
+            },
+            "cuda_cell": {
+              "backend": "cuda_cell",
+              "resolved_backend": "cuda_cell",
+              "decision_reason": "legacy resolver",
+              "pair_work": 65536,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0008473269990645349,
+                0.000835849998111371,
+                0.0008288519966299646
+              ],
+              "median_selection_seconds": 0.000835849998111371,
+              "rebuild_seconds": [
+                0.017348483997920994,
+                0.017352048998873215,
+                0.01739563800219912
+              ],
+              "median_rebuild_seconds": 0.017352048998873215,
+              "rebuilt_systems_per_second": 922.0813058468765,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 313704960,
+              "peak_reserved_bytes": 1237319680
+            },
+            "auto": {
+              "backend": "auto",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 65536,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.001969719000044279,
+                0.0019120040014968254,
+                0.0018879030030802824
+              ],
+              "median_selection_seconds": 0.0019120040014968254,
+              "rebuild_seconds": [
+                0.011414679000154138,
+                0.011341108998749405,
+                0.01132325199432671
+              ],
+              "median_rebuild_seconds": 0.011341108998749405,
+              "rebuilt_systems_per_second": 1410.796774968333,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 72416256,
+              "peak_reserved_bytes": 123731968,
+              "regret_vs_fastest": 0.10085473867643668
+            }
+          }
+        },
+        {
+          "candidate_cutoff_A": 6.0,
+          "resident_systems": 64,
+          "rebuilt_systems": 32,
+          "policy_features": {
+            "system_count": 32,
+            "atom_count": 2048,
+            "minimum_atoms_per_system": 64,
+            "maximum_atoms_per_system": 64,
+            "pair_work": 131072,
+            "candidate_edges": 127112,
+            "candidate_edges_per_atom": 62.06640625,
+            "candidate_edges_per_pair_work": 0.96978759765625,
+            "minimum_volume_A3": 636.6529541015625,
+            "mean_volume_A3": 956.5623779296875,
+            "maximum_volume_A3": 1390.1058349609375,
+            "mean_volume_per_atom_A3": 14.946287155151367,
+            "estimated_cell_candidate_reduction": 0.0
+          },
+          "fastest_explicit_backend": "cuda_dense",
+          "methods": {
+            "matscipy": {
+              "backend": "matscipy",
+              "resolved_backend": "matscipy",
+              "decision_reason": "legacy resolver",
+              "pair_work": 131072,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.001550319000671152,
+                0.0015423700024257414,
+                0.0015186189993983135
+              ],
+              "median_selection_seconds": 0.0015423700024257414,
+              "rebuild_seconds": [
+                0.09339397599978838,
+                0.0899571339978138,
+                0.08996239800035255
+              ],
+              "median_rebuild_seconds": 0.08996239800035255,
+              "rebuilt_systems_per_second": 355.7041687558684,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 72783872,
+              "peak_reserved_bytes": 88080384
+            },
+            "cuda_dense": {
+              "backend": "cuda_dense",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 131072,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0015374189970316365,
+                0.0015358929958892986,
+                0.0015036869954201393
+              ],
+              "median_selection_seconds": 0.0015358929958892986,
+              "rebuild_seconds": [
+                0.01294943899847567,
+                0.012978134996956214,
+                0.012987290996534284
+              ],
+              "median_rebuild_seconds": 0.012978134996956214,
+              "rebuilt_systems_per_second": 2465.6855555520897,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 82433536,
+              "peak_reserved_bytes": 123731968
+            },
+            "cuda_cell": {
+              "backend": "cuda_cell",
+              "resolved_backend": "cuda_cell",
+              "decision_reason": "legacy resolver",
+              "pair_work": 131072,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0015419289993587881,
+                0.0015426020036102273,
+                0.0015260520012816414
+              ],
+              "median_selection_seconds": 0.0015419289993587881,
+              "rebuild_seconds": [
+                0.02396852200035937,
+                0.023970173999259714,
+                0.023947531000885647
+              ],
+              "median_rebuild_seconds": 0.02396852200035937,
+              "rebuilt_systems_per_second": 1335.084407771168,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 601042944,
+              "peak_reserved_bytes": 1237319680
+            },
+            "auto": {
+              "backend": "auto",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 131072,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0034317760000703856,
+                0.003383307994226925,
+                0.0034367499974905513
+              ],
+              "median_selection_seconds": 0.0034317760000703856,
+              "rebuild_seconds": [
+                0.014829904997895937,
+                0.014769880996027496,
+                0.014725865999935195
+              ],
+              "median_rebuild_seconds": 0.014769880996027496,
+              "rebuilt_systems_per_second": 2166.5712816918913,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 82433536,
+              "peak_reserved_bytes": 123731968,
+              "regret_vs_fastest": 0.13805881966025968
+            }
+          }
+        },
+        {
+          "candidate_cutoff_A": 6.0,
+          "resident_systems": 64,
+          "rebuilt_systems": 64,
+          "policy_features": {
+            "system_count": 64,
+            "atom_count": 4096,
+            "minimum_atoms_per_system": 64,
+            "maximum_atoms_per_system": 64,
+            "pair_work": 262144,
+            "candidate_edges": 245352,
+            "candidate_edges_per_atom": 59.900390625,
+            "candidate_edges_per_pair_work": 0.935943603515625,
+            "minimum_volume_A3": 636.6529541015625,
+            "mean_volume_A3": 995.0548095703125,
+            "maximum_volume_A3": 1915.55224609375,
+            "mean_volume_per_atom_A3": 15.547731399536133,
+            "estimated_cell_candidate_reduction": 0.0
+          },
+          "fastest_explicit_backend": "cuda_dense",
+          "methods": {
+            "matscipy": {
+              "backend": "matscipy",
+              "resolved_backend": "matscipy",
+              "decision_reason": "legacy resolver",
+              "pair_work": 262144,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0029233749955892563,
+                0.0029100110041326843,
+                0.002886850001232233
+              ],
+              "median_selection_seconds": 0.0029100110041326843,
+              "rebuild_seconds": [
+                0.17496719200426014,
+                0.17506840200076113,
+                0.17492660599964438
+              ],
+              "median_rebuild_seconds": 0.17496719200426014,
+              "rebuilt_systems_per_second": 365.78286058589606,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 69461504,
+              "peak_reserved_bytes": 88080384
+            },
+            "cuda_dense": {
+              "backend": "cuda_dense",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 262144,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.002905797999119386,
+                0.002885863999836147,
+                0.0028893330018036067
+              ],
+              "median_selection_seconds": 0.0028893330018036067,
+              "rebuild_seconds": [
+                0.026321842000470497,
+                0.02617451600235654,
+                0.026208900999336038
+              ],
+              "median_rebuild_seconds": 0.026208900999336038,
+              "rebuilt_systems_per_second": 2441.9184917986963,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 106734592,
+              "peak_reserved_bytes": 119537664
+            },
+            "cuda_cell": {
+              "backend": "cuda_cell",
+              "resolved_backend": "cuda_cell",
+              "decision_reason": "legacy resolver",
+              "pair_work": 262144,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0029090409952914342,
+                0.0029028350036242045,
+                0.0029010910002398305
+              ],
+              "median_selection_seconds": 0.0029028350036242045,
+              "rebuild_seconds": [
+                0.03678688799845986,
+                0.036745455996424425,
+                0.037060324000776745
+              ],
+              "median_rebuild_seconds": 0.03678688799845986,
+              "rebuilt_systems_per_second": 1739.7503154569492,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 1121773568,
+              "peak_reserved_bytes": 1237319680
+            },
+            "auto": {
+              "backend": "auto",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 262144,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0062643700002809055,
+                0.00626297399867326,
+                0.006157477000670042
+              ],
+              "median_selection_seconds": 0.00626297399867326,
+              "rebuild_seconds": [
+                0.02980613899853779,
+                0.029498578995116986,
+                0.029300400005013216
+              ],
+              "median_rebuild_seconds": 0.029498578995116986,
+              "rebuilt_systems_per_second": 2169.5960341206323,
+              "total_candidate_edges": 245352,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 106734592,
+              "peak_reserved_bytes": 119537664,
+              "regret_vs_fastest": 0.12551758640563704
+            }
+          }
+        },
+        {
+          "candidate_cutoff_A": 6.5,
+          "resident_systems": 64,
+          "rebuilt_systems": 1,
+          "policy_features": {
+            "system_count": 1,
+            "atom_count": 64,
+            "minimum_atoms_per_system": 64,
+            "maximum_atoms_per_system": 64,
+            "pair_work": 4096,
+            "candidate_edges": 6952,
+            "candidate_edges_per_atom": 108.625,
+            "candidate_edges_per_pair_work": 1.697265625,
+            "minimum_volume_A3": 646.6802368164062,
+            "mean_volume_A3": 646.6802368164062,
+            "maximum_volume_A3": 646.6802368164062,
+            "mean_volume_per_atom_A3": 10.104378700256348,
+            "estimated_cell_candidate_reduction": 0.0
+          },
+          "fastest_explicit_backend": "cuda_cell",
+          "methods": {
+            "matscipy": {
+              "backend": "matscipy",
+              "resolved_backend": "matscipy",
+              "decision_reason": "legacy resolver",
+              "pair_work": 4096,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0002104920058627613,
+                0.00019264099682914093,
+                0.0001851740016718395
+              ],
+              "median_selection_seconds": 0.00019264099682914093,
+              "rebuild_seconds": [
+                0.005037649993028026,
+                0.0049365340018994175,
+                0.004982952996215317
+              ],
+              "median_rebuild_seconds": 0.004982952996215317,
+              "rebuilt_systems_per_second": 200.68421290739167,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 79097344,
+              "peak_reserved_bytes": 111149056
+            },
+            "cuda_dense": {
+              "backend": "cuda_dense",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 4096,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.00020166100148344412,
+                0.00018840400298358873,
+                0.0001880710042314604
+              ],
+              "median_selection_seconds": 0.00018840400298358873,
+              "rebuild_seconds": [
+                0.007210458999907132,
+                0.007269642999744974,
+                0.0072150990017689764
+              ],
+              "median_rebuild_seconds": 0.0072150990017689764,
+              "rebuilt_systems_per_second": 138.59823680240882,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 79096832,
+              "peak_reserved_bytes": 140509184
+            },
+            "cuda_cell": {
+              "backend": "cuda_cell",
+              "resolved_backend": "cuda_cell",
+              "decision_reason": "legacy resolver",
+              "pair_work": 4096,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0001985990020330064,
+                0.00018841800192603841,
+                0.00018897399422712624
+              ],
+              "median_selection_seconds": 0.00018897399422712624,
+              "rebuild_seconds": [
+                0.004428148997249082,
+                0.004476308997254819,
+                0.004418409000209067
+              ],
+              "median_rebuild_seconds": 0.004428148997249082,
+              "rebuilt_systems_per_second": 225.82799282978831,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 85906944,
+              "peak_reserved_bytes": 1300234240
+            },
+            "auto": {
+              "backend": "auto",
+              "resolved_backend": "matscipy",
+              "decision_reason": "legacy resolver",
+              "pair_work": 4096,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.00025463700148975477,
+                0.00022333500237436965,
+                0.00021861699497094378
+              ],
+              "median_selection_seconds": 0.00022333500237436965,
+              "rebuild_seconds": [
+                0.005065356999693904,
+                0.00503389799996512,
+                0.005069777995231561
+              ],
+              "median_rebuild_seconds": 0.005065356999693904,
+              "rebuilt_systems_per_second": 197.4194513951197,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 79096832,
+              "peak_reserved_bytes": 140509184,
+              "regret_vs_fastest": 0.14389940420719305
+            }
+          }
+        },
+        {
+          "candidate_cutoff_A": 6.5,
+          "resident_systems": 64,
+          "rebuilt_systems": 2,
+          "policy_features": {
+            "system_count": 2,
+            "atom_count": 128,
+            "minimum_atoms_per_system": 64,
+            "maximum_atoms_per_system": 64,
+            "pair_work": 8192,
+            "candidate_edges": 12848,
+            "candidate_edges_per_atom": 100.375,
+            "candidate_edges_per_pair_work": 1.568359375,
+            "minimum_volume_A3": 646.6802368164062,
+            "mean_volume_A3": 726.1932373046875,
+            "maximum_volume_A3": 805.7061767578125,
+            "mean_volume_per_atom_A3": 11.346769332885742,
+            "estimated_cell_candidate_reduction": 0.0
+          },
+          "fastest_explicit_backend": "cuda_cell",
+          "methods": {
+            "matscipy": {
+              "backend": "matscipy",
+              "resolved_backend": "matscipy",
+              "decision_reason": "legacy resolver",
+              "pair_work": 8192,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0002458240051055327,
+                0.00024907500483095646,
+                0.00022720899869455025
+              ],
+              "median_selection_seconds": 0.0002458240051055327,
+              "rebuild_seconds": [
+                0.008533496002200991,
+                0.008474900001601782,
+                0.008441532001597807
+              ],
+              "median_rebuild_seconds": 0.008474900001601782,
+              "rebuilt_systems_per_second": 235.9909850997645,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 79334912,
+              "peak_reserved_bytes": 111149056
+            },
+            "cuda_dense": {
+              "backend": "cuda_dense",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 8192,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.00023981700360309333,
+                0.00023136600066209212,
+                0.00023012900055618957
+              ],
+              "median_selection_seconds": 0.00023136600066209212,
+              "rebuild_seconds": [
+                0.007914314002846368,
+                0.00791844200284686,
+                0.007892962996265851
+              ],
+              "median_rebuild_seconds": 0.007914314002846368,
+              "rebuilt_systems_per_second": 252.7066779610594,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 79333888,
+              "peak_reserved_bytes": 142606336
+            },
+            "cuda_cell": {
+              "backend": "cuda_cell",
+              "resolved_backend": "cuda_cell",
+              "decision_reason": "legacy resolver",
+              "pair_work": 8192,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.00024109999503707513,
+                0.00024172200210159644,
+                0.0002291350028826855
+              ],
+              "median_selection_seconds": 0.00024109999503707513,
+              "rebuild_seconds": [
+                0.004758469993248582,
+                0.004728562998934649,
+                0.004732927001896314
+              ],
+              "median_rebuild_seconds": 0.004732927001896314,
+              "rebuilt_systems_per_second": 422.5714867773519,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 111437312,
+              "peak_reserved_bytes": 1300234240
+            },
+            "auto": {
+              "backend": "auto",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 8192,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0006286269999691285,
+                0.0005804020038340241,
+                0.0005927160018472932
+              ],
+              "median_selection_seconds": 0.0005927160018472932,
+              "rebuild_seconds": [
+                0.008256277993496042,
+                0.008273724997707177,
+                0.008292148995678872
+              ],
+              "median_rebuild_seconds": 0.008273724997707177,
+              "rebuilt_systems_per_second": 241.7290882346515,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 79333888,
+              "peak_reserved_bytes": 142606336,
+              "regret_vs_fastest": 0.748120136734032
+            }
+          }
+        },
+        {
+          "candidate_cutoff_A": 6.5,
+          "resident_systems": 64,
+          "rebuilt_systems": 4,
+          "policy_features": {
+            "system_count": 4,
+            "atom_count": 256,
+            "minimum_atoms_per_system": 64,
+            "maximum_atoms_per_system": 64,
+            "pair_work": 16384,
+            "candidate_edges": 23736,
+            "candidate_edges_per_atom": 92.71875,
+            "candidate_edges_per_pair_work": 1.44873046875,
+            "minimum_volume_A3": 646.6802368164062,
+            "mean_volume_A3": 787.4185791015625,
+            "maximum_volume_A3": 886.1708374023438,
+            "mean_volume_per_atom_A3": 12.303415298461914,
+            "estimated_cell_candidate_reduction": 0.0
+          },
+          "fastest_explicit_backend": "cuda_cell",
+          "methods": {
+            "matscipy": {
+              "backend": "matscipy",
+              "resolved_backend": "matscipy",
+              "decision_reason": "legacy resolver",
+              "pair_work": 16384,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0003392389990040101,
+                0.0003177580001647584,
+                0.00032070300221676007
+              ],
+              "median_selection_seconds": 0.00032070300221676007,
+              "rebuild_seconds": [
+                0.014312209998024628,
+                0.0141821750003146,
+                0.014142604995868169
+              ],
+              "median_rebuild_seconds": 0.0141821750003146,
+              "rebuilt_systems_per_second": 282.0441857409931,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 79773184,
+              "peak_reserved_bytes": 111149056
+            },
+            "cuda_dense": {
+              "backend": "cuda_dense",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 16384,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.00032552500488236547,
+                0.00031778899574419484,
+                0.0003135820006718859
+              ],
+              "median_selection_seconds": 0.00031778899574419484,
+              "rebuild_seconds": [
+                0.008200795004086103,
+                0.00827840199781349,
+                0.008211484993807971
+              ],
+              "median_rebuild_seconds": 0.008211484993807971,
+              "rebuilt_systems_per_second": 487.1226097370058,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 79771136,
+              "peak_reserved_bytes": 144703488
+            },
+            "cuda_cell": {
+              "backend": "cuda_cell",
+              "resolved_backend": "cuda_cell",
+              "decision_reason": "legacy resolver",
+              "pair_work": 16384,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0003290940003353171,
+                0.0003164020017720759,
+                0.0003115919971605763
+              ],
+              "median_selection_seconds": 0.0003164020017720759,
+              "rebuild_seconds": [
+                0.00754318899998907,
+                0.007573334994958714,
+                0.007525868000811897
+              ],
+              "median_rebuild_seconds": 0.00754318899998907,
+              "rebuilt_systems_per_second": 530.2797000056337,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 137884160,
+              "peak_reserved_bytes": 1300234240
+            },
+            "auto": {
+              "backend": "auto",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 16384,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0008233939952333458,
+                0.0007870920017012395,
+                0.0007670340055483393
+              ],
+              "median_selection_seconds": 0.0007870920017012395,
+              "rebuild_seconds": [
+                0.008696582000993658,
+                0.008688384004926775,
+                0.008635699996375479
+              ],
+              "median_rebuild_seconds": 0.008688384004926775,
+              "rebuilt_systems_per_second": 460.38480777688784,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 79771136,
+              "peak_reserved_bytes": 144703488,
+              "regret_vs_fastest": 0.15181841591657896
+            }
+          }
+        },
+        {
+          "candidate_cutoff_A": 6.5,
+          "resident_systems": 64,
+          "rebuilt_systems": 8,
+          "policy_features": {
+            "system_count": 8,
+            "atom_count": 512,
+            "minimum_atoms_per_system": 64,
+            "maximum_atoms_per_system": 64,
+            "pair_work": 32768,
+            "candidate_edges": 39952,
+            "candidate_edges_per_atom": 78.03125,
+            "candidate_edges_per_pair_work": 1.21923828125,
+            "minimum_volume_A3": 646.6802368164062,
+            "mean_volume_A3": 977.52294921875,
+            "maximum_volume_A3": 1390.1058349609375,
+            "mean_volume_per_atom_A3": 15.273796081542969,
+            "estimated_cell_candidate_reduction": 0.0
+          },
+          "fastest_explicit_backend": "cuda_dense",
+          "methods": {
+            "matscipy": {
+              "backend": "matscipy",
+              "resolved_backend": "matscipy",
+              "decision_reason": "legacy resolver",
+              "pair_work": 32768,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0005287550011416897,
+                0.0004943240055581555,
+                0.000489439997181762
+              ],
+              "median_selection_seconds": 0.0004943240055581555,
+              "rebuild_seconds": [
+                0.02602417599700857,
+                0.025819518996286206,
+                0.025780741998460144
+              ],
+              "median_rebuild_seconds": 0.025819518996286206,
+              "rebuilt_systems_per_second": 309.8431075013711,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 80427520,
+              "peak_reserved_bytes": 111149056
+            },
+            "cuda_dense": {
+              "backend": "cuda_dense",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 32768,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.000502634997246787,
+                0.0004913839948130772,
+                0.00048606899508740753
+              ],
+              "median_selection_seconds": 0.0004913839948130772,
+              "rebuild_seconds": [
+                0.008979393001936842,
+                0.01082646499708062,
+                0.009105636003369
+              ],
+              "median_rebuild_seconds": 0.009105636003369,
+              "rebuilt_systems_per_second": 878.5767404978714,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 80423936,
+              "peak_reserved_bytes": 146800640
+            },
+            "cuda_cell": {
+              "backend": "cuda_cell",
+              "resolved_backend": "cuda_cell",
+              "decision_reason": "legacy resolver",
+              "pair_work": 32768,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.000501943999552168,
+                0.0004929540009470657,
+                0.00048619099834468216
+              ],
+              "median_selection_seconds": 0.0004929540009470657,
+              "rebuild_seconds": [
+                0.010968351001793053,
+                0.010896653002419043,
+                0.010864868003409356
+              ],
+              "median_rebuild_seconds": 0.010896653002419043,
+              "rebuilt_systems_per_second": 734.17039142423,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 215175680,
+              "peak_reserved_bytes": 1300234240
+            },
+            "auto": {
+              "backend": "auto",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 32768,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0012152569979662076,
+                0.001163732995337341,
+                0.0011356199975125492
+              ],
+              "median_selection_seconds": 0.001163732995337341,
+              "rebuild_seconds": [
+                0.009607174994016532,
+                0.009573113005899359,
+                0.009614321999833919
+              ],
+              "median_rebuild_seconds": 0.009607174994016532,
+              "rebuilt_systems_per_second": 832.7109691436348,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 80423936,
+              "peak_reserved_bytes": 146800640,
+              "regret_vs_fastest": 0.05508006145446265
+            }
+          }
+        },
+        {
+          "candidate_cutoff_A": 6.5,
+          "resident_systems": 64,
+          "rebuilt_systems": 16,
+          "policy_features": {
+            "system_count": 16,
+            "atom_count": 1024,
+            "minimum_atoms_per_system": 64,
+            "maximum_atoms_per_system": 64,
+            "pair_work": 65536,
+            "candidate_edges": 82104,
+            "candidate_edges_per_atom": 80.1796875,
+            "candidate_edges_per_pair_work": 1.2528076171875,
+            "minimum_volume_A3": 646.6802368164062,
+            "mean_volume_A3": 935.953125,
+            "maximum_volume_A3": 1390.1058349609375,
+            "mean_volume_per_atom_A3": 14.624267578125,
+            "estimated_cell_candidate_reduction": 0.0
+          },
+          "fastest_explicit_backend": "cuda_dense",
+          "methods": {
+            "matscipy": {
+              "backend": "matscipy",
+              "resolved_backend": "matscipy",
+              "decision_reason": "legacy resolver",
+              "pair_work": 65536,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.000855523998325225,
+                0.0008449099987046793,
+                0.000830163000500761
+              ],
+              "median_selection_seconds": 0.0008449099987046793,
+              "rebuild_seconds": [
+                0.05058751100295922,
+                0.05037243999686325,
+                0.05033991500386037
+              ],
+              "median_rebuild_seconds": 0.05037243999686325,
+              "rebuilt_systems_per_second": 317.63400782245884,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 82124288,
+              "peak_reserved_bytes": 111149056
+            },
+            "cuda_dense": {
+              "backend": "cuda_dense",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 65536,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0008464749989798293,
+                0.0008385210021515377,
+                0.000835692000691779
+              ],
+              "median_selection_seconds": 0.0008385210021515377,
+              "rebuild_seconds": [
+                0.010323536000214517,
+                0.010334933998819906,
+                0.010374475998105481
+              ],
+              "median_rebuild_seconds": 0.010334933998819906,
+              "rebuilt_systems_per_second": 1548.14728394269,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 81980416,
+              "peak_reserved_bytes": 142606336
+            },
+            "cuda_cell": {
+              "backend": "cuda_cell",
+              "resolved_backend": "cuda_cell",
+              "decision_reason": "legacy resolver",
+              "pair_work": 65536,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0008452609981759451,
+                0.000838747997477185,
+                0.0008297790045617148
+              ],
+              "median_selection_seconds": 0.000838747997477185,
+              "rebuild_seconds": [
+                0.015246763003233355,
+                0.015199946996290237,
+                0.015242919995216653
+              ],
+              "median_rebuild_seconds": 0.015242919995216653,
+              "rebuilt_systems_per_second": 1049.6676493100354,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 371107328,
+              "peak_reserved_bytes": 1300234240
+            },
+            "auto": {
+              "backend": "auto",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 65536,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.001941303002240602,
+                0.0019040950064663775,
+                0.001879458999610506
+              ],
+              "median_selection_seconds": 0.0019040950064663775,
+              "rebuild_seconds": [
+                0.011326430001645349,
+                0.011317386997689027,
+                0.011333164002280682
+              ],
+              "median_rebuild_seconds": 0.011326430001645349,
+              "rebuilt_systems_per_second": 1412.6251605912664,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 81980416,
+              "peak_reserved_bytes": 142606336,
+              "regret_vs_fastest": 0.09593636523839022
+            }
+          }
+        },
+        {
+          "candidate_cutoff_A": 6.5,
+          "resident_systems": 64,
+          "rebuilt_systems": 32,
+          "policy_features": {
+            "system_count": 32,
+            "atom_count": 2048,
+            "minimum_atoms_per_system": 64,
+            "maximum_atoms_per_system": 64,
+            "pair_work": 131072,
+            "candidate_edges": 162272,
+            "candidate_edges_per_atom": 79.234375,
+            "candidate_edges_per_pair_work": 1.238037109375,
+            "minimum_volume_A3": 636.6529541015625,
+            "mean_volume_A3": 956.5623779296875,
+            "maximum_volume_A3": 1390.1058349609375,
+            "mean_volume_per_atom_A3": 14.946287155151367,
+            "estimated_cell_candidate_reduction": 0.0
+          },
+          "fastest_explicit_backend": "cuda_dense",
+          "methods": {
+            "matscipy": {
+              "backend": "matscipy",
+              "resolved_backend": "matscipy",
+              "decision_reason": "legacy resolver",
+              "pair_work": 131072,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0015558020022581331,
+                0.0015313600015360862,
+                0.001529685003333725
+              ],
+              "median_selection_seconds": 0.0015313600015360862,
+              "rebuild_seconds": [
+                0.10119000099803088,
+                0.10080408499925397,
+                0.10103281400370179
+              ],
+              "median_rebuild_seconds": 0.10103281400370179,
+              "rebuilt_systems_per_second": 316.72878079816263,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 85354496,
+              "peak_reserved_bytes": 111149056
+            },
+            "cuda_dense": {
+              "backend": "cuda_dense",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 131072,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.00153155300358776,
+                0.0015292809985112399,
+                0.0015162179988692515
+              ],
+              "median_selection_seconds": 0.0015292809985112399,
+              "rebuild_seconds": [
+                0.02097676099947421,
+                0.020962597998732235,
+                0.020959861001756508
+              ],
+              "median_rebuild_seconds": 0.020962597998732235,
+              "rebuilt_systems_per_second": 1526.52834357341,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 91487744,
+              "peak_reserved_bytes": 140509184
+            },
+            "cuda_cell": {
+              "backend": "cuda_cell",
+              "resolved_backend": "cuda_cell",
+              "decision_reason": "legacy resolver",
+              "pair_work": 131072,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0015414860026794486,
+                0.0015505090050282888,
+                0.0015338310040533543
+              ],
+              "median_selection_seconds": 0.0015414860026794486,
+              "rebuild_seconds": [
+                0.0223357219947502,
+                0.022238203004235402,
+                0.022134817998448852
+              ],
+              "median_rebuild_seconds": 0.022238203004235402,
+              "rebuilt_systems_per_second": 1438.9651894941962,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 734944768,
+              "peak_reserved_bytes": 1300234240
+            },
+            "auto": {
+              "backend": "auto",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 131072,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0034020430030068383,
+                0.00334619999921415,
+                0.003427604999160394
+              ],
+              "median_selection_seconds": 0.0034020430030068383,
+              "rebuild_seconds": [
+                0.02259883499937132,
+                0.022575390998099465,
+                0.02252727200539084
+              ],
+              "median_rebuild_seconds": 0.022575390998099465,
+              "rebuilt_systems_per_second": 1417.4726808804312,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 91487744,
+              "peak_reserved_bytes": 140509184,
+              "regret_vs_fastest": 0.07693669455783914
+            }
+          }
+        },
+        {
+          "candidate_cutoff_A": 6.5,
+          "resident_systems": 64,
+          "rebuilt_systems": 64,
+          "policy_features": {
+            "system_count": 64,
+            "atom_count": 4096,
+            "minimum_atoms_per_system": 64,
+            "maximum_atoms_per_system": 64,
+            "pair_work": 262144,
+            "candidate_edges": 315048,
+            "candidate_edges_per_atom": 76.916015625,
+            "candidate_edges_per_pair_work": 1.201812744140625,
+            "minimum_volume_A3": 636.6529541015625,
+            "mean_volume_A3": 995.0548095703125,
+            "maximum_volume_A3": 1915.55224609375,
+            "mean_volume_per_atom_A3": 15.547731399536133,
+            "estimated_cell_candidate_reduction": -0.6666666666666667
+          },
+          "fastest_explicit_backend": "cuda_dense",
+          "methods": {
+            "matscipy": {
+              "backend": "matscipy",
+              "resolved_backend": "matscipy",
+              "decision_reason": "legacy resolver",
+              "pair_work": 262144,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0029488490035873838,
+                0.0029226269980426878,
+                0.002890920004574582
+              ],
+              "median_selection_seconds": 0.0029226269980426878,
+              "rebuild_seconds": [
+                0.20338021500356263,
+                0.20356220699613914,
+                0.20405746899632504
+              ],
+              "median_rebuild_seconds": 0.20356220699613914,
+              "rebuilt_systems_per_second": 314.4002069166692,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 80304128,
+              "peak_reserved_bytes": 90177536
+            },
+            "cuda_dense": {
+              "backend": "cuda_dense",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 262144,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.002914682001573965,
+                0.002870329000870697,
+                0.0028838810030720197
+              ],
+              "median_selection_seconds": 0.0028838810030720197,
+              "rebuild_seconds": [
+                0.033807756000896916,
+                0.03390496100473683,
+                0.033978389998083
+              ],
+              "median_rebuild_seconds": 0.03390496100473683,
+              "rebuilt_systems_per_second": 1887.629364654294,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 122464256,
+              "peak_reserved_bytes": 140509184
+            },
+            "cuda_cell": {
+              "backend": "cuda_cell",
+              "resolved_backend": "cuda_cell",
+              "decision_reason": "legacy resolver",
+              "pair_work": 262144,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.0029182080033933744,
+                0.002900268002122175,
+                0.0028762319998349994
+              ],
+              "median_selection_seconds": 0.002900268002122175,
+              "rebuild_seconds": [
+                0.04067258699797094,
+                0.04082018200278981,
+                0.04072737300157314
+              ],
+              "median_rebuild_seconds": 0.04072737300157314,
+              "rebuilt_systems_per_second": 1571.4247024360723,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 1171842560,
+              "peak_reserved_bytes": 1300234240
+            },
+            "auto": {
+              "backend": "auto",
+              "resolved_backend": "cuda_dense",
+              "decision_reason": "legacy resolver",
+              "pair_work": 262144,
+              "candidate_reduction": null,
+              "selection_seconds": [
+                0.00621930199849885,
+                0.0062380490053328685,
+                0.006194764995598234
+              ],
+              "median_selection_seconds": 0.00621930199849885,
+              "rebuild_seconds": [
+                0.03702709500066703,
+                0.03700552500231424,
+                0.037023570999735966
+              ],
+              "median_rebuild_seconds": 0.037023570999735966,
+              "rebuilt_systems_per_second": 1728.62849994822,
+              "total_candidate_edges": 315048,
+              "exact_ordered_vs_matscipy": true,
+              "peak_allocated_bytes": 122464256,
+              "peak_reserved_bytes": 140509184,
+              "regret_vs_fastest": 0.09198093442913668
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "environment": {
+    "python": "3.11.14",
+    "torch": "2.9.1+cu128",
+    "cuda": "12.8",
+    "gpu": "NVIDIA H100 80GB HBM3"
+  }
+}

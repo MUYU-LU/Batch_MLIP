@@ -113,6 +113,19 @@ The runtime may select:
 The runtime must not silently change the optimizer, precision contract,
 potential, cutoff, convergence criterion, or physical ensemble.
 
+## Frozen AtomBit Instance
+
+The accepted AtomBit OMC-CSP v1 execution path is frozen in
+`atombit_omc_csp_v1.md` and `baseline_v1.yaml`. Its multi-GPU default is
+memory-planned active drain with active compaction, bucket-stratified initial
+assignment, pending-chunk work stealing, source-backed prefetch, and neighbor
+policy v2. Private and bounded-streaming refill remain explicit experiments.
+
+The freeze is model-specific only where evidence must be model-specific:
+calculator translation, graph/cutoff profile, capacity coefficients, allocator
+choice, and correctness tolerances. Generic scheduling and optimizer APIs are
+not forked for AtomBit.
+
 ## Evidence Layers
 
 1. **Execution foundation:** graph isolation, calculator adapters, optimizer
@@ -184,11 +197,13 @@ not uniformly matched.
 
 ## Immediate Work Sequence
 
-1. Freeze exact unique OMC-CSP pools from the existing candidate families.
-2. Validate nested `P64/P512/P2048` intra-family and inter-family manifests.
-3. Classify those pools by atom, candidate-edge, and variable-cell BFGS costs.
-4. Run paired scheduler-v1 and CUDA-MPS experiments under one frozen contract.
-5. Derive and validate OMC-CSP policy decisions on held-out families.
-6. Construct the molecular conformer-search workload as a separate instance.
-7. Revisit parent-level chemical selection only when testing chemical transfer
-   beyond the available workload families.
+1. Preserve the committed AtomBit OMC-CSP v1 baseline without implicit policy
+   changes.
+2. Generate MACE-specific graph and task profiles for the existing signed
+   OMC-CSP manifests.
+3. Calibrate MACE H100 capacity and allocator policies without reusing AtomBit
+   coefficients.
+4. Validate MACE active-drain execution against common MACE ASE/MPS under one
+   frozen contract.
+5. Freeze a MACE policy instance behind the same generic executor interface.
+6. Construct molecular conformer search as a separate workload instance.

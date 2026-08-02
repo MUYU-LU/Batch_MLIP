@@ -5,7 +5,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
-from ..models.potential import AtomBitBatchCalculator
 from ..optimization.registry import BatchedBFGS, BatchedFIRE, BatchOptimizer
 
 CudaAllocatorPolicy = Literal["auto", "native", "expandable_segments"]
@@ -18,6 +17,25 @@ _ALLOCATOR_ENVIRONMENT_KEYS = (
 # reliably through the deprecated CUDA-prefixed spelling. Keep both identical
 # until the installed-version matrix proves the compatibility alias unnecessary.
 _EXPANDABLE_SEGMENTS = "expandable_segments:True"
+
+_AUTO_ALLOCATOR_RULES = {
+    ("atombit", "bfgs", True): (
+        "expandable_segments",
+        "measured AtomBit variable-cell FIRE/BFGS fragmentation policy",
+    ),
+    ("atombit", "fire", True): (
+        "expandable_segments",
+        "measured AtomBit variable-cell FIRE/BFGS fragmentation policy",
+    ),
+}
+
+
+def _optimizer_policy_family(optimizer: BatchOptimizer) -> str:
+    if isinstance(optimizer, BatchedBFGS):
+        return "bfgs"
+    if isinstance(optimizer, BatchedFIRE):
+        return "fire"
+    return type(optimizer).__name__.lower()
 
 
 @dataclass(frozen=True)
@@ -77,18 +95,18 @@ def select_cuda_allocator(
             selected_policy="expandable_segments",
             reason="expandable segments explicitly requested",
         )
-    if (
-        isinstance(calculator, AtomBitBatchCalculator)
-        and isinstance(optimizer, (BatchedBFGS, BatchedFIRE))
-        and variable_cell
-    ):
+    calculator_family = str(
+        getattr(calculator, "execution_policy_family", "generic")
+    )
+    rule = _AUTO_ALLOCATOR_RULES.get(
+        (calculator_family, _optimizer_policy_family(optimizer), variable_cell)
+    )
+    if rule is not None:
+        selected_policy, reason = rule
         return CudaAllocatorPlan(
             requested_policy=policy,
-            selected_policy="expandable_segments",
-            reason=(
-                "measured AtomBit variable-cell FIRE/BFGS fragmentation "
-                "policy"
-            ),
+            selected_policy=selected_policy,
+            reason=reason,
         )
     return CudaAllocatorPlan(
         requested_policy=policy,

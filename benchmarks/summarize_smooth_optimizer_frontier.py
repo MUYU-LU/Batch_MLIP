@@ -12,7 +12,6 @@ from typing import Any
 
 import numpy as np
 
-
 ASE_FILES = {
     "fire": {
         atoms: f"ase64_fire_H{atoms}.json" for atoms in (46, 92, 184, 276)

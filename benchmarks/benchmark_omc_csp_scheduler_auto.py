@@ -103,6 +103,45 @@ def _records(result: Any, source_ids: list[str]) -> list[dict[str, Any]]:
     return records
 
 
+def _worker_peak_memory(
+    workers: list[dict[str, Any]],
+) -> dict[str, dict[str, int]]:
+    """Report execution peaks from the CUDA contexts that ran the chunks."""
+
+    peaks: dict[str, dict[str, int]] = {}
+    for worker in workers:
+        device = str(worker["device"])
+        current = peaks.setdefault(
+            device,
+            {"allocated_bytes": 0, "reserved_bytes": 0},
+        )
+        for chunk in worker.get("chunks", []):
+            current["allocated_bytes"] = max(
+                current["allocated_bytes"],
+                int(chunk.get("peak_allocated_bytes") or 0),
+            )
+            current["reserved_bytes"] = max(
+                current["reserved_bytes"],
+                int(chunk.get("peak_reserved_bytes") or 0),
+            )
+    return peaks
+
+
+def _relaxation_options(args: argparse.Namespace) -> dict[str, Any]:
+    """Return the frozen ASE-compatible variable-cell BFGS contract."""
+
+    return {
+        "cell_filter": FrechetCellFilter(),
+        "fmax": args.fmax,
+        "max_steps": args.max_steps,
+        "max_step": 0.2,
+        "alpha": 70.0,
+        "smax": None,
+        "optimizer_dtype": "float64",
+        "linear_algebra_backend": args.linear_algebra_backend,
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, required=True)
@@ -125,6 +164,11 @@ def main() -> None:
         "--multi-gpu-queue-policy",
         choices=("cost_descending", "bucket_stratified"),
         default=AutoSchedulerConfig().multi_gpu_queue_policy,
+    )
+    parser.add_argument(
+        "--manifest-multi-gpu-refill-policy",
+        choices=("disabled", "local_compatible", "streaming_compatible"),
+        default="disabled",
     )
     parser.add_argument("--manifest-prefetch-depth", type=int, default=1)
     parser.add_argument(
@@ -214,30 +258,19 @@ def main() -> None:
     executor_call_timings = []
     executor_shutdown = None
     with RuntimeProfiler(device=devices[0]) as profiler:
-        relaxation_options = {
-            "cell_filter": FrechetCellFilter(),
-            "fmax": args.fmax,
-            "max_steps": args.max_steps,
-            "max_step": 0.2,
-            "alpha": 70.0,
-            "optimizer_dtype": "float64",
-            "linear_algebra_backend": args.linear_algebra_backend,
-        }
+        relaxation_options = _relaxation_options(args)
         if systems is None:
             if planning_profile is None:  # pragma: no cover - CLI narrows this
                 raise RuntimeError("manifest_lazy requires a planning profile")
             auto_config = AutoSchedulerConfig(
-                manifest_loader_processes=(
-                    args.manifest_loader_processes
-                ),
-                manifest_prefetch_chunks_per_worker=(
-                    args.manifest_prefetch_depth
-                ),
-                multi_gpu_target_chunks_per_device=(
-                    args.target_chunks_per_device
-                ),
+                manifest_loader_processes=(args.manifest_loader_processes),
+                manifest_prefetch_chunks_per_worker=(args.manifest_prefetch_depth),
+                multi_gpu_target_chunks_per_device=(args.target_chunks_per_device),
                 multi_gpu_dispatch_policy=args.multi_gpu_dispatch_policy,
                 multi_gpu_queue_policy=args.multi_gpu_queue_policy,
+                manifest_multi_gpu_refill_policy=(
+                    args.manifest_multi_gpu_refill_policy
+                ),
             )
             if args.executor_calls:
                 with BatchExecutor(
@@ -260,22 +293,14 @@ def main() -> None:
                         executor_call_timings.append(
                             {
                                 "call": call_index + 1,
-                                "seconds": (
-                                    time.perf_counter() - call_started
-                                ),
-                                "worker_generation": call_schedule[
-                                    "worker_generation"
-                                ],
+                                "seconds": (time.perf_counter() - call_started),
+                                "worker_generation": call_schedule["worker_generation"],
                                 "worker_pids": call_schedule["worker_pids"],
                                 "worker_startup_seconds": call_schedule[
                                     "worker_startup_seconds_this_call"
                                 ],
-                                "production_run_seconds": call_schedule[
-                                    "production_run_seconds"
-                                ],
-                                "materialization": call_schedule[
-                                    "structure_materialization"
-                                ],
+                                "production_run_seconds": call_schedule["production_run_seconds"],
+                                "materialization": call_schedule["structure_materialization"],
                             }
                         )
                 executor_shutdown = executor.shutdown_metadata
@@ -305,6 +330,8 @@ def main() -> None:
     tensor_records = _records(result, source_ids)
     records = tensor_records
     scheduling = result.metadata.get("scheduling", {})
+    if executor_shutdown is None:
+        executor_shutdown = scheduling.get("executor_shutdown")
     tensor_model_evaluations = result.model_evaluations
     tensor_graph_evaluations = result.graph_evaluations
     tensor_optimizer_steps = int(result.steps)
@@ -355,8 +382,7 @@ def main() -> None:
                 with torch.cuda.device(device):
                     torch.cuda.empty_cache()
             parent_reserved = {
-                str(device): torch.cuda.memory_reserved(device)
-                for device in devices
+                str(device): torch.cuda.memory_reserved(device) for device in devices
             }
         else:
             parent_reserved = {}
@@ -372,50 +398,40 @@ def main() -> None:
             alpha=70.0,
         )
         tail_recovery["mode"] = "ase_bfgs"
-        tail_recovery[
-            "parent_reserved_bytes_during_recovery_by_device"
-        ] = parent_reserved
-        tail_recovery["total_seconds"] = (
-            time.perf_counter() - recovery_started
-        )
+        tail_recovery["parent_reserved_bytes_during_recovery_by_device"] = parent_reserved
+        tail_recovery["total_seconds"] = time.perf_counter() - recovery_started
         records = replace_nonconverged_records(
             tensor_records,
             recovery_records,
         )
-    execution_seconds = (
-        tensor_execution_seconds + float(tail_recovery["total_seconds"])
-    )
+    execution_seconds = tensor_execution_seconds + float(tail_recovery["total_seconds"])
     if {record["source"] for record in records} != set(source_ids):
         raise RuntimeError("automatic scheduler did not return exact job coverage")
 
     workers = scheduling.get("workers", [])
+    parent_peak_memory = {
+        str(device): {
+            "allocated_bytes": torch.cuda.max_memory_allocated(device),
+            "reserved_bytes": torch.cuda.max_memory_reserved(device),
+        }
+        for device in devices
+    }
     if args.executor_calls:
         method = "persistent_source_backed_auto"
-        peak_memory = {
-            worker["device"]: {
-                "allocated_bytes": max(
-                    (
-                        int(chunk["peak_allocated_bytes"] or 0)
-                        for chunk in worker["chunks"]
-                    ),
-                    default=0,
-                ),
-                "reserved_bytes": max(
-                    (
-                        int(chunk["peak_reserved_bytes"] or 0)
-                        for chunk in worker["chunks"]
-                    ),
-                    default=0,
-                ),
-            }
-            for worker in workers
-        }
     else:
         method = (
             (
-                "source_backed_auto_ase_tail_recovery"
+                (
+                    "source_backed_auto_global_prefetch_ase_tail_recovery"
+                    if scheduling.get("entrypoint") == "relax_manifest_global_prefetch"
+                    else "source_backed_auto_ase_tail_recovery"
+                )
                 if args.tail_recovery == "ase_bfgs"
-                else "source_backed_auto"
+                else (
+                    "source_backed_auto_global_prefetch"
+                    if scheduling.get("entrypoint") == "relax_manifest_global_prefetch"
+                    else "source_backed_auto"
+                )
             )
             if args.materialization == "manifest_lazy"
             else (
@@ -424,13 +440,7 @@ def main() -> None:
                 else "current_auto"
             )
         )
-        peak_memory = {
-            str(device): {
-                "allocated_bytes": torch.cuda.max_memory_allocated(device),
-                "reserved_bytes": torch.cuda.max_memory_reserved(device),
-            }
-            for device in devices
-        }
+    peak_memory = _worker_peak_memory(workers) or parent_peak_memory
     output = {
         "schema_version": 1,
         "status": "complete",
@@ -452,34 +462,24 @@ def main() -> None:
             "skin_A": 0.5,
             "force_mode": "autograd",
             "fmax_eV_per_A": args.fmax,
+            "smax_eV_per_A3": None,
             "max_steps": args.max_steps,
             "scheduling": "auto",
             "linear_algebra_backend": args.linear_algebra_backend,
             "tail_recovery": args.tail_recovery,
-            "tail_recovery_optimizer": (
-                "ASE BFGS"
-                if args.tail_recovery == "ase_bfgs"
-                else None
-            ),
+            "tail_recovery_optimizer": ("ASE BFGS" if args.tail_recovery == "ase_bfgs" else None),
             "structure_materialization": args.materialization,
-            "manifest_loader_processes": (
-                args.manifest_loader_processes
-            ),
+            "manifest_loader_processes": (args.manifest_loader_processes),
             "persistent_executor_calls": args.executor_calls,
-            "manifest_prefetch_chunks_per_worker": (
-                args.manifest_prefetch_depth
-            ),
-            "target_chunks_per_device": (
-                args.target_chunks_per_device
-            ),
-            "multi_gpu_dispatch_policy": (
-                args.multi_gpu_dispatch_policy
-            ),
+            "manifest_prefetch_chunks_per_worker": (args.manifest_prefetch_depth),
+            "target_chunks_per_device": (args.target_chunks_per_device),
+            "multi_gpu_dispatch_policy": (args.multi_gpu_dispatch_policy),
             "multi_gpu_queue_policy": args.multi_gpu_queue_policy,
+            "manifest_multi_gpu_refill_policy": (
+                args.manifest_multi_gpu_refill_policy
+            ),
             "planning_profile_sha256": (
-                None
-                if planning_profile is None
-                else planning_profile.profile_sha256
+                None if planning_profile is None else planning_profile.profile_sha256
             ),
             "benchmark_parent_prewarm_system_count": 1,
         },
@@ -492,28 +492,27 @@ def main() -> None:
             "tail_recovery_seconds": tail_recovery["total_seconds"],
             "scheduler_total_seconds": scheduling.get("total_seconds"),
             "profiling_seconds": scheduling.get("profiling_seconds"),
-            "worker_startup_seconds": scheduling.get("worker_startup_wall_seconds"),
-            "worker_execution_seconds": scheduling.get("worker_run_wall_seconds"),
+            "worker_startup_seconds": scheduling.get(
+                "worker_startup_wall_seconds",
+                scheduling.get("worker_startup_seconds_this_call"),
+            ),
+            "worker_execution_seconds": scheduling.get(
+                "worker_run_wall_seconds",
+                scheduling.get("production_run_seconds"),
+            ),
             "executor_calls": executor_call_timings,
         },
         "peak_memory": peak_memory,
+        "parent_peak_memory": parent_peak_memory,
         "scheduling": scheduling,
         "executor_shutdown": executor_shutdown,
         "tail_recovery": tail_recovery,
         "runtime_profile": profiler.summary(),
-        "model_evaluations": (
-            tensor_model_evaluations
-            + int(tail_recovery["model_evaluations"])
-        ),
-        "graph_evaluations": (
-            tensor_graph_evaluations
-            + int(tail_recovery["graph_evaluations"])
-        ),
+        "model_evaluations": (tensor_model_evaluations + int(tail_recovery["model_evaluations"])),
+        "graph_evaluations": (tensor_graph_evaluations + int(tail_recovery["graph_evaluations"])),
         "optimizer_steps": tensor_optimizer_steps,
         "tensor_converged_count": tensor_converged_count,
-        "converged_count": sum(
-            int(record["converged"]) for record in records
-        ),
+        "converged_count": sum(int(record["converged"]) for record in records),
         "records": records,
         "workers": workers,
     }

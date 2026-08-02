@@ -1,0 +1,38 @@
+id: omc-csp-multigpu-local-refill-v1
+date: 2026-08-01
+hypothesis: >-
+  Preassigned homogeneous per-GPU queues can recover compatible inner-batch
+  holes through fixed-slot refill without live cross-GPU state migration.
+workload:
+  id: OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2
+  split: held_out_test
+  pool_size: 2048
+  homogeneous_optimizer_shape: true
+methods:
+  baseline: automatic_active_drain_work_stealing
+  candidate: private_local_compatible_refill
+gpu_counts: [2, 4, 8]
+configuration:
+  model: AtomBit-OMC-s smooth_rms fp32 epoch5
+  optimizer: BFGS
+  optimizer_dtype: float64
+  cell_filter: FrechetCellFilter
+  cutoff_A: 6.0
+  skin_A: 0.5
+  memory_fraction: 0.85
+  local_resident_capacity: 131
+  capacity_source: worst_case_memory_safe_first_wave
+  refill_policy: immediate
+  refill_storage: slots
+  materialization: manifest_lazy
+  timing_repeats: 1
+gates:
+  execution_speedup_min: 1.02
+  peak_reserved_memory_fraction_max: 0.85
+  convergence_count: 2048
+  endpoint_energy_difference_meV_per_atom_max: 5.0
+status: completed_mixed_not_promoted
+decision:
+  automatic_default: active_drain
+  local_compatible_refill: explicit_only
+  source_backed_streaming_refill: completed_mixed_not_promoted

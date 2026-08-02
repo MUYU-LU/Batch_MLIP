@@ -55,5 +55,8 @@ target-version = "py310"
 select = ["E", "F", "I", "B", "UP"]
 ignore = ["E501"]
 
+[tool.ruff.lint.isort]
+known-first-party = ["atombit_batch", "batch_mlip"]
+
 [tool.ruff.lint.per-file-ignores]
 "src/*.py" = ["E", "F", "I", "B", "UP"]

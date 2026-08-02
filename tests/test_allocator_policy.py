@@ -51,6 +51,22 @@ def test_auto_allocator_keeps_mace_native():
     assert set(plan.environment().values()) == {None}
 
 
+def test_auto_allocator_uses_declared_calculator_policy_family():
+    calculator = type(
+        "ExternalAtomBitAdapter",
+        (),
+        {"execution_policy_family": "atombit"},
+    )()
+
+    plan = select_cuda_allocator(
+        calculator,
+        BatchedBFGS(),
+        variable_cell=True,
+    )
+
+    assert plan.selected_policy == "expandable_segments"
+
+
 def test_explicit_allocator_policy_overrides_auto_selection():
     calculator = object.__new__(AtomBitBatchCalculator)
 

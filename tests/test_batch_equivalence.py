@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import torch
 from ase import Atoms
-from batch_mlip.toy_models import QuadraticWellModel
 
 from batch_mlip import AseGraphBatch, AtomBitBatchCalculator
+from batch_mlip.toy_models import QuadraticWellModel
 
 
 def make_systems():

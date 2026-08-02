@@ -18,7 +18,7 @@ def _json_scalar(value):
         if value.numel() != 1:
             raise ValueError("expected scalar tensor")
         value = value.detach().cpu().item()
-    if isinstance(value, (bool, int, float, str)) or value is None:
+    if isinstance(value, bool | int | float | str) or value is None:
         return value
     return str(value)
 

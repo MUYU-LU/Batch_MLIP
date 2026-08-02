@@ -350,10 +350,7 @@ def _validate_manifest_planning_profile(
     optimizer_name = type(optimizer).__name__.lower()
     force_mode = str(getattr(calculator, "force_mode", "unspecified"))
     for bound, job in zip(profile.systems, manifest.jobs, strict=True):
-        if (
-            bound.index != job.order
-            or bound.structure.atom_count != job.atom_count
-        ):
+        if bound.index != job.order or bound.structure.atom_count != job.atom_count:
             raise ValueError("planning profile structure order differs from manifest")
         if not math.isclose(bound.mlip_graph.cutoff_A, calculator.cutoff):
             raise ValueError("planning profile cutoff differs from calculator")
@@ -364,17 +361,21 @@ def _validate_manifest_planning_profile(
         if bound.mlip_graph.force_mode != force_mode:
             raise ValueError("planning profile force mode differs from calculator")
         if bound.graph_execution.neighbor_backend != calculator.neighbor_backend:
-            raise ValueError(
-                "planning profile neighbor backend differs from calculator"
-            )
+            raise ValueError("planning profile neighbor backend differs from calculator")
         task = bound.task_auxiliary
-        if (
-            task.variable_cell != variable_cell
-            or task.stress_required != variable_cell
-        ):
+        if task.variable_cell != variable_cell or task.stress_required != variable_cell:
             raise ValueError("planning profile cell mode differs from request")
         if optimizer_name not in task.algorithm.lower():
             raise ValueError("planning profile optimizer differs from request")
+
+
+def _use_global_manifest_prefetch(
+    devices: Sequence[torch.device],
+    worker_backend: Literal["auto", "process", "thread"],
+) -> bool:
+    """Select the bounded global source queue for multi-GPU CUDA pools."""
+
+    return len(devices) > 1 and devices[0].type == "cuda" and worker_backend != "thread"
 
 
 def relax_manifest(
@@ -394,26 +395,20 @@ def relax_manifest(
     The immutable planning sidecar supplies atoms, graph work, and
     task-auxiliary costs. A matching signed hardware policy removes the online
     memory probe entirely. Unmatched hardware or execution contracts fall back
-    to the bounded representative probe. Production chunks are materialized
-    inside their assigned process workers.
+    to the bounded representative probe. One-GPU calls preserve resident
+    batches in-process; multi-GPU CUDA calls overlap global source prefetch
+    with isolated worker execution.
     """
 
-    resolved = (
-        create_optimizer(optimizer)
-        if isinstance(optimizer, str)
-        else optimizer
-    )
+    entry_started = time.perf_counter()
+    resolved = create_optimizer(optimizer) if isinstance(optimizer, str) else optimizer
     if not isinstance(resolved, BatchOptimizer):
-        raise TypeError(
-            "optimizer must be a registered name or implement BatchOptimizer"
-        )
+        raise TypeError("optimizer must be a registered name or implement BatchOptimizer")
     resolved_devices = _normalize_devices(devices)
     if not resolved_devices:
         raise ValueError("source-backed relaxation requires execution devices")
     if optimizer_kwargs.get("refill_batch_size") is not None:
-        raise ValueError(
-            "automatic scheduling controls refill_batch_size; do not set it"
-        )
+        raise ValueError("automatic scheduling controls refill_batch_size; do not set it")
     if resolved_devices[0] != calculator.device:
         calculator = calculator.clone_to(resolved_devices[0])
     config = auto_config or AutoSchedulerConfig()
@@ -427,6 +422,36 @@ def relax_manifest(
         resolved,
         options,
     )
+    if _use_global_manifest_prefetch(
+        resolved_devices,
+        config.multi_gpu_worker_backend,
+    ):
+        # Global prefetch overlaps structure loading with GPU work. Own the
+        # worker lifecycle here so one-pool users get it without another API.
+        from .executor import BatchExecutor
+
+        executor = BatchExecutor(
+            calculator,
+            devices=resolved_devices,
+            auto_config=config,
+        )
+        try:
+            result = executor.relax_manifest(
+                manifest,
+                dataset_dir,
+                planning_profile,
+                optimizer=resolved,
+                hardware_capacity_policy=hardware_capacity_policy,
+                **options,
+            )
+        finally:
+            executor.close()
+        scheduling = result.metadata["scheduling"]
+        scheduling["entrypoint"] = "relax_manifest_global_prefetch"
+        scheduling["executor_lifecycle"] = "one_pool"
+        scheduling["executor_shutdown"] = executor.shutdown_metadata
+        scheduling["api_total_seconds"] = time.perf_counter() - entry_started
+        return result
     provider = AseManifestStructureProvider.from_manifest(
         manifest,
         dataset_dir,
@@ -860,6 +885,30 @@ def _coefficient_of_variation(values: list[float]) -> float:
     return math.sqrt(variance) / mean
 
 
+def _refill_shape_groups(
+    system_indices: Sequence[int],
+    profiles: Mapping[int, SystemProfile],
+) -> tuple[tuple[int, ...], ...]:
+    """Partition a queue by optimizer-state shape in submitted order."""
+
+    groups: dict[tuple[int, int], list[int]] = {}
+    for index in system_indices:
+        profile = profiles[index]
+        key = (profile.atom_count, profile.dof_squared)
+        groups.setdefault(key, []).append(index)
+    return tuple(tuple(group) for group in groups.values())
+
+
+def _chunk_estimated_cost(
+    system_indices: Sequence[int],
+    profiles: Mapping[int, SystemProfile],
+) -> float:
+    return sum(
+        profile_model_work(profiles[index]) + math.sqrt(profiles[index].dof_squared)
+        for index in system_indices
+    )
+
+
 def _apply_offline_refill_policy(
     plan: DeterministicRelaxationPlan,
     calculator: BatchCalculator,
@@ -880,6 +929,7 @@ def _apply_offline_refill_policy(
     selected_chunks: list[DeterministicRelaxationChunk] = []
     for bucket_index, bucket in enumerate(plan.workload.buckets):
         chunks = by_bucket[bucket_index]
+        shape_groups = _refill_shape_groups(bucket.system_indices, profiles)
         capacity = max(len(chunk.system_indices) for chunk in chunks)
         atom_counts = [float(profiles[index].atom_count) for index in bucket.system_indices]
         edge_counts = [float(profiles[index].edge_count) for index in bucket.system_indices]
@@ -897,7 +947,7 @@ def _apply_offline_refill_policy(
             atom_count_cv=_coefficient_of_variation(atom_counts),
             mean_edge_count=sum(edge_counts) / len(edge_counts),
             edge_count_cv=_coefficient_of_variation(edge_counts),
-            homogeneous_atom_count=bucket.homogeneous_atom_count,
+            homogeneous_atom_count=len(shape_groups) == 1,
             predicted_peak_bytes=predicted_peak,
             memory_budget_bytes=plan.probe.memory_budget_bytes,
         )
@@ -917,7 +967,48 @@ def _apply_offline_refill_policy(
                     refill_prediction=prediction_record,
                 )
             )
-        else:
+            continue
+        accepted_groups = []
+        if len(shape_groups) > 1:
+            for group in shape_groups:
+                group_ids = set(group)
+                group_capacity = max(
+                    sum(index in group_ids for index in chunk.system_indices) for chunk in chunks
+                )
+                if len(group) <= group_capacity:
+                    continue
+                group_atom_counts = [float(profiles[index].atom_count) for index in group]
+                group_edge_counts = [float(profiles[index].edge_count) for index in group]
+                relevant_peaks = [
+                    chunk.predicted_peak_bytes
+                    for chunk in chunks
+                    if any(index in group_ids for index in chunk.system_indices)
+                    and chunk.predicted_peak_bytes is not None
+                ]
+                group_prediction = predict_refill(
+                    calculator,
+                    optimizer,
+                    optimizer_kwargs,
+                    pool_size=len(group),
+                    resident_capacity=group_capacity,
+                    mean_atom_count=sum(group_atom_counts) / len(group_atom_counts),
+                    atom_count_cv=_coefficient_of_variation(group_atom_counts),
+                    mean_edge_count=sum(group_edge_counts) / len(group_edge_counts),
+                    edge_count_cv=_coefficient_of_variation(group_edge_counts),
+                    homogeneous_atom_count=True,
+                    predicted_peak_bytes=(max(relevant_peaks) if relevant_peaks else None),
+                    memory_budget_bytes=plan.probe.memory_budget_bytes,
+                )
+                if group_prediction.use_refill:
+                    accepted_groups.append(
+                        (
+                            group,
+                            group_capacity,
+                            max(relevant_peaks) if relevant_peaks else None,
+                            group_prediction,
+                        )
+                    )
+        if not accepted_groups:
             selected_chunks.extend(
                 replace(
                     chunk,
@@ -926,6 +1017,57 @@ def _apply_offline_refill_policy(
                 )
                 for chunk in chunks
             )
+            continue
+
+        submitted_order = {index: position for position, index in enumerate(bucket.system_indices)}
+        accepted_ids = {index for group, _, _, _ in accepted_groups for index in group}
+        scheduled_parts: list[tuple[int, DeterministicRelaxationChunk]] = []
+        for group, group_capacity, group_peak, group_prediction in accepted_groups:
+            group_profile = profiles[group[0]]
+            group_record = {
+                **group_prediction.to_dict(),
+                "parent_bucket_homogeneous": False,
+                "shape_atom_count": group_profile.atom_count,
+                "shape_dof_squared": group_profile.dof_squared,
+            }
+            scheduled_parts.append(
+                (
+                    min(submitted_order[index] for index in group),
+                    DeterministicRelaxationChunk(
+                        system_indices=group,
+                        bucket_index=bucket_index,
+                        predicted_peak_bytes=group_peak,
+                        estimated_cost=_chunk_estimated_cost(group, profiles),
+                        resident_capacity=group_capacity,
+                        active_refill=True,
+                        refill_storage="slots",
+                        refill_prediction=group_record,
+                    ),
+                )
+            )
+        remainder_record = {
+            **prediction_record,
+            "reason": "mixed remainder retained after compatible refill extraction",
+        }
+        for chunk in chunks:
+            remaining = tuple(index for index in chunk.system_indices if index not in accepted_ids)
+            if not remaining:
+                continue
+            scheduled_parts.append(
+                (
+                    min(submitted_order[index] for index in remaining),
+                    replace(
+                        chunk,
+                        system_indices=remaining,
+                        estimated_cost=_chunk_estimated_cost(remaining, profiles),
+                        resident_capacity=len(remaining),
+                        refill_prediction=remainder_record,
+                    ),
+                )
+            )
+        selected_chunks.extend(
+            chunk for _, chunk in sorted(scheduled_parts, key=lambda item: item[0])
+        )
     return replace(plan, chunks=tuple(selected_chunks))
 
 
@@ -1236,6 +1378,28 @@ class _PendingAutoChunk:
     estimated_cost: float
     bucket_index: int
     predicted_peak_bytes: int | None = None
+    capacity_bound_bytes: int | None = None
+    resident_capacity: int | None = None
+    active_refill: bool = False
+    refill_storage: str = "slots"
+    refill_prediction: dict[str, Any] | None = None
+
+
+def _pending_chunk_optimizer_options(
+    optimizer_kwargs: Mapping[str, Any],
+    chunk: _PendingAutoChunk,
+) -> dict[str, Any]:
+    """Bind a planned inner-scheduler decision to one execution task."""
+
+    options = dict(optimizer_kwargs)
+    if not chunk.active_refill:
+        return options
+    if chunk.resident_capacity is None:
+        raise RuntimeError("refill chunk has no resident capacity")
+    options["refill_batch_size"] = chunk.resident_capacity
+    options.setdefault("refill_policy", "immediate")
+    options.setdefault("refill_storage", chunk.refill_storage)
+    return options
 
 
 @dataclass
@@ -1258,6 +1422,10 @@ class _ProcessAutoWorkerRunner:
         materialization_started = time.perf_counter()
         systems = self.materializer.materialize(chunk.indices)
         materialization_seconds = time.perf_counter() - materialization_started
+        options = _pending_chunk_optimizer_options(
+            self.optimizer_kwargs,
+            chunk,
+        )
         with RuntimeProfiler(device=device) as profiler:
             result = relax(
                 systems,
@@ -1265,7 +1433,7 @@ class _ProcessAutoWorkerRunner:
                 optimizer=self.optimizer,
                 scheduling=self.worker_scheduling,
                 auto_config=(self.config if self.worker_scheduling != "single_batch" else None),
-                **self.optimizer_kwargs,
+                **options,
             )
         if device.type == "cuda":
             torch.cuda.synchronize(device)
@@ -1346,9 +1514,7 @@ class _ProcessAutoWorkerPreparer:
                 torch.cuda.memory.get_allocator_backend() if device.type == "cuda" else None
             ),
             "reproducibility": active_reproducibility_state(),
-            "warmup_materialization_seconds": (
-                warmup_materialization_seconds
-            ),
+            "warmup_materialization_seconds": (warmup_materialization_seconds),
         }
         return _ProcessAutoWorkerRunner(
             materializer=materializer,
@@ -1445,9 +1611,7 @@ def _parallel_deterministic_chunks(
     if target_chunks_per_device <= 0:
         raise ValueError("target_chunks_per_device must be positive")
     if dispatch_policy not in ("subdivide", "preserve_resident"):
-        raise ValueError(
-            "dispatch_policy must be 'subdivide' or 'preserve_resident'"
-        )
+        raise ValueError("dispatch_policy must be 'subdivide' or 'preserve_resident'")
     profiles = {profile.index: profile for profile in plan.workload.profiles}
     system_costs = {
         index: (profile_model_work(profile) + math.sqrt(profile.dof_squared))
@@ -1456,7 +1620,7 @@ def _parallel_deterministic_chunks(
     system_count = sum(len(chunk.system_indices) for chunk in plan.chunks)
     target_part_count = (
         len(plan.chunks)
-        if dispatch_policy == "preserve_resident"
+        if dispatch_policy == "preserve_resident" or device_count == 1
         else max(
             len(plan.chunks),
             min(device_count * target_chunks_per_device, system_count),
@@ -1500,19 +1664,213 @@ def _parallel_deterministic_chunks(
                 bin_costs[part_index] += system_costs[index]
             partitions = [tuple(sorted(indices)) for indices in bins if indices]
         for indices in partitions:
+            subdivided = part_count > 1
             pending.append(
                 _PendingAutoChunk(
                     indices=indices,
                     estimated_cost=sum(system_costs[index] for index in indices),
                     bucket_index=chunk.bucket_index,
-                    # A subset cannot exceed its memory-safe parent. Retaining
-                    # the parent estimate avoids unsafe linear scaling for
-                    # heterogeneous structures and allocator overhead.
-                    predicted_peak_bytes=chunk.predicted_peak_bytes,
+                    # The parent remains a valid capacity bound, but it is not
+                    # an honest prediction for a smaller execution child.
+                    predicted_peak_bytes=(None if subdivided else chunk.predicted_peak_bytes),
+                    capacity_bound_bytes=chunk.predicted_peak_bytes,
+                    resident_capacity=(
+                        len(indices)
+                        if subdivided or chunk.resident_capacity is None
+                        else chunk.resident_capacity
+                    ),
+                    active_refill=(chunk.active_refill and not subdivided),
+                    refill_storage=chunk.refill_storage,
+                    refill_prediction=chunk.refill_prediction,
                 )
             )
     return sorted(
         pending,
+        key=lambda chunk: (-chunk.estimated_cost, chunk.indices),
+    )
+
+
+def _parallel_local_refill_chunks(
+    plan: DeterministicRelaxationPlan,
+    *,
+    device_count: int,
+) -> list[_PendingAutoChunk]:
+    """Build private homogeneous refill queues without live state migration."""
+
+    if device_count <= 1:
+        raise ValueError("multi-GPU local refill requires at least two devices")
+    if len(plan.workload.buckets) != 1:
+        raise ValueError("multi-GPU local refill requires one cost bucket")
+    profiles = {profile.index: profile for profile in plan.workload.profiles}
+    shape_keys = {
+        (profile.atom_count, profile.dof_squared)
+        for profile in plan.workload.profiles
+    }
+    if len(shape_keys) != 1:
+        raise ValueError(
+            "multi-GPU local refill requires one exact optimizer-state shape"
+        )
+    if not plan.chunks:
+        raise ValueError("multi-GPU local refill requires planned resident chunks")
+
+    # The deterministic planner orders systems from largest incremental memory
+    # cost to smallest. Its first resident wave is therefore a conservative
+    # fixed capacity for every later replacement cohort in this bucket.
+    resident_capacity = len(plan.chunks[0].system_indices)
+    system_count = len(plan.workload.profiles)
+    worker_count = min(device_count, system_count)
+    if system_count <= worker_count * resident_capacity:
+        raise ValueError(
+            "multi-GPU local refill requires more than one resident wave per GPU"
+        )
+
+    costs = {
+        index: profile_model_work(profile) + math.sqrt(profile.dof_squared)
+        for index, profile in profiles.items()
+    }
+    bins: list[list[int]] = [[] for _ in range(worker_count)]
+    bin_costs = [0.0] * worker_count
+    for index in sorted(costs, key=lambda item: (-costs[item], item)):
+        target = min(
+            range(worker_count),
+            key=lambda candidate: (bin_costs[candidate], candidate),
+        )
+        bins[target].append(index)
+        bin_costs[target] += costs[index]
+
+    if any(len(indices) <= resident_capacity for indices in bins):
+        raise ValueError(
+            "multi-GPU local refill could not form a pending wave on every device"
+        )
+    capacity_bound = max(
+        (
+            int(chunk.predicted_peak_bytes)
+            for chunk in plan.chunks
+            if chunk.predicted_peak_bytes is not None
+        ),
+        default=None,
+    )
+    prediction = {
+        "mode": "refill_experimental",
+        "reason": (
+            "explicit homogeneous multi-GPU local-cohort experiment; not an "
+            "accepted automatic policy"
+        ),
+        "policy_id": "omc-csp-multigpu-local-cohort-v1",
+        "matched_family": None,
+        "predicted_speedup": None,
+        "evidence_split": "experiment",
+        "resident_capacity_source": "worst_case_memory_safe_first_wave",
+    }
+    return [
+        _PendingAutoChunk(
+            indices=tuple(sorted(indices)),
+            estimated_cost=bin_costs[worker_id],
+            bucket_index=0,
+            predicted_peak_bytes=capacity_bound,
+            capacity_bound_bytes=capacity_bound,
+            resident_capacity=resident_capacity,
+            active_refill=True,
+            refill_storage="slots",
+            refill_prediction=dict(prediction),
+        )
+        for worker_id, indices in enumerate(bins)
+    ]
+
+
+def _parallel_streaming_refill_chunks(
+    plan: DeterministicRelaxationPlan,
+    *,
+    device_count: int,
+    resident_waves_per_task: int = 2,
+) -> list[_PendingAutoChunk]:
+    """Build bounded refill micro-pools for outer work stealing."""
+
+    if device_count <= 1:
+        raise ValueError("multi-GPU streaming refill requires at least two devices")
+    if resident_waves_per_task < 2:
+        raise ValueError("streaming refill tasks require at least two resident waves")
+    if len(plan.workload.buckets) != 1:
+        raise ValueError("multi-GPU streaming refill requires one cost bucket")
+    profiles = {profile.index: profile for profile in plan.workload.profiles}
+    shape_keys = {
+        (profile.atom_count, profile.dof_squared)
+        for profile in plan.workload.profiles
+    }
+    if len(shape_keys) != 1:
+        raise ValueError(
+            "multi-GPU streaming refill requires one exact optimizer-state shape"
+        )
+    if not plan.chunks:
+        raise ValueError("multi-GPU streaming refill requires planned resident chunks")
+
+    resident_capacity = len(plan.chunks[0].system_indices)
+    system_count = len(plan.workload.profiles)
+    maximum_task_size = resident_waves_per_task * resident_capacity
+    minimum_task_count = math.ceil(system_count / maximum_task_size)
+    task_count = max(device_count, minimum_task_count)
+    maximum_refill_task_count = system_count // (resident_capacity + 1)
+    if task_count > maximum_refill_task_count:
+        raise ValueError(
+            "multi-GPU streaming refill cannot give every task a pending cohort"
+        )
+
+    costs = {
+        index: profile_model_work(profile) + math.sqrt(profile.dof_squared)
+        for index, profile in profiles.items()
+    }
+    bins: list[list[int]] = [[] for _ in range(task_count)]
+    bin_costs = [0.0] * task_count
+    for index in sorted(costs, key=lambda item: (-costs[item], item)):
+        target = min(
+            range(task_count),
+            key=lambda candidate: (bin_costs[candidate], candidate),
+        )
+        bins[target].append(index)
+        bin_costs[target] += costs[index]
+    if any(
+        not resident_capacity < len(indices) <= maximum_task_size
+        for indices in bins
+    ):
+        raise RuntimeError("streaming refill micro-pool construction violated its bound")
+
+    capacity_bound = max(
+        (
+            int(chunk.predicted_peak_bytes)
+            for chunk in plan.chunks
+            if chunk.predicted_peak_bytes is not None
+        ),
+        default=None,
+    )
+    prediction = {
+        "mode": "refill_experimental",
+        "reason": (
+            "bounded source-backed compatible refill micro-pool experiment; "
+            "not an accepted automatic policy"
+        ),
+        "policy_id": "omc-csp-multigpu-streaming-cohort-v1",
+        "matched_family": None,
+        "predicted_speedup": None,
+        "evidence_split": "experiment",
+        "resident_capacity_source": "worst_case_memory_safe_first_wave",
+        "resident_waves_per_task": resident_waves_per_task,
+        "maximum_task_systems": maximum_task_size,
+    }
+    return sorted(
+        (
+            _PendingAutoChunk(
+                indices=tuple(sorted(indices)),
+                estimated_cost=bin_costs[task_index],
+                bucket_index=0,
+                predicted_peak_bytes=capacity_bound,
+                capacity_bound_bytes=capacity_bound,
+                resident_capacity=resident_capacity,
+                active_refill=True,
+                refill_storage="slots",
+                refill_prediction=dict(prediction),
+            )
+            for task_index, indices in enumerate(bins)
+        ),
         key=lambda chunk: (-chunk.estimated_cost, chunk.indices),
     )
 
@@ -1528,6 +1886,8 @@ def _parallel_deterministic_chunk_policy(
 
     if dispatch_policy == "preserve_resident":
         return "resident_batches_preserved"
+    if device_count == 1:
+        return "single_device_resident_batches"
     system_count = sum(len(chunk.system_indices) for chunk in plan.chunks)
     occupancy_parts = min(device_count, system_count)
     target_parts = min(
@@ -1539,6 +1899,21 @@ def _parallel_deterministic_chunk_policy(
     if len(plan.chunks) >= occupancy_parts:
         return "minimum_parts_for_work_stealing"
     return "minimum_parts_for_device_occupancy"
+
+
+def _allocator_requires_process_workers(
+    allocator_plan: CudaAllocatorPlan,
+    worker_devices: Sequence[torch.device],
+    *,
+    environment_matches: bool,
+) -> bool:
+    """Keep multi-GPU expandable allocators in isolated CUDA processes."""
+
+    has_cuda_workers = any(device.type == "cuda" for device in worker_devices)
+    return has_cuda_workers and (
+        not environment_matches
+        or (len(worker_devices) > 1 and allocator_plan.selected_policy == "expandable_segments")
+    )
 
 
 def _parallel_deterministic_dispatch_order(
@@ -1555,9 +1930,7 @@ def _parallel_deterministic_dispatch_order(
     if worker_count <= 0:
         raise ValueError("worker_count must be positive")
     if queue_policy not in ("cost_descending", "bucket_stratified"):
-        raise ValueError(
-            "queue_policy must be 'cost_descending' or 'bucket_stratified'"
-        )
+        raise ValueError("queue_policy must be 'cost_descending' or 'bucket_stratified'")
     cost_order = tuple(
         sorted(
             range(len(chunks)),
@@ -1585,9 +1958,7 @@ def _parallel_deterministic_dispatch_order(
         if index not in selected:
             initial_wave.append(index)
             selected.add(index)
-    return tuple(initial_wave) + tuple(
-        index for index in cost_order if index not in selected
-    )
+    return tuple(initial_wave) + tuple(index for index in cost_order if index not in selected)
 
 
 def _execute_multi_device_deterministic_relaxation(
@@ -1643,10 +2014,7 @@ def _execute_multi_device_deterministic_provider_relaxation(
         variable_cell=optimizer_kwargs.get("cell_filter") is not None,
         policy=config.cuda_allocator_policy,
     )
-    if (
-        capacity_decision is not None
-        and capacity_decision.use_offline_model
-    ):
+    if capacity_decision is not None and capacity_decision.use_offline_model:
         if capacity_decision.policy is None:  # pragma: no cover - property narrows
             raise RuntimeError("offline capacity decision has no policy")
         calibrated_planner = HardwareCalibratedBatchPlanner(
@@ -1676,6 +2044,14 @@ def _execute_multi_device_deterministic_provider_relaxation(
             optimizer,
             optimizer_kwargs,
             calculator.dtype,
+            config,
+        )
+    if len(devices) == 1:
+        plan = _apply_offline_refill_policy(
+            plan,
+            calculator,
+            optimizer,
+            optimizer_kwargs,
             config,
         )
     chunks = _parallel_deterministic_chunks(
@@ -1710,8 +2086,13 @@ def _execute_multi_device_deterministic_provider_relaxation(
     process_has_enough_work = len(chunks) >= (
         config.multi_gpu_process_min_chunks_per_device * worker_count
     )
-    allocator_requires_process = (
-        has_cuda_workers and allocator_plan.selected_policy == "expandable_segments"
+    allocator_environment_matches = all(
+        os.environ.get(name) == value for name, value in allocator_plan.environment().items()
+    )
+    allocator_requires_process = _allocator_requires_process_workers(
+        allocator_plan,
+        worker_devices,
+        environment_matches=allocator_environment_matches,
     )
     selected_backend = "thread"
     fallback_reason = None
@@ -1775,8 +2156,12 @@ def _execute_multi_device_deterministic_provider_relaxation(
                     {
                         "bucket_index": chunk.bucket_index,
                         "system_count": len(chunk.indices),
-                        "resident_capacity": len(chunk.indices),
+                        "resident_capacity": chunk.resident_capacity,
                         "predicted_peak_bytes": chunk.predicted_peak_bytes,
+                        "capacity_bound_bytes": chunk.capacity_bound_bytes,
+                        "active_refill": chunk.active_refill,
+                        "refill_storage": (chunk.refill_storage if chunk.active_refill else None),
+                        "refill_prediction": chunk.refill_prediction,
                         "peak_allocated_bytes": task.payload.metadata.get(
                             "worker_peak_allocated_bytes"
                         ),
@@ -1786,19 +2171,13 @@ def _execute_multi_device_deterministic_provider_relaxation(
                         "runtime_profile": task.payload.metadata.get("worker_runtime_profile"),
                         "materialization_mode": materialization.get("mode"),
                         "materialization_seconds": materialization.get("seconds"),
-                        "materialization_process_count": (
-                            materialization.get("process_count")
-                        ),
-                        "materialization_parallel": (
-                            materialization.get("parallel")
-                        ),
+                        "materialization_process_count": (materialization.get("process_count")),
+                        "materialization_parallel": (materialization.get("parallel")),
                         "wall_seconds": task.run_seconds,
                     }
                 )
             first_task = (
-                task_results[worker_result.task_indices[0]]
-                if worker_result.task_indices
-                else None
+                task_results[worker_result.task_indices[0]] if worker_result.task_indices else None
             )
             worker_allocator = (
                 {}
@@ -1811,9 +2190,7 @@ def _execute_multi_device_deterministic_provider_relaxation(
                     "device": worker_result.worker.device,
                     "startup_seconds": worker_result.startup_seconds,
                     "warmup_materialization_seconds": (
-                        worker_allocator.get(
-                            "warmup_materialization_seconds"
-                        )
+                        worker_allocator.get("warmup_materialization_seconds")
                     ),
                     "wall_seconds": worker_result.run_seconds,
                     "chunks": completed,
@@ -1852,14 +2229,15 @@ def _execute_multi_device_deterministic_provider_relaxation(
                         torch.cuda.reset_peak_memory_stats(device)
                     materialization_started = time.perf_counter()
                     chunk_systems = provider.materialize(chunk.indices)
-                    materialization_seconds = (
-                        time.perf_counter() - materialization_started
-                    )
+                    materialization_seconds = time.perf_counter() - materialization_started
                     chunk_result = _run_optimizer(
                         chunk_systems,
                         worker_calculator,
                         worker_optimizer,
-                        optimizer_kwargs,
+                        _pending_chunk_optimizer_options(
+                            optimizer_kwargs,
+                            chunk,
+                        ),
                     )
                     if device.type == "cuda":
                         torch.cuda.synchronize(device)
@@ -1878,14 +2256,18 @@ def _execute_multi_device_deterministic_provider_relaxation(
                         {
                             "bucket_index": chunk.bucket_index,
                             "system_count": len(chunk.indices),
-                            "resident_capacity": len(chunk.indices),
+                            "resident_capacity": chunk.resident_capacity,
                             "predicted_peak_bytes": chunk.predicted_peak_bytes,
+                            "capacity_bound_bytes": chunk.capacity_bound_bytes,
+                            "active_refill": chunk.active_refill,
+                            "refill_storage": (
+                                chunk.refill_storage if chunk.active_refill else None
+                            ),
+                            "refill_prediction": chunk.refill_prediction,
                             "peak_allocated_bytes": peak_allocated,
                             "peak_reserved_bytes": peak_reserved,
                             "materialization_mode": provider.mode,
-                            "materialization_seconds": (
-                                materialization_seconds
-                            ),
+                            "materialization_seconds": (materialization_seconds),
                             "wall_seconds": wall_seconds,
                         }
                     )
@@ -1924,18 +2306,32 @@ def _execute_multi_device_deterministic_provider_relaxation(
         workload_size=provider.system_count,
         calculator=calculator,
     )
+    work_stealing = worker_count > 1
+    refill_reasons = [
+        str(prediction["reason"])
+        for chunk in chunks
+        if (prediction := chunk.refill_prediction) is not None
+    ]
+    if len(devices) > 1:
+        refill_reasons = ["multi-GPU refill has no accepted scientific policy"]
     result.metadata["scheduling"] = {
         "policy": "auto",
-        "decision": "deterministic_memory_plan_multi_gpu",
+        "decision": (
+            "deterministic_memory_plan_source_single_gpu"
+            if len(devices) == 1
+            else "deterministic_memory_plan_multi_gpu"
+        ),
         "summary": scheduling_summary(
             strategy="automatic",
             devices=[str(device) for device in devices],
-            resident_capacities=[len(chunk.indices) for chunk in chunks],
+            resident_capacities=[
+                int(chunk.resident_capacity or len(chunk.indices)) for chunk in chunks
+            ],
             active_compaction=bool(optimizer_kwargs.get("active_compaction", False)),
-            active_refill=[False] * len(chunks),
+            active_refill=[chunk.active_refill for chunk in chunks],
             memory_fraction=plan.memory_fraction,
-            work_stealing=True,
-            refill_reasons=["multi-GPU refill has no accepted scientific policy"],
+            work_stealing=work_stealing,
+            refill_reasons=refill_reasons,
         ),
         "policy_manifest": compose_relaxation_policy_manifest(
             plan,
@@ -1946,9 +2342,15 @@ def _execute_multi_device_deterministic_provider_relaxation(
             available_devices=[str(device) for device in devices],
             active_device_count=worker_count,
             execution_chunk_sizes=[len(chunk.indices) for chunk in chunks],
-            execution_resident_capacities=[len(chunk.indices) for chunk in chunks],
-            work_stealing=True,
-            refill_fallback_reasons=["multi-GPU refill has no accepted scientific policy"],
+            execution_resident_capacities=[
+                int(chunk.resident_capacity or len(chunk.indices)) for chunk in chunks
+            ],
+            work_stealing=work_stealing,
+            refill_fallback_reasons=(
+                ["multi-GPU refill has no accepted scientific policy"]
+                if len(devices) > 1
+                else refill_reasons
+            ),
             observed_converged_steps=[
                 int(step) for step in result.converged_step.detach().cpu().tolist()
             ],
@@ -2012,13 +2414,19 @@ def _execute_multi_device_deterministic_provider_relaxation(
                 "bucket_index": chunk.bucket_index,
                 "system_count": len(chunk.indices),
                 "predicted_peak_bytes": chunk.predicted_peak_bytes,
+                "capacity_bound_bytes": chunk.capacity_bound_bytes,
                 "estimated_cost": chunk.estimated_cost,
+                "resident_capacity": chunk.resident_capacity,
+                "active_refill": chunk.active_refill,
+                "refill_storage": (chunk.refill_storage if chunk.active_refill else None),
+                "refill_prediction": chunk.refill_prediction,
             }
             for chunk in chunks
         ],
         "worker_backend_requested": requested_backend,
         "worker_backend": selected_backend,
         "worker_backend_fallback_reason": fallback_reason,
+        "allocator_environment_matches_parent": (allocator_environment_matches),
         "structure_materialization": {
             "mode": provider.mode,
             "parent_system_count": (
@@ -2033,24 +2441,16 @@ def _execute_multi_device_deterministic_provider_relaxation(
                 for chunk in worker["chunks"]
             ),
             "processes_per_worker": (
-                loader_decision.process_count
-                if selected_backend == "process"
-                else 1
+                loader_decision.process_count if selected_backend == "process" else 1
             ),
             "maximum_loader_processes": (
                 worker_count
-                * (
-                    loader_decision.process_count
-                    if selected_backend == "process"
-                    else 1
-                )
+                * (loader_decision.process_count if selected_backend == "process" else 1)
             ),
             "loader_policy": {
                 **loader_decision.to_dict(),
                 "effective_process_count": (
-                    loader_decision.process_count
-                    if selected_backend == "process"
-                    else 1
+                    loader_decision.process_count if selected_backend == "process" else 1
                 ),
                 "worker_backend": selected_backend,
             },
@@ -2059,9 +2459,10 @@ def _execute_multi_device_deterministic_provider_relaxation(
         "worker_startup_wall_seconds": worker_startup_seconds,
         "worker_run_wall_seconds": worker_run_seconds,
         "workers": sorted(worker_records, key=lambda record: record["worker_id"]),
-        "pending_work_stealing": True,
+        "optimization_pilot_runs": 0,
+        "pending_work_stealing": work_stealing,
         "active_compaction": bool(optimizer_kwargs.get("active_compaction", False)),
-        "active_refill": False,
+        "active_refill": any(chunk.active_refill for chunk in chunks),
         "mps": False,
         "reproducibility": active_reproducibility_state(),
         "allocator": allocator_plan.metadata(),

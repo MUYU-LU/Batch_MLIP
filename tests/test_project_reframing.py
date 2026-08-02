@@ -48,8 +48,22 @@ def test_v1_baseline_binds_the_shipped_refill_policy():
     baseline = _load_yaml("baseline_v1.yaml")
     policy = baseline["provenance"]["refill_policy"]
     payload = Path(policy["path"]).read_bytes()
+    experiment_dirs = sorted(
+        path.name for path in Path("experiments").iterdir() if path.is_dir()
+    )
+    experiment_fingerprint = hashlib.sha256(
+        "\n".join(experiment_dirs).encode("utf-8")
+    ).hexdigest()
 
+    assert baseline["baseline_id"] == "atombit-omc-csp-v1"
     assert hashlib.sha256(payload).hexdigest() == policy["sha256"]
+    assert baseline["provenance"]["experiment_directory_count"] == len(
+        experiment_dirs
+    )
+    assert (
+        baseline["provenance"]["experiment_directory_names_sha256"]
+        == experiment_fingerprint
+    )
     assert baseline["objective"]["memory_safety_fraction"] == 0.85
     assert not baseline["automatic_decisions"]["multi_device"]["refill"]
     assert not baseline["automatic_decisions"]["external_baseline_dispatch"][

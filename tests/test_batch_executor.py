@@ -11,6 +11,7 @@ from ase.io import write
 from batch_mlip import (
     AutoSchedulerConfig,
     BatchCalculator,
+    BatchedBFGS,
     BatchedFIRE,
     BatchEvaluation,
     BatchExecutor,
@@ -75,8 +76,9 @@ def _config(tmp_path) -> AutoSchedulerConfig:
     )
 
 
-def _manifest_workload(tmp_path):
-    systems = _systems()
+def _manifest_workload(tmp_path, systems=None, optimizer=None):
+    systems = _systems() if systems is None else systems
+    optimizer = BatchedFIRE() if optimizer is None else optimizer
     jobs = []
     for index, atoms in enumerate(systems):
         source_path = f"executor-{index}.extxyz"
@@ -125,7 +127,7 @@ def _manifest_workload(tmp_path):
         candidate_edge_key="candidate",
         force_mode="unspecified",
         model_dtype="torch.float64",
-        optimizer=BatchedFIRE(),
+        optimizer=optimizer,
         variable_cell=False,
         cell_method=None,
         skin_A=0.0,
@@ -278,6 +280,14 @@ def test_batch_executor_prefetches_manifests_and_reuses_worker_generation(
         )
         assert schedule["worker_startup_seconds_this_call"] == 0.0
         assert schedule["executor_call"] == 2
+        assert schedule["summary"]["strategy"] == "automatic"
+        assert schedule["summary"]["batch_mode"] == "active_drain"
+        assert schedule["policy_manifest"]["outer_scheduler"][
+            "active_device_count"
+        ] == 2
+        assert schedule["policy_manifest"]["outer_scheduler"]["assignment"] == (
+            "bucket_stratified_initial_then_cost_descending_work_stealing"
+        )
         materialization = schedule["structure_materialization"]
         assert materialization["mode"] == "manifest_global_prefetch"
         assert materialization["total_loader_processes"] == 2
@@ -291,6 +301,25 @@ def test_batch_executor_prefetches_manifests_and_reuses_worker_generation(
             for worker in schedule["workers"]
             for chunk in worker["chunks"]
         )
+        chunks = [
+            chunk
+            for worker in schedule["workers"]
+            for chunk in worker["chunks"]
+        ]
+        assert sorted(chunk["task_index"] for chunk in chunks) == list(range(4))
+        assert sorted(
+            index for chunk in chunks for index in chunk["system_indices"]
+        ) == list(range(len(systems)))
+        assert all(chunk["dispatch_offset_seconds"] >= 0.0 for chunk in chunks)
+        assert all(
+            chunk["completion_offset_seconds"] >= chunk["dispatch_offset_seconds"]
+            for chunk in chunks
+        )
+        assert all(
+            event["elapsed_seconds"] >= 0.0
+            for chunk in chunks
+            for event in chunk["runtime_profile"]["events"]
+        )
         torch.testing.assert_close(
             first.evaluation.energy,
             second.evaluation.energy,
@@ -303,6 +332,131 @@ def test_batch_executor_prefetches_manifests_and_reuses_worker_generation(
             reference.evaluation.forces,
             second.evaluation.forces,
         )
+
+
+def test_batch_executor_runs_private_multigpu_local_refill_queues(tmp_path):
+    systems = [
+        Atoms("H", positions=[[0.8 - 0.05 * index, 0.0, 0.0]])
+        for index in range(8)
+    ]
+    systems, manifest, profile = _manifest_workload(
+        tmp_path,
+        systems=systems,
+        optimizer=BatchedBFGS(),
+    )
+    config = AutoSchedulerConfig(
+        cache_enabled=False,
+        max_batch_size=2,
+        offline_hardware_capacity_enabled=False,
+        manifest_loader_processes=1,
+        manifest_multi_gpu_refill_policy="local_compatible",
+        multi_gpu_process_cpu_threads=1,
+    )
+    options = {
+        "fmax": 1e-5,
+        "max_steps": 100,
+        "optimizer_dtype": "float64",
+    }
+    reference = relax(
+        systems,
+        ExecutorQuadraticCalculator(),
+        optimizer="bfgs",
+        **options,
+    )
+
+    with BatchExecutor(
+        ExecutorQuadraticCalculator(),
+        devices=["cpu:0", "cpu:1"],
+        auto_config=config,
+        startup_timeout_seconds=30.0,
+        run_timeout_seconds=30.0,
+    ) as executor:
+        result = executor.relax_manifest(
+            manifest,
+            tmp_path,
+            profile,
+            optimizer="bfgs",
+            **options,
+        )
+
+    schedule = result.metadata["scheduling"]
+    assert bool(result.converged.all())
+    assert schedule["decision"] == (
+        "persistent_manifest_multigpu_local_refill_experiment"
+    )
+    assert schedule["parallel_chunk_policy"] == (
+        "homogeneous_private_local_refill_queues"
+    )
+    assert schedule["manifest_multi_gpu_refill_policy"] == "local_compatible"
+    assert schedule["execution_chunk_count"] == 2
+    assert schedule["active_refill"]
+    assert not schedule["pending_work_stealing"]
+    assert all(chunk["active_refill"] for chunk in schedule["planned_chunks"])
+    assert all(chunk["resident_capacity"] == 2 for chunk in schedule["planned_chunks"])
+    torch.testing.assert_close(result.evaluation.energy, reference.evaluation.energy)
+    torch.testing.assert_close(result.evaluation.forces, reference.evaluation.forces)
+
+
+def test_batch_executor_streams_bounded_refill_micro_pools(tmp_path):
+    systems = [
+        Atoms("H", positions=[[0.8 - 0.025 * index, 0.0, 0.0]])
+        for index in range(16)
+    ]
+    systems, manifest, profile = _manifest_workload(
+        tmp_path,
+        systems=systems,
+        optimizer=BatchedBFGS(),
+    )
+    config = AutoSchedulerConfig(
+        cache_enabled=False,
+        max_batch_size=2,
+        offline_hardware_capacity_enabled=False,
+        manifest_loader_processes=1,
+        manifest_multi_gpu_refill_policy="streaming_compatible",
+        multi_gpu_process_cpu_threads=1,
+    )
+    options = {
+        "fmax": 1e-5,
+        "max_steps": 100,
+        "optimizer_dtype": "float64",
+    }
+    reference = relax(
+        systems,
+        ExecutorQuadraticCalculator(),
+        optimizer="bfgs",
+        **options,
+    )
+
+    with BatchExecutor(
+        ExecutorQuadraticCalculator(),
+        devices=["cpu:0", "cpu:1"],
+        auto_config=config,
+        startup_timeout_seconds=30.0,
+        run_timeout_seconds=30.0,
+    ) as executor:
+        result = executor.relax_manifest(
+            manifest,
+            tmp_path,
+            profile,
+            optimizer="bfgs",
+            **options,
+        )
+
+    schedule = result.metadata["scheduling"]
+    assert bool(result.converged.all())
+    assert schedule["decision"] == (
+        "persistent_manifest_multigpu_streaming_refill_experiment"
+    )
+    assert schedule["parallel_chunk_policy"] == (
+        "bounded_source_backed_streaming_refill_micro_pools"
+    )
+    assert schedule["execution_chunk_count"] == 4
+    assert schedule["active_refill"]
+    assert schedule["pending_work_stealing"]
+    assert all(chunk["system_count"] == 4 for chunk in schedule["planned_chunks"])
+    assert all(chunk["resident_capacity"] == 2 for chunk in schedule["planned_chunks"])
+    torch.testing.assert_close(result.evaluation.energy, reference.evaluation.energy)
+    torch.testing.assert_close(result.evaluation.forces, reference.evaluation.forces)
 
 
 def test_batch_executor_reuses_native_generation_across_optimizers(tmp_path):

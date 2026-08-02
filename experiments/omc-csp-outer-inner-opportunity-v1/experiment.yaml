@@ -1,0 +1,56 @@
+id: omc-csp-outer-inner-opportunity-v1
+date: 2026-08-01
+hypothesis: >-
+  Passive communication telemetry can distinguish compatible inner-batch
+  underfill from outer-dispatch delay, incompatible pending work, and
+  unavoidable queue tail, defining whether dynamic multi-GPU refill has a
+  recoverable opportunity before changing the frozen workflow.
+scope:
+  execution_policy: frozen_automatic_omc_csp
+  numerical_method: variable_cell_full_bfgs
+  scheduling_change: none
+  observation_only: true
+compatibility_key:
+  - atom_count
+  - generalized_dimension
+workloads:
+  - id: OPT-OMC-SCHED-E1-TEST-OBEQIX-P2048-INTRA-NARROW-v2
+    kind: homogeneous_held_out
+    pool_size: 2048
+    gpu_counts: [2, 4, 8]
+  - id: OPT-OMC-SCHED-E1-TEST-MIX-ALL-P512-INTER-WIDE-v2
+    kind: heterogeneous_held_out
+    pool_size: 512
+    gpu_counts: [8]
+configuration:
+  model: AtomBit-OMC-s smooth_rms fp32 epoch5
+  optimizer: BFGS
+  optimizer_dtype: float64
+  cell_filter: FrechetCellFilter
+  cutoff_A: 6.0
+  materialization: manifest_lazy
+  outer_assignment: bucket_stratified_initial_then_cost_descending_work_stealing
+  inner_policy: active_drain
+  tail_recovery: none
+  deterministic_seed: 20260729
+  timing_repeats: 1
+metrics:
+  - execution_seconds
+  - production_run_seconds
+  - resident_slot_seconds
+  - refill_opportunity_slot_seconds
+  - incompatible_pending_slot_seconds
+  - unavoidable_tail_slot_seconds
+  - idle_gpu_with_ready_work_seconds
+  - materialization_or_dispatch_wait_gpu_seconds
+  - unavoidable_tail_gpu_seconds
+status: completed_passive_analysis
+decision:
+  multi_gpu_default: deterministic_complete_chunks_with_active_drain
+  homogeneous_candidate: compatible_cohort_refill
+  heterogeneous_refill: disabled
+  live_state_migration: disabled
+  duration_prediction: not_required
+  local_cohort_experiment: completed_mixed_not_promoted
+  next_experiment: source_backed_streaming_compatible_refill
+  runtime_cross_gpu_refill_channel: defer_until_streaming_local_refill_is_measured

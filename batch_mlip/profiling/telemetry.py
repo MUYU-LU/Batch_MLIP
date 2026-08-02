@@ -102,7 +102,7 @@ _REQUIRED_FIELDS = {
 
 
 def _validate_scalar(name: str, value: Any) -> None:
-    if value is None or isinstance(value, (bool, int, str)):
+    if value is None or isinstance(value, bool | int | str):
         return
     if isinstance(value, float) and math.isfinite(value):
         return

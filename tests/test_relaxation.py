@@ -6,7 +6,6 @@ from ase import Atoms
 from ase.calculators.calculator import Calculator, all_changes
 from ase.constraints import FixAtoms
 from ase.optimize import FIRE
-from batch_mlip.toy_models import QuadraticWellModel
 
 from batch_mlip import (
     AseGraphBatch,
@@ -14,6 +13,7 @@ from batch_mlip import (
     batched_fire_relax,
     create_optimizer,
 )
+from batch_mlip.toy_models import QuadraticWellModel
 
 
 class QuadraticCalculator(Calculator):

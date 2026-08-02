@@ -10,7 +10,6 @@ from ase.calculators.lj import LennardJones
 from ase.constraints import FixAtoms
 from ase.filters import FrechetCellFilter as ASEFrechetCellFilter
 from ase.optimize import BFGS
-from batch_mlip.toy_models import QuadraticWellModel
 
 from batch_mlip import (
     ASECalculatorAdapter,
@@ -28,6 +27,8 @@ from batch_mlip.optimization.bfgs import (
     _refill_insert_count,
     _use_grouped_linear_algebra,
 )
+from batch_mlip.optimization.refill import match_compatible_slots
+from batch_mlip.toy_models import QuadraticWellModel
 
 
 class QuadraticCalculator(Calculator):
@@ -430,6 +431,36 @@ def test_refill_policy_insert_count(policy, survivors, pending, expected):
     )
 
 
+def test_compatible_refill_matches_earliest_equal_atom_pending_jobs():
+    assignment = match_compatible_slots(
+        destination_ids=[1, 3],
+        destination_counts=[1, 2],
+        pending_ids=[8, 9, 10],
+        pending_counts=[2, 1, 1],
+    )
+
+    assert assignment.complete
+    assert assignment.destination_ids == (1, 3)
+    assert assignment.source_ids == (9, 8)
+    assert assignment.unmatched_destination_ids == ()
+
+
+def test_compatible_refill_reports_incomplete_cohort_without_mutating_queue():
+    pending = [8, 9]
+    assignment = match_compatible_slots(
+        destination_ids=[1, 3],
+        destination_counts=[1, 3],
+        pending_ids=pending,
+        pending_counts=[2, 1],
+    )
+
+    assert not assignment.complete
+    assert assignment.destination_ids == (1,)
+    assert assignment.source_ids == (9,)
+    assert assignment.unmatched_destination_ids == (3,)
+    assert pending == [8, 9]
+
+
 @pytest.mark.parametrize(
     "backend,device_type,group_size,dimension,expected",
     [
@@ -539,6 +570,48 @@ def test_slot_refill_falls_back_for_unequal_atom_counts():
 
     assert result.state.counts.tolist() == [1, 2]
     assert result.converged.tolist() == [False, False]
+
+
+def test_compatible_slot_refill_looks_ahead_and_preserves_results(monkeypatch):
+    systems = [
+        Atoms("H", positions=[[1e-8, 0.0, 0.0]]),
+        Atoms("He2", positions=[[0.8, 0.0, 0.0], [0.4, 0.0, 0.0]]),
+        Atoms("He2", positions=[[0.6, 0.0, 0.0], [0.3, 0.0, 0.0]]),
+        Atoms("H", positions=[[0.2, 0.0, 0.0]]),
+    ]
+
+    def run(storage):
+        return relax(
+            systems,
+            _quadratic_potential(),
+            optimizer="bfgs",
+            refill_batch_size=2,
+            refill_storage=storage,
+            refill_min_chunk=1,
+            fmax=1e-5,
+            max_steps=200,
+            max_step=0.2,
+            optimizer_dtype="float64",
+        )
+
+    reference = run("repack")
+    swaps = []
+    state_type = type(_quadratic_potential().create_state(systems))
+    original = state_type.replace_systems_from_
+
+    def record_swap(state, destination_ids, source, source_ids):
+        swaps.append((tuple(destination_ids), tuple(source_ids)))
+        return original(state, destination_ids, source, source_ids)
+
+    monkeypatch.setattr(state_type, "replace_systems_from_", record_swap)
+    compatible = run("compatible_slots")
+
+    assert swaps[0] == ((0,), (3,))
+    assert bool(compatible.converged.all())
+    torch.testing.assert_close(compatible.converged_step, reference.converged_step)
+    torch.testing.assert_close(compatible.state.positions, reference.state.positions)
+    torch.testing.assert_close(compatible.evaluation.energy, reference.evaluation.energy)
+    torch.testing.assert_close(compatible.evaluation.forces, reference.evaluation.forces)
 
 
 def test_heterogeneous_arena_refill_matches_repack():

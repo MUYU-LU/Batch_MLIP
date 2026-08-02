@@ -38,6 +38,8 @@ from ..planning.capacity_policy import (
     load_hardware_capacity_policy,
     select_hardware_capacity_policy,
 )
+from ..planning.composition import compose_relaxation_policy_manifest
+from ..planning.decision import scheduling_summary
 from ..planning.deterministic import (
     plan_deterministic_relaxation,
     plan_hardware_calibrated_relaxation,
@@ -46,6 +48,7 @@ from ..planning.memory import HardwareCalibratedBatchPlanner
 from ..planning.profiles import PlanningProfileBundle
 from ..profiling import RuntimeProfiler
 from .api import (
+    _apply_offline_refill_policy,
     _combine_relaxation_results,
     _measure_representative_memory,
     _measure_representative_provider_memory,
@@ -55,6 +58,10 @@ from .api import (
     _parallel_deterministic_chunk_policy,
     _parallel_deterministic_chunks,
     _parallel_deterministic_dispatch_order,
+    _parallel_local_refill_chunks,
+    _parallel_streaming_refill_chunks,
+    _pending_chunk_optimizer_options,
+    _PendingAutoChunk,
     _validate_manifest_planning_profile,
     relax,
 )
@@ -109,7 +116,10 @@ class _ExecutorWorkerRunner:
         if device.type == "cuda":
             torch.cuda.synchronize(device)
             torch.cuda.reset_peak_memory_stats(device)
-        with RuntimeProfiler(device=device) as profiler:
+        with RuntimeProfiler(
+            device=device,
+            record_event_timestamps=True,
+        ) as profiler:
             result = relax(
                 task.systems,
                 self.calculator,
@@ -127,9 +137,7 @@ class _ExecutorWorkerRunner:
         if result.state.device.type == "cuda":
             torch.cuda.synchronize(result.state.device)
             result = _offload_relaxation_result(result)
-        result.metadata["worker_runtime_profile"] = profiler.summary(
-            include_samples=False
-        )
+        result.metadata["worker_runtime_profile"] = profiler.summary(include_samples=False)
         result.metadata["executor_worker"] = {
             **self.allocator_metadata,
             "pid": os.getpid(),
@@ -155,8 +163,7 @@ class _ExecutorWorkerPreparer:
         cuda_initialized_before_prepare = torch.cuda.is_initialized()
         if device.type == "cuda" and cuda_initialized_before_prepare:
             raise RuntimeError(
-                "CUDA initialized before the worker allocator environment "
-                "could take effect"
+                "CUDA initialized before the worker allocator environment " "could take effect"
             )
         if device.type == "cuda":
             torch.cuda.set_device(device)
@@ -178,17 +185,12 @@ class _ExecutorWorkerPreparer:
             allocator_metadata={
                 **self.allocator_plan.metadata(),
                 "applied": device.type == "cuda",
-                "cuda_initialized_before_prepare": (
-                    cuda_initialized_before_prepare
-                ),
+                "cuda_initialized_before_prepare": (cuda_initialized_before_prepare),
                 "effective_environment": {
-                    name: os.environ.get(name)
-                    for name in self.allocator_plan.environment()
+                    name: os.environ.get(name) for name in self.allocator_plan.environment()
                 },
                 "reported_backend": (
-                    torch.cuda.memory.get_allocator_backend()
-                    if device.type == "cuda"
-                    else None
+                    torch.cuda.memory.get_allocator_backend() if device.type == "cuda" else None
                 ),
                 "reproducibility": active_reproducibility_state(),
             },
@@ -200,6 +202,31 @@ class _ExecutorChunk:
     indices: tuple[int, ...]
     cost: float
     bucket_index: int
+    predicted_peak_bytes: int | None = None
+    capacity_bound_bytes: int | None = None
+    resident_capacity: int | None = None
+    active_refill: bool = False
+    refill_storage: str = "slots"
+    refill_prediction: dict[str, Any] | None = None
+
+    def optimizer_options(
+        self,
+        optimizer_kwargs: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        return _pending_chunk_optimizer_options(
+            optimizer_kwargs,
+            _PendingAutoChunk(
+                indices=self.indices,
+                estimated_cost=self.cost,
+                bucket_index=self.bucket_index,
+                predicted_peak_bytes=self.predicted_peak_bytes,
+                capacity_bound_bytes=self.capacity_bound_bytes,
+                resident_capacity=self.resident_capacity,
+                active_refill=self.active_refill,
+                refill_storage=self.refill_storage,
+                refill_prediction=self.refill_prediction,
+            ),
+        )
 
 
 @dataclass
@@ -237,9 +264,7 @@ class _ManifestExecutorTaskSource:
         self.records = {}
         self._prefetch_capacity = prefetch_capacity
         self._initial_dispatch_remaining = initial_dispatch_count
-        self._initial_task_indices = set(
-            tuple(ordered_task_indices)[:initial_dispatch_count]
-        )
+        self._initial_task_indices = set(tuple(ordered_task_indices)[:initial_dispatch_count])
         self._buffer_capacity = max(
             0,
             prefetch_capacity - initial_dispatch_count,
@@ -267,20 +292,15 @@ class _ManifestExecutorTaskSource:
             raise RuntimeError("manifest task source was not prepared")
         if task_index not in self._handles:
             if self._pending is None or not self._pending:
-                raise RuntimeError(
-                    f"manifest task {task_index} is unavailable"
-                )
+                raise RuntimeError(f"manifest task {task_index} is unavailable")
             expected = self._pending.popleft()
             if expected != task_index:
-                raise RuntimeError(
-                    "manifest task resolution differs from prepared order"
-                )
+                raise RuntimeError("manifest task resolution differs from prepared order")
             self._submit(task_index)
         handle = self._handles.pop(task_index)
         systems, metadata = self.materializer.resolve(handle)
         metadata["initial_wave"] = bool(
-            self._initial_task_indices is not None
-            and task_index in self._initial_task_indices
+            self._initial_task_indices is not None and task_index in self._initial_task_indices
         )
         self.records[task_index] = metadata
         if self._initial_dispatch_remaining > 0:
@@ -290,7 +310,7 @@ class _ManifestExecutorTaskSource:
         return _ExecutorRelaxTask(
             systems=tuple(systems),
             optimizer=self.optimizer,
-            optimizer_kwargs=self.optimizer_kwargs,
+            optimizer_kwargs=self.chunks[task_index].optimizer_options(self.optimizer_kwargs),
             input_metadata={
                 "mode": "manifest_global_prefetch",
                 **metadata,
@@ -316,9 +336,7 @@ def _worker_records(
 ) -> list[dict[str, Any]]:
     if execution is None:
         return []
-    task_results = {
-        result.task_index: result for result in execution.task_results
-    }
+    task_results = {result.task_index: result for result in execution.task_results}
     records = []
     for worker_result in execution.worker_results:
         completed = []
@@ -333,19 +351,23 @@ def _worker_records(
             allocator = worker_metadata
             completed.append(
                 {
+                    "task_index": task_index,
                     "bucket_index": chunk.bucket_index,
+                    "system_indices": list(chunk.indices),
                     "system_count": len(chunk.indices),
                     "estimated_cost": chunk.cost,
+                    "resident_capacity": chunk.resident_capacity,
+                    "predicted_peak_bytes": chunk.predicted_peak_bytes,
+                    "capacity_bound_bytes": chunk.capacity_bound_bytes,
+                    "active_refill": chunk.active_refill,
+                    "refill_storage": (chunk.refill_storage if chunk.active_refill else None),
+                    "refill_prediction": chunk.refill_prediction,
                     "wall_seconds": task_result.run_seconds,
-                    "peak_allocated_bytes": worker_metadata.get(
-                        "peak_allocated_bytes"
-                    ),
-                    "peak_reserved_bytes": worker_metadata.get(
-                        "peak_reserved_bytes"
-                    ),
-                    "runtime_profile": task_result.payload.metadata.get(
-                        "worker_runtime_profile"
-                    ),
+                    "dispatch_offset_seconds": task_result.dispatch_offset_seconds,
+                    "completion_offset_seconds": task_result.completion_offset_seconds,
+                    "peak_allocated_bytes": worker_metadata.get("peak_allocated_bytes"),
+                    "peak_reserved_bytes": worker_metadata.get("peak_reserved_bytes"),
+                    "runtime_profile": task_result.payload.metadata.get("worker_runtime_profile"),
                     "input": worker_metadata.get("input"),
                     "schedule": task_result.payload.metadata.get(
                         "scheduling",
@@ -434,11 +456,7 @@ class BatchExecutor:
         active_devices: Sequence[torch.device],
     ) -> tuple[Any, ...]:
         device_type = self.devices[0].type
-        allocator = (
-            allocator_plan.selected_policy
-            if device_type == "cuda"
-            else "not_applicable"
-        )
+        allocator = allocator_plan.selected_policy if device_type == "cuda" else "not_applicable"
         return (
             device_type,
             allocator,
@@ -466,9 +484,7 @@ class BatchExecutor:
             normalized_active_devices,
         )
         restarted = self._pool is not None and self._pool_key != desired_key
-        if self._pool is not None and (
-            restarted or self._pool.broken or self._pool.closed
-        ):
+        if self._pool is not None and (restarted or self._pool.broken or self._pool.closed):
             self._pool.close()
             self._pool = None
             self._pool_key = None
@@ -478,9 +494,7 @@ class BatchExecutor:
 
         main_module = sys.modules.get("__main__")
         if not getattr(main_module, "__file__", None):
-            raise RuntimeError(
-                "BatchExecutor with spawn requires a file-backed __main__ module"
-            )
+            raise RuntimeError("BatchExecutor with spawn requires a file-backed __main__ module")
         calculator_template = self.calculator.clone_to("cpu")
         model = getattr(calculator_template, "model", None)
         if isinstance(model, torch.nn.Module):
@@ -504,9 +518,7 @@ class BatchExecutor:
         self._pool = PersistentTaskPool(
             [str(device) for device in normalized_active_devices],
             preparer,
-            worker_environment=(
-                allocator_plan.environment() if has_cuda else None
-            ),
+            worker_environment=(allocator_plan.environment() if has_cuda else None),
             start_method=self.start_method,
             startup_timeout_seconds=self.startup_timeout_seconds,
             run_timeout_seconds=self.run_timeout_seconds,
@@ -521,8 +533,7 @@ class BatchExecutor:
         process_count: int,
     ) -> tuple[AsyncStructureMaterializer, bool]:
         restarted = (
-            self._materializer is not None
-            and self._materializer_process_count != process_count
+            self._materializer is not None and self._materializer_process_count != process_count
         )
         if restarted and self._materializer is not None:
             self._materializer.close()
@@ -549,15 +560,9 @@ class BatchExecutor:
             raise RuntimeError("BatchExecutor is closed")
         total_started = time.perf_counter()
         normalized = _normalize_systems(systems)
-        resolved = (
-            create_optimizer(optimizer)
-            if isinstance(optimizer, str)
-            else optimizer
-        )
+        resolved = create_optimizer(optimizer) if isinstance(optimizer, str) else optimizer
         if not isinstance(resolved, BatchOptimizer):
-            raise TypeError(
-                "optimizer must be a registered name or implement BatchOptimizer"
-            )
+            raise TypeError("optimizer must be a registered name or implement BatchOptimizer")
         config = auto_config or self.auto_config
         if config.multi_gpu_worker_backend == "thread":
             raise ValueError(
@@ -567,9 +572,7 @@ class BatchExecutor:
         capabilities = resolved.capabilities()
         options = dict(optimizer_kwargs)
         if options.get("refill_batch_size") is not None:
-            raise ValueError(
-                "BatchExecutor controls refill_batch_size; do not set it"
-            )
+            raise ValueError("BatchExecutor controls refill_batch_size; do not set it")
         if getattr(capabilities, "active_compaction", False):
             options.setdefault("active_compaction", True)
         _validate_capabilities(resolved, options)
@@ -603,12 +606,18 @@ class BatchExecutor:
             self.calculator.dtype,
             config,
         )
+        if len(self.devices) == 1:
+            plan = _apply_offline_refill_policy(
+                plan,
+                self.calculator,
+                resolved,
+                options,
+                config,
+            )
         pending_chunks = _parallel_deterministic_chunks(
             plan,
             device_count=len(self.devices),
-            target_chunks_per_device=(
-                config.multi_gpu_target_chunks_per_device
-            ),
+            target_chunks_per_device=(config.multi_gpu_target_chunks_per_device),
             dispatch_policy=config.multi_gpu_dispatch_policy,
         )
         active_worker_count = min(len(self.devices), len(pending_chunks))
@@ -628,14 +637,18 @@ class BatchExecutor:
         self._relaxation_calls += 1
 
         optimizer_spec = _OptimizerSpec.from_optimizer(resolved)
-        indexed_results: list[
-            tuple[tuple[int, ...], RelaxationResult]
-        ] = []
+        indexed_results: list[tuple[tuple[int, ...], RelaxationResult]] = []
         production_chunks = [
             _ExecutorChunk(
                 indices=chunk.indices,
                 cost=chunk.estimated_cost,
                 bucket_index=chunk.bucket_index,
+                predicted_peak_bytes=chunk.predicted_peak_bytes,
+                capacity_bound_bytes=chunk.capacity_bound_bytes,
+                resident_capacity=chunk.resident_capacity,
+                active_refill=chunk.active_refill,
+                refill_storage=chunk.refill_storage,
+                refill_prediction=chunk.refill_prediction,
             )
             for chunk in pending_chunks
         ]
@@ -643,7 +656,7 @@ class BatchExecutor:
             _ExecutorRelaxTask(
                 systems=tuple(normalized[index] for index in chunk.indices),
                 optimizer=optimizer_spec,
-                optimizer_kwargs=options,
+                optimizer_kwargs=chunk.optimizer_options(options),
             )
             for chunk in production_chunks
         ]
@@ -670,13 +683,9 @@ class BatchExecutor:
                 indexed_results.append((chunk.indices, task_result.payload))
 
         reassembly_started = time.perf_counter()
-        executed = [
-            index for indices, _ in indexed_results for index in indices
-        ]
+        executed = [index for indices, _ in indexed_results for index in indices]
         if sorted(executed) != list(range(len(normalized))):
-            raise RuntimeError(
-                "persistent scheduling duplicated or omitted input systems"
-            )
+            raise RuntimeError("persistent scheduling duplicated or omitted input systems")
         result = _combine_relaxation_results(
             indexed_results,
             workload_size=len(normalized),
@@ -708,23 +717,16 @@ class BatchExecutor:
             "parallel_chunk_policy": _parallel_deterministic_chunk_policy(
                 plan,
                 device_count=len(self.devices),
-                target_chunks_per_device=(
-                    config.multi_gpu_target_chunks_per_device
-                ),
+                target_chunks_per_device=(config.multi_gpu_target_chunks_per_device),
                 dispatch_policy=config.multi_gpu_dispatch_policy,
             ),
             "multi_gpu_dispatch_policy": config.multi_gpu_dispatch_policy,
             "multi_gpu_queue_policy": config.multi_gpu_queue_policy,
-            "initial_dispatch_chunk_indices": list(
-                dispatch_order[:active_worker_count]
-            ),
+            "initial_dispatch_chunk_indices": list(dispatch_order[:active_worker_count]),
             "initial_dispatch_bucket_indices": [
-                pending_chunks[index].bucket_index
-                for index in dispatch_order[:active_worker_count]
+                pending_chunks[index].bucket_index for index in dispatch_order[:active_worker_count]
             ],
-            "target_chunks_per_device": (
-                config.multi_gpu_target_chunks_per_device
-            ),
+            "target_chunks_per_device": (config.multi_gpu_target_chunks_per_device),
             "resident_plan_chunk_count": len(plan.chunks),
             "execution_chunk_count": len(pending_chunks),
             "resident_plan_chunks": [
@@ -741,7 +743,12 @@ class BatchExecutor:
                     "bucket_index": chunk.bucket_index,
                     "system_count": len(chunk.indices),
                     "predicted_peak_bytes": chunk.predicted_peak_bytes,
+                    "capacity_bound_bytes": chunk.capacity_bound_bytes,
                     "estimated_cost": chunk.estimated_cost,
+                    "resident_capacity": chunk.resident_capacity,
+                    "active_refill": chunk.active_refill,
+                    "refill_storage": (chunk.refill_storage if chunk.active_refill else None),
+                    "refill_prediction": chunk.refill_prediction,
                 }
                 for chunk in pending_chunks
             ],
@@ -751,24 +758,21 @@ class BatchExecutor:
             "worker_generation_restarted": restarted,
             "worker_pids": list(self._pool.worker_pids),
             "worker_startup_seconds_this_call": startup_seconds,
-            "worker_startup_seconds_generation": (
-                self._pool.startup_wall_seconds
-            ),
+            "worker_startup_seconds_generation": (self._pool.startup_wall_seconds),
             "allocator": {
                 **allocator_plan.metadata(),
                 "applied_to_workers": self.devices[0].type == "cuda",
             },
             "optimization_pilot_runs": 0,
+            "active_refill": any(chunk.active_refill for chunk in pending_chunks),
             "production_run_seconds": (
-                0.0
-                if production_execution is None
-                else production_execution.run_wall_seconds
+                0.0 if production_execution is None else production_execution.run_wall_seconds
             ),
             "workers": _worker_records(
                 production_execution,
                 production_chunks,
             ),
-            "pending_work_stealing": True,
+            "pending_work_stealing": len(self.devices) > 1,
             "total_seconds": time.perf_counter() - total_started,
         }
         return result
@@ -781,9 +785,7 @@ class BatchExecutor:
         *,
         optimizer: str | BatchOptimizer = "fire",
         auto_config: AutoSchedulerConfig | None = None,
-        hardware_capacity_policy: (
-            HardwareCapacityPolicy | str | Path | None
-        ) = None,
+        hardware_capacity_policy: (HardwareCapacityPolicy | str | Path | None) = None,
         **optimizer_kwargs: Any,
     ) -> RelaxationResult:
         """Relax a signed pool with bounded prefetch and persistent workers."""
@@ -791,16 +793,9 @@ class BatchExecutor:
         if self._closed:
             raise RuntimeError("BatchExecutor is closed")
         total_started = time.perf_counter()
-        resolved = (
-            create_optimizer(optimizer)
-            if isinstance(optimizer, str)
-            else optimizer
-        )
+        resolved = create_optimizer(optimizer) if isinstance(optimizer, str) else optimizer
         if not isinstance(resolved, BatchOptimizer):
-            raise TypeError(
-                "optimizer must be a registered name or implement "
-                "BatchOptimizer"
-            )
+            raise TypeError("optimizer must be a registered name or implement " "BatchOptimizer")
         config = auto_config or self.auto_config
         if config.multi_gpu_worker_backend == "thread":
             raise ValueError(
@@ -809,9 +804,7 @@ class BatchExecutor:
             )
         options = dict(optimizer_kwargs)
         if options.get("refill_batch_size") is not None:
-            raise ValueError(
-                "BatchExecutor controls refill_batch_size; do not set it"
-            )
+            raise ValueError("BatchExecutor controls refill_batch_size; do not set it")
         capabilities = resolved.capabilities()
         if getattr(capabilities, "active_compaction", False):
             options.setdefault("active_compaction", True)
@@ -849,9 +842,7 @@ class BatchExecutor:
                     hardware_capacity_policy,
                     HardwareCapacityPolicy,
                 )
-                else load_hardware_capacity_policy(
-                    hardware_capacity_policy
-                )
+                else load_hardware_capacity_policy(hardware_capacity_policy)
             )
             capacity_decision = select_hardware_capacity_policy(
                 policy,
@@ -870,9 +861,7 @@ class BatchExecutor:
             )
         if capacity_decision.use_offline_model:
             if capacity_decision.policy is None:
-                raise RuntimeError(
-                    "offline capacity decision has no policy"
-                )
+                raise RuntimeError("offline capacity decision has no policy")
             planner = HardwareCalibratedBatchPlanner(
                 capacity_decision.policy.model,
                 memory_budget_bytes=config.memory_budget_bytes,
@@ -902,14 +891,39 @@ class BatchExecutor:
                 self.calculator.dtype,
                 config,
             )
-        pending_chunks = _parallel_deterministic_chunks(
-            plan,
-            device_count=len(self.devices),
-            target_chunks_per_device=(
-                config.multi_gpu_target_chunks_per_device
-            ),
-            dispatch_policy=config.multi_gpu_dispatch_policy,
+        if len(self.devices) == 1:
+            plan = _apply_offline_refill_policy(
+                plan,
+                self.calculator,
+                resolved,
+                options,
+                config,
+            )
+        local_refill = (
+            len(self.devices) > 1
+            and config.manifest_multi_gpu_refill_policy == "local_compatible"
         )
+        streaming_refill = (
+            len(self.devices) > 1
+            and config.manifest_multi_gpu_refill_policy == "streaming_compatible"
+        )
+        if streaming_refill:
+            pending_chunks = _parallel_streaming_refill_chunks(
+                plan,
+                device_count=len(self.devices),
+            )
+        elif local_refill:
+            pending_chunks = _parallel_local_refill_chunks(
+                plan,
+                device_count=len(self.devices),
+            )
+        else:
+            pending_chunks = _parallel_deterministic_chunks(
+                plan,
+                device_count=len(self.devices),
+                target_chunks_per_device=(config.multi_gpu_target_chunks_per_device),
+                dispatch_policy=config.multi_gpu_dispatch_policy,
+            )
         planning_seconds = time.perf_counter() - planning_started
         active_worker_count = min(
             len(self.devices),
@@ -919,17 +933,11 @@ class BatchExecutor:
             [profile.atom_count for profile in workload.profiles],
             active_worker_count=active_worker_count,
             requested=config.manifest_loader_processes,
-            compute_threads_per_worker=(
-                config.multi_gpu_process_cpu_threads
-            ),
+            compute_threads_per_worker=(config.multi_gpu_process_cpu_threads),
             manifest_backed=True,
         )
-        total_loader_processes = (
-            loader_decision.process_count * active_worker_count
-        )
-        materializer, materializer_restarted = (
-            self._ensure_materializer(total_loader_processes)
-        )
+        total_loader_processes = loader_decision.process_count * active_worker_count
+        materializer, materializer_restarted = self._ensure_materializer(total_loader_processes)
 
         restarted, startup_seconds = self._ensure_pool(
             allocator_plan=allocator_plan,
@@ -948,6 +956,12 @@ class BatchExecutor:
                 indices=chunk.indices,
                 cost=chunk.estimated_cost,
                 bucket_index=chunk.bucket_index,
+                predicted_peak_bytes=chunk.predicted_peak_bytes,
+                capacity_bound_bytes=chunk.capacity_bound_bytes,
+                resident_capacity=chunk.resident_capacity,
+                active_refill=chunk.active_refill,
+                refill_storage=chunk.refill_storage,
+                refill_prediction=chunk.refill_prediction,
             )
             for chunk in pending_chunks
         )
@@ -966,9 +980,7 @@ class BatchExecutor:
         production_execution = self._pool.execute_source(
             task_source,
             [chunk.cost for chunk in production_chunks],
-            prefetch_depth=(
-                config.manifest_prefetch_chunks_per_worker
-            ),
+            prefetch_depth=(config.manifest_prefetch_chunks_per_worker),
             dispatch_order=dispatch_order,
         )
         indexed_results = [
@@ -981,13 +993,9 @@ class BatchExecutor:
         ]
 
         reassembly_started = time.perf_counter()
-        executed = [
-            index for indices, _ in indexed_results for index in indices
-        ]
+        executed = [index for indices, _ in indexed_results for index in indices]
         if sorted(executed) != list(range(provider.system_count)):
-            raise RuntimeError(
-                "persistent manifest scheduling duplicated or omitted systems"
-            )
+            raise RuntimeError("persistent manifest scheduling duplicated or omitted systems")
         result = _combine_relaxation_results(
             indexed_results,
             workload_size=provider.system_count,
@@ -996,17 +1004,14 @@ class BatchExecutor:
         reassembly_seconds = time.perf_counter() - reassembly_started
         materialization_records = task_source.records or {}
         dispatch_wait_seconds = sum(
-            float(record["dispatch_wait_seconds"])
-            for record in materialization_records.values()
+            float(record["dispatch_wait_seconds"]) for record in materialization_records.values()
         )
         initial_dispatch_wait_seconds = sum(
             float(record["dispatch_wait_seconds"])
             for record in materialization_records.values()
             if record["initial_wave"]
         )
-        prefetched_dispatch_wait_seconds = (
-            dispatch_wait_seconds - initial_dispatch_wait_seconds
-        )
+        prefetched_dispatch_wait_seconds = dispatch_wait_seconds - initial_dispatch_wait_seconds
         eligible_prefetch_count = max(
             0,
             len(materialization_records) - active_worker_count,
@@ -1016,9 +1021,74 @@ class BatchExecutor:
             for record in materialization_records.values()
             if not record["initial_wave"]
         )
+        work_stealing = len(pending_chunks) > active_worker_count
+        refill_reasons = [
+            str(prediction["reason"])
+            for chunk in pending_chunks
+            if (prediction := chunk.refill_prediction) is not None
+        ]
+        refill_fallback_reasons: list[str] = []
+        if len(self.devices) > 1 and not (local_refill or streaming_refill):
+            refill_fallback_reasons.append(
+                "multi-GPU refill has no accepted scientific policy"
+            )
         result.metadata["scheduling"] = {
             "policy": "auto",
-            "decision": "persistent_manifest_deterministic_memory_plan",
+            "decision": (
+                "persistent_manifest_multigpu_streaming_refill_experiment"
+                if streaming_refill
+                else (
+                    "persistent_manifest_multigpu_local_refill_experiment"
+                    if local_refill
+                    else "persistent_manifest_deterministic_memory_plan"
+                )
+            ),
+            "summary": scheduling_summary(
+                strategy="automatic",
+                devices=[str(device) for device in self.devices],
+                resident_capacities=[
+                    int(chunk.resident_capacity or len(chunk.indices))
+                    for chunk in pending_chunks
+                ],
+                active_compaction=bool(options.get("active_compaction", False)),
+                active_refill=[chunk.active_refill for chunk in pending_chunks],
+                memory_fraction=plan.memory_fraction,
+                work_stealing=work_stealing,
+                refill_reasons=[*refill_reasons, *refill_fallback_reasons],
+            ),
+            "policy_manifest": compose_relaxation_policy_manifest(
+                plan,
+                self.calculator,
+                resolved,
+                options,
+                fully_periodic=provider.fully_periodic,
+                available_devices=[str(device) for device in self.devices],
+                active_device_count=active_worker_count,
+                execution_chunk_sizes=[len(chunk.indices) for chunk in pending_chunks],
+                execution_resident_capacities=[
+                    int(chunk.resident_capacity or len(chunk.indices))
+                    for chunk in pending_chunks
+                ],
+                work_stealing=work_stealing,
+                outer_assignment=(
+                    "bounded_compatible_refill_micro_pools_then_work_stealing"
+                    if streaming_refill
+                    else (
+                        "cost_balanced_private_compatible_refill_queues"
+                        if local_refill
+                        else (
+                            "bucket_stratified_initial_then_cost_descending_work_stealing"
+                            if work_stealing
+                            and config.multi_gpu_queue_policy == "bucket_stratified"
+                            else None
+                        )
+                    )
+                ),
+                refill_fallback_reasons=refill_fallback_reasons,
+                observed_converged_steps=[
+                    int(step) for step in result.converged_step.detach().cpu().tolist()
+                ],
+            ),
             "devices": [str(device) for device in self.devices],
             "gpu_count": len(self.devices),
             "active_gpu_count": active_worker_count,
@@ -1033,36 +1103,36 @@ class BatchExecutor:
                 "system_count": len(probe.probe_indices),
                 "system_indices": list(probe.probe_indices),
                 "model_forward_count": 1 if probe.probe_indices else 0,
-                "baseline_allocated_bytes": (
-                    probe.baseline_allocated_bytes
-                ),
+                "baseline_allocated_bytes": (probe.baseline_allocated_bytes),
                 "peak_allocated_bytes": probe.peak_allocated_bytes,
                 "peak_reserved_bytes": probe.peak_reserved_bytes,
                 "model_bytes_per_work": probe.model_bytes_per_work,
             },
             "capacity_planning": capacity_decision.to_dict(),
             "parallel_chunk_policy": (
-                _parallel_deterministic_chunk_policy(
-                    plan,
-                    device_count=len(self.devices),
-                    target_chunks_per_device=(
-                        config.multi_gpu_target_chunks_per_device
-                    ),
-                    dispatch_policy=config.multi_gpu_dispatch_policy,
+                "bounded_source_backed_streaming_refill_micro_pools"
+                if streaming_refill
+                else (
+                    "homogeneous_private_local_refill_queues"
+                    if local_refill
+                    else _parallel_deterministic_chunk_policy(
+                        plan,
+                        device_count=len(self.devices),
+                        target_chunks_per_device=(config.multi_gpu_target_chunks_per_device),
+                        dispatch_policy=config.multi_gpu_dispatch_policy,
+                    )
                 )
             ),
             "multi_gpu_dispatch_policy": config.multi_gpu_dispatch_policy,
             "multi_gpu_queue_policy": config.multi_gpu_queue_policy,
-            "initial_dispatch_chunk_indices": list(
-                dispatch_order[:active_worker_count]
+            "manifest_multi_gpu_refill_policy": (
+                config.manifest_multi_gpu_refill_policy
             ),
+            "initial_dispatch_chunk_indices": list(dispatch_order[:active_worker_count]),
             "initial_dispatch_bucket_indices": [
-                pending_chunks[index].bucket_index
-                for index in dispatch_order[:active_worker_count]
+                pending_chunks[index].bucket_index for index in dispatch_order[:active_worker_count]
             ],
-            "target_chunks_per_device": (
-                config.multi_gpu_target_chunks_per_device
-            ),
+            "target_chunks_per_device": (config.multi_gpu_target_chunks_per_device),
             "resident_plan_chunk_count": len(plan.chunks),
             "execution_chunk_count": len(pending_chunks),
             "resident_plan_chunks": [
@@ -1079,7 +1149,12 @@ class BatchExecutor:
                     "bucket_index": chunk.bucket_index,
                     "system_count": len(chunk.indices),
                     "predicted_peak_bytes": chunk.predicted_peak_bytes,
+                    "capacity_bound_bytes": chunk.capacity_bound_bytes,
                     "estimated_cost": chunk.estimated_cost,
+                    "resident_capacity": chunk.resident_capacity,
+                    "active_refill": chunk.active_refill,
+                    "refill_storage": (chunk.refill_storage if chunk.active_refill else None),
+                    "refill_prediction": chunk.refill_prediction,
                 }
                 for chunk in pending_chunks
             ],
@@ -1087,38 +1162,22 @@ class BatchExecutor:
                 "mode": "manifest_global_prefetch",
                 "loader_policy": loader_decision.to_dict(),
                 "total_loader_processes": total_loader_processes,
-                "prefetch_chunks_per_worker": (
-                    config.manifest_prefetch_chunks_per_worker
-                ),
+                "prefetch_chunks_per_worker": (config.manifest_prefetch_chunks_per_worker),
                 "maximum_buffered_chunks": min(
                     len(production_chunks),
-                    active_worker_count
-                    * (
-                        1
-                        + config.manifest_prefetch_chunks_per_worker
-                    ),
+                    active_worker_count * (1 + config.manifest_prefetch_chunks_per_worker),
                 ),
                 "chunk_count": len(materialization_records),
                 "eligible_prefetch_count": eligible_prefetch_count,
                 "prefetch_hit_count": prefetch_hits,
                 "prefetch_hit_rate": (
-                    1.0
-                    if eligible_prefetch_count == 0
-                    else prefetch_hits / eligible_prefetch_count
+                    1.0 if eligible_prefetch_count == 0 else prefetch_hits / eligible_prefetch_count
                 ),
                 "dispatch_wait_seconds": dispatch_wait_seconds,
-                "initial_dispatch_wait_seconds": (
-                    initial_dispatch_wait_seconds
-                ),
-                "prefetched_dispatch_wait_seconds": (
-                    prefetched_dispatch_wait_seconds
-                ),
-                "materializer_generation": (
-                    self._materializer_generation
-                ),
-                "materializer_generation_restarted": (
-                    materializer_restarted
-                ),
+                "initial_dispatch_wait_seconds": (initial_dispatch_wait_seconds),
+                "prefetched_dispatch_wait_seconds": (prefetched_dispatch_wait_seconds),
+                "materializer_generation": (self._materializer_generation),
+                "materializer_generation_restarted": (materializer_restarted),
             },
             "reassembly_seconds": reassembly_seconds,
             "executor_call": self._relaxation_calls,
@@ -1126,22 +1185,19 @@ class BatchExecutor:
             "worker_generation_restarted": restarted,
             "worker_pids": list(self._pool.worker_pids),
             "worker_startup_seconds_this_call": startup_seconds,
-            "worker_startup_seconds_generation": (
-                self._pool.startup_wall_seconds
-            ),
+            "worker_startup_seconds_generation": (self._pool.startup_wall_seconds),
             "allocator": {
                 **allocator_plan.metadata(),
                 "applied_to_workers": self.devices[0].type == "cuda",
             },
             "optimization_pilot_runs": 0,
-            "production_run_seconds": (
-                production_execution.run_wall_seconds
-            ),
+            "active_refill": any(chunk.active_refill for chunk in pending_chunks),
+            "production_run_seconds": (production_execution.run_wall_seconds),
             "workers": _worker_records(
                 production_execution,
                 production_chunks,
             ),
-            "pending_work_stealing": True,
+            "pending_work_stealing": work_stealing,
             "total_seconds": time.perf_counter() - total_started,
         }
         return result
@@ -1159,12 +1215,8 @@ class BatchExecutor:
             pool.close()
             self._last_shutdown_metadata = {
                 "wall_seconds": pool.shutdown_wall_seconds,
-                "acknowledged_worker_ids": list(
-                    pool.shutdown_acknowledged_workers
-                ),
-                "forced_worker_count": (
-                    pool.shutdown_forced_worker_count
-                ),
+                "acknowledged_worker_ids": list(pool.shutdown_acknowledged_workers),
+                "forced_worker_count": (pool.shutdown_forced_worker_count),
             }
             self._pool = None
             self._pool_key = None
@@ -1173,11 +1225,7 @@ class BatchExecutor:
     def shutdown_metadata(self) -> dict[str, Any] | None:
         """Return telemetry for the most recently closed worker generation."""
 
-        return (
-            None
-            if self._last_shutdown_metadata is None
-            else dict(self._last_shutdown_metadata)
-        )
+        return None if self._last_shutdown_metadata is None else dict(self._last_shutdown_metadata)
 
     def __enter__(self) -> BatchExecutor:
         if self._closed:

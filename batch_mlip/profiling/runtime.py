@@ -36,7 +36,7 @@ def _normalized_metadata(values: dict[str, Any]) -> dict[str, Any]:
             value = value.detach().item()
         if isinstance(value, torch.device):
             value = str(value)
-        if value is None or isinstance(value, (bool, int, float, str)):
+        if value is None or isinstance(value, bool | int | float | str):
             normalized[key] = value
         else:
             raise TypeError(
@@ -53,8 +53,14 @@ class RuntimeProfiler:
     lookup at each instrumentation point when no profiler is active.
     """
 
-    def __init__(self, *, device: str | torch.device | None = None) -> None:
+    def __init__(
+        self,
+        *,
+        device: str | torch.device | None = None,
+        record_event_timestamps: bool = False,
+    ) -> None:
         self.device = None if device is None else torch.device(device)
+        self.record_event_timestamps = bool(record_event_timestamps)
         self._token: Token[RuntimeProfiler | None] | None = None
         self._started_at: float | None = None
         self._total_seconds: float | None = None
@@ -135,7 +141,12 @@ class RuntimeProfiler:
     def event(self, name: str, **values: Any) -> None:
         if self._finalized:
             raise RuntimeError("cannot add events after profiler finalization")
-        self._events.append({"name": name, **_normalized_metadata(values)})
+        event = {"name": name, **_normalized_metadata(values)}
+        if self.record_event_timestamps:
+            if self._started_at is None:
+                raise RuntimeError("RuntimeProfiler must be entered before recording events")
+            event["elapsed_seconds"] = time.perf_counter() - self._started_at
+        self._events.append(event)
 
     def finalize(self) -> None:
         if self._finalized:

@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 
 from ase.io import read, write
-from batch_mlip.loaders import infer_cutoff, load_full_torch_model, parse_dtype
 
 from batch_mlip import (
     AseGraphBatch,
@@ -15,6 +14,7 @@ from batch_mlip import (
     batched_velocity_verlet,
     initialize_maxwell_boltzmann,
 )
+from batch_mlip.loaders import infer_cutoff, load_full_torch_model, parse_dtype
 
 
 def main() -> int:

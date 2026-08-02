@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any, Literal
 
 import torch
@@ -27,6 +28,27 @@ NeighborBackend = Literal[
 AUTO_CUDA_DENSE_LONG_CUTOFF_PAIR_THRESHOLD = 8192
 AUTO_CUDA_DENSE_SHORT_CUTOFF_PAIR_THRESHOLD = 32768
 AUTO_CUDA_CELL_CANDIDATE_REDUCTION_THRESHOLD = 0.98
+AUTO_WARM_SMALL_EDGE_THRESHOLD = 10_000
+AUTO_WARM_DENSE_EDGE_THRESHOLD = 35_000
+AUTO_WARM_CELL_EDGE_DENSITY_THRESHOLD = 62.0
+AUTO_WARM_CELL_PAIR_RATIO_THRESHOLD = 1.3
+AUTO_WARM_CELL_VOLUME_PER_ATOM_THRESHOLD = 10.5
+AUTO_WARM_CELL_MAX_SMALL_SYSTEMS = 3
+
+ResolvedNeighborBackend = Literal["matscipy", "cuda_dense", "cuda_cell", "nvalchemi"]
+
+
+@dataclass(frozen=True)
+class NeighborBackendDecision:
+    """Observable result of one neighbor-backend selection."""
+
+    backend: ResolvedNeighborBackend
+    reason: str
+    system_count: int
+    pair_work: int | None = None
+    candidate_reduction: float | None = None
+    candidate_edges: int | None = None
+    mean_volume_per_atom: float | None = None
 
 
 def validate_neighbor_backend(backend: str) -> NeighborBackend:
@@ -49,26 +71,98 @@ def resolve_neighbor_backend(
     cells: torch.Tensor | None = None,
     pbc: torch.Tensor | None = None,
     positions: torch.Tensor | None = None,
-) -> Literal["matscipy", "cuda_dense", "cuda_cell", "nvalchemi"]:
+    candidate_edges: int | None = None,
+    mean_volume_per_atom: float | None = None,
+) -> ResolvedNeighborBackend:
     """Resolve the requested backend for one rebuild operation."""
 
+    return resolve_neighbor_backend_decision(
+        backend,
+        device=device,
+        counts=counts,
+        cutoff=cutoff,
+        cells=cells,
+        pbc=pbc,
+        positions=positions,
+        candidate_edges=candidate_edges,
+        mean_volume_per_atom=mean_volume_per_atom,
+    ).backend
+
+
+def resolve_neighbor_backend_decision(
+    backend: NeighborBackend,
+    *,
+    device: torch.device,
+    counts: torch.Tensor,
+    cutoff: float,
+    cells: torch.Tensor | None = None,
+    pbc: torch.Tensor | None = None,
+    positions: torch.Tensor | None = None,
+    candidate_edges: int | None = None,
+    mean_volume_per_atom: float | None = None,
+) -> NeighborBackendDecision:
+    """Resolve a backend and expose the inputs that caused the decision."""
+
+    system_count = counts.numel()
+
     if backend == "matscipy":
-        return "matscipy"
+        return NeighborBackendDecision("matscipy", "explicit backend", system_count)
     if backend == "cuda_dense":
         if device.type != "cuda":
             raise ValueError("cuda_dense neighbor construction requires a CUDA device")
-        return "cuda_dense"
+        return NeighborBackendDecision("cuda_dense", "explicit backend", system_count)
     if backend == "cuda_cell":
         if device.type != "cuda":
             raise ValueError("cuda_cell neighbor construction requires a CUDA device")
-        return "cuda_cell"
+        return NeighborBackendDecision("cuda_cell", "explicit backend", system_count)
     if backend == "nvalchemi":
         if device.type != "cuda":
             raise ValueError("nvalchemi neighbor construction requires a CUDA device")
-        return "nvalchemi"
+        return NeighborBackendDecision("nvalchemi", "explicit backend", system_count)
     if cutoff <= 0.0:
         raise ValueError("cutoff must be positive")
+    if candidate_edges is not None and candidate_edges < 0:
+        raise ValueError("candidate_edges must be non-negative")
+    if mean_volume_per_atom is not None and mean_volume_per_atom <= 0.0:
+        raise ValueError("mean_volume_per_atom must be positive")
     pair_work = int(torch.sum(counts.to(torch.int64) ** 2).item())
+    if (
+        device.type == "cuda"
+        and candidate_edges is not None
+        and mean_volume_per_atom is not None
+    ):
+        atom_count = int(counts.sum().item())
+        edges_per_atom = candidate_edges / atom_count
+        edges_per_pair_work = candidate_edges / pair_work
+        if candidate_edges <= AUTO_WARM_SMALL_EDGE_THRESHOLD:
+            resolved = (
+                "cuda_cell"
+                if mean_volume_per_atom <= AUTO_WARM_CELL_VOLUME_PER_ATOM_THRESHOLD
+                else "matscipy"
+            )
+        elif candidate_edges <= AUTO_WARM_DENSE_EDGE_THRESHOLD:
+            resolved = (
+                "cuda_cell"
+                if (
+                    edges_per_atom > AUTO_WARM_CELL_EDGE_DENSITY_THRESHOLD
+                    or system_count <= AUTO_WARM_CELL_MAX_SMALL_SYSTEMS
+                )
+                else "cuda_dense"
+            )
+        else:
+            resolved = (
+                "cuda_cell"
+                if edges_per_pair_work > AUTO_WARM_CELL_PAIR_RATIO_THRESHOLD
+                else "cuda_dense"
+            )
+        return NeighborBackendDecision(
+            resolved,
+            "cached candidate-graph policy",
+            system_count,
+            pair_work,
+            candidate_edges=candidate_edges,
+            mean_volume_per_atom=mean_volume_per_atom,
+        )
     minimum_systems = 2 if cutoff >= 5.5 else 4
     pair_threshold = (
         AUTO_CUDA_DENSE_LONG_CUTOFF_PAIR_THRESHOLD
@@ -76,6 +170,7 @@ def resolve_neighbor_backend(
         else AUTO_CUDA_DENSE_SHORT_CUTOFF_PAIR_THRESHOLD
     )
     if device.type == "cuda" and counts.numel() >= minimum_systems and pair_work >= pair_threshold:
+        reduction = None
         if cells is not None and pbc is not None:
             span_inputs = (
                 {}
@@ -92,9 +187,31 @@ def resolve_neighbor_backend(
                 reduction is not None
                 and reduction >= AUTO_CUDA_CELL_CANDIDATE_REDUCTION_THRESHOLD
             ):
-                return "cuda_cell"
-        return "cuda_dense"
-    return "matscipy"
+                return NeighborBackendDecision(
+                    "cuda_cell",
+                    "predicted sparse candidate reduction passed",
+                    system_count,
+                    pair_work,
+                    reduction,
+                )
+        return NeighborBackendDecision(
+            "cuda_dense",
+            "CUDA pair-work threshold passed",
+            system_count,
+            pair_work,
+            reduction,
+        )
+    reason = (
+        "non-CUDA device"
+        if device.type != "cuda"
+        else "CUDA pair-work threshold not reached"
+    )
+    return NeighborBackendDecision(
+        "matscipy",
+        reason,
+        system_count,
+        pair_work,
+    )
 
 
 def neighbor_list(quantities: str, atoms: Any, cutoff: float, *args, **kwargs):

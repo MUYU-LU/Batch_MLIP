@@ -51,12 +51,18 @@ nvalchemi-neighbor-backend,mechanism,nvalchemi_neighbors,negative_result,exclude
 offline-throughput-policy,scheduler,nearest_workload_capacity,negative_result,excluded,action_exclusion
 online-autoscheduler,scheduler,online_timing_autotune,superseded,optional,action_exclusion
 omc-csp-hardware-calibration,scheduler,layered_hardware_calibration,accepted_v1_prior,default,mechanism_prior
+omc-csp-neighbor-policy-v2,mechanism,candidate_graph_neighbor_backend_policy,validated_component,default,mechanism_prior
+omc-csp-compatible-refill-v1,mechanism,compatible_fixed_slot_lookahead,negative_result,explicit_only,action_exclusion
+omc-csp-multigpu-local-refill-v1,mechanism,multigpu_private_compatible_refill,mixed_result,explicit_only,action_exclusion
+omc-csp-multigpu-streaming-refill-v1,mechanism,bounded_source_backed_multigpu_refill,mixed_result,explicit_only,mechanism_prior
+omc-csp-outer-inner-opportunity-v1,scheduler,passive_outer_inner_opportunity,validated_component,default,mechanism_prior
 omc-csp-policy-composition,scheduler,policy_composition,candidate,default,frozen_baseline
 omc-csp-scheduler-epoch1,scheduler,scheduler_refinement_protocol,candidate,optional,protocol_only
 omc-csp-scheduler-epoch2,scheduler,source_backed_lazy_materialization,accepted_v1_prior,default,mechanism_prior
 omc-csp-scheduler-epoch3,scheduler,signed_offline_hardware_capacity,mixed_result,default,mechanism_prior
 omc-csp-scheduler-v2-loader-tier,scheduler,tiered_cif_loader_parallelism,candidate,optional,mechanism_prior
 omc-csp-scheduler-v2-outer-policy,scheduler,resident_batch_outer_dispatch,mixed_result,optional,action_exclusion
+omc-csp-workflow-validation-v1,scheduler,end_to_end_workflow_validation,mixed_result,default,mechanism_prior
 omc-csp-workload-construction,foundation,omc_csp_workloads,candidate,default,protocol_only
 optimizer-interface,foundation,optimizer_protocol,validated_component,default,protocol_only
 package-layout,foundation,package_structure,validated_component,default,protocol_only
@@ -74,6 +80,7 @@ refill-policy-stage2,mechanism,threshold_refill,negative_result,excluded,action_
 refill-pool-multigpu-transfer,scheduler,refill_pool_and_gpu_transfer,mixed_result,default,mechanism_prior
 resident-packing-r1024-robustness,scheduler,large_pool_resident_packing,mixed_result,historical,action_exclusion
 runtime-phase-profiling,foundation,runtime_telemetry,validated_component,default,mechanism_prior
+t2-p6000-strict-bfgs-vs-mps16-v1,baseline,t2_strict_long_horizon_production_stress,benchmark_reference,baseline,mechanism_prior
 t2-unique3000-auto-bfgs-recalibrated,baseline,t2_large_pool_recalibrated,benchmark_reference,baseline,frozen_baseline
 t2-unique3000-auto-bfgs-vs-mps,baseline,t2_large_pool_vs_mps,superseded,historical,mechanism_prior
 t2-unique6000-auto-bfgs-vs-mps8,baseline,t2_large_pool_scaling,benchmark_reference,baseline,frozen_baseline

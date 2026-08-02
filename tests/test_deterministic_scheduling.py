@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 
+import pytest
 import torch
 from ase import Atoms
 
@@ -18,10 +19,16 @@ from batch_mlip import (
     plan_deterministic_relaxation,
     relax,
 )
+from batch_mlip.execution import CudaAllocatorPlan
 from batch_mlip.interfaces.api import (
+    _allocator_requires_process_workers,
     _parallel_deterministic_chunk_policy,
     _parallel_deterministic_chunks,
     _parallel_deterministic_dispatch_order,
+    _parallel_local_refill_chunks,
+    _parallel_streaming_refill_chunks,
+    _pending_chunk_optimizer_options,
+    _PendingAutoChunk,
     _reserved_incremental_bytes,
 )
 
@@ -97,26 +104,29 @@ def test_deterministic_planner_respects_absolute_memory_budget():
 
     assert [len(chunk.system_indices) for chunk in plan.chunks] == [2, 1]
     assert all(
-        chunk.predicted_peak_bytes is not None
-        and chunk.predicted_peak_bytes <= 850
+        chunk.predicted_peak_bytes is not None and chunk.predicted_peak_bytes <= 850
         for chunk in plan.chunks
     )
-    assert sorted(
-        index for chunk in plan.chunks for index in chunk.system_indices
-    ) == [0, 1, 2]
+    assert sorted(index for chunk in plan.chunks for index in chunk.system_indices) == [0, 1, 2]
 
 
 def test_probe_incremental_memory_uses_reserved_device_occupancy():
-    assert _reserved_incremental_bytes(
-        baseline_allocated=100,
-        peak_allocated=400,
-        peak_reserved=700,
-    ) == 600
-    assert _reserved_incremental_bytes(
-        baseline_allocated=100,
-        peak_allocated=400,
-        peak_reserved=350,
-    ) == 300
+    assert (
+        _reserved_incremental_bytes(
+            baseline_allocated=100,
+            peak_allocated=400,
+            peak_reserved=700,
+        )
+        == 600
+    )
+    assert (
+        _reserved_incremental_bytes(
+            baseline_allocated=100,
+            peak_allocated=400,
+            peak_reserved=350,
+        )
+        == 300
+    )
 
 
 def test_parallel_chunks_preserve_full_batches_when_devices_are_occupied():
@@ -147,9 +157,206 @@ def test_parallel_chunks_preserve_full_batches_when_devices_are_occupied():
 
     assert len(plan.chunks) == 4
     assert [len(chunk.indices) for chunk in chunks] == [2, 2, 2, 2]
-    assert sorted(
-        index for chunk in chunks for index in chunk.indices
-    ) == list(range(8))
+    assert sorted(index for chunk in chunks for index in chunk.indices) == list(range(8))
+
+
+def test_parallel_local_refill_builds_private_compatible_queues():
+    config = AutoSchedulerConfig(max_batch_size=2)
+    probe = DeterministicMemoryProbe(
+        memory_budget_bytes=None,
+        baseline_allocated_bytes=None,
+        peak_allocated_bytes=None,
+        peak_reserved_bytes=None,
+        probe_indices=(),
+        probe_model_work=0,
+        model_bytes_per_work=0.0,
+    )
+    plan = plan_deterministic_relaxation(
+        _workload(8),
+        probe,
+        BatchedBFGS(),
+        {},
+        torch.float64,
+        config,
+    )
+
+    chunks = _parallel_local_refill_chunks(plan, device_count=2)
+
+    assert len(chunks) == 2
+    assert [len(chunk.indices) for chunk in chunks] == [4, 4]
+    assert all(chunk.resident_capacity == 2 for chunk in chunks)
+    assert all(chunk.active_refill for chunk in chunks)
+    assert all(chunk.refill_storage == "slots" for chunk in chunks)
+    assert all(
+        chunk.refill_prediction["resident_capacity_source"]
+        == "worst_case_memory_safe_first_wave"
+        for chunk in chunks
+    )
+    assert sorted(index for chunk in chunks for index in chunk.indices) == list(range(8))
+
+
+def test_parallel_local_refill_rejects_mixed_optimizer_shapes():
+    config = AutoSchedulerConfig(max_batch_size=2)
+    probe = DeterministicMemoryProbe(
+        memory_budget_bytes=None,
+        baseline_allocated_bytes=None,
+        peak_allocated_bytes=None,
+        peak_reserved_bytes=None,
+        probe_indices=(),
+        probe_model_work=0,
+        model_bytes_per_work=0.0,
+    )
+    workload = _workload(8)
+    profiles = list(workload.profiles)
+    profiles[-1] = SystemProfile(
+        index=7,
+        atom_count=2,
+        edge_count=0,
+        dof_squared=36,
+    )
+    plan = plan_deterministic_relaxation(
+        replace(workload, profiles=tuple(profiles)),
+        probe,
+        BatchedBFGS(),
+        {},
+        torch.float64,
+        config,
+    )
+
+    with pytest.raises(ValueError, match="one exact optimizer-state shape"):
+        _parallel_local_refill_chunks(plan, device_count=2)
+
+
+def test_parallel_streaming_refill_bounds_micro_pools_and_restores_work_stealing():
+    config = AutoSchedulerConfig(max_batch_size=2)
+    probe = DeterministicMemoryProbe(
+        memory_budget_bytes=None,
+        baseline_allocated_bytes=None,
+        peak_allocated_bytes=None,
+        peak_reserved_bytes=None,
+        probe_indices=(),
+        probe_model_work=0,
+        model_bytes_per_work=0.0,
+    )
+    plan = plan_deterministic_relaxation(
+        _workload(16),
+        probe,
+        BatchedBFGS(),
+        {},
+        torch.float64,
+        config,
+    )
+
+    chunks = _parallel_streaming_refill_chunks(plan, device_count=2)
+
+    assert len(chunks) == 4
+    assert [len(chunk.indices) for chunk in chunks] == [4, 4, 4, 4]
+    assert all(chunk.resident_capacity == 2 for chunk in chunks)
+    assert all(chunk.active_refill for chunk in chunks)
+    assert all(
+        chunk.refill_prediction["resident_waves_per_task"] == 2
+        for chunk in chunks
+    )
+    assert sorted(index for chunk in chunks for index in chunk.indices) == list(range(16))
+
+
+def test_manifest_multi_gpu_refill_policy_is_explicit():
+    assert (
+        AutoSchedulerConfig(
+            manifest_multi_gpu_refill_policy="local_compatible"
+        ).manifest_multi_gpu_refill_policy
+        == "local_compatible"
+    )
+    assert (
+        AutoSchedulerConfig(
+            manifest_multi_gpu_refill_policy="streaming_compatible"
+        ).manifest_multi_gpu_refill_policy
+        == "streaming_compatible"
+    )
+    with pytest.raises(ValueError, match="manifest_multi_gpu_refill_policy"):
+        AutoSchedulerConfig(manifest_multi_gpu_refill_policy="automatic")
+
+
+def test_parallel_chunks_do_not_outer_split_a_single_device_plan():
+    config = AutoSchedulerConfig(max_batch_size=8)
+    probe = DeterministicMemoryProbe(
+        memory_budget_bytes=None,
+        baseline_allocated_bytes=None,
+        peak_allocated_bytes=None,
+        peak_reserved_bytes=None,
+        probe_indices=(),
+        probe_model_work=0,
+        model_bytes_per_work=0.0,
+    )
+    plan = plan_deterministic_relaxation(
+        _workload(8),
+        probe,
+        BatchedFIRE(),
+        {},
+        torch.float64,
+        config,
+    )
+
+    chunks = _parallel_deterministic_chunks(
+        plan,
+        device_count=1,
+        target_chunks_per_device=2,
+    )
+
+    assert [chunk.indices for chunk in chunks] == [tuple(range(8))]
+    assert (
+        _parallel_deterministic_chunk_policy(
+            plan,
+            device_count=1,
+            target_chunks_per_device=2,
+        )
+        == "single_device_resident_batches"
+    )
+
+
+def test_pending_refill_decision_is_bound_to_worker_options():
+    chunk = _PendingAutoChunk(
+        indices=tuple(range(16)),
+        estimated_cost=1.0,
+        bucket_index=0,
+        resident_capacity=4,
+        active_refill=True,
+        refill_storage="slots",
+    )
+
+    assert _pending_chunk_optimizer_options(
+        {"fmax": 0.05},
+        chunk,
+    ) == {
+        "fmax": 0.05,
+        "refill_batch_size": 4,
+        "refill_policy": "immediate",
+        "refill_storage": "slots",
+    }
+
+
+def test_expandable_allocator_uses_parent_only_for_one_cuda_device():
+    plan = CudaAllocatorPlan(
+        requested_policy="auto",
+        selected_policy="expandable_segments",
+        reason="test",
+    )
+
+    assert not _allocator_requires_process_workers(
+        plan,
+        [torch.device("cuda:0")],
+        environment_matches=True,
+    )
+    assert _allocator_requires_process_workers(
+        plan,
+        [torch.device("cuda:0"), torch.device("cuda:1")],
+        environment_matches=True,
+    )
+    assert _allocator_requires_process_workers(
+        plan,
+        [torch.device("cuda:0")],
+        environment_matches=False,
+    )
 
 
 def test_parallel_chunks_add_only_minimum_parts_for_idle_devices():
@@ -181,9 +388,7 @@ def test_parallel_chunks_add_only_minimum_parts_for_idle_devices():
     assert len(plan.chunks) == 2
     assert len(chunks) == 4
     assert [len(chunk.indices) for chunk in chunks] == [2, 2, 2, 2]
-    assert sorted(
-        index for chunk in chunks for index in chunk.indices
-    ) == list(range(8))
+    assert sorted(index for chunk in chunks for index in chunk.indices) == list(range(8))
 
 
 def test_parallel_chunks_can_preserve_resident_batches_and_idle_devices():
@@ -215,12 +420,15 @@ def test_parallel_chunks_can_preserve_resident_batches_and_idle_devices():
 
     assert len(plan.chunks) == 1
     assert [chunk.indices for chunk in chunks] == [tuple(range(8))]
-    assert _parallel_deterministic_chunk_policy(
-        plan,
-        device_count=4,
-        target_chunks_per_device=2,
-        dispatch_policy="preserve_resident",
-    ) == "resident_batches_preserved"
+    assert (
+        _parallel_deterministic_chunk_policy(
+            plan,
+            device_count=4,
+            target_chunks_per_device=2,
+            dispatch_policy="preserve_resident",
+        )
+        == "resident_batches_preserved"
+    )
 
 
 def test_parallel_chunks_split_only_enough_to_occupy_devices():
@@ -258,9 +466,7 @@ def test_parallel_chunks_split_only_enough_to_occupy_devices():
 
     assert len(chunks) == 4
     assert [len(chunk.indices) for chunk in chunks] == [2] * 4
-    assert sorted(
-        index for chunk in chunks for index in chunk.indices
-    ) == list(range(8))
+    assert sorted(index for chunk in chunks for index in chunk.indices) == list(range(8))
 
 
 def test_parallel_dispatch_can_stratify_only_the_initial_wave():
@@ -334,8 +540,7 @@ def test_parallel_chunks_preserve_heterogeneous_resident_batches():
     plan = replace(
         homogeneous,
         chunks=tuple(
-            replace(chunk, bucket_index=index % 2)
-            for index, chunk in enumerate(homogeneous.chunks)
+            replace(chunk, bucket_index=index % 2) for index, chunk in enumerate(homogeneous.chunks)
         ),
     )
 
@@ -347,9 +552,7 @@ def test_parallel_chunks_preserve_heterogeneous_resident_batches():
 
     assert len(chunks) == 4
     assert [len(chunk.indices) for chunk in chunks] == [2] * 4
-    assert sorted(
-        index for chunk in chunks for index in chunk.indices
-    ) == list(range(8))
+    assert sorted(index for chunk in chunks for index in chunk.indices) == list(range(8))
 
 
 def test_dense_bfgs_allowance_changes_deterministic_capacity():
@@ -391,10 +594,7 @@ def test_dense_bfgs_allowance_changes_deterministic_capacity():
 
 
 def test_auto_relaxation_uses_deterministic_active_drain_without_probe_on_cpu():
-    systems = [
-        Atoms("H", positions=[[0.8 - 0.1 * index, 0.0, 0.0]])
-        for index in range(4)
-    ]
+    systems = [Atoms("H", positions=[[0.8 - 0.1 * index, 0.0, 0.0]]) for index in range(4)]
     result = relax(
         systems,
         QuadraticCalculator(),
@@ -418,17 +618,12 @@ def test_auto_relaxation_uses_deterministic_active_drain_without_probe_on_cpu():
     manifest = schedule["policy_manifest"]
     assert result.execution_policy == manifest
     assert manifest["task"]["kind"] == "fixed_cell_relaxation"
-    assert manifest["outer_scheduler"]["pool_regime"] == (
-        "multiple_resident_waves"
-    )
+    assert manifest["outer_scheduler"]["pool_regime"] == ("multiple_resident_waves")
     assert manifest["inner_scheduler"]["queue_policy"] == "active_drain"
 
 
 def test_ordinary_relaxation_defaults_to_automatic_scheduling():
-    systems = [
-        Atoms("H", positions=[[0.8 - 0.1 * index, 0.0, 0.0]])
-        for index in range(4)
-    ]
+    systems = [Atoms("H", positions=[[0.8 - 0.1 * index, 0.0, 0.0]]) for index in range(4)]
 
     result = relax(
         systems,
@@ -451,9 +646,7 @@ def test_ordinary_relaxation_defaults_to_automatic_scheduling():
         "memory_fraction": 0.85,
         "active_compaction": True,
         "work_stealing": False,
-        "refill_reasons": [
-            "calculator has no hashable torch model"
-        ],
+        "refill_reasons": ["calculator has no hashable torch model"],
     }
 
 
@@ -487,10 +680,7 @@ def test_explicit_single_batch_remains_available():
 
 
 def test_multi_device_auto_shards_deterministic_chunks_without_autotuning():
-    systems = [
-        Atoms("H", positions=[[0.8 - 0.05 * index, 0.0, 0.0]])
-        for index in range(8)
-    ]
+    systems = [Atoms("H", positions=[[0.8 - 0.05 * index, 0.0, 0.0]]) for index in range(8)]
     result = relax(
         systems,
         QuadraticCalculator(),
@@ -510,15 +700,11 @@ def test_multi_device_auto_shards_deterministic_chunks_without_autotuning():
     assert schedule["decision"] == "deterministic_memory_plan_multi_gpu"
     assert schedule["active_gpu_count"] == 2
     assert schedule["worker_backend"] == "thread"
-    assert schedule["parallel_chunk_policy"] == (
-        "minimum_parts_for_device_occupancy"
-    )
+    assert schedule["parallel_chunk_policy"] == ("minimum_parts_for_device_occupancy")
     assert schedule["resident_plan_chunk_count"] == 1
     assert schedule["execution_chunk_count"] == 4
     assert len(schedule["planned_chunks"]) == 4
-    assert sum(
-        chunk["system_count"] for chunk in schedule["planned_chunks"]
-    ) == len(systems)
+    assert sum(chunk["system_count"] for chunk in schedule["planned_chunks"]) == len(systems)
     assert not schedule["active_refill"]
     assert schedule["summary"] == {
         "strategy": "automatic",
@@ -529,23 +715,16 @@ def test_multi_device_auto_shards_deterministic_chunks_without_autotuning():
         "memory_fraction": 0.85,
         "active_compaction": True,
         "work_stealing": True,
-        "refill_reasons": [
-            "multi-GPU refill has no accepted scientific policy"
-        ],
+        "refill_reasons": ["multi-GPU refill has no accepted scientific policy"],
     }
     manifest = schedule["policy_manifest"]
     assert manifest["outer_scheduler"]["active_device_count"] == 2
     assert manifest["outer_scheduler"]["execution_chunk_count"] == 4
-    assert manifest["inner_scheduler"]["refill"]["evidence_source"] == (
-        "policy_exclusion"
-    )
+    assert manifest["inner_scheduler"]["refill"]["evidence_source"] == ("policy_exclusion")
 
 
 def test_multi_device_auto_can_preserve_resident_batch_and_idle_devices():
-    systems = [
-        Atoms("H", positions=[[0.8 - 0.05 * index, 0.0, 0.0]])
-        for index in range(8)
-    ]
+    systems = [Atoms("H", positions=[[0.8 - 0.05 * index, 0.0, 0.0]]) for index in range(8)]
     result = relax(
         systems,
         QuadraticCalculator(),
@@ -570,16 +749,11 @@ def test_multi_device_auto_can_preserve_resident_batch_and_idle_devices():
     assert schedule["resident_plan_chunk_count"] == 1
     assert schedule["execution_chunk_count"] == 1
     assert schedule["planned_chunks"][0]["system_count"] == len(systems)
-    assert schedule["policy_manifest"]["outer_scheduler"][
-        "active_device_count"
-    ] == 1
+    assert schedule["policy_manifest"]["outer_scheduler"]["active_device_count"] == 1
 
 
 def test_multi_device_auto_supports_persistent_process_workers():
-    systems = [
-        Atoms("H", positions=[[0.7 - 0.1 * index, 0.0, 0.0]])
-        for index in range(4)
-    ]
+    systems = [Atoms("H", positions=[[0.7 - 0.1 * index, 0.0, 0.0]]) for index in range(4)]
     result = relax(
         systems,
         QuadraticCalculator(),
@@ -600,7 +774,5 @@ def test_multi_device_auto_supports_persistent_process_workers():
     assert schedule["worker_backend"] == "process"
     assert schedule["active_gpu_count"] == 2
     assert sum(
-        chunk["system_count"]
-        for worker in schedule["workers"]
-        for chunk in worker["chunks"]
+        chunk["system_count"] for worker in schedule["workers"] for chunk in worker["chunks"]
     ) == len(systems)

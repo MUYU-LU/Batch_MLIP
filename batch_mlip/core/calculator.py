@@ -27,6 +27,8 @@ class BatchCalculator(ABC):
     native inputs. FIRE and MD depend only on this contract.
     """
 
+    execution_policy_family = "generic"
+
     def __init__(
         self,
         *,
@@ -55,7 +57,7 @@ class BatchCalculator(ABC):
         """Convert ASE structures to the common tensor batch representation.
 
         ``build_neighbors=False`` creates a lightweight state shell whose
-        graph is constructed on its first AtomBit evaluation.
+        graph is constructed on its first model evaluation.
         """
 
         if self.cutoff is None:

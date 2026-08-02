@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "status": "complete_production_stress",
+  "workload": "OPT-OMC-STRUCTURES-P6000-INTRA-WIDE-v1",
+  "pool_size": 6000,
+  "contract": {
+    "fmax_eV_per_A": 0.01,
+    "max_steps": 3000,
+    "gpu_count": 8,
+    "tail_recovery": "none"
+  },
+  "automatic": {
+    "execution_seconds": 2245.0894825949945,
+    "production_seconds": 2209.692819791002,
+    "full_script_seconds": 2248.968469561005,
+    "systems_per_execution_second": 2.672499268521306,
+    "converged_count": 5986,
+    "model_batch_calls": 69957,
+    "structure_graph_evaluations": 3827420,
+    "resident_chunk_count": 31,
+    "execution_chunk_count": 31,
+    "peak_reserved_bytes": 76684460032,
+    "peak_reserved_fraction_of_h100": 0.901980312502409,
+    "max_step_count": 14,
+    "step_p50": 520,
+    "step_p90": 1092,
+    "step_p99": 2222,
+    "worker_max_over_mean": 1.0305211739614717,
+    "ideal_balance_gap_seconds": 65.16408556625174
+  },
+  "mps16": {
+    "production_makespan_seconds": 4706.150795802998,
+    "full_script_seconds": 4775.346419976006,
+    "systems_per_production_second": 1.2749272729107772,
+    "converged_count": 5985,
+    "model_single_structure_calls": 3807979,
+    "optimizer_steps_total": 3801979,
+    "peak_sampled_device_bytes": 77703675904,
+    "peak_sampled_fraction_of_h100": 0.9139685647552167,
+    "max_step_count": 15,
+    "step_p50": 518,
+    "step_p90": 1072,
+    "step_p99": 2206,
+    "shard_max_over_mean": 1.0434085054771796,
+    "ideal_balance_gap_seconds": 195.78810362737204
+  },
+  "comparison": {
+    "mps_makespan_over_automatic_execution": 2.0961974265557455,
+    "mps_makespan_over_automatic_production": 2.129776027533147,
+    "mps_script_over_automatic_script": 2.123349653233754,
+    "same_source_coverage": true,
+    "convergence_flag_mismatches": 27,
+    "common_nonconverged_sources": 1,
+    "energy_difference_meV_per_atom": {
+      "median": 0.00286102294921875,
+      "p95": 4.0615952533224355,
+      "p99": 14.237331307452658,
+      "max": 30.83955723306407
+    }
+  },
+  "automatic_worker_phase_fraction": {
+    "model_forward_and_autograd": 0.6461,
+    "bfgs_update": 0.2708,
+    "neighbor_update": 0.0292,
+    "active_compaction": 0.0093,
+    "bfgs_eigh_fallback": 0.2017
+  },
+  "decision": {
+    "production_execution_default": "automatic_active_drain",
+    "strict_policy_frozen": false,
+    "reason": "2.096x faster than MPS16, but long-horizon memory and BFGS tail controls require refinement"
+  }
+}

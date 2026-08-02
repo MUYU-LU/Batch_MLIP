@@ -74,6 +74,7 @@ def compose_relaxation_policy_manifest(
     execution_chunk_sizes: Sequence[int],
     execution_resident_capacities: Sequence[int],
     work_stealing: bool,
+    outer_assignment: str | None = None,
     refill_fallback_reasons: Sequence[str] = (),
     observed_converged_steps: Sequence[int] | None = None,
 ) -> dict[str, Any]:
@@ -81,6 +82,8 @@ def compose_relaxation_policy_manifest(
 
     if not available_devices:
         raise ValueError("available_devices must not be empty")
+    if outer_assignment is not None and not outer_assignment:
+        raise ValueError("outer_assignment must not be empty")
     if not 0 < active_device_count <= len(available_devices):
         raise ValueError(
             "active_device_count must be positive and no larger than "
@@ -331,9 +334,13 @@ def compose_relaxation_policy_manifest(
             "execution_chunk_count": len(execution_chunk_sizes),
             "execution_chunk_sizes": list(execution_chunk_sizes),
             "assignment": (
-                "largest_cost_first_work_stealing"
-                if work_stealing
-                else "sequential_submitted_chunks"
+                outer_assignment
+                if outer_assignment is not None
+                else (
+                    "largest_cost_first_work_stealing"
+                    if work_stealing
+                    else "sequential_submitted_chunks"
+                )
             ),
         },
         "inner_scheduler": {

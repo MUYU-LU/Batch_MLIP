@@ -1,0 +1,123 @@
+id: omc-csp-compatible-refill-v1
+date: 2026-08-01
+baseline_commit: 9dd272821f8f93d1e19842a2ee751a3b9ddf30c1
+baseline_context: >-
+  The working tree also contains the validated OMC-CSP neighbor-policy-v2
+  change. Its exact dirty-tree provenance is recorded with every raw run.
+hypothesis: >-
+  For a structurally heterogeneous OMC-CSP queue, deterministic look-ahead
+  matching of released slots to pending jobs with equal atom counts avoids
+  avoidable whole-resident repacks while preserving survivor BFGS, Frechet,
+  and candidate-graph state. It must not add material overhead to homogeneous
+  queues and must fall back to repacking when a complete compatible cohort is
+  unavailable.
+mechanism:
+  accepted_unit: complete_compatible_cohort
+  compatibility_key:
+    - atom_count
+    - graph_settings
+  preserved_for_survivors:
+    - bfgs_history
+    - frechet_filter_state
+    - candidate_edges_and_periodic_shifts
+    - neighbor_reference_geometry
+  reset_for_incoming:
+    - bfgs_history
+    - local_step_count
+    - convergence_state
+  incoming_graph: invalidated_then_exactly_rebuilt
+  fallback: deterministic_repack
+workloads:
+  homogeneous:
+    - family: SOXLEX48
+      pool_size: 256
+      resident_batches: [64, 128]
+  heterogeneous:
+    - family: ROFA-MIX
+      pool_size: 256
+      atom_counts: [74, 148, 222, 296]
+      resident_batches: [32, 64, 128]
+methods:
+  - active_drain
+  - immediate_fifo_slots
+  - immediate_compatible_slots
+  - threshold_arena
+configuration:
+  model: AtomBit-OMC-s smooth_rms fp32 epoch5
+  optimizer: variable-cell BFGS
+  optimizer_dtype: float64
+  cutoff_A: 6.0
+  skin_A: 0.5
+  neighbor_backend: auto_neighbor_policy_v2
+  fmax_eV_per_A: 0.05
+  smax: null
+  max_steps: 500
+  convergence_check_interval: 1
+  deterministic_algorithms: true
+  allocator:
+    PYTORCH_ALLOC_CONF: expandable_segments:True
+    PYTORCH_CUDA_ALLOC_CONF: expandable_segments:True
+  timing_repeats: 1
+correctness_gates:
+  - all_jobs_complete
+  - convergence_count_matches_active_drain
+  - endpoint_energy_difference_meV_per_atom_max_5
+  - survivor_state_unit_equivalence
+  - no_cross_graph_edges
+performance_gates:
+  homogeneous_overhead_fraction_max: 0.02
+  mixed_speedup_over_fifo_min: 1.02
+  peak_reserved_memory_fraction_max: 0.85
+metrics:
+  - full_optimizer_wall_seconds
+  - systems_per_second
+  - active_batch_occupancy
+  - model_and_graph_evaluations
+  - refill_events_and_insertions
+  - slot_match_and_repack_fallback_counts
+  - refill_phase_seconds
+  - neighbor_rebuild_seconds
+  - peak_allocated_and_reserved_memory
+status: completed_negative_mechanism
+results:
+  homogeneous_soxlex48:
+    B64:
+      active_seconds: 28.811
+      fifo_slots_seconds: 20.497
+      compatible_slots_seconds: 20.167
+      compatible_speedup_over_active: 1.429
+      compatible_speedup_over_fifo: 1.016
+    B128:
+      active_seconds: 22.636
+      fifo_slots_seconds: 19.256
+      compatible_slots_seconds: 19.322
+      compatible_speedup_over_active: 1.172
+      compatible_speedup_over_fifo: 0.997
+  heterogeneous_rofa_mix:
+    B32:
+      active_seconds: 44.529
+      fifo_slots_seconds: 43.419
+      compatible_slots_seconds: 43.157
+      complete_compatible_cohorts: 26
+      compatible_speedup_over_fifo: 1.006
+    B64:
+      active_seconds: 39.137
+      fifo_slots_seconds: 37.015
+      compatible_slots_seconds: 37.406
+      complete_compatible_cohorts: 0
+      compatible_speedup_over_fifo: 0.990
+    B128:
+      active_seconds: 36.509
+      fifo_slots_seconds: 35.485
+      compatible_slots_seconds: 35.614
+      complete_compatible_cohorts: 0
+      compatible_speedup_over_fifo: 0.996
+  conclusion: >-
+    Compatible pending-queue look-ahead is retained as an explicit diagnostic
+    storage mode but fails the two-percent performance gate and is not selected
+    automatically. OMC-CSP fixed-slot refill queues must instead be formed by
+    the outer scheduler with exact optimizer-shape compatibility. The implemented
+    scheduler extracts such a queue only when it spans multiple safe resident
+    waves and matches accepted refill evidence; all unmatched jobs retain their
+    original active-drain chunks. Refill then operates only while compatible
+    pending jobs remain in that bucket.

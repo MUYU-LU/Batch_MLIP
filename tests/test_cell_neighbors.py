@@ -11,7 +11,12 @@ from batch_mlip.core.cell_neighbors import (
     cell_list_neighbor_blocks,
     estimate_cell_candidate_reduction,
 )
-from batch_mlip.core.neighbors import neighbor_list, resolve_neighbor_backend
+from batch_mlip.core.neighbors import (
+    NeighborBackendDecision,
+    neighbor_list,
+    resolve_neighbor_backend,
+    resolve_neighbor_backend_decision,
+)
 
 CPU_DEVICE = torch.device("cpu")
 
@@ -257,6 +262,92 @@ def test_auto_cell_policy_requires_large_predicted_candidate_reduction():
     )
 
 
+def test_auto_cell_decision_reports_selection_evidence():
+    counts = torch.full((8,), 368)
+    cells = torch.eye(3).repeat(8, 1, 1) * 24.0
+    pbc = torch.ones((8, 3), dtype=torch.bool)
+
+    decision = resolve_neighbor_backend_decision(
+        "auto",
+        device=torch.device("cuda"),
+        counts=counts,
+        cutoff=6.0,
+        cells=cells,
+        pbc=pbc,
+    )
+
+    assert decision.backend == "cuda_cell"
+    assert decision.pair_work == 8 * 368**2
+    assert decision.candidate_reduction is not None
+    assert decision.candidate_reduction >= 0.98
+
+
+@pytest.mark.parametrize(
+    ("counts", "candidate_edges", "volume_per_atom", "expected"),
+    [
+        ([44], 5_000, 20.0, "matscipy"),
+        ([44], 5_000, 8.0, "cuda_cell"),
+        ([44, 44], 20_000, 20.0, "cuda_cell"),
+        ([88, 88], 20_000, 20.0, "cuda_cell"),
+        ([88] * 8, 20_000, 20.0, "cuda_dense"),
+        ([44] * 32, 90_000, 15.0, "cuda_cell"),
+        ([116] * 32, 90_000, 25.0, "cuda_dense"),
+    ],
+)
+def test_warm_graph_policy_uses_observed_candidate_work(
+    counts,
+    candidate_edges,
+    volume_per_atom,
+    expected,
+):
+    decision = resolve_neighbor_backend_decision(
+        "auto",
+        device=torch.device("cuda"),
+        counts=torch.tensor(counts),
+        cutoff=6.5,
+        candidate_edges=candidate_edges,
+        mean_volume_per_atom=volume_per_atom,
+    )
+
+    assert decision.backend == expected
+    assert decision.reason == "cached candidate-graph policy"
+    assert decision.candidate_edges == candidate_edges
+
+
+@pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA is unavailable")
+def test_cell_policy_estimate_matches_between_cpu_and_cuda():
+    cells = torch.tensor(
+        [
+            [[24.0, 0.0, 0.0], [1.5, 21.0, 0.0], [0.7, 0.4, 19.0]],
+            [[18.0, 0.0, 0.0], [-1.0, 23.0, 0.0], [0.2, 0.9, 20.0]],
+        ],
+        dtype=torch.float64,
+    )
+    pbc = torch.ones((2, 3), dtype=torch.bool)
+    counts = torch.tensor([3, 2])
+    positions = torch.tensor(
+        [[1.0, 2.0, 3.0], [4.0, 2.0, 1.0], [3.0, 5.0, 2.0], [2.0, 1.0, 4.0], [7.0, 8.0, 3.0]],
+        dtype=torch.float64,
+    )
+
+    cpu = estimate_cell_candidate_reduction(
+        cells,
+        pbc,
+        cutoff=6.5,
+        positions=positions,
+        counts=counts,
+    )
+    cuda = estimate_cell_candidate_reduction(
+        cells.cuda(),
+        pbc.cuda(),
+        cutoff=6.5,
+        positions=positions.cuda(),
+        counts=counts.cuda(),
+    )
+
+    assert cuda == pytest.approx(cpu, abs=1e-12)
+
+
 def test_cell_policy_uses_occupied_fractional_span():
     cells = torch.eye(3).reshape(1, 3, 3) * 24.0
     pbc = torch.ones((1, 3), dtype=torch.bool)
@@ -312,8 +403,12 @@ def test_auto_cell_work_guard_falls_back_to_dense(monkeypatch):
     )
 
     monkeypatch.setattr(
-        "batch_mlip.core.state.resolve_neighbor_backend",
-        lambda *args, **kwargs: "cuda_cell",
+        "batch_mlip.core.state.resolve_neighbor_backend_decision",
+        lambda *args, **kwargs: NeighborBackendDecision(
+            "cuda_cell",
+            "synthetic test decision",
+            1,
+        ),
     )
 
     def reject_cell(*args, **kwargs):

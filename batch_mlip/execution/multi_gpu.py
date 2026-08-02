@@ -66,6 +66,8 @@ class TaskResult:
     worker_id: int
     run_seconds: float
     payload: Any
+    dispatch_offset_seconds: float | None = None
+    completion_offset_seconds: float | None = None
 
 
 @dataclass(frozen=True)
@@ -947,6 +949,7 @@ class PersistentTaskPool:
             started = time.perf_counter()
             deadline = started + self._run_timeout_seconds
             outputs: dict[int, TaskResult] = {}
+            dispatch_offsets: dict[int, float] = {}
             assignments: dict[int, list[int]] = {
                 worker.worker_id: [] for worker in self._workers
             }
@@ -967,11 +970,13 @@ class PersistentTaskPool:
                     if not pending:
                         break
                     task_index = pending.popleft()
+                    task = resolve_task(task_index)
+                    dispatch_offsets[task_index] = time.perf_counter() - started
                     self._task_queues[worker.worker_id].put(
                         (
                             call_id,
                             task_index,
-                            resolve_task(task_index),
+                            task,
                         )
                     )
 
@@ -1008,16 +1013,20 @@ class PersistentTaskPool:
                         worker_id=worker_id,
                         run_seconds=float(task_seconds),
                         payload=payload,
+                        dispatch_offset_seconds=dispatch_offsets[task_index],
+                        completion_offset_seconds=time.perf_counter() - started,
                     )
                     assignments[worker_id].append(task_index)
                     run_seconds[worker_id] += float(task_seconds)
                     if pending:
                         next_index = pending.popleft()
+                        task = resolve_task(next_index)
+                        dispatch_offsets[next_index] = time.perf_counter() - started
                         self._task_queues[worker_id].put(
                             (
                                 call_id,
                                 next_index,
-                                resolve_task(next_index),
+                                task,
                             )
                         )
             except BaseException:

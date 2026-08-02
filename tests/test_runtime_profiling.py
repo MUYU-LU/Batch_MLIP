@@ -34,6 +34,16 @@ def test_runtime_profiler_records_cpu_phases_and_events():
     assert summary["samples"][0]["systems"] == 2
 
 
+def test_runtime_profiler_can_timestamp_events():
+    with RuntimeProfiler(record_event_timestamps=True) as profiler:
+        profiler.event("scheduler.population", active_systems=3)
+
+    event = profiler.summary()["events"][0]
+    assert event["name"] == "scheduler.population"
+    assert event["active_systems"] == 3
+    assert event["elapsed_seconds"] >= 0.0
+
+
 def test_profiled_refill_bfgs_preserves_results_and_reports_runtime_phases():
     systems = [
         Atoms("H", positions=[[value, 0.0, 0.0]])
@@ -113,3 +123,17 @@ def test_profiled_active_compaction_reports_removed_systems():
     assert events[0]["systems_before"] == 2
     assert events[0]["systems_after"] == 1
     assert events[0]["removed"] == 1
+    slots = [
+        event
+        for event in summary["events"]
+        if event["name"] == "active_compaction_slots"
+    ]
+    assert slots == [
+        {
+            "name": "active_compaction_slots",
+            "scheduler_step": 0,
+            "atom_count": 1,
+            "generalized_dimension": 3,
+            "slots": 1,
+        }
+    ]

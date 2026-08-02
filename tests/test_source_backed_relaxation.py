@@ -23,6 +23,7 @@ from batch_mlip import (
     relax,
     relax_manifest,
 )
+from batch_mlip.interfaces.api import _use_global_manifest_prefetch
 from batch_mlip.interfaces.sources import (
     AseManifestStructureProvider,
     AsyncStructureMaterializer,
@@ -65,6 +66,29 @@ class SourceQuadraticCalculator(BatchCalculator):
             forces=-state.positions.clone(),
             stress=stress,
         )
+
+
+def test_global_manifest_prefetch_is_automatic_only_for_multi_gpu_cuda():
+    assert _use_global_manifest_prefetch(
+        [torch.device("cuda:0"), torch.device("cuda:1")],
+        "auto",
+    )
+    assert _use_global_manifest_prefetch(
+        [torch.device("cuda:0"), torch.device("cuda:1")],
+        "process",
+    )
+    assert not _use_global_manifest_prefetch(
+        [torch.device("cuda:0")],
+        "auto",
+    )
+    assert not _use_global_manifest_prefetch(
+        [torch.device("cpu:0"), torch.device("cpu:1")],
+        "auto",
+    )
+    assert not _use_global_manifest_prefetch(
+        [torch.device("cuda:0"), torch.device("cuda:1")],
+        "thread",
+    )
 
 
 def _workload(tmp_path):
@@ -179,13 +203,9 @@ def test_manifest_relaxation_matches_eager_plan_and_results(tmp_path):
     assert materialization["parent_system_count"] == 0
     assert materialization["worker_system_count"] == 4
     assert materialization["worker_seconds"] >= 0.0
-    assert eager_schedule["structure_materialization"]["mode"] == (
-        "eager_in_memory"
-    )
+    assert eager_schedule["structure_materialization"]["mode"] == ("eager_in_memory")
     assert eager_schedule["structure_materialization"]["parent_system_count"] == 4
-    assert lazy_schedule["capacity_planning"]["mode"] == (
-        "representative_probe_fallback"
-    )
+    assert lazy_schedule["capacity_planning"]["mode"] == ("representative_probe_fallback")
     assert all(
         chunk["materialization_mode"] == "manifest_lazy_worker"
         for worker in lazy_schedule["workers"]
@@ -211,6 +231,40 @@ def test_manifest_relaxation_matches_eager_plan_and_results(tmp_path):
         lazy.state.cells.cpu(),
         atol=1e-12,
     )
+
+
+def test_manifest_single_device_preserves_resident_batch_and_reports_zero_pilots(
+    tmp_path,
+):
+    _, manifest, profile = _workload(tmp_path)
+    result = relax_manifest(
+        manifest,
+        tmp_path,
+        profile,
+        SourceQuadraticCalculator(),
+        optimizer="fire",
+        devices=["cpu:0"],
+        auto_config=AutoSchedulerConfig(
+            cache_path=tmp_path / "single-device-cache.json",
+            cache_enabled=False,
+            max_batch_size=4,
+            multi_gpu_worker_backend="thread",
+            multi_gpu_target_chunks_per_device=2,
+        ),
+        fmax=1e-5,
+        max_steps=500,
+        dt_start=0.05,
+        dt_max=0.5,
+    )
+
+    scheduling = result.metadata["scheduling"]
+    assert scheduling["decision"] == ("deterministic_memory_plan_source_single_gpu")
+    assert scheduling["resident_plan_chunk_count"] == 1
+    assert scheduling["execution_chunk_count"] == 1
+    assert scheduling["planned_chunks"][0]["system_count"] == 4
+    assert scheduling["optimization_pilot_runs"] == 0
+    assert not scheduling["pending_work_stealing"]
+    assert bool(result.converged.all())
 
 
 def test_manifest_relaxation_rejects_sidecar_contract_mismatch(tmp_path):
@@ -416,8 +470,6 @@ def test_manifest_relaxation_uses_matched_offline_capacity_without_probe(
     assert scheduling["probe"]["system_count"] == 0
     assert scheduling["probe"]["model_forward_count"] == 0
     assert scheduling["structure_materialization"]["parent_system_count"] == 0
-    assert all(
-        chunk["predicted_peak_bytes"] is not None
-        for chunk in scheduling["planned_chunks"]
-    )
+    assert all(chunk["capacity_bound_bytes"] is not None for chunk in scheduling["planned_chunks"])
+    assert any(chunk["predicted_peak_bytes"] is None for chunk in scheduling["planned_chunks"])
     assert bool(result.converged.all())

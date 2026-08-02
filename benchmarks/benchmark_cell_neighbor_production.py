@@ -10,6 +10,7 @@ import platform
 import statistics
 import sys
 import time
+import warnings
 from pathlib import Path
 from typing import Any
 
@@ -39,6 +40,23 @@ def _base_structure(atom_count: int, manifest_dir: Path, dataset_dir: Path):
         )
     )
     return read(dataset_dir / manifest["jobs"][0]["source_path"])
+
+
+def _family_structures(root: Path, family: str, count: int):
+    paths = sorted((root / family / "structures").glob("*.cif"))
+    if len(paths) < count:
+        raise ValueError(f"{family} contains {len(paths)} CIFs, fewer than {count}")
+    if count == 1:
+        selected = [paths[0]]
+    else:
+        selected = [
+            paths[round(index * (len(paths) - 1) / (count - 1))]
+            for index in range(count)
+        ]
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=UserWarning)
+        systems = [read(path) for path in selected]
+    return selected, systems
 
 
 def _synchronize(device: torch.device) -> None:
@@ -194,7 +212,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", choices=("atombit", "mace"), required=True)
     parser.add_argument("--task", choices=("eval", "bfgs", "nve"), required=True)
-    parser.add_argument("--source-atoms", type=int, choices=(46, 276), required=True)
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument("--source-atoms", type=int, choices=(46, 276))
+    source.add_argument("--family")
     parser.add_argument("--repeat", default="1x1x1")
     parser.add_argument("--batch-size", type=int, required=True)
     parser.add_argument("--backends", default="cuda_dense,cuda_cell")
@@ -204,6 +224,11 @@ def main() -> None:
     parser.add_argument("--skin", type=float, default=0.0)
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--dataset-dir", type=Path, default=Path("data/T2_test/structures"))
+    parser.add_argument(
+        "--omc-root",
+        type=Path,
+        default=Path("/public/home/lmy/Batch_imple_project/test_set"),
+    )
     parser.add_argument(
         "--manifest-dir",
         type=Path,
@@ -243,9 +268,20 @@ def main() -> None:
         parser.error("repeat must contain three positive integers")
     torch.set_num_threads(1)
     torch.use_deterministic_algorithms(True)
-    base = _base_structure(args.source_atoms, args.manifest_dir, args.dataset_dir)
-    structure = base.repeat(repeat)
-    systems = [structure.copy() for _ in range(args.batch_size)]
+    if args.family is None:
+        base = _base_structure(args.source_atoms, args.manifest_dir, args.dataset_dir)
+        structure = base.repeat(repeat)
+        systems = [structure.copy() for _ in range(args.batch_size)]
+        source_paths = None
+    else:
+        if repeat != (1, 1, 1):
+            parser.error("--repeat is only supported with --source-atoms")
+        selected_paths, systems = _family_structures(
+            args.omc_root,
+            args.family,
+            args.batch_size,
+        )
+        source_paths = [str(path) for path in selected_paths]
     methods = {}
     snapshots = {}
     for backend in (value.strip() for value in args.backends.split(",")):
@@ -270,8 +306,15 @@ def main() -> None:
         "model": args.model,
         "task": args.task,
         "source_atoms": args.source_atoms,
+        "family": args.family,
+        "source_paths": source_paths,
         "repeat": repeat,
-        "atoms_per_system": len(structure),
+        "atom_counts": [len(atoms) for atoms in systems],
+        "atoms_per_system": (
+            len(systems[0])
+            if all(len(atoms) == len(systems[0]) for atoms in systems)
+            else None
+        ),
         "batch_size": args.batch_size,
         "skin_A": args.skin,
         "nve_steps": args.nve_steps if args.task == "nve" else None,

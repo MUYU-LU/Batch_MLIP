@@ -1,13 +1,12 @@
 schema_version: 1
-baseline_id: scheduler-v1
-status: algorithm_frozen_interface_patch_pending_commit
+baseline_id: atombit-omc-csp-v1
+status: implementation_freeze_pending_commit
 
 provenance:
-  implementation_commit: 4ee8b18f2cc140bf52bfb1700cf1a937b4232a51
+  implementation_commit: pending
   implementation_commit_role: >-
-    Last committed scheduler algorithm. The local unified-auto-scheduling
-    patch changes the default route and reporting but not the deterministic
-    scheduling decisions for scheduling=auto.
+    This field is replaced by the tested implementation commit in the freeze
+    metadata commit. Numerical code does not change in that second commit.
   refill_policy:
     path: batch_mlip/planning/data/refill_policy_v2.json
     policy_id: atombit-smooth-rms-bfgs-h100-refill-v2
@@ -16,8 +15,8 @@ provenance:
     path: batch_mlip/planning/data/capacity_policy_v1.json
     policy_id: omc-csp-atombit-h100-capacity-v1
     sha256: d8ed5cbbfd63d6e845eb3d552f628169a0c4e99f996f820c81299bdeafaf46fb
-  experiment_directory_count: 86
-  experiment_directory_names_sha256: 8d8f217ae9c5d8caf6274e5dbecfb54096075818c4d3035ea2fdb4004f1105b3
+  experiment_directory_count: 96
+  experiment_directory_names_sha256: 3e539dd0afa9c9d95e8e55de2976b8f1044903ffdcbbc2ae1ba435d1a7966a7b
 
 objective:
   primary: minimize_total_makespan
@@ -27,6 +26,7 @@ objective:
     - no_runtime_failure
     - peak_reserved_memory_within_budget
   memory_safety_fraction: 0.85
+  accepted_observed_runtime_high_water_fraction: 0.91
 
 reproducibility_contract:
   process_seed: 20260729
@@ -86,8 +86,21 @@ automatic_decisions:
     refill: false
     refill_reason: no_accepted_multi_gpu_scientific_policy
     target_execution_chunks_per_device: 2
-    assignment: largest_cost_first_work_stealing
+    initial_assignment: bucket_stratified
+    pending_assignment: largest_cost_first_work_stealing
     optimizer_state_migration: false
+    explicit_experiment_policies:
+      - local_compatible
+      - streaming_compatible
+  source_materialization:
+    mode: manifest_lazy_global_prefetch
+    loader_processes: task_aware_auto
+    prefetch_chunks_per_worker: 1
+  neighbor_execution:
+    policy: omc-csp-neighbor-policy-v2
+    cold_build: conservative_pair_work_and_cell_estimator
+    cached_rebuild: candidate_graph_work_rule
+    unsupported_geometry_fallback: cuda_dense_then_matscipy_then_ase
   external_baseline_dispatch:
     automatic_mps_fallback: false
 
@@ -126,6 +139,9 @@ accepted_priors:
   - multi_gpu_resident_packing
   - process_worker_autoscheduler
   - signed_offline_hardware_capacity
+  - source_backed_lazy_materialization
+  - bucket_stratified_outer_scheduling
+  - omc_csp_neighbor_policy_v2
 
 explicit_negative_priors:
   - universal_refill
@@ -147,6 +163,21 @@ baseline_comparisons:
     - same_convergence_limits
     - cold_and_production_times_reported_separately
 
+production_stress_reference:
+  experiment: t2-p6000-strict-bfgs-vs-mps16-v1
+  workload: OPT-OMC-STRUCTURES-P6000-INTRA-WIDE-v1
+  pool_size: 6000
+  fmax_eV_per_A: 0.01
+  max_steps: 3000
+  gpu_count: 8
+  automatic_execution_seconds: 2245.0894825949945
+  mps16_makespan_seconds: 4706.150795802998
+  speedup_over_mps16: 2.0961974265557455
+  automatic_converged: 5986
+  mps16_converged: 5985
+  automatic_peak_reserved_fraction: 0.901980312502409
+  decision: retain_active_drain
+
 limitations:
   - Refill evidence is contract-specific rather than a general predictor.
   - Supplied devices are treated as available execution resources; their external opportunity cost is not modeled.
@@ -156,3 +187,5 @@ limitations:
   - Cache skin is not selected automatically.
   - MD uses separate execution paths and is not covered by scheduler v1.
   - Historical timings are not eligible as chemical-transfer training labels.
+  - Strict BFGS and ASE BFGS may reach different local minima; schedule-level
+    speed comparisons do not claim endpoint identity.

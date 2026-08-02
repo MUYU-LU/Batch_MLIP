@@ -1,0 +1,48 @@
+experiment_id: omc-csp-neighbor-policy-v2
+baseline_commit: 9dd272821f8f93d1e19842a2ee751a3b9ddf30c1
+hypothesis: >-
+  Replacing the CPU/NumPy cuda-cell eligibility estimate with a tensor-native
+  decision and calibrating the complete auto path on unique OMC structures
+  will reduce backend-selection overhead while preserving exact graph topology.
+mechanism: >-
+  Keep cell, position, and occupancy calculations on the geometry device;
+  synchronize only the final scalar decision; select the backend from measured
+  invalid-subset work rather than timing isolated builders alone.
+hardware:
+  gpu: NVIDIA H100 80GB HBM3
+  gpu_count_for_points: 1
+  environment: /public/home/lmy/.conda/envs/lmy
+data:
+  root: /public/home/lmy/Batch_imple_project/test_set
+  fit_families: [GUFJOG, XATMOV, BOQWIN, XAFPAY, OBEQIX, rof-b, AXOSOW, HAMTIZ, WICZUF, rof-a]
+  validation_families: [JAYDUI, NACJAF, rof-c, KONTIQ, PAHYON, OBEQUJ]
+  heldout_families: [UJIRIO, XAFQIH, BOQQUT, SOXLEX, XULDUD, WIDBAO]
+  selection: 64 evenly spaced unique CIFs per family
+matrix:
+  candidate_cutoff_A: [6.0, 6.5]
+  resident_systems: 64
+  rebuilt_systems: [1, 2, 4, 8, 16, 32, 64]
+  backends: [matscipy, cuda_dense, cuda_cell, auto]
+  warmups: 1
+  timing_repeats: 3
+validation:
+  topology: exact ordered edge_index and integer shifts versus matscipy
+  graph_isolation: required
+  integrated_tasks: [variable_cell_bfgs, nve]
+  endpoint_comparison: required
+metrics:
+  - complete_backend_selection_time
+  - neighbor_search_time
+  - graph_replacement_time
+  - systems_per_second
+  - peak_allocated_bytes
+  - peak_reserved_bytes
+  - selected_backend
+  - candidate_reduction
+acceptance:
+  topology_mismatches: 0
+  auto_oom_failures: 0
+  policy_evaluation: held_out_family
+limitations:
+  - The fitted performance policy is specific to the recorded H100 software contract.
+  - A portable policy requires separate calibration on other GPU architectures.

@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "negative_tensor_selector": {
+    "baseline": {
+      "directory": "experiments/omc-csp-neighbor-policy-v2/results/baseline",
+      "families": [
+        "BOQWIN",
+        "GUFJOG",
+        "OBEQIX",
+        "XAFPAY",
+        "XATMOV",
+        "rof-b"
+      ],
+      "point_count": 84,
+      "topology_passed": true,
+      "exact_fastest_matches": 61,
+      "selected_backends": {
+        "matscipy": 16,
+        "cuda_dense": 68
+      },
+      "median_regret": 0.10554948326721647,
+      "mean_regret": 0.19611007631145022,
+      "p90_regret": 0.43566754465681656,
+      "p95_regret": 0.8876690245780694,
+      "maximum_regret": 1.2726589172952059,
+      "median_selection_seconds": 0.0012236325019330252
+    },
+    "tensor_selector": {
+      "directory": "experiments/omc-csp-neighbor-policy-v2/results/tensor-selector",
+      "families": [
+        "BOQWIN",
+        "GUFJOG",
+        "OBEQIX",
+        "XAFPAY",
+        "XATMOV",
+        "rof-b"
+      ],
+      "point_count": 84,
+      "topology_passed": true,
+      "exact_fastest_matches": 61,
+      "selected_backends": {
+        "matscipy": 16,
+        "cuda_dense": 68
+      },
+      "median_regret": 0.12039882147266467,
+      "mean_regret": 0.20750898149456812,
+      "p90_regret": 0.4432120319995001,
+      "p95_regret": 0.9501027473214885,
+      "maximum_regret": 1.3246205448173467,
+      "median_selection_seconds": 0.0015429189952556044
+    }
+  },
+  "policy_validation": {
+    "old_policy": {
+      "directory": "experiments/omc-csp-neighbor-policy-v2/results/heldout",
+      "families": [
+        "BOQQUT",
+        "JAYDUI",
+        "KONTIQ",
+        "NACJAF",
+        "OBEQUJ",
+        "PAHYON",
+        "SOXLEX",
+        "UJIRIO",
+        "WIDBAO",
+        "XAFQIH",
+        "XULDUD",
+        "rof-c"
+      ],
+      "point_count": 168,
+      "topology_passed": true,
+      "exact_fastest_matches": 104,
+      "selected_backends": {
+        "matscipy": 34,
+        "cuda_dense": 134
+      },
+      "median_regret": 0.11849808438644083,
+      "mean_regret": 0.26757343541918976,
+      "p90_regret": 0.7206447971398742,
+      "p95_regret": 1.2196394462713376,
+      "maximum_regret": 2.204175594812708,
+      "median_selection_seconds": 0.0011956765010836534
+    },
+    "candidate_graph_policy": {
+      "directory": "experiments/omc-csp-neighbor-policy-v2/results/policy-v2-heldout",
+      "families": [
+        "BOQQUT",
+        "JAYDUI",
+        "KONTIQ",
+        "NACJAF",
+        "OBEQUJ",
+        "PAHYON",
+        "SOXLEX",
+        "UJIRIO",
+        "WIDBAO",
+        "XAFQIH",
+        "XULDUD",
+        "rof-c"
+      ],
+      "point_count": 168,
+      "topology_passed": true,
+      "exact_fastest_matches": 147,
+      "selected_backends": {
+        "cuda_cell": 35,
+        "cuda_dense": 98,
+        "matscipy": 35
+      },
+      "median_regret": 0.007130283633367429,
+      "mean_regret": 0.028772958952872105,
+      "p90_regret": 0.04486119660865873,
+      "p95_regret": 0.1502131370767188,
+      "maximum_regret": 0.6881033153153,
+      "median_selection_seconds": 0.0010912715006270446
+    }
+  },
+  "integrated_replicated": {
+    "directory": "experiments/omc-csp-neighbor-policy-v2/results/integrated-policy-v2",
+    "point_count": 4,
+    "all_endpoints_exact": true,
+    "points": [
+      {
+        "workload": "bfgs-H276-B16",
+        "reference": "matscipy",
+        "fastest_backend": "cuda_cell",
+        "auto_seconds": 0.4560236990073463,
+        "fastest_seconds": 0.4322900850092992,
+        "auto_regret": 0.05490205494196454,
+        "auto_speedup_vs_matscipy": 1.4688654985868985,
+        "maximum_absolute_endpoint_difference": 0.0,
+        "max_abs_total_energy_drift_eV_per_atom": null,
+        "auto_peak_reserved_bytes": 6394216448
+      },
+      {
+        "workload": "bfgs-H46-B32",
+        "reference": "matscipy",
+        "fastest_backend": "cuda_cell",
+        "auto_seconds": 0.32217129299533553,
+        "fastest_seconds": 0.2998701870092191,
+        "auto_regret": 0.07436920024807536,
+        "auto_speedup_vs_matscipy": 1.3137252579603937,
+        "maximum_absolute_endpoint_difference": 0.0,
+        "max_abs_total_energy_drift_eV_per_atom": null,
+        "auto_peak_reserved_bytes": 2317352960
+      },
+      {
+        "workload": "nve-H276-B16",
+        "reference": "matscipy",
+        "fastest_backend": "cuda_cell",
+        "auto_seconds": 0.7587803570058895,
+        "fastest_seconds": 0.7324204070027918,
+        "auto_regret": 0.0359901905395672,
+        "auto_speedup_vs_matscipy": 1.6547203118988911,
+        "maximum_absolute_endpoint_difference": 0.0,
+        "max_abs_total_energy_drift_eV_per_atom": 4.300172778143399e-05,
+        "auto_peak_reserved_bytes": 6662651904
+      },
+      {
+        "workload": "nve-H46-B32",
+        "reference": "matscipy",
+        "fastest_backend": "cuda_cell",
+        "auto_seconds": 0.4755762959975982,
+        "fastest_seconds": 0.436057669998263,
+        "auto_regret": 0.09062706315770708,
+        "auto_speedup_vs_matscipy": 1.5353721140839889,
+        "maximum_absolute_endpoint_difference": 0.0,
+        "max_abs_total_energy_drift_eV_per_atom": 7.021686305170473e-05,
+        "auto_peak_reserved_bytes": 2315255808
+      }
+    ]
+  },
+  "integrated_unique": {
+    "directory": "experiments/omc-csp-neighbor-policy-v2/results/integrated-unique-policy-v2",
+    "point_count": 4,
+    "all_endpoints_exact": true,
+    "points": [
+      {
+        "workload": "bfgs-BOQQUT-B16",
+        "reference": "matscipy",
+        "fastest_backend": "auto",
+        "auto_seconds": 0.6600527069967939,
+        "fastest_seconds": 0.6600527069967939,
+        "auto_regret": 0.0,
+        "auto_speedup_vs_matscipy": 1.293411483563434,
+        "maximum_absolute_endpoint_difference": 0.0,
+        "max_abs_total_energy_drift_eV_per_atom": null,
+        "auto_peak_reserved_bytes": 2311061504
+      },
+      {
+        "workload": "bfgs-SOXLEX-B32",
+        "reference": "matscipy",
+        "fastest_backend": "cuda_cell",
+        "auto_seconds": 0.41305106700747274,
+        "fastest_seconds": 0.3957540639967192,
+        "auto_regret": 0.04370644444196259,
+        "auto_speedup_vs_matscipy": 1.04253533375653,
+        "maximum_absolute_endpoint_difference": 0.0,
+        "max_abs_total_energy_drift_eV_per_atom": null,
+        "auto_peak_reserved_bytes": 2317352960
+      },
+      {
+        "workload": "nve-BOQQUT-B16",
+        "reference": "matscipy",
+        "fastest_backend": "cuda_dense",
+        "auto_seconds": 0.7999504400067963,
+        "fastest_seconds": 0.7978319409885444,
+        "auto_regret": 0.002655319885572549,
+        "auto_speedup_vs_matscipy": 1.5353224332122528,
+        "maximum_absolute_endpoint_difference": 0.0,
+        "max_abs_total_energy_drift_eV_per_atom": 0.0020172975280068135,
+        "auto_peak_reserved_bytes": 5502926848
+      },
+      {
+        "workload": "nve-SOXLEX-B32",
+        "reference": "matscipy",
+        "fastest_backend": "cuda_cell",
+        "auto_seconds": 0.683760402011103,
+        "fastest_seconds": 0.6470850269979564,
+        "auto_regret": 0.05667782977964397,
+        "auto_speedup_vs_matscipy": 1.0591524938707426,
+        "maximum_absolute_endpoint_difference": 0.0,
+        "max_abs_total_energy_drift_eV_per_atom": 0.0005920330683390299,
+        "auto_peak_reserved_bytes": 2306867200
+      }
+    ]
+  }
+}

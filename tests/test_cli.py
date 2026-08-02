@@ -5,6 +5,7 @@ from pathlib import Path
 import yaml
 from ase import Atoms
 from ase.io import write
+
 from batch_mlip.cli import run_config, validate_batch
 
 

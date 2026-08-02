@@ -379,7 +379,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--refill-storage",
-        choices=("repack", "slots"),
+        choices=("repack", "slots", "arena", "compatible_slots"),
         default="repack",
     )
     parser.add_argument("--refill-low-watermark", type=float, default=0.8)
