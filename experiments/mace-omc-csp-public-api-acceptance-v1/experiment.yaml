@@ -1,0 +1,55 @@
+schema_version: 1
+id: mace-omc-csp-public-api-acceptance-v1
+date: 2026-08-02
+status: planned
+
+question: >-
+  Does the one-call optimize_pool interface execute a chemically untouched,
+  unique P2048 OMC-CSP family under the frozen MACE/H100 production contract?
+
+workload:
+  id: OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2
+  scheduler_split: test
+  family: XULDUD
+  pool_size: 2048
+  unique_sources: 2048
+  synthetic_repetition: false
+  manifest_sha256: ec9d6f04a1f9674c433336c423fa3c489241315caf3d4bb504750224fbac29dd
+
+contract:
+  model: MACE-OFF23-Small
+  model_file_sha256: 165cce4cfec5a34b9c64d4ebf95de15d71106bb584b7291c8470f0749977c46f
+  model_dtype: float64
+  optimizer: BFGS
+  optimizer_dtype: float64
+  cell_filter: FrechetCellFilter
+  fmax_eV_per_A: 0.01
+  max_steps: 3000
+  max_step_A: 0.2
+  alpha_eV_per_A2: 70.0
+  graph_mode: cached
+  skin_A: 0.5
+  neighbor_backend: auto
+  deterministic: true
+
+hardware:
+  gpu_model: NVIDIA H100 80GB HBM3
+  requested_gpu_indices: [0, 1, 4, 5, 6, 7]
+  memory_fraction_limit: 0.85
+
+acceptance_gates:
+  signed_manifest_verified: true
+  unique_unreplicated_pool: true
+  exact_job_coverage: true
+  input_order_preserved: true
+  finite_endpoints: true
+  minimum_convergence_rate: 0.99
+  exact_packaged_capacity_policy: true
+  zero_memory_probe_forwards: true
+  maximum_peak_reserved_fraction: 0.85
+  all_active_workers_acknowledge_shutdown: true
+
+artifacts:
+  remote_root: /public/home/lmy/Batch_imple_project/mace_omc_csp_public_api_acceptance_v1
+  result: null
+  relaxed_structures: null
