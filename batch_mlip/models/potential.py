@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from contextlib import nullcontext
+from pathlib import Path
 from typing import Any, Literal
 
 import torch
@@ -64,6 +65,44 @@ class AtomBitBatchCalculator(BatchCalculator):
 
         for parameter in self.model.parameters():
             parameter.requires_grad_(False)
+
+    @classmethod
+    def from_checkpoint(
+        cls,
+        checkpoint: str | Path,
+        *,
+        device: str | torch.device = "cpu",
+        dtype: str | torch.dtype | None = None,
+        force_mode: ForceMode = "autograd",
+        e0: str | Path | Mapping[int, float] | None = None,
+        model_call_kwargs: Mapping[str, object] | None = None,
+        cutoff: float | None = None,
+        skin: float = 0.0,
+        neighbor_backend: NeighborBackend = "auto",
+        strict: bool = True,
+    ) -> AtomBitBatchCalculator:
+        """Load a training checkpoint and construct the native batch adapter."""
+
+        from .loaders import (
+            infer_cutoff,
+            load_atombit_training_checkpoint,
+            load_e0,
+            parse_dtype,
+        )
+
+        model, _ = load_atombit_training_checkpoint(checkpoint, strict=strict)
+        resolved_dtype = model_dtype(model) if dtype is None else parse_dtype(dtype)
+        return cls(
+            model,
+            device=device,
+            dtype=resolved_dtype,
+            force_mode=force_mode,
+            e0_dict=load_e0(e0),
+            model_call_kwargs=model_call_kwargs,
+            cutoff=infer_cutoff(model, cutoff),
+            skin=skin,
+            neighbor_backend=neighbor_backend,
+        )
 
     def _e0_per_system(self, state: AseGraphBatch) -> torch.Tensor:
         if not self.e0_dict:

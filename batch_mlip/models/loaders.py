@@ -4,11 +4,86 @@ from __future__ import annotations
 
 import importlib
 import json
+import sys
+import types
 from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import Any
 
 import torch
+
+
+def _install_legacy_atombit_config_alias() -> None:
+    """Make checkpoints pickled with the original nested module importable."""
+
+    from src.utils import AtomBitConfig
+
+    module = types.ModuleType("src.utils.Utils")
+    module.AtomBitConfig = AtomBitConfig
+    sys.modules.setdefault("src.utils.Utils", module)
+
+
+def load_atombit_training_checkpoint(
+    checkpoint: str | Path,
+    *,
+    map_location: str | torch.device = "cpu",
+    strict: bool = True,
+) -> tuple[torch.nn.Module, dict[str, Any]]:
+    """Reconstruct AtomBit from its training checkpoint without benchmark code."""
+
+    from src.model import AtomBitModel
+    from src.utils import AtomBitConfig
+
+    _install_legacy_atombit_config_alias()
+    payload = torch.load(
+        Path(checkpoint),
+        map_location=map_location,
+        weights_only=False,
+    )
+    if not isinstance(payload, Mapping):
+        raise TypeError("AtomBit checkpoint must contain a mapping")
+    if "model_config" not in payload or "model_state_dict" not in payload:
+        raise KeyError(
+            "AtomBit checkpoint must contain model_config and model_state_dict"
+        )
+
+    raw_config = payload["model_config"]
+    config = (
+        AtomBitConfig.from_dict(raw_config)
+        if isinstance(raw_config, Mapping)
+        else raw_config
+    )
+    if not isinstance(config, AtomBitConfig):
+        raise TypeError("model_config must be an AtomBitConfig or mapping")
+
+    raw_state = payload["model_state_dict"]
+    if not isinstance(raw_state, Mapping):
+        raise TypeError("model_state_dict must be a tensor mapping")
+    state_dict = {
+        (str(key)[7:] if str(key).startswith("module.") else str(key)): value
+        for key, value in raw_state.items()
+    }
+    floating_dtypes = {
+        value.dtype
+        for value in state_dict.values()
+        if torch.is_tensor(value) and value.is_floating_point()
+    }
+    if len(floating_dtypes) != 1:
+        raise ValueError(
+            "checkpoint floating state tensors must use one consistent dtype; "
+            f"found {sorted(map(str, floating_dtypes))}"
+        )
+    checkpoint_dtype = next(iter(floating_dtypes))
+    model = AtomBitModel(config).to(dtype=checkpoint_dtype)
+    model.load_state_dict(state_dict, strict=strict)
+    metadata = {
+        "epoch": payload.get("epoch"),
+        "label_mode": payload.get("label_mode"),
+        "precision_dtype": payload.get("precision_dtype"),
+        "state_dtype": str(checkpoint_dtype),
+        "state_tensor_count": len(state_dict),
+    }
+    return model, metadata
 
 
 def resolve_callable(spec: str) -> Callable[..., Any]:

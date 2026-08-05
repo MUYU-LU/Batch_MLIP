@@ -5,7 +5,6 @@ import torch
 from ase import Atoms
 
 from batch_mlip import AseGraphBatch, AtomBitBatchCalculator
-from benchmarks.benchmark_production import load_production_model
 from src.model import AtomBitModel
 from src.modules import CartesianDensityBlock
 from src.utils import AtomBitConfig
@@ -95,7 +94,7 @@ def test_density_requires_model_supplied_degree_normalization():
         )
 
 
-def test_production_loader_preserves_checkpoint_dtype(tmp_path):
+def test_public_checkpoint_constructor_preserves_dtype_and_e0(tmp_path):
     config = AtomBitConfig(
         hidden_dim=4,
         num_layers=1,
@@ -117,12 +116,29 @@ def test_production_loader_preserves_checkpoint_dtype(tmp_path):
         },
         checkpoint,
     )
+    e0 = tmp_path / "e0.pt"
+    torch.save({"e0_dict": {1: -13.6}}, e0)
 
-    loaded, metadata = load_production_model(checkpoint)
+    calculator = AtomBitBatchCalculator.from_checkpoint(
+        checkpoint,
+        e0=e0,
+        cutoff=3.0,
+    )
 
-    assert metadata["state_dtype"] == "torch.float64"
+    loaded = calculator.model
     floating_state = [
         value for value in loaded.state_dict().values() if value.is_floating_point()
     ]
     assert floating_state
     assert {value.dtype for value in floating_state} == {torch.float64}
+    assert calculator.dtype == torch.float64
+    assert calculator.cutoff == 3.0
+    assert calculator.e0_dict == {1: -13.6}
+
+
+def test_public_checkpoint_constructor_rejects_incomplete_payload(tmp_path):
+    checkpoint = tmp_path / "invalid.pt"
+    torch.save({"model_config": {}}, checkpoint)
+
+    with pytest.raises(KeyError, match="model_state_dict"):
+        AtomBitBatchCalculator.from_checkpoint(checkpoint)

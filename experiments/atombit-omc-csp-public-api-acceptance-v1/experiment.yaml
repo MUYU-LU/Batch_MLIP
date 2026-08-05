@@ -1,0 +1,60 @@
+schema_version: 1
+id: atombit-omc-csp-public-api-acceptance-v1
+date: 2026-08-05
+status: planned
+
+question: >-
+  Does the one-call optimize_pool interface preserve the frozen AtomBit
+  OMC-CSP contract on signed small- and large-pool held-out workloads?
+
+workloads:
+  single_gpu:
+    id: OPT-OMC-SCHED-E1-TEST-XULDUD-P64-INTRA-WIDE-v2
+    pool_size: 64
+    manifest_sha256: a7b7e2e3eb54356b40c2186c0893e0bd5dee961b86c088c3b7e9c39c17860798
+  multi_gpu:
+    id: OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2
+    pool_size: 2048
+    manifest_sha256: ec9d6f04a1f9674c433336c423fa3c489241315caf3d4bb504750224fbac29dd
+  scheduler_split: test
+  family: XULDUD
+  synthetic_repetition: false
+
+contract:
+  model: AtomBit-OMC-s smooth-RMS fp32 epoch5
+  checkpoint_file_sha256: b27c372cb2c2848ae1e54a9ffd7a2aa0b0401d9cc0ed922e3be250ff63e44486
+  model_state_sha256: 200b8a378d848c00b9a690583e34e49dacad79975cf3c7c4c92c39a0e24d620d
+  e0_file_sha256: feaabcc547f1dcddf0afd10c54e85a6041193541b3ea5825fa875ee804f99fdf
+  model_dtype: float32
+  optimizer: BFGS
+  optimizer_dtype: float64
+  cell_filter: FrechetCellFilter
+  cutoff_A: 6.0
+  skin_A: 0.5
+  fmax_eV_per_A: 0.01
+  max_steps: 3000
+  deterministic: true
+
+hardware:
+  gpu_model: NVIDIA H100 80GB HBM3
+  single_gpu_indices: [0]
+  target_multi_gpu_indices: [0, 1, 2, 3, 4, 5, 6, 7]
+  planning_memory_fraction: 0.85
+  accepted_runtime_peak_reserved_fraction: 0.91
+
+acceptance_gates:
+  signed_unique_pool: true
+  exact_job_coverage_and_order: true
+  finite_endpoints: true
+  minimum_convergence_rate: 0.99
+  exact_packaged_capacity_policy: true
+  zero_memory_probe_forwards: true
+  predicted_chunks_within_planning_budget: true
+  runtime_peak_reserved_within_accepted_high_water: true
+  all_active_workers_acknowledge_shutdown: true
+
+artifacts:
+  remote_root: /public/home/lmy/Batch_imple_project/atombit_omc_csp_public_api_acceptance_v1
+  single_gpu_result: null
+  multi_gpu_result: null
+  relaxed_structures: external

@@ -164,6 +164,40 @@ if __name__ == "__main__":
     main()
 ```
 
+The frozen AtomBit OMC-CSP path uses the same entry point and loads the
+training checkpoint without a benchmark-specific helper:
+
+```python
+from batch_mlip import AtomBitBatchCalculator
+
+calculator = AtomBitBatchCalculator.from_checkpoint(
+    "AtomBit-OMC-s_smooth_rms_fp32_7gpu_epoch5.pt",
+    e0="meta_e0_data_OMC_r6_single.pt",
+    device="cuda:0",
+    dtype=torch.float32,
+    cutoff=6.0,
+    skin=0.5,
+    force_mode="autograd",
+    neighbor_backend="auto",
+)
+result = optimize_pool(
+    structures,
+    calculator,
+    optimizer="bfgs",
+    cell_filter="frechet",
+    devices=["cuda:0", "cuda:1"],
+    policy="auto",
+    fmax=0.01,
+    max_steps=3000,
+)
+```
+
+`examples/optimize_atombit_omc_csp.py` is the complete file-backed command-line
+example. The exact smooth-RMS fp32 checkpoint, float64 BFGS state, 6.0 A
+cutoff, 0.5 A skin, Frechet cell filter, H100, and allocator contract select
+the packaged AtomBit capacity policy; a mismatch uses the recorded probe
+fallback instead.
+
 `policy="auto"` uses a packaged capacity model only when the checkpoint,
 adapter options, optimizer, cell filter, precision, allocator, PyTorch/CUDA
 versions, GPU model, and memory budget match its signed contract. Otherwise it
