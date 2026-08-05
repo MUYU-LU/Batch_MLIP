@@ -174,6 +174,22 @@ fixed-cell optimization. Because GPU workers use Python's spawn method, invoke
 the one-shot interface from a file-backed `__main__`; retain `BatchExecutor`
 directly when processing several pools with the same calculator and devices.
 
+The complete argument-driven MACE example can be run directly:
+
+```bash
+PYTHONHASHSEED=20260729 CUBLAS_WORKSPACE_CONFIG=:4096:8 \
+python examples/optimize_pool_mace.py candidates.extxyz relaxed.extxyz \
+  --model /path/to/MACE-OFF23_small.model \
+  --devices cuda:0,cuda:1,cuda:2,cuda:3
+```
+
+Release wheels can be checked without importing the source tree:
+
+```bash
+python -m build --wheel
+python tools/verify_wheel_install.py dist/batch_mlip-*.whl
+```
+
 ## Use a serialized complete model
 
 A YAML model factory can return any `torch.nn.Module` that accepts the generic graph fields. For a checkpoint containing the complete module:

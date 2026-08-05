@@ -8,6 +8,7 @@ import batch_mlip
 from batch_mlip.core.calculator import BatchCalculator
 from batch_mlip.core.state import AseGraphBatch
 from batch_mlip.interfaces.api import relax
+from batch_mlip.interfaces.optimization import optimize_pool
 from batch_mlip.models.loaders import build_model
 from batch_mlip.models.mace import MACEBatchCalculator
 from batch_mlip.models.potential import AtomBitBatchCalculator
@@ -45,6 +46,7 @@ def test_root_public_symbols_keep_their_new_canonical_identities():
     assert batch_mlip.RuntimeProfiler is RuntimeProfiler
     assert callable(batch_mlip.MACEBatchCalculator.from_off)
     assert batch_mlip.relax is relax
+    assert batch_mlip.optimize_pool is optimize_pool
 
 
 def test_pre_rename_root_symbols_are_compatibility_aliases():
