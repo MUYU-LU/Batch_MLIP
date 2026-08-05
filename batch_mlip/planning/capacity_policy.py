@@ -24,7 +24,7 @@ from .profiles import (
 from .refill_policy import model_state_sha256
 
 _POLICY_DIRECTORY = Path(__file__).with_name("data")
-_POLICY_PATH = _POLICY_DIRECTORY / "capacity_policy_v1.json"
+_POLICY_PATH = _POLICY_DIRECTORY / "capacity_policy_atombit_h100_v2.json"
 _PACKAGED_POLICY_PATHS = (
     _POLICY_PATH,
     _POLICY_DIRECTORY / "capacity_policy_mace_off23_small_h100_v1.json",
@@ -240,10 +240,13 @@ def select_hardware_capacity_policy(
     """Use an offline model only when its full execution contract matches."""
 
     contract = policy.contract
-    if (
-        config.memory_growth_margin
-        < _VALIDATED_MINIMUM_MEMORY_GROWTH_MARGIN
-    ):
+    minimum_growth_margin = float(
+        contract.get(
+            "minimum_memory_growth_margin",
+            _VALIDATED_MINIMUM_MEMORY_GROWTH_MARGIN,
+        )
+    )
+    if config.memory_growth_margin < minimum_growth_margin:
         return _fallback(
             "memory growth margin is below the validated minimum",
             policy,

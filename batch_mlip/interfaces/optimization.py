@@ -15,7 +15,10 @@ from ..core.types import RelaxationResult
 from ..optimization.cell_filters import FrechetCellFilter
 from ..optimization.registry import BatchedBFGS, BatchOptimizer
 from ..planning.auto import AutoSchedulerConfig
-from ..planning.capacity_policy import HardwareCapacityPolicy
+from ..planning.capacity_policy import (
+    HardwareCapacityPolicy,
+    find_packaged_hardware_capacity_policy,
+)
 from .executor import BatchExecutor
 
 PoolPolicy = Literal["auto", "probe"] | HardwareCapacityPolicy | str | Path
@@ -34,6 +37,23 @@ def _policy_label(policy: PoolPolicy) -> str:
     if isinstance(policy, HardwareCapacityPolicy):
         return f"policy:{policy.policy_id}"
     return str(policy)
+
+
+def _resolve_auto_config(
+    calculator: BatchCalculator,
+    policy: PoolPolicy,
+    auto_config: AutoSchedulerConfig | None,
+) -> AutoSchedulerConfig:
+    config = auto_config or AutoSchedulerConfig()
+    if auto_config is not None or policy != "auto":
+        return config
+    packaged = find_packaged_hardware_capacity_policy(calculator)
+    if packaged is None:
+        return config
+    minimum = float(packaged.contract.get("minimum_memory_growth_margin", 1.0))
+    if config.memory_growth_margin < minimum:
+        config = replace(config, memory_growth_margin=minimum)
+    return config
 
 
 def optimize_pool(
@@ -57,7 +77,7 @@ def optimize_pool(
     explicitly requests that conservative fallback.
     """
 
-    config = auto_config or AutoSchedulerConfig()
+    config = _resolve_auto_config(calculator, policy, auto_config)
     if isinstance(policy, str) and policy == "probe":
         config = replace(config, offline_hardware_capacity_enabled=False)
         capacity_policy: HardwareCapacityPolicy | str | Path | None = None

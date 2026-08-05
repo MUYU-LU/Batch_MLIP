@@ -15,23 +15,24 @@ from batch_mlip import (
 def test_packaged_capacity_policy_is_signed_and_uses_accepted_calibration():
     policy = load_hardware_capacity_policy()
 
-    assert policy.policy_id == "omc-csp-atombit-h100-capacity-v1"
+    assert policy.policy_id == "omc-csp-atombit-h100-capacity-v2"
     assert policy.source_calibration_sha256 == (
-        "d27468326e2b7f464b37c8739d3d3bd219425081bdb96dabf0f250928c78b297"
+        "324d80cce73c31a51da30dac56af2152c677b38ebc40afadb38b04b3785a69dd"
     )
     assert policy.model.contract_id == (
         "atombit-smooth-rms-fp32-bfgs-f64-frechet-h100-"
-        "peak_reserved_bytes-v1"
+        "peak_reserved_bytes-v2"
     )
     assert policy.model.hardware.memory_safety_fraction == 0.85
-    assert policy.contract["maximum_validated_batch_size"] == 512
+    assert policy.contract["maximum_validated_batch_size"] == 256
+    assert policy.contract["minimum_memory_growth_margin"] == 1.3
 
 
 def test_packaged_capacity_registry_includes_frozen_atombit_and_mace_policies():
     policies = load_packaged_hardware_capacity_policies()
 
     assert [policy.policy_id for policy in policies] == [
-        "omc-csp-atombit-h100-capacity-v1",
+        "omc-csp-atombit-h100-capacity-v2",
         "omc-csp-mace-off23-small-h100-capacity-cached-expandable-v1",
     ]
     assert all(policy.verify() is None for policy in policies)
@@ -71,7 +72,7 @@ def test_capacity_policy_falls_back_below_validated_growth_margin():
         None,
         {},
         (),
-        AutoSchedulerConfig(memory_growth_margin=1.0),
+        AutoSchedulerConfig(memory_growth_margin=1.1),
         allocator_policy="expandable_segments",
     )
 

@@ -35,7 +35,7 @@ _H100_MEMORY_BYTES = 85_017_886_720
 _PLANNING_MEMORY_FRACTION = 0.85
 _RUNTIME_MEMORY_FRACTION = 0.91
 _MINIMUM_CONVERGENCE_RATE = 0.99
-_POLICY_ID = "omc-csp-atombit-h100-capacity-v1"
+_POLICY_ID = "omc-csp-atombit-h100-capacity-v2"
 
 
 def _parse_args() -> argparse.Namespace:
@@ -206,7 +206,7 @@ def main() -> None:
                 cache_enabled=False,
                 max_batch_size=256,
                 memory_safety_fraction=_PLANNING_MEMORY_FRACTION,
-                memory_growth_margin=1.10,
+                memory_growth_margin=1.30,
                 multi_gpu_target_chunks_per_device=2,
                 multi_gpu_queue_policy="bucket_stratified",
             ),

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 import pytest
 import torch
 from ase import Atoms
@@ -10,6 +12,7 @@ from batch_mlip import (
     BatchEvaluation,
     optimize_pool,
 )
+from batch_mlip.interfaces import optimization as pool_api
 
 
 class PoolQuadraticCalculator(BatchCalculator):
@@ -121,3 +124,38 @@ def test_optimize_pool_rejects_unknown_cell_filter():
             devices=["cpu:0"],
             cell_filter="unit-cell",  # type: ignore[arg-type]
         )
+
+
+def test_default_auto_config_applies_packaged_policy_growth_margin(monkeypatch):
+    policy = SimpleNamespace(contract={"minimum_memory_growth_margin": 1.3})
+    monkeypatch.setattr(
+        pool_api,
+        "find_packaged_hardware_capacity_policy",
+        lambda calculator: policy,
+    )
+
+    config = pool_api._resolve_auto_config(
+        PoolQuadraticCalculator(),
+        "auto",
+        None,
+    )
+
+    assert config.memory_growth_margin == 1.3
+
+
+def test_explicit_auto_config_is_not_silently_rewritten(monkeypatch):
+    policy = SimpleNamespace(contract={"minimum_memory_growth_margin": 1.3})
+    monkeypatch.setattr(
+        pool_api,
+        "find_packaged_hardware_capacity_policy",
+        lambda calculator: policy,
+    )
+    explicit = AutoSchedulerConfig(memory_growth_margin=1.1)
+
+    config = pool_api._resolve_auto_config(
+        PoolQuadraticCalculator(),
+        "auto",
+        explicit,
+    )
+
+    assert config is explicit

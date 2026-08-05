@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "status": "capacity_refinement_input",
+  "workload_id": "OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2",
+  "gpu_count": 6,
+  "maximum_resident_batch_size": 256,
+  "baseline_policy_id": "omc-csp-atombit-h100-capacity-v1",
+  "baseline_memory_growth_margin": 1.1,
+  "maximum_predicted_peak_bytes": 72154949449,
+  "maximum_observed_peak_reserved_bytes": 82413879296,
+  "observed_to_predicted_ratio": 1.1421791564589916,
+  "minimum_ratio_corrected_growth_margin": 1.256397072104891,
+  "selected_growth_margin": 1.3,
+  "selection_reason": "Round above the measured ratio-corrected minimum to retain held-out headroom.",
+  "source_result_sha256": "927c87c7fafdb089759015d82c50765bbd58e0961addbe465c2b8fb30aa03a38",
+  "source_result_location": "external:atombit_omc_csp_public_api_acceptance_v1/p2048-g6-b256-result.json",
+  "numerical_gates_passed": true,
+  "memory_gate_passed": false
+}
