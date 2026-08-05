@@ -204,7 +204,7 @@ def main() -> None:
             policy="auto",
             auto_config=AutoSchedulerConfig(
                 cache_enabled=False,
-                max_batch_size=512,
+                max_batch_size=256,
                 memory_safety_fraction=_PLANNING_MEMORY_FRACTION,
                 memory_growth_margin=1.10,
                 multi_gpu_target_chunks_per_device=2,

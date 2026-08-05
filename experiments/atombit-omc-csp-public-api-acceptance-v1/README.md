@@ -9,7 +9,8 @@ The small gate uses the signed, unique XULDUD P64 test workload on one H100.
 The large gate uses the nested signed XULDUD P2048 workload on eight H100s once
 all requested devices are externally idle. Both retain the AtomBit smooth-RMS
 fp32, float64 BFGS state, `FrechetCellFilter`, 6.0 A cutoff, 0.5 A skin,
-`fmax=0.01 eV/A`, and 3,000-step production contract.
+maximum resident batch size 256, `fmax=0.01 eV/A`, and 3,000-step production
+contract.
 
 Acceptance requires exact packaged-policy selection with no memory-probe model
 forwards, immutable output coverage and ordering, finite endpoints, at least
