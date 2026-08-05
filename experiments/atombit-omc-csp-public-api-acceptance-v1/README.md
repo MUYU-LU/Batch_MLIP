@@ -5,9 +5,9 @@ It invokes `AtomBitBatchCalculator.from_checkpoint(...)` and
 `optimize_pool(...)` rather than benchmark-only loaders or manifest execution
 internals.
 
-The small gate uses the signed, unique XULDUD P64 test workload on one H100.
-The large gate uses the nested signed XULDUD P2048 workload on eight H100s once
-all requested devices are externally idle. Both retain the AtomBit smooth-RMS
+The small gate uses the signed, unique `rof-c` P64 test workload on one H100.
+The large gate uses the nested signed `rof-c` P2048 workload on the six H100s
+that were externally idle. Both retain the AtomBit smooth-RMS
 fp32, float64 BFGS state, `FrechetCellFilter`, 6.0 A cutoff, 0.5 A skin,
 maximum resident batch size 256, `fmax=0.01 eV/A`, and 3,000-step production
 contract.
@@ -23,7 +23,9 @@ forwards, immutable output coverage and ordering, finite endpoints, at least
 reserved memory within the frozen 91% runtime high-water bound, and explicit
 worker shutdown acknowledgements.
 
-Full relaxed structures and run JSON remain outside Git. A compact signed
-summary is committed after both gates complete.
+Full relaxed structures and run JSON remain outside Git. The compact committed
+summary binds their hashes and the prior eight-H100 P6000/MPS16 reference.
 
-Status: planned.
+Status: accepted. Both P64/G1 and P2048/G6 gates passed with 100% convergence,
+exact input ordering, exact policy-v2 selection, zero probe forwards, and peak
+reserved fractions of 11.76% and 58.35%, respectively.

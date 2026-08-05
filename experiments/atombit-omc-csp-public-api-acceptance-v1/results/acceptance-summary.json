@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "status": "pass",
+  "decision": "accept_atombit_omc_csp_public_api_v1",
+  "implementation_commit": "f740ecf2865c144cd0eecf780304f3c7364fd973",
+  "capacity_policy": {
+    "policy_id": "omc-csp-atombit-h100-capacity-v2",
+    "policy_sha256": "5cb7cf62e4846c62b629047f570a55a5d5de5c64414f1234cf1fdb82e8d8cc0f",
+    "minimum_memory_growth_margin": 1.3,
+    "planning_memory_fraction": 0.85
+  },
+  "small_pool": {
+    "workload_id": "OPT-OMC-SCHED-E1-TEST-ROF-C-P64-INTRA-WIDE-v2",
+    "manifest_sha256": "181b3a656d44df6b99f34a64f79003da4cf03d7ebc78d1d220c529eaadc5fd03",
+    "pool_size": 64,
+    "gpu_count": 1,
+    "converged_count": 64,
+    "full_script_seconds": 229.64772629999788,
+    "production_run_seconds": 220.13101299694972,
+    "peak_reserved_bytes": 9995026432,
+    "peak_reserved_fraction": 0.1175638070717738,
+    "endpoint_sha256": "648a7085a1b8b64611bdef642ebe65b2b7dcea5869233d8a3d1d432b757fd425",
+    "relaxed_structures_sha256": "f79c2b7cb3e0832cfaa346e52d309bb4f8579dc7681a8227e8736c45cccaed50",
+    "external_result_sha256": "8513f223a02fbd5df63ba0658786bbbc29222a4e3eb79be4c65f28261a592c9b",
+    "all_gates_passed": true
+  },
+  "large_pool": {
+    "workload_id": "OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2",
+    "manifest_sha256": "a8aa05178634172b53197afee1325e5a37e2e9fbc2921aaa332a4c4209627da8",
+    "pool_size": 2048,
+    "gpu_count": 6,
+    "execution_chunk_count": 12,
+    "converged_count": 2048,
+    "full_script_seconds": 960.3954277649755,
+    "optimization_and_shutdown_seconds": 804.1480938700261,
+    "production_run_seconds": 793.5481809310149,
+    "peak_reserved_bytes": 49606033408,
+    "peak_reserved_fraction": 0.5834776106747246,
+    "endpoint_sha256": "48ef8fec876ed5eb4da5d595db67b96785a99ecc5affbe3979708eced1c4049e",
+    "relaxed_structures_sha256": "af5b121729d4d99b740a3ebeee3cfe5a1a17a7ec1129266c90b8b3cefff111db",
+    "external_result_sha256": "b37f7e49bd5fcb883dbcf131b0b5f9f31b84a499f29282213a7b4a1e1ca2a8e4",
+    "all_gates_passed": true
+  },
+  "refinement": {
+    "workload_id": "OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2",
+    "baseline_policy_id": "omc-csp-atombit-h100-capacity-v1",
+    "numerical_gates_passed": true,
+    "memory_gate_passed": false,
+    "observed_to_predicted_ratio": 1.1421791564589916,
+    "rejected_peak_reserved_fraction": 0.9693710638494685,
+    "external_result_sha256": "927c87c7fafdb089759015d82c50765bbd58e0961addbe465c2b8fb30aa03a38"
+  },
+  "accepted_existing_mps16_reference": {
+    "workload_id": "OPT-OMC-STRUCTURES-P6000-INTRA-WIDE-v1",
+    "gpu_count": 8,
+    "automatic_execution_seconds": 2245.0894825949945,
+    "mps16_makespan_seconds": 4706.150795802998,
+    "speedup_over_mps16": 2.0961974265557455,
+    "scope": "Frozen engine comparison; not rerun under the six-GPU public-API gate."
+  },
+  "limitations": [
+    "GPU 2 and GPU 3 were externally occupied, so the new public-API large-pool gate used six H100s.",
+    "The frozen engine retains separate prior eight-H100 P6000 evidence against MPS16.",
+    "The acceptance gate validates scheduling and endpoints, not identity of local minima versus MPS or serial ASE."
+  ]
+}

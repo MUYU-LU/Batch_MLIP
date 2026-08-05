@@ -1,5 +1,18 @@
 # Changelog
 
+## AtomBit OMC-CSP public API v1
+
+- Add `AtomBitBatchCalculator.from_checkpoint(...)` and a complete
+  `optimize_pool(...)` production example for smooth-RMS AtomBit checkpoints.
+- Add signed AtomBit/H100 capacity policy v2 with an automatically applied 1.30
+  growth margin after a held-out XULDUD pool exposed a 14.2% underprediction.
+- Accept the one-call path on unique `rof-c` P64/G1 and P2048/G6 pools with
+  100% convergence, exact order, zero probe forwards, and 11.76%/58.35% peak
+  reserved-memory fractions.
+- Retain the frozen eight-H100 P6000 comparison at 2.096x over MPS16 as the
+  performance reference; do not reinterpret the six-GPU acceptance as a new
+  MPS comparison.
+
 ## OMC-CSP Scheduler v1 freeze validation
 
 - Add a signed multi-manifest sequence benchmark for persistent OMC-CSP

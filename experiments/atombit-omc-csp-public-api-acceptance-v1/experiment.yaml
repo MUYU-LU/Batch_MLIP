@@ -1,23 +1,27 @@
 schema_version: 1
 id: atombit-omc-csp-public-api-acceptance-v1
 date: 2026-08-05
-status: planned
+status: complete
 
 question: >-
   Does the one-call optimize_pool interface preserve the frozen AtomBit
   OMC-CSP contract on signed small- and large-pool held-out workloads?
 
 workloads:
-  single_gpu:
-    id: OPT-OMC-SCHED-E1-TEST-XULDUD-P64-INTRA-WIDE-v2
-    pool_size: 64
-    manifest_sha256: a7b7e2e3eb54356b40c2186c0893e0bd5dee961b86c088c3b7e9c39c17860798
-  multi_gpu:
+  refinement:
     id: OPT-OMC-SCHED-E1-TEST-XULDUD-P2048-INTRA-WIDE-v2
     pool_size: 2048
     manifest_sha256: ec9d6f04a1f9674c433336c423fa3c489241315caf3d4bb504750224fbac29dd
+  single_gpu:
+    id: OPT-OMC-SCHED-E1-TEST-ROF-C-P64-INTRA-WIDE-v2
+    pool_size: 64
+    manifest_sha256: 181b3a656d44df6b99f34a64f79003da4cf03d7ebc78d1d220c529eaadc5fd03
+  multi_gpu:
+    id: OPT-OMC-SCHED-E1-TEST-ROF-C-P2048-INTRA-WIDE-v2
+    pool_size: 2048
+    manifest_sha256: a8aa05178634172b53197afee1325e5a37e2e9fbc2921aaa332a4c4209627da8
   scheduler_split: test
-  family: XULDUD
+  acceptance_family: rof-c
   synthetic_repetition: false
 
 contract:
@@ -40,7 +44,8 @@ contract:
 hardware:
   gpu_model: NVIDIA H100 80GB HBM3
   single_gpu_indices: [0]
-  target_multi_gpu_indices: [0, 1, 2, 3, 4, 5, 6, 7]
+  actual_multi_gpu_indices: [0, 1, 4, 5, 6, 7]
+  prior_engine_stress_gpu_count: 8
   planning_memory_fraction: 0.85
   accepted_runtime_peak_reserved_fraction: 0.91
 
@@ -57,6 +62,7 @@ acceptance_gates:
 
 artifacts:
   remote_root: /public/home/lmy/Batch_imple_project/atombit_omc_csp_public_api_acceptance_v1
-  single_gpu_result: null
-  multi_gpu_result: null
+  single_gpu_result_sha256: 8513f223a02fbd5df63ba0658786bbbc29222a4e3eb79be4c65f28261a592c9b
+  multi_gpu_result_sha256: b37f7e49bd5fcb883dbcf131b0b5f9f31b84a499f29282213a7b4a1e1ca2a8e4
+  committed_summary: results/acceptance-summary.json
   relaxed_structures: external

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import hashlib
+import json
 from pathlib import Path
 
 import yaml
@@ -94,3 +95,24 @@ def test_chemical_transfer_protocol_uses_parent_level_splits():
     assert not protocol["planner_modes"]["zero_shot_transfer"][
         "separate_timing_pilot"
     ]
+
+
+def test_atombit_public_api_acceptance_binds_capacity_refinement():
+    path = Path(
+        "experiments/atombit-omc-csp-public-api-acceptance-v1/"
+        "results/acceptance-summary.json"
+    )
+    summary = json.loads(path.read_text(encoding="utf-8"))
+
+    assert summary["status"] == "pass"
+    assert summary["decision"] == "accept_atombit_omc_csp_public_api_v1"
+    assert summary["capacity_policy"]["policy_id"] == (
+        "omc-csp-atombit-h100-capacity-v2"
+    )
+    assert summary["capacity_policy"]["minimum_memory_growth_margin"] == 1.3
+    assert summary["small_pool"]["all_gates_passed"]
+    assert summary["large_pool"]["all_gates_passed"]
+    assert summary["small_pool"]["converged_count"] == 64
+    assert summary["large_pool"]["converged_count"] == 2048
+    assert summary["refinement"]["numerical_gates_passed"]
+    assert not summary["refinement"]["memory_gate_passed"]
